@@ -1,0 +1,17 @@
+#linkStyle {
+  width: 100%;
+}
+
+#linkStyle a.active {
+  color: white;
+  background-color: #8c383e;
+}
+
+.nav-link {
+  display: block;
+  text-decoration: none;
+  color: #1e1e1e;
+  border-radius: 5px;
+  margin: 0px 5px 0px 5px;
+  padding: 5px 0 5px 25px;
+}

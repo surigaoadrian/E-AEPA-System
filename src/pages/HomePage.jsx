@@ -1,13 +1,20 @@
 import React from "react";
 import NavBar from "../components/NavBar";
 import SideBar from "../components/SideBar";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Showcase from "../components/Showcase";
 
 function HomePage() {
   return (
-    <div>
+    <>
+      {/* Navbar Section*/}
       <NavBar />
-      <SideBar />
-    </div>
+      {/* Sidebar Section*/}
+      <div style={{ display: "flex" }}>
+        <SideBar />
+        <Showcase />
+      </div>
+    </>
   );
 }
 

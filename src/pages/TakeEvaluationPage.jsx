@@ -1,7 +1,7 @@
 import React from "react";
 
 function TakeEvaluationPage() {
-  return <div>TakeEvaluationPage</div>;
+  return <div>This is the take evaluation page</div>;
 }
 
 export default TakeEvaluationPage;

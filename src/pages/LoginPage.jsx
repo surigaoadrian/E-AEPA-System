@@ -65,18 +65,18 @@ function LoginPage() {
           <img style={{ width: "200px" }} src={logo} alt="e-aepa-logo" />
 
           {isForgottenBtn ? (
+            <ForgottenPassForm loginStyles={loginStyles} />
+          ) : (
             <LoginForm
               loginStyles={loginStyles}
               handleInputPassword={handleInputPassword}
               handleShowPassword={handleShowPassword}
               showPassword={showPassword}
             />
-          ) : (
-            <ForgottenPassForm loginStyles={loginStyles} />
           )}
 
           <button style={forgotPassBtn} onClick={handleForgotPassword}>
-            {isForgottenBtn ? "Forgot Password?" : "Back to Login"}
+            {isForgottenBtn ? "Back to Login" : "Forgot Password?"}
           </button>
         </CardContent>
       </Card>

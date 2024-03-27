@@ -12,10 +12,10 @@ function NavBar() {
     backgroundColor: "white",
     display: "flex",
     alignItems: "center",
-    borderImage:
-      "linear-gradient(to right, #8C383E 15%, #F8C702 15%, #F8C702 100%)",
-    borderImageSlice: 1,
-    borderImageWidth: "0px 0px 4px 0px",
+    // borderImage:
+    //   "linear-gradient(to right, #8C383E 15%, #F8C702 15%, #F8C702 100%)",
+    // borderImageSlice: 1,
+    // borderImageWidth: "0px 0px 4px 0px",
   };
 
   return (
