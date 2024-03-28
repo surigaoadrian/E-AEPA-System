@@ -1,15 +1,12 @@
 import React from "react";
 import NavBar from "../components/NavBar";
 import SideBar from "../components/SideBar";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Showcase from "../components/Showcase";
 
-function HomePage() {
+function Layout() {
   return (
     <>
-      {/* Navbar Section*/}
       <NavBar />
-      {/* Sidebar Section*/}
       <div style={{ display: "flex" }}>
         <SideBar />
         <Showcase />
@@ -18,4 +15,4 @@ function HomePage() {
   );
 }
 
-export default HomePage;
+export default Layout;

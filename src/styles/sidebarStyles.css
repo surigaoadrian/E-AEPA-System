@@ -15,3 +15,7 @@
   margin: 0px 5px 0px 5px;
   padding: 5px 0 5px 25px;
 }
+
+.nav-link:hover {
+  background-color: #e0e0e0;
+}

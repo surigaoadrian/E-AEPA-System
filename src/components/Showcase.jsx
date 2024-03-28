@@ -1,9 +1,5 @@
 import React from "react";
-import { Route, Routes } from "react-router-dom";
-import ViewProfilePage from "../pages/ViewProfilePage";
-import HomeShowcase from "../pages/HomeShowcase";
-import TakeEvaluationPage from "../pages/TakeEvaluationPage";
-import ViewRatingsPage from "../pages/ViewRatingsPage";
+import { Outlet } from "react-router-dom";
 
 function Showcase() {
   const showcaseStyles = {
@@ -15,12 +11,7 @@ function Showcase() {
 
   return (
     <div style={showcaseStyles}>
-      <Routes>
-        <Route path="/" element={<HomeShowcase />} />
-        <Route path="/viewProfile" element={<ViewProfilePage />} />
-        <Route path="/takeEvaluation" element={<TakeEvaluationPage />} />
-        <Route path="/viewRatings" element={<ViewRatingsPage />} />
-      </Routes>
+      <Outlet />
     </div>
   );
 }

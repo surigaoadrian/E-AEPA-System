@@ -7,7 +7,7 @@ function LoginForm(props) {
       action=""
       style={{
         width: "90%",
-        minHeight: "200px",
+        minHeight: "190px",
         marginTop: "20px",
         display: "flex",
         flexDirection: "column",

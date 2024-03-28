@@ -1,9 +1,12 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faBuildingUser,
   faFileLines,
   faHouse,
   faStar,
   faUser,
+  faUserTie,
+  faUsers,
 } from "@fortawesome/free-solid-svg-icons";
 
 export const SideBarData = [
@@ -30,5 +33,25 @@ export const SideBarData = [
     path: "/viewRatings",
     role: "employee",
     icon: <FontAwesomeIcon icon={faStar} style={{ fontSize: "15px" }} />,
+  },
+  {
+    title: "Manage Account",
+    path: "/manageAccount",
+    role: "admin",
+    icon: <FontAwesomeIcon icon={faUsers} style={{ fontSize: "15px" }} />,
+  },
+  {
+    title: "Manage Offices",
+    path: "/manageOffices",
+    role: "admin",
+    icon: (
+      <FontAwesomeIcon icon={faBuildingUser} style={{ fontSize: "15px" }} />
+    ),
+  },
+  {
+    title: "Manage Employee",
+    path: "/manageEmployee",
+    role: "admin",
+    icon: <FontAwesomeIcon icon={faUserTie} style={{ fontSize: "15px" }} />,
   },
 ];

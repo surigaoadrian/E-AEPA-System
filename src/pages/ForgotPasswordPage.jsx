@@ -1,28 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import "../index.css";
-import LoginForm from "../components/LoginForm";
 import logo from "../assets/e-AEPA-logo.png";
 import { NavLink } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeftLong } from "@fortawesome/free-solid-svg-icons";
+import ForgottenPassForm from "../components/ForgottenPassForm";
 
-function LoginPage() {
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [isForgottenBtn, setIsForgottenBtn] = useState(false);
-
-  const handleInputPassword = (e) => {
-    setPassword(e.target.value);
-  };
-
-  const handleShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const handleForgotPassword = () => {
-    setIsForgottenBtn(!isForgottenBtn);
-  };
-
+function ForgotPasswordPage() {
   const centerDiv = {
     minHeight: "95vh",
     display: "flex",
@@ -39,7 +24,7 @@ function LoginPage() {
     marginBottom: "10px",
   };
 
-  const forgotPassBtn = {
+  const backToLoginBtn = {
     textDecoration: "none",
     background: "none",
     fontFamily: "poppins",
@@ -65,15 +50,16 @@ function LoginPage() {
         >
           <img style={{ width: "200px" }} src={logo} alt="e-aepa-logo" />
 
-          <LoginForm
-            loginStyles={loginStyles}
-            handleInputPassword={handleInputPassword}
-            handleShowPassword={handleShowPassword}
-            showPassword={showPassword}
-          />
+          <ForgottenPassForm loginStyles={loginStyles} />
 
-          <NavLink style={forgotPassBtn} to={"/forgotPassword"}>
-            Forgot Password?
+          <NavLink style={backToLoginBtn} to={"/login"}>
+            <span>
+              <FontAwesomeIcon
+                icon={faArrowLeftLong}
+                style={{ fontSize: "15px", marginRight: "10px" }}
+              />
+            </span>
+            Back to Login
           </NavLink>
         </CardContent>
       </Card>
@@ -81,4 +67,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default ForgotPasswordPage;

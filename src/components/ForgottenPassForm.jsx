@@ -6,7 +6,7 @@ function ForgottenPassForm(props) {
   return (
     <div
       style={{
-        height: "240px",
+        height: "215px",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -38,8 +38,7 @@ function ForgottenPassForm(props) {
         variant="body2"
         gutterBottom
       >
-        Enter the email address associated to this account and we will send you
-        a code to reset your password.
+        Enter your institutional email below to receive a password reset link.
       </Typography>
 
       <form
