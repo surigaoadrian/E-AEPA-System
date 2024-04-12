@@ -1,15 +1,24 @@
 import React, { useState } from "react";
+import axios from "axios";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import "../index.css";
 import LoginForm from "../components/LoginForm";
 import logo from "../assets/e-AEPA-logo.png";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 function LoginPage() {
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isForgottenBtn, setIsForgottenBtn] = useState(false);
+  const navigate = useNavigate();
+  // const signIn = useSignIn();
+
+  const handleInputUsername = (e) => {
+    setUsername(e.target.value);
+  };
 
   const handleInputPassword = (e) => {
     setPassword(e.target.value);
@@ -21,6 +30,31 @@ function LoginPage() {
 
   const handleForgotPassword = () => {
     setIsForgottenBtn(!isForgottenBtn);
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post("http://localhost:8080/login", {
+        username: username,
+        password: password,
+      });
+      // // Authenticate the token using isAuthenticated function
+
+      const token = response.data.token;
+      localStorage.setItem("token", token);
+
+      const decodedToken = jwtDecode(token);
+      const role = decodedToken.role;
+      const userID = decodedToken.userID;
+
+      sessionStorage.setItem("userRole", role);
+      sessionStorage.setItem("userID", userID);
+
+      navigate("/");
+    } catch (error) {
+      console.error("Login failed", error);
+    }
   };
 
   const centerDiv = {
@@ -67,9 +101,11 @@ function LoginPage() {
 
           <LoginForm
             loginStyles={loginStyles}
+            handleInputUsername={handleInputUsername}
             handleInputPassword={handleInputPassword}
             handleShowPassword={handleShowPassword}
             showPassword={showPassword}
+            handleLogin={handleLogin}
           />
 
           <NavLink style={forgotPassBtn} to={"/forgotPassword"}>

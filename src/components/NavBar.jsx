@@ -1,11 +1,71 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import logo from "../assets/e-AEPA-logo.png";
 import profile from "../assets/rick.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell } from "@fortawesome/free-solid-svg-icons";
+import { faBell, faCaretDown } from "@fortawesome/free-solid-svg-icons";
 import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function NavBar() {
+  const [loggedUserData, setLoggedUserData] = useState({});
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const navigate = useNavigate();
+
+  const role = sessionStorage.getItem("userRole");
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  //fetch user
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userID = sessionStorage.getItem("userID");
+
+        const response = await axios.get(
+          `http://localhost:8080/user/getUser/${userID}`
+        );
+
+        setLoggedUserData(response.data);
+        console.log(userID);
+        console.log(loggedUserData);
+      } catch (error) {
+        if (error.response) {
+          //not in 200 response range
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else {
+          console.log(`Error: ${error.message}`);
+        }
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+
+    sessionStorage.removeItem("userRole");
+    sessionStorage.removeItem("userID");
+
+    navigate("/login");
+  };
+
+  const handleViewProfile = () => {
+    navigate("/viewProfile");
+  };
+
   const navBarStyle = {
     height: "8vh",
     width: "100%",
@@ -41,7 +101,7 @@ function NavBar() {
         className="nav-profile"
         style={{
           display: "flex",
-          marginRight: "20px",
+          marginRight: "0px",
         }}
       >
         <div
@@ -65,7 +125,7 @@ function NavBar() {
             variant="h6"
             gutterBottom
           >
-            John Doe
+            {loggedUserData.fName} {loggedUserData.lName}
           </Typography>
           <Typography
             sx={{
@@ -76,7 +136,9 @@ function NavBar() {
             variant="h6"
             gutterBottom
           >
-            MIS-Staff
+            {loggedUserData.role === "ADMIN"
+              ? "Admin"
+              : `${loggedUserData.dept} - ${loggedUserData.position}`}
           </Typography>
         </div>
         <div className="nav-profile-picture">
@@ -96,6 +158,48 @@ function NavBar() {
             />
           </div>
         </div>
+      </div>
+      <div className="nav-logout">
+        <Button
+          variant="text"
+          size="tiny"
+          id="basic-button"
+          aria-controls={open ? "basic-menu" : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? "true" : undefined}
+          onClick={handleClick}
+          sx={{
+            minWidth: 27,
+            width: 27,
+            padding: 0,
+            minHeight: "auto",
+            height: 25,
+            borderRadius: "50%",
+            margin: "0px 10px 0px 10px",
+          }}
+        >
+          <FontAwesomeIcon
+            icon={faCaretDown}
+            style={{
+              fontSize: "18px",
+              color: "#8C383E",
+            }}
+          />
+        </Button>
+        <Menu
+          id="basic-menu"
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+          MenuListProps={{
+            "aria-labelledby": "basic-button",
+          }}
+        >
+          {role === "EMPLOYEE" ? (
+            <MenuItem onClick={handleViewProfile}>View Profile</MenuItem>
+          ) : null}
+          <MenuItem onClick={handleLogout}>Logout</MenuItem>
+        </Menu>
       </div>
     </div>
   );

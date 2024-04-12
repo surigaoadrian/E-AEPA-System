@@ -1,9 +1,24 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "../styles/sidebarStyles.css";
 import { NavLink } from "react-router-dom";
 import { SideBarData } from "../data/sideBarData";
 
 function SideBar() {
+  const [userRole, setUserRole] = useState("");
+  const [filteredSideBarData, setFilteredSideBarData] = useState([]);
+
+  useEffect(() => {
+    const role = sessionStorage.getItem("userRole");
+    setUserRole(role);
+
+    const filteredData = SideBarData.filter(
+      (item) => item.role === role || item.role === "ALL"
+    );
+    setFilteredSideBarData(filteredData);
+  }, []);
+
+  console.log(filteredSideBarData);
+
   const sidebarStyles = {
     height: "92vh",
     width: "229px",
@@ -15,7 +30,7 @@ function SideBar() {
   return (
     <div>
       <div style={sidebarStyles}>
-        {SideBarData.map((item, index) => {
+        {filteredSideBarData.map((item, index) => {
           return (
             <div key={index} style={{ paddingTop: "5px" }}>
               <div id="linkStyle">

@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 function LoginForm(props) {
   return (
     <form
-      action=""
+      onSubmit={props.handleLogin}
       style={{
         width: "90%",
         minHeight: "190px",
@@ -14,7 +14,12 @@ function LoginForm(props) {
         alignItems: "center",
       }}
     >
-      <input style={props.loginStyles} type="text" placeholder="ID Number" />
+      <input
+        onChange={props.handleInputUsername}
+        style={props.loginStyles}
+        type="text"
+        placeholder="Username"
+      />
 
       <input
         style={props.loginStyles}
@@ -49,6 +54,7 @@ function LoginForm(props) {
       </div>
 
       <Button
+        type="submit"
         fullWidth
         variant="contained"
         size="small"
