@@ -1,13 +1,43 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Button from "@mui/material/Button";
+import { borderRadius, display, textAlign } from "@mui/system";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
 function LoginForm(props) {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (props.message) {
+      setVisible(true);
+      const timer = setTimeout(() => {
+        setVisible(false);
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [props.message]);
+
+  const messageStyle = {
+    display: "flex",
+    backgroundColor: "#FEDCE0",
+    fontSize: "13px",
+    color: "#8C383E",
+    marginTop: "0px",
+    marginBottom: "0px",
+    width: "100%",
+    height: "30px",
+    alignItems: "center",
+    padding: "10px",
+    borderRadius: "3px",
+  };
+
   return (
     <form
       onSubmit={props.handleLogin}
       style={{
         width: "90%",
-        minHeight: "190px",
+        minHeight: "90px",
         marginTop: "20px",
         display: "flex",
         flexDirection: "column",
@@ -21,37 +51,28 @@ function LoginForm(props) {
         placeholder="Username"
       />
 
-      <input
-        style={props.loginStyles}
-        type={props.showPassword ? "text" : "password"}
-        placeholder="Password"
-        onChange={props.handleInputPassword}
-      />
-
-      <div
-        style={{
-          alignSelf: "flex-start",
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
+      <div style={{ position: "relative", width: "100%" }}>
         <input
-          id="showpass"
-          type="checkbox"
-          onChange={props.handleShowPassword}
+          style={{ ...props.loginStyles, paddingRight: "30px" }}
+          type={props.showPassword ? "text" : "password"}
+          placeholder="Password"
+          onChange={props.handleInputPassword}
         />
-        <label
-          htmlFor="showpass"
+        <FontAwesomeIcon
+          icon={props.showPassword ? faEyeSlash : faEye}
+          onClick={props.handleShowPassword}
           style={{
-            fontSize: "14px",
-            fontWeight: "400",
             color: "#636E72",
-            marginLeft: "5px",
+            position: "absolute",
+            right: "10px",
+            top: "40%",
+            transform: "translateY(-50%)",
+            cursor: "pointer",
           }}
-        >
-          Show Password
-        </label>
+        />
       </div>
+
+      {props.message && visible && <p style={messageStyle}>{props.message}</p>}
 
       <Button
         type="submit"
@@ -59,7 +80,7 @@ function LoginForm(props) {
         variant="contained"
         size="small"
         sx={{
-          marginTop: "20px",
+          marginTop: "10px",
           backgroundColor: "#8C383E",
           "&:hover": {
             backgroundColor: "#7C2828",

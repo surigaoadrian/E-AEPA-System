@@ -13,8 +13,8 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isForgottenBtn, setIsForgottenBtn] = useState(false);
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
-  // const signIn = useSignIn();
 
   const handleInputUsername = (e) => {
     setUsername(e.target.value);
@@ -34,12 +34,12 @@ function LoginPage() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setMessage("");
     try {
       const response = await axios.post("http://localhost:8080/login", {
         username: username,
         password: password,
       });
-      // // Authenticate the token using isAuthenticated function
 
       const token = response.data.token;
       localStorage.setItem("token", token);
@@ -53,6 +53,7 @@ function LoginPage() {
 
       navigate("/");
     } catch (error) {
+      setTimeout(() => setMessage("Invalid username or password."), 0);
       console.error("Login failed", error);
     }
   };
@@ -65,6 +66,7 @@ function LoginPage() {
   };
 
   const loginStyles = {
+    fontSize: "14px",
     width: "100%",
     backgroundColor: "#f1f2f6",
     border: "none",
@@ -74,6 +76,7 @@ function LoginPage() {
   };
 
   const forgotPassBtn = {
+    marginTop: "15px",
     textDecoration: "none",
     background: "none",
     fontFamily: "poppins",
@@ -88,16 +91,25 @@ function LoginPage() {
 
   return (
     <div style={centerDiv}>
-      <Card sx={{ width: "320px", height: "420px", borderRadius: "10px" }}>
+      <Card
+        sx={{
+          width: "320px",
+          minHeight: "410px",
+          borderRadius: "10px",
+        }}
+      >
         <CardContent
           sx={{
             display: "flex",
+            minHeight: "300px",
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
           }}
         >
-          <img style={{ width: "200px" }} src={logo} alt="e-aepa-logo" />
+          <div style={{ height: "80px" }}>
+            <img style={{ width: "195px" }} src={logo} alt="e-aepa-logo" />
+          </div>
 
           <LoginForm
             loginStyles={loginStyles}
@@ -106,6 +118,7 @@ function LoginPage() {
             handleShowPassword={handleShowPassword}
             showPassword={showPassword}
             handleLogin={handleLogin}
+            message={message}
           />
 
           <NavLink style={forgotPassBtn} to={"/forgotPassword"}>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 
-function ForgottenPassForm(props) {
+function ResetPassForm(props) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -22,7 +22,7 @@ function ForgottenPassForm(props) {
       props.messageInfo.type === "success" ? "#DFF0D8" : "#FEDCE0",
     fontSize: "13px",
     color: props.messageInfo.type === "success" ? "#6ab04c" : "#8C383E",
-    marginTop: "3px",
+    marginBottom: "5px",
     width: "100%",
     minheight: "30px",
     alignItems: "center",
@@ -33,7 +33,8 @@ function ForgottenPassForm(props) {
   return (
     <div
       style={{
-        minHeight: "200px",
+        height: "215px",
+        width: "290px",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -51,7 +52,7 @@ function ForgottenPassForm(props) {
         variant="body2"
         gutterBottom
       >
-        Forgot Password
+        Reset Password
       </Typography>
       <Typography
         sx={{
@@ -65,11 +66,11 @@ function ForgottenPassForm(props) {
         variant="body2"
         gutterBottom
       >
-        Enter your institutional email below to receive a password reset link.
+        Set your new password.
       </Typography>
 
       <form
-        onSubmit={props.handleSubmit}
+        onSubmit={props.handleResetPassword}
         style={{
           width: "90%",
           marginTop: "20px",
@@ -80,30 +81,28 @@ function ForgottenPassForm(props) {
       >
         <input
           style={props.loginStyles}
-          onChange={props.handleEmail}
-          type="email"
-          placeholder="Institutional Email"
+          type="password"
+          placeholder="Password"
+          onChange={props.handleNewPassword}
         />
-
-        <div
-          style={{
-            alignSelf: "flex-start",
-            display: "flex",
-            alignItems: "center",
-          }}
-        ></div>
+        <input
+          style={props.loginStyles}
+          type="password"
+          placeholder="Confirm Password"
+          onChange={props.handleConfirmPassword}
+        />
 
         {props.messageInfo.message && visible && (
           <p style={messageStyle}>{props.messageInfo.message}</p>
         )}
 
         <Button
-          type="submit"
           fullWidth
           variant="contained"
           size="small"
+          type="submit"
           sx={{
-            marginTop: "8px",
+            marginTop: "4px",
             backgroundColor: "#8C383E",
             "&:hover": {
               backgroundColor: "#7C2828",
@@ -111,11 +110,11 @@ function ForgottenPassForm(props) {
             fontFamily: "poppins",
           }}
         >
-          Send
+          Reset Password
         </Button>
       </form>
     </div>
   );
 }
 
-export default ForgottenPassForm;
+export default ResetPassForm;

@@ -13,6 +13,7 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import NotAuthorized from "./pages/NotAuthorized";
 import PrivateRoute from "./components/PrivateRoute";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 function App() {
   return (
@@ -83,6 +84,7 @@ function App() {
       </Route>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/forgotPassword" element={<ForgotPasswordPage />} />
+      <Route path="/resetPassword/:token" element={<ResetPasswordPage />} />
       <Route path="/notAuthorized" element={<NotAuthorized />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>

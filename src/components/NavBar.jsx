@@ -117,7 +117,7 @@ function NavBar() {
           <Typography
             sx={{
               fontFamily: "poppins",
-              fontWeight: 400,
+              fontWeight: 500,
               fontSize: "11px",
               color: "#8C383E",
               marginBottom: "0px",
@@ -130,7 +130,7 @@ function NavBar() {
           <Typography
             sx={{
               fontFamily: "poppins",
-              fontWeight: 400,
+              fontWeight: 500,
               fontSize: "10px",
             }}
             variant="h6"
