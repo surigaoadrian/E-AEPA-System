@@ -43,7 +43,12 @@ public class SecurityConfig {
                                         "/user/getAllUser",
                                         "/user/getUser/**",
                                         "/auth/forgotPassword/**",
-                                        "/auth/resetPassword/**")
+                                        "/auth/resetPassword/**",
+                                        "department/getAllDepts",
+                                        "department/getDept/**",
+                                        "department/deleteDept/**",
+                                        "department/addDept",
+                                        "department/updateDept")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()
