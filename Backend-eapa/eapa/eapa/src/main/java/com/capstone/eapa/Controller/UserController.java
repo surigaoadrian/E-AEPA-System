@@ -3,6 +3,7 @@ package com.capstone.eapa.Controller;
 import com.capstone.eapa.Entity.UserEntity;
 import com.capstone.eapa.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,5 +43,20 @@ public class UserController {
         } else {
             return ResponseEntity.ok(userList);
         }
+    }
+
+    @DeleteMapping("/delete/{userID}")
+    public ResponseEntity<String> deleteUser(@PathVariable int userID) {
+        userServ.deleteUser(userID);
+        return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
+    }
+
+    @PutMapping("/editUser/{userID}")
+    public UserEntity editUserDetails(@PathVariable int userID, @RequestBody UserEntity newDetails) {
+        UserEntity user = userServ.editUserDetails(userID, newDetails);
+        if(user == null){
+            throw new RuntimeException("User not found with id: " + userID);
+        }
+        return user;
     }
 }

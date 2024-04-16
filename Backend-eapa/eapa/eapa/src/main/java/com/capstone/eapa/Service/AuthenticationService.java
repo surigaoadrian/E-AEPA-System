@@ -42,6 +42,7 @@ public class AuthenticationService {
         user.setSignature((request.getSignature()));
         user.setDateStarted(request.getDateStarted());
         user.setContactNum(request.getContactNum());
+        user.setProbeStatus(request.getProbeStatus()); //ge add nko para sa status if 5th or 3rd month ba ang employee
         user.setProbationary(request.isProbationary());
 
         user = userRepo.save(user);

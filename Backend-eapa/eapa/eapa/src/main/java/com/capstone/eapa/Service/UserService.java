@@ -4,6 +4,8 @@ import com.capstone.eapa.Entity.PasswordResetToken;
 import com.capstone.eapa.Entity.UserEntity;
 import com.capstone.eapa.Repository.PasswordResetTokenRepository;
 import com.capstone.eapa.Repository.UserRepository;
+
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,7 +30,7 @@ public class UserService implements UserDetailsService {
     private PasswordEncoder passwordEncoder;
 
     public List<UserEntity> getAllUser(){
-        return userRepo.findAll();
+        return userRepo.findAllByIsDeleted(0);
     }
 
     public UserEntity getUser(int userID){
@@ -92,5 +94,42 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    //this method deletes a user account
+    public void deleteUser(int userID) {
+        UserEntity user = userRepo.findByUserID(userID);
+        if (user == null) {
+            throw new EntityNotFoundException("User not found with id: " + userID);
+        }
+        // Mark the user as deleted
+        user.setIsDeleted(1);
+        userRepo.save(user);
+    }
+
+    //this method edits user details
+    public UserEntity editUserDetails(int userID, UserEntity newUserDetails){
+        UserEntity user = userRepo.findByUserID(userID);
+        if(user != null){
+
+            if(!newUserDetails.getUsername().equals(user.getUsername())){
+                if(userRepo.existsByUsernameAndIsDeleted(newUserDetails.getUsername(),0)){
+                    throw new RuntimeException("Username already exists");
+                }
+            }
+            user.setEmpStatus(newUserDetails.getEmpStatus());
+            user.setProbeStatus(newUserDetails.getProbeStatus());
+            user.setDateStarted(newUserDetails.getDateStarted());
+            user.setfName(newUserDetails.getfName());
+            user.setmName(newUserDetails.getmName());
+            user.setlName(newUserDetails.getlName());
+            user.setPassword(newUserDetails.getPassword());
+            user.setWorkEmail(newUserDetails.getEmpStatus());
+            user.setUsername(newUserDetails.getUsername());
+
+            return userRepo.save(user);
+        }else{
+            throw new RuntimeException("User not found");
+        }
     }
 }
