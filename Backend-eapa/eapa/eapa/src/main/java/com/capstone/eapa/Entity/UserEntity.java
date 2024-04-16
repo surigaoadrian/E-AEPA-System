@@ -47,6 +47,8 @@ public class UserEntity implements UserDetails {
     @Lob
     private Blob signature;
     private boolean isProbationary;
+    @Column (name = "Probationary Status")
+    private String probeStatus;
     private int isDeleted = 0;
 
     public UserEntity() {
@@ -232,4 +234,14 @@ public class UserEntity implements UserDetails {
     public void setProbationary(boolean probationary) {
         isProbationary = probationary;
     }
+
+    public String getProbeStatus() {
+        return probeStatus;
+    }
+
+    public void setProbeStatus(String probeStatus) {
+        this.probeStatus = probeStatus;
+    }
+
+    
 }
