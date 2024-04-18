@@ -13,7 +13,6 @@ import TableHead from '@mui/material/TableHead';
 import EditNoteTwoToneIcon from '@mui/icons-material/EditNoteTwoTone';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import TableRow from '@mui/material/TableRow';
-import ViewHeadlineOutlinedIcon from '@mui/icons-material/ViewHeadlineOutlined';
 
 
 const CustomAlert = ({ open, onClose, severity, message }) => {
@@ -38,19 +37,15 @@ const capitalizeFirstLetter = (string) => {
 
 function ManageAccount() {
 
-  const [openRegistration, setOpenRegistration] = React.useState(false);
-  const [openEdit, setOpenEdit] = React.useState(false);
-  const [openDelete, setOpenDelete] = React.useState(false);
-  const [employStatus, setEmployStatus] = React.useState('');
+  const [openRegistrationDialog, setOpenRegistrationDialog] = React.useState(false);
+  const [openEditDialog, setOpenEditDialog] = React.useState(false);
+  const [openDeleteDialog, setopenDeleteDialog] = React.useState(false);
+  const [empStatus, setempStatus] = React.useState('');
   const [probeStatus, setProbeStatus] = React.useState('');
   const [gender, setGender] = React.useState('');
-  const [dateStarted, setDateStarted] = React.useState('');
-  const [department, setDepartment] = React.useState('');
+  const [dept, setdept] = React.useState('');
   const [role, setRole] = React.useState('');
-  const [edit, setEdit] = React.useState(false);
-  const [del, setDel] = React.useState(false);
-
-  const [openDetails, setOpenDetails] = React.useState(false);
+  const [dateStarted, setDateStarted] = React.useState('');
   const [rows, setRows] = useState([]);
   const [selectedTab, setSelectedTab] = useState(0);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -95,96 +90,33 @@ function ManageAccount() {
     setErrorAlert({ open: true, message });
   };
 
-  const columnsEmployees = [
-    {
-      id: 'workID',
-      label: 'Work ID',
-      align: 'center',
-      minWidth: 150
-    },
-
-    {
-      id: 'role',
-      label: 'Employee Role',
-      minWidth: 170,
-      align: 'center',
-      format: (value) => value ? value.toLocaleString('en-US') : '',
-    },
-
-    {
-      id: 'name',
-      label: 'Name',
-      minWidth: 170,
-      align: 'center',
-      format: value => formatName(value),
-    },
-
-    {
-      id: 'username',
-      label: 'Username',
-      minWidth: 150,
-      align: 'center',
-      format: (value) => value ? value.toLocaleString('en-US') : ''
-    },
-
-    {
-      id: 'institutionalEmail',
-      label: 'Email',
-      minWidth: 150,
-      align: 'center',
-      format: (value) => value ? value.toLocaleString('en-US') : '',
-    },
-
-  ];
-
-  const columnsAdmins = [
-    {
-      id: 'workID',
-      label: 'Work ID',
-      align: 'center',
-      minWidth: 150
-    },
-
-    {
-      id: 'name',
-      label: 'Name',
-      minWidth: 170,
-      align: 'center',
-      format: (value) => value ? `${value.firstname} ${value.lastname}` : '',
-    },
-
-    {
-      id: 'username',
-      label: 'Username',
-      minWidth: 150,
-      align: 'center',
-      format: (value) => value ? value.toLocaleString('en-US') : ''
-    },
-
-    {
-      id: 'institutionalEmail',
-      label: 'Email',
-      minWidth: 170,
-      align: 'center'
-    },
-
-
-  ];
-
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
   };
-  const handleClickAddUser = () => {
-    setOpenRegistration(true);
+  const handleClickAddUserBtn = () => {
+    setOpenRegistrationDialog(true);
   }
 
-  const handleClickEdit = () => {
-    setOpenEdit(true);
-  }
-
-  const handleSaveEditBtn = async (userId) => {
+  const handleClickEditBtn = async (userID) => {
     try {
-      const response = await fetch(`http://localhost:8080/users/editUser/${userId}`, {
+      const response = await fetch(`http://localhost:8080/user/getUser/${userID}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch user data');
+      }
+      const userData = await response.json();
+      setSelectedUser(userData);
+      setOpenEditDialog(true);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  }
+
+  const handleSaveEditBtn = async (userID) => {
+    const selectedUser = rows.find(user => user.userID === userID);
+
+    console.log('Edit user:', userID);
+    try {
+      const response = await fetch(`http://localhost:8080/user/editUser/${userID}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -197,19 +129,23 @@ function ManageAccount() {
       const updateUser = await response.json();
       showSuccessAlert('User updated successfully');
       fetchData();
-      setOpenEdit(false);
+      setOpenEditDialog(false);
     } catch (error) {
       console.error('Error updating user:', error);
     }
   }
 
-  const handleClickDelete = () => {
-    setOpenDelete(true);
+  const handleClickDeleteBtn = (userID) => {
+    console.log("delete user:", userID);
+    const selectedUser = rows.find(user => user.userID === userID);
+    setSelectedUser(selectedUser);
+    setopenDeleteDialog(true);
   }
 
-  const handleDelete = async (userId) => {
+  const handleYesDelBtn = async (userID) => {
+    console.log('delete Yes user:', userID);
     try {
-      const response = await fetch(`http://localhost:8080/users/delete/${userId}`, {
+      const response = await fetch(`http://localhost:8080/user/delete/${userID}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -221,28 +157,17 @@ function ManageAccount() {
       // Optionally, you can handle success or update UI accordingly
       showSuccessAlert('User deleted successfully');
       fetchData();
-      setOpenDelete(false);
-      setOpenDetails(false);
+      setopenDeleteDialog(false);
     } catch (error) {
       console.error('Error deleting user:', error);
       // Optionally, you can show an error message to the user
     }
   };
 
-
-  const handleSeeDetails = (userId) => {
-    console.log('User ID:', userId);
-    console.log('Rows:', rows);
-    const selectedUser = rows.find(user => user.userID === userId);
-    setSelectedUser(selectedUser);
-    setOpenDetails(true);
-  };
-
-  const handleClickClose = () => {
-    setOpenRegistration(false);
-    setOpenDelete(false);
-    setOpenEdit(false);
-    setOpenDetails(false);
+  const handleClickCloseBtn = () => {
+    setOpenRegistrationDialog(false);
+    setopenDeleteDialog(false);
+    setOpenEditDialog(false);
 
   }
 
@@ -254,33 +179,33 @@ function ManageAccount() {
     try {
 
       const userData = {
-        employStatus,
+        empStatus,
         probeStatus,
         dateStarted: document.getElementById('dateStarted')?.value || '',
-        dateHired: document.getElementById('dateHired')?.value || '',
+        dateHired: document.getElementById('datehired')?.value || '',
         username: document.getElementById('username')?.value || '',
         workID: document.getElementById('workId')?.value || '',
-        firstname: firstName,
-        middlename: middleName,
-        lastname: lastName,
-        institutionalEmail: document.getElementById('email')?.value || '',
+        fName: firstName,
+        mName: middleName,
+        lName: lastName,
+        workEmail: document.getElementById('email')?.value || '',
         gender,
         password: document.getElementById('password')?.value || '',
         position: document.getElementById('position')?.value || '',
-        department,
+        dept,
         role,
       };
-      if (role === 'Admin') {
+      if (role === 'ADMIN') {
         userData.workID = document.getElementById('workId')?.value || '',
-          userData.institutionalEmail = document.getElementById('email')?.value || '';
+        userData.workEmail = document.getElementById('email')?.value || '';
         userData.username = document.getElementById('username')?.value || '';
         userData.password = document.getElementById('password')?.value || '';
-        userData.firstname = firstName,
-          userData.middlename = middleName,
-          userData.lastname = lastName
+        userData.fName = firstName,
+        userData.mName = middleName,
+        userData.lName = lastName
       }
 
-      const response = await fetch('http://localhost:8080/users/register', {
+      const response = await fetch('http://localhost:8080/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -291,7 +216,7 @@ function ManageAccount() {
       if (response.ok) {
         fetchData();
         showSuccessAlert('User registered successfully');
-        setOpenRegistration(false);
+        setOpenRegistrationDialog(false);
       } else {
         showErrorAlert('Failed to register user. User already exists.');
       }
@@ -304,7 +229,7 @@ function ManageAccount() {
 
   const fetchData = async () => {
     try {
-      const response = await fetch('http://localhost:8080/users/getAllEmployeeAccounts');
+      const response = await fetch('http://localhost:8080/user/getAllUser');
       if (!response.ok) {
         throw new Error('Failed to fetch data');
       }
@@ -312,18 +237,20 @@ function ManageAccount() {
       // Filter data based on selected tab
       const filteredData = data.filter(item => {
         if (selectedTab === 0) { // All Employees
-          return item.role !== 'Admin';
+          return item.role !== 'ADMIN';
         } else if (selectedTab === 1) { // All Admins
-          return item.role === 'Admin';
+          return item.role === 'ADMIN';
         }
       });
       // Process the data and set rows
       const processedData = filteredData.map(item => ({
         ...item,
-        name: `${item.firstname} ${item.lastname}`,
+        name: `${item.fName} ${item.lName}`,
         userID: item.userID
+
       }));
       setRows(processedData);
+
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -338,8 +265,8 @@ function ManageAccount() {
 
 
   const handleEmploymentStatus = (event) => {
-    setEmployStatus(event.target.value);
-    if (event.target.value !== 'probe') {
+    setempStatus(event.target.value);
+    if (event.target.value !== 'Probationary') {
       setProbeStatus('');
       setDateStarted('');
     }
@@ -350,14 +277,126 @@ function ManageAccount() {
 
   }
 
-  const handleDepartment = (event) => {
-    setDepartment(event.target.value);
+  const handledept = (event) => {
+    setdept(event.target.value);
 
   };
 
   const handleGender = (event) => {
     setGender(event.target.value);
   }
+
+  const columnsEmployees = [
+    {
+      id: 'workID',
+      label: 'ID Number',
+      align: 'center',
+      minWidth: 150
+    },
+
+    {
+      id: 'name',
+      label: 'Name',
+      minWidth: 170,
+      align: 'center',
+      format: value => formatName(value),
+    },
+
+
+    {
+      id: 'workEmail',
+      label: 'Email',
+      minWidth: 150,
+      align: 'center',
+      format: (value) => value ? value.toLocaleString('en-US') : '',
+    },
+
+    {
+      id: 'dept',
+      label: 'Department',
+      minWidth: 150,
+      align: 'center',
+      format: (value) => value ? value.toLocaleString('en-US') : ''
+    },
+
+    {
+      id: 'position',
+      label: 'Position',
+      minWidth: 150,
+      align: 'center',
+      format: (value) => value ? value.toLocaleString('en-US') : ''
+    },
+
+    {
+      id: 'actions',
+      label: 'Actions',
+      minWidth: 150,
+      align: 'center',
+      format: (value, row) => {
+
+        return (
+          <div>
+            <IconButton onClick={() => handleClickEditBtn(row.userID)}>
+
+              <EditNoteTwoToneIcon sx={{ fontSize: '3vh' }} />
+            </IconButton>
+            <IconButton color="error" onClick={() => handleClickDeleteBtn(row.userID)}>
+              <DeleteOutlineIcon />
+            </IconButton>
+          </div>
+        );
+      },
+    }
+
+  ];
+
+  const columnsAdmins = [
+    {
+      id: 'workID',
+      label: 'ID Number',
+      align: 'center',
+      minWidth: 150
+    },
+
+    {
+      id: 'name',
+      label: 'Name',
+      minWidth: 170,
+      align: 'center',
+      format: (value) => value ? `${value.fName} ${value.lName}` : '',
+    },
+
+    {
+      id: 'username',
+      label: 'Username',
+      minWidth: 150,
+      align: 'center',
+      format: (value) => value ? value.toLocaleString('en-US') : ''
+    },
+
+    {
+      id: 'workEmail',
+      label: 'Email',
+      minWidth: 170,
+      align: 'center'
+    },
+    {
+      id: 'actions',
+      label: 'Actions',
+      minWidth: 150,
+      align: 'center',
+      format: (value, row) => (
+        <div>
+          <IconButton onClick={() => handleClickEditBtn(row.userID)}>
+            <EditNoteTwoToneIcon sx={{ fontSize: '3vh' }} />
+          </IconButton>
+          <IconButton color="error" onClick={() => handleClickDeleteBtn(row.userID)}>
+            <DeleteOutlineIcon />
+          </IconButton>
+        </div>
+      ),
+    }
+  ];
 
 
   return <div>
@@ -396,8 +435,9 @@ function ManageAccount() {
           <Button
             variant="contained"
             sx={{
-              height: 33,
-              width: 120,
+              fontSize: '18px',
+              height: 45,
+              width: 145,
               mb: 4,
               fontFamily: 'Poppins',
               backgroundColor: '#8c383e',
@@ -411,7 +451,7 @@ function ManageAccount() {
               textTransform: 'none',
             }}
             startIcon={<AddCircleIcon />}
-            onClick={handleClickAddUser}
+            onClick={handleClickAddUserBtn}
           >
             Add User
           </Button>
@@ -435,7 +475,7 @@ function ManageAccount() {
 
           <TableContainer sx={{ borderRadius: '10px 10px 0 0 ', maxHeight: '100%' }}>
             <Table stickyHeader aria-label="sticky table" size="small">
-              <TableHead >
+              <TableHead sx={{ height: '5vh' }} >
                 <TableRow>
                   {(selectedTab === 0 ? columnsEmployees : columnsAdmins).map((column) => (
                     <TableCell
@@ -466,9 +506,10 @@ function ManageAccount() {
                     {(selectedTab === 0 ? columnsEmployees : columnsAdmins).map((column) => (
                       <TableCell
                         sx={{ fontFamily: 'Poppins' }}
-                        onClick={() => handleSeeDetails(row.userID)}
-                        key={`${row.id}-${column.id}`} align={column.align}>
-                        {column.id === 'name' ? row.name : column.format ? column.format(row[column.id]) : row[column.id]}
+                        key={`${row.id}-${column.id}`}
+                        align={column.align}>
+                        {column.id === 'name' ? row.name : column.id === 'actions' ? column.format ? column.format(row[column.id], row) : null :
+                          column.format ? column.format(row[column.id]) : row[column.id]}
                       </TableCell>
                     ))}
                   </TableRow>
@@ -483,8 +524,8 @@ function ManageAccount() {
 
     {/* regis pop up screen */}
     <Dialog
-      open={openRegistration}
-      onClose={handleClickClose}
+      open={openRegistrationDialog}
+      onClose={handleClickCloseBtn}
 
       sx={{
         '@media (min-width: 600px)': {
@@ -495,14 +536,14 @@ function ManageAccount() {
       <Box
         sx={{
           bgcolor: '#8c383e',
-          height: '5vh',
+          height: '4vh',
           width: '100%',
           display: 'flex',
           justifyContent: 'right',
         }}
       >
         <Grid container spacing={.6}>
-          <Grid item xs={12} sx={{ height: '4.5vh' }}  >
+          <Grid item xs={12} sx={{ height: '4.5vh', }}  >
             <Grid
               container
               spacing={0.5}
@@ -516,8 +557,8 @@ function ManageAccount() {
                 alignItems: 'center', // Align items vertically
               }}
             >
-              <Grid item sx={{ height: '4.1vh' }}>
-                <PersonRoundedIcon sx={{ color: 'white', fontSize: '28px', ml: 1 }} />
+              <Grid item sx={{ height: '4.1vh', }}>
+                <PersonRoundedIcon sx={{ color: 'white', fontSize: '29px', ml: 1, mt: .5 }} />
               </Grid>
               <Grid item sx={{ fontSize: '18px' }}>
                 Register User Account
@@ -526,7 +567,7 @@ function ManageAccount() {
           </Grid>
         </Grid>
         <IconButton
-          onClick={handleClickClose}
+          onClick={handleClickCloseBtn}
           sx={{
 
             '&:hover': {
@@ -534,7 +575,7 @@ function ManageAccount() {
             },
           }}
         >
-          <HighlightOffOutlinedIcon sx={{ fontSize: '28px', color: 'white' }} />
+          <HighlightOffOutlinedIcon sx={{ fontSize: '35px', color: 'white' }} />
         </IconButton>
       </Box>
       <DialogContent>
@@ -559,9 +600,9 @@ function ManageAccount() {
                   size="small"
                   sx={{ fontFamily: 'Poppins', }}
                 >
-                  <MenuItem style={{ fontFamily: 'Poppins', }} value='Admin'>Admin</MenuItem>
-                  <MenuItem style={{ fontFamily: 'Poppins', }} value='Employee'>Employee</MenuItem>
-                  <MenuItem style={{ fontFamily: 'Poppins', }} value='Department Head'>Department Head</MenuItem>
+                  <MenuItem style={{ fontFamily: 'Poppins', }} value='ADMIN'>Admin</MenuItem>
+                  <MenuItem style={{ fontFamily: 'Poppins', }} value='EMPLOYEE'>Employee</MenuItem>
+                  <MenuItem style={{ fontFamily: 'Poppins', }} value= 'DEPARTMENT HEAD'>Department Head</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -575,7 +616,7 @@ function ManageAccount() {
             justifyContent: 'center',
           }}
         >
-          {role === 'Admin' && (
+          {role === 'ADMIN' && (
             <>
 
 
@@ -609,7 +650,7 @@ function ManageAccount() {
                 <Box sx={{ height: '100%' }}>
                   <TextField
                     fullWidth size='medium'
-                    label="Employee ID"
+                    label="ID Number"
                     id="workId" /*value={generateWorkID()}*/
                     InputLabelProps={{
                       style: {
@@ -685,7 +726,7 @@ function ManageAccount() {
               </Grid>
             </>
           )}
-          {(role === 'Employee' || role === 'Department Head') && (
+          {(role === 'EMPLOYEE' || role === 'DEPARTMENT HEAD') && (
             <>
               <Grid item xs={4} sx={{ width: '100%', }}>
                 <Box >
@@ -702,7 +743,7 @@ function ManageAccount() {
                     <Select
                       labelId="employementStatusLabel"
                       id="employementStatus"
-                      value={employStatus}
+                      value={empStatus}
                       label="employment status"
                       onChange={handleEmploymentStatus}
                       sx={{ fontFamily: 'Poppins', }}
@@ -714,8 +755,8 @@ function ManageAccount() {
                 </Box>
               </Grid>
               <Grid item xs={4} sx={{ width: '100%', }}>
-                <Box sx={{ bgcolor: employStatus ? 'inherit' : 'transparent' }}>
-                  <FormControl fullWidth size='medium' disabled={employStatus === 'Regular'}>
+                <Box sx={{ bgcolor: empStatus ? 'inherit' : 'transparent' }}>
+                  <FormControl fullWidth size='medium' disabled={empStatus === 'Regular'}>
                     <InputLabel
                       id="probationaryStatus"
                       sx={{
@@ -733,16 +774,16 @@ function ManageAccount() {
                       onChange={handleProbeStatus}
                       sx={{ fontFamily: 'Poppins', }}
                     >
-                      <MenuItem style={{ fontFamily: 'Poppins' }} value={'3rd'}>3rd Probationary</MenuItem>
-                      <MenuItem style={{ fontFamily: 'Poppins' }} value={'5th'}>5th Probationary</MenuItem>
+                      <MenuItem style={{ fontFamily: 'Poppins' }} value={'3rd Probationary'}>3rd Probationary</MenuItem>
+                      <MenuItem style={{ fontFamily: 'Poppins' }} value={'5th Probationary'}>5th Probationary</MenuItem>
                     </Select>
                   </FormControl>
                 </Box>
               </Grid>
               <Grid item xs={4} sx={{ width: '100%', }}>
-                <Box sx={{ bgcolor: employStatus == 'Regular' ? 'inherit' : 'transparent' }}>
+                <Box sx={{ bgcolor: empStatus == 'Regular' ? 'inherit' : 'transparent' }}>
                   <TextField fullWidth
-                    disabled={employStatus === 'Regular'}
+                    disabled={empStatus === 'Regular'}
                     size='medium'
                     label="Date Started "
                     id="dateStarted"
@@ -772,7 +813,7 @@ function ManageAccount() {
                   <TextField
                     fullWidth
                     size='medium'
-                    label="Employee ID"
+                    label="ID Number"
                     id="workId" /*value={generateWorkID()}*/
                     InputLabelProps={{
                       style: {
@@ -792,7 +833,7 @@ function ManageAccount() {
                   <TextField fullWidth
                     size='medium'
                     label="Date Hired "
-                    id="dateHired"
+                    id="datehired"
                     type="date"
                     InputLabelProps={{
                       shrink: true,
@@ -874,9 +915,9 @@ function ManageAccount() {
                       onChange={handleGender}
                       sx={{ fontFamily: 'Poppins', }}
                     >
-                      <MenuItem style={{ fontFamily: 'Poppins' }} value={'female'}>Female</MenuItem>
-                      <MenuItem style={{ fontFamily: 'Poppins' }} value={'male'}>Male</MenuItem>
-                      <MenuItem style={{ fontFamily: 'Poppins' }} value={'other'}>Other</MenuItem>
+                      <MenuItem style={{ fontFamily: 'Poppins' }} value={'Female'}>Female</MenuItem>
+                      <MenuItem style={{ fontFamily: 'Poppins' }} value={'Male'}>Male</MenuItem>
+                      <MenuItem style={{ fontFamily: 'Poppins' }} value={'Other'}>Other</MenuItem>
                     </Select>
                   </FormControl>
                 </Box>
@@ -934,7 +975,7 @@ function ManageAccount() {
                 <Box >
                   <FormControl fullWidth size='medium'>
                     <InputLabel
-                      id="departmentLabel"
+                      id="deptLabel"
                       sx={{
                         fontSize: '14px',
                         fontFamily: 'Poppins',
@@ -943,16 +984,15 @@ function ManageAccount() {
                       Department
                     </InputLabel>
                     <Select
-                      labelId="departmentLabel"
-                      id="department"
-                      value={department}
-                      label="department"
-                      onChange={handleDepartment}
+                      labelId="deptLabel"
+                      id="dept"
+                      value={dept}
+                      label="dept"
+                      onChange={handledept}
                       sx={{ fontFamily: 'Poppins', }}
                     >
-                      <MenuItem style={{fontFamily:'Poppins'}} value={'ETO'}>Female</MenuItem>
-                      <MenuItem style={{fontFamily:'Poppins'}} value={'m'}>Male</MenuItem>
-                      <MenuItem style={{fontFamily:'Poppins'}} value={'o'}>Other</MenuItem>
+                      <MenuItem style={{ fontFamily: 'Poppins' }} value={'Enrollment Technical Office'}>Enrollment Technical Office</MenuItem>
+                      <MenuItem style={{ fontFamily: 'Poppins' }} value={'Human Resource Office'}>Human Resource Office</MenuItem>
                     </Select>
                   </FormControl>
                 </Box>
@@ -964,16 +1004,16 @@ function ManageAccount() {
       </DialogContent>
       <DialogActions
         sx={{
-          display: 'flex',
+
           justifyContent: 'left',
-          ml: '2vh',
+          ml: '1.3vh',
         }}
       >
         <Button
           sx={{
             bgcolor: '#8c383e',
             color: 'white',
-            width: '96.3%',
+            width: '96.5%',
             '&:hover': {
               backgroundColor: '#F8C702',
               color: 'black',
@@ -992,180 +1032,10 @@ function ManageAccount() {
       </DialogActions>
     </Dialog>
 
-    {/* pop up SEE DETAILS */}
-    <Dialog
-      open={openDetails}
-      onAbort={handleClickClose}
-      sx={{
-        '@media (min-width: 600px)': {
-          width: '100vw',
-        },
-      }}
-    >
-      <Box
-        sx={{
-          bgcolor: '#8c383e',
-          height: '5vh',
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'right',
-        }}
-      >
-        <Grid container spacing={.6}>
-          <Grid item xs={12} sx={{ height: '4.5vh' }}  >
-            <Grid
-              container
-              spacing={0.5}
-              sx={{
-
-                padding: '4px 0 6px 0',
-                fontFamily: 'Poppins',
-                fontWeight: 'bold',
-                color: 'white',
-                backgroundColor: 'transparent',
-                alignItems: 'center', // Align items vertically
-              }}
-            >
-              <Grid item sx={{ height: '4.1vh' }}>
-                <ViewHeadlineOutlinedIcon sx={{ color: 'white', fontSize: '28px', ml: 1 }} />
-              </Grid>
-              <Grid item sx={{ fontSize: '18px' }}>
-                User Details
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
-        <IconButton
-          onClick={handleClickClose}
-          sx={{
-
-            '&:hover': {
-              color: '#F8C702'
-            },
-          }}
-        >
-          <HighlightOffOutlinedIcon sx={{ fontSize: '28px', color: 'white' }} />
-        </IconButton>
-      </Box>
-      <DialogContent>
-        <Grid container spacing={.6}
-          sx={{
-            width: '90%',
-            display: 'flex',
-            justifyContent: 'center',
-          }}
-        >
-          {selectedUser?.role === 'Admin' && (
-            <>
-              <Grid item xs={12} >
-                <Typography style={{fontFamily:'Poppins'}}>Name: {selectedUser?.firstname} {selectedUser.middlename} {selectedUser?.lastname}</Typography>
-              </Grid>
-              <Grid item xs={6} >
-                <Typography style={{fontFamily:'Poppins'}}> Work ID :  {selectedUser?.workID}</Typography>
-              </Grid>
-              <Grid item xs={6} >
-                <Typography style={{fontFamily:'Poppins'}}>Email: {selectedUser?.institutionalEmail}</Typography>
-              </Grid>
-              <Grid item xs={6} >
-                <Typography style={{fontFamily:'Poppins'}}>Username: {selectedUser?.username} </Typography>
-              </Grid>
-              <Grid item xs={6} >
-                <Typography style={{fontFamily:'Poppins'}}>Password: {selectedUser?.password}</Typography>
-
-              </Grid>
-            </>
-          )}
-          {(selectedUser?.role === 'Employee' || selectedUser?.role === 'Department Head') && (
-            <>
-              <Grid item xs={6} >
-                <Typography style={{fontFamily:'Poppins'}}>ID Number: <strong>{selectedUser?.workID}</strong></Typography>
-              </Grid>
-              <Grid item xs={6} >
-                <Typography style={{fontFamily:'Poppins'}}>User Role: {selectedUser?.role}</Typography>
-              </Grid>
-              <Grid item xs={6} >
-                <Typography style={{fontFamily:'Poppins'}}>Name: {selectedUser?.firstname} {selectedUser.middlename} {selectedUser?.lastname}</Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography style={{fontFamily:'Poppins'}}>Email: {selectedUser?.institutionalEmail}</Typography>
-              </Grid>
-
-              <Grid item xs={6} >
-                <Typography style={{fontFamily:'Poppins'}}>Department: {selectedUser?.department}</Typography>
-              </Grid>
-              <Grid item xs={6} >
-                <Typography style={{fontFamily:'Poppins'}}>Position: {selectedUser?.position}</Typography>
-              </Grid>
-              <Grid item xs={6} >
-                <Typography style={{fontFamily:'Poppins'}}>Employee Status: {selectedUser?.employStatus}</Typography>
-              </Grid>
-              <Grid item xs={6} >
-                <Typography style={{fontFamily:'Poppins'}}>Date Hired: {selectedUser?.dateHired}</Typography>
-              </Grid>
-              {selectedUser?.employStatus !== 'Regular' && (
-                <>
-                  <Grid item xs={6} >
-                    <Typography style={{fontFamily:'Poppins'}}>Probationary Status: {selectedUser?.probeStatus}</Typography>
-                  </Grid>
-                  <Grid item xs={6} >
-                    <Typography style={{fontFamily:'Poppins'}}>Date Started: {selectedUser?.dateStarted}</Typography>
-                  </Grid>
-                </>
-              )}
-              <Grid item xs={6} >
-                <Typography style={{fontFamily:'Poppins', color:'rgba(248, 199, 2, 0.9)',  fontWeight:'lightbold'}}>Username: {selectedUser?.username}</Typography>
-              </Grid>
-              <Grid item xs={6} >
-                <Typography style={{fontFamily:'Poppins', color:'rgba(248, 199, 2, 0.9)', fontWeight:'lightbold'}}>Password: {selectedUser?.password}</Typography>
-              </Grid>
-            </>
-          )}
-
-        </Grid>
-
-      </DialogContent>
-      <DialogActions
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-        }}
-      >
-        <Button
-          onClick={handleClickEdit}
-          variant='contained'
-          sx={{
-            bgcolor: 'rgba(248, 199, 2, 0.9)',
-            fontFamily: 'Poppins',
-            color: 'black',
-            '&:hover': {
-              bgcolor: '#e0e0e0',
-              color: 'black'
-            },
-          }}>
-          Edit User
-        </Button>
-        <Button
-          onClick={handleClickDelete}
-          variant='contained'
-          sx={{
-            bgcolor: '#8c383e',
-            fontFamily: 'Poppins',
-            ml: '1vh',
-            '&:hover': {
-              bgcolor: '#e0e0e0',
-              color: 'black',
-            },
-          }}>
-          Delete User
-        </Button>
-      </DialogActions>
-    </Dialog>
-
-
     {/* {POP up for edit} */}
     <Dialog
-      open={openEdit}
-      onAbort={handleClickClose}
+      open={openEditDialog}
+      onAbort={handleClickCloseBtn}
       sx={{
         '@media (min-width: 600px)': {
           width: '100vw',
@@ -1175,7 +1045,7 @@ function ManageAccount() {
       <Box
         sx={{
           bgcolor: '#8c383e',
-          height: '5vh',
+          height: '4vh',
           width: '100%',
           display: 'flex',
           justifyContent: 'right',
@@ -1197,7 +1067,7 @@ function ManageAccount() {
               }}
             >
               <Grid item sx={{ height: '4.1vh' }}>
-                <EditNoteTwoToneIcon sx={{ color: 'white', fontSize: '28px', ml: 1 }} />
+                <EditNoteTwoToneIcon sx={{ color: 'white', fontSize: '35px', ml: 1, mt:.3 }} />
               </Grid>
               <Grid item sx={{ fontSize: '18px' }}>
                 Edit User Details
@@ -1206,7 +1076,7 @@ function ManageAccount() {
           </Grid>
         </Grid>
         <IconButton
-          onClick={handleClickClose}
+          onClick={handleClickCloseBtn}
           sx={{
 
             '&:hover': {
@@ -1214,7 +1084,7 @@ function ManageAccount() {
             },
           }}
         >
-          <HighlightOffOutlinedIcon sx={{ fontSize: '28px', color: 'white' }} />
+          <HighlightOffOutlinedIcon sx={{ fontSize: '35px', color: 'white' }} />
         </IconButton>
       </Box>
       <DialogContent>
@@ -1226,31 +1096,33 @@ function ManageAccount() {
             fontFamily: 'Poppins',
           }}>
 
-          {selectedUser?.role === 'Admin' && (
+          {selectedUser?.role === 'ADMIN' && (
             <>
-              <Grid item xs={6}>
-                <FormControl fullWidth disabled>
-                  <InputLabel
-                    id="userRoleLabel"
-                    sx={{
-                      fontSize: '14px',
-                      fontFamily: 'Poppins',
-                    }}
-                  >
-                    User Role
-                  </InputLabel>
-                  <Select
-                    labelId="userRoleLabel"
-                    id="role"
-                    value={selectedUser?.role || ''}
-                    label="user role"
-                  >
-                    <MenuItem value='Admin'>Admin</MenuItem>
-                    <MenuItem value='Employee'>Employee</MenuItem>
-                    <MenuItem value='Department Head'>Department Head</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
+              {Object.entries(name).map(([fieldName, value]) => (
+                <Grid item xs={4} key={fieldName}>
+                  <Box height="100%">
+                    <TextField
+                      fullWidth
+                      size="medium"
+                      label={fieldName === 'fname' ? 'First Name' : fieldName === 'mname' ? 'Middle Name' : 'Last Name'}
+                      id={fieldName}
+                      value={fieldName === 'fname' ? selectedUser?.fName || '' : fieldName === 'mname' ? selectedUser?.mName || '' : selectedUser?.lName || ''}
+                      onChange={(e) => handleUserInputChange(e, 'fName' || 'mName' || 'lName')}
+                      InputLabelProps={{
+                        style: {
+                          fontFamily: 'Poppins',
+                        },
+                      }}
+                      inputProps={{
+                        style: {
+                          fontSize: '16px',
+                          fontFamily: 'Poppins',
+                        },
+                      }}
+                    />
+                  </Box>
+                </Grid>
+              ))}
               <Grid item xs={6} >
                 <Box sx={{ height: '100%' }}>
                   <TextField
@@ -1259,6 +1131,7 @@ function ManageAccount() {
                     label="Work ID"
                     id="workId"
                     value={selectedUser?.workID || ''}
+                    onChange={(e) => handleUserInputChange(e, 'workID')}
                     InputLabelProps={{
                       style: {
                         fontFamily: 'Poppins',
@@ -1275,42 +1148,15 @@ function ManageAccount() {
                 </Box>
               </Grid>
 
-              {/* workid,fname,mname,lname,workemail,username, password, role, */}
-              {Object.entries(name).map(([fieldName, value]) => (
-                <Grid item xs={4} key={fieldName}>
-                  <Box height="100%">
-                    <TextField
-                      fullWidth
-                      size="medium"
-                      label={fieldName === 'fname' ? 'First Name' : fieldName === 'mname' ? 'Middle Name' : 'Last Name'}
-                      id={fieldName}
-                      value={fieldName === 'fname' ? selectedUser?.firstname || '' : fieldName === 'mname' ? selectedUser?.middlename || '' : selectedUser?.lastname || ''}
-                      onChange={(event) => handleUserInputChange(event, fieldName)}
-                      InputLabelProps={{
-                        style: {
-                          fontFamily: 'Poppins',
-                        },
-                      }}
-                      inputProps={{
-                        style: {
-                          fontSize: '16px',
-                          fontFamily: 'Poppins',  
-                        },
-                      }}
-                    />
-                  </Box>
-                </Grid>
-              ))}
-
-              <Grid item xs={12}>
+              <Grid item xs={6}>
                 <Box sx={{ height: '100%' }}>
                   <TextField
                     fullWidth
                     size='medium'
                     label="Institutional Email"
                     id="email"
-                    value={selectedUser?.institutionalEmail || ''}
-                    onChange={handleUserInputChange}
+                    value={selectedUser?.workEmail || ''}
+                    onChange={(e) => handleUserInputChange(e, 'workEmail')}
                     InputLabelProps={{
                       style: {
                         fontFamily: 'Poppins',
@@ -1374,14 +1220,14 @@ function ManageAccount() {
               </Grid>
             </>
           )}
-          {(selectedUser?.role === 'Employee' || selectedUser?.role === 'Department Head') && (
+          {(selectedUser?.role === 'EMPLOYEE' || selectedUser?.role === 'DEPARTMENT HEAD') && (
             <>
               <Grid item xs={4} sx={{ width: '100%', }}>
                 <Box >
                   <FormControl
                     fullWidth
                     size='medium'
-                    disabled={selectedUser?.employStatus === 'Regular'}>
+                    disabled={selectedUser?.empStatus === 'Regular'}>
                     <InputLabel
                       id="employementStatusLabel"
 
@@ -1395,13 +1241,13 @@ function ManageAccount() {
                     <Select
                       labelId="employementStatusLabel"
                       id="employementStatus"
-                      value={selectedUser?.employStatus || ''}
+                      value={selectedUser?.empStatus || ''}
                       label="employment status"
-                      onChange={(e) => handleUserInputChange(e, 'employmentStatus')}
+                      onChange={(e) => handleUserInputChange(e, 'empStatus')}
                       sx={{ fontFamily: 'Poppins', }}
                     >
-                      <MenuItem style={{fontFamily:'Poppins'}} value='Probationary'>Probationary</MenuItem>
-                      <MenuItem style={{fontFamily:'Poppins'}} value='Regular'>Regular</MenuItem>
+                      <MenuItem style={{ fontFamily: 'Poppins' }} value='Probationary'>Probationary</MenuItem>
+                      <MenuItem style={{ fontFamily: 'Poppins' }} value='Regular'>Regular</MenuItem>
                     </Select>
                   </FormControl>
                 </Box>
@@ -1411,7 +1257,7 @@ function ManageAccount() {
                   <FormControl
                     fullWidth
                     size='medium'
-                    disabled={selectedUser?.employStatus === 'Regular'}>
+                    disabled={selectedUser?.empStatus === 'Regular'}>
                     <InputLabel
                       id="probationaryStatus"
                       sx={{
@@ -1427,18 +1273,18 @@ function ManageAccount() {
                       id="probeStat"
                       value={selectedUser?.probeStatus || ''}
                       label="probationary status"
-                      onChange={(e) => handleUserInputChange(e, 'probeStat')}
+                      onChange={(e) => handleUserInputChange(e, 'probeStatus')}
                       sx={{ fontFamily: 'Poppins', }}
                     >
-                      <MenuItem 
-                        style={{fontFamily:'Poppins'}}
-                        value={3}
+                      <MenuItem
+                        style={{ fontFamily: 'Poppins' }}
+                        value={'3rd Probationary'}
                       >
                         3rd Probationary
                       </MenuItem>
-                      <MenuItem 
-                        style={{fontFamily:'Poppins'}}
-                        value={5}
+                      <MenuItem
+                        style={{ fontFamily: 'Poppins' }}
+                        value={'5th Probationary'}
                       >
                         5th Probationary
                       </MenuItem>
@@ -1447,7 +1293,7 @@ function ManageAccount() {
                 </Box>
               </Grid>
               <Grid item xs={4} sx={{ width: '100%', }}>
-                <Box sx={{ bgcolor: employStatus == 'Regular' ? 'inherit' : 'transparent' }}>
+                <Box sx={{ bgcolor: empStatus == 'Regular' ? 'inherit' : 'transparent' }}>
                   <TextField
                     fullWidth
                     disabled
@@ -1484,6 +1330,7 @@ function ManageAccount() {
                     label="Employee ID"
                     id="workId" /*value={generateWorkID()}*/
                     value={selectedUser?.workID || ''}
+                    onChange={(e) => handleUserInputChange(e, 'workID')}
                     InputLabelProps={{
                       style: {
                         fontFamily: 'Poppins',
@@ -1500,10 +1347,10 @@ function ManageAccount() {
               <Grid item xs={4} sx={{ width: '100%', }}>
                 <Box >
                   <TextField fullWidth
-
+                    disabled
                     size='medium'
                     label="Date Hired "
-                    id="dateHired"
+                    id="datehired"
                     type="date"
                     value={selectedUser?.dateHired || ''}
                     InputLabelProps={{
@@ -1532,8 +1379,8 @@ function ManageAccount() {
                       size="medium"
                       label={fieldName === 'fname' ? 'First Name' : fieldName === 'mname' ? 'Middle Name' : 'Last Name'}
                       id={fieldName}
-                      value={fieldName === 'fname' ? selectedUser?.firstname || '' : fieldName === 'mname' ? selectedUser?.middlename || '' : selectedUser?.lastname || ''}
-                      onChange={(event) => handleUserInputChange(event, fieldName)}
+                      value={fieldName === 'fname' ? selectedUser?.fName || '' : fieldName === 'mname' ? selectedUser?.mName || '' : selectedUser?.lName || ''}
+                      onChange={(event) => handleUserInputChange(event, 'fName' || 'mName' || 'lName')}
                       InputLabelProps={{
                         style: {
                           fontFamily: 'Poppins',
@@ -1556,8 +1403,8 @@ function ManageAccount() {
                     size='medium'
                     label="Institutional Email"
                     id="email"
-                    value={selectedUser?.institutionalEmail || ''}
-                    onChange={(e) => handleUserInputChange(e, 'email')}
+                    value={selectedUser?.workEmail || ''}
+                    onChange={(e) => handleUserInputChange(e, 'workEmail')}
                     InputLabelProps={{
                       style: {
                         fontFamily: 'Poppins',
@@ -1566,7 +1413,7 @@ function ManageAccount() {
                     inputProps={{
                       style: {
                         fontSize: '16px',
-                        fontFamily : 'Poppins',
+                        fontFamily: 'Poppins',
                       }
                     }} />
                 </Box>
@@ -1596,9 +1443,9 @@ function ManageAccount() {
                       label="gender"
                       onChange={handleGender}
                     >
-                      <MenuItem value={'female'}>Female</MenuItem>
-                      <MenuItem value={'male'}>Male</MenuItem>
-                      <MenuItem value={'other'}>Other</MenuItem>
+                      <MenuItem value={'Female'}>Female</MenuItem>
+                      <MenuItem value={'Male'}>Male</MenuItem>
+                      <MenuItem value={'Other'}>Other</MenuItem>
                     </Select>
                   </FormControl>
                 </Box>
@@ -1676,7 +1523,7 @@ function ManageAccount() {
                     fullWidth
                     size='medium'>
                     <InputLabel
-                      id="departmentLabel"
+                      id="deptLabel"
                       sx={{
                         fontSize: '14px',
                         fontFamily: 'Poppins',
@@ -1685,30 +1532,24 @@ function ManageAccount() {
                       Department
                     </InputLabel>
                     <Select
-                      labelId="departmentLabel"
-                      id="department"
-                      value={selectedUser?.department || ''}
-                      label="department"
-                      onChange={(e) => handleUserInputChange(e, 'department')}
+                      labelId="deptLabel"
+                      id="dept"
+                      value={selectedUser?.dept || ''}
+                      label="dept"
+                      onChange={(e) => handleUserInputChange(e, 'dept')}
                       sx={{ fontFamily: 'Poppins', }}
                     >
-                      <MenuItem 
-                        style={{fontFamily:'Poppins'}}
-                        value={'ETO'}
+                      <MenuItem
+                        style={{ fontFamily: 'Poppins' }}
+                        value={'Enrollment Technical Office'}
                       >
-                        Female
+                        Enrollment Technical Office
                       </MenuItem>
                       <MenuItem
-                        style={{fontFamily:'Poppins'}}
-                        value={'m'}
+                        style={{ fontFamily: 'Poppins' }}
+                        value={'Human Resource Office'}
                       >
-                        Male
-                      </MenuItem>
-                      <MenuItem 
-                        style={{fontFamily:'Poppins'}}
-                        value={'o'}
-                      >
-                        Other
+                        Human Resource Office
                       </MenuItem>
                     </Select>
                   </FormControl>
@@ -1745,10 +1586,11 @@ function ManageAccount() {
       </DialogActions>
 
     </Dialog>
+
     {/* pop up DELETE */}
     <Dialog
-      open={openDelete}
-      onClose={handleClickClose}
+      open={openDeleteDialog}
+      onClose={handleClickCloseBtn}
       sx={{
         '@media (min-width: 600px)': {
           width: '100vw',
@@ -1758,7 +1600,7 @@ function ManageAccount() {
       <Box
         sx={{
           bgcolor: '#8c383e',
-          height: '5vh',
+          height: '4vh',
           width: '100%',
           display: 'flex',
           justifyContent: 'right',
@@ -1780,16 +1622,16 @@ function ManageAccount() {
               }}
             >
               <Grid item sx={{ height: '4.1vh' }}>
-                <DeleteOutlineIcon sx={{ color: 'white', fontSize: '28px', ml: 1, height: '3.5vh' }} />
+                <DeleteOutlineIcon sx={{ color: 'white', fontSize: '29px', ml: 1, mt: .5 }} />
               </Grid>
-              <Grid item sx={{ fontSize: '18px', height: '3.5vh' }}>
+              <Grid item sx={{ fontSize: '18px' }}>
                 Delete User Account
               </Grid>
             </Grid>
           </Grid>
         </Grid>
         <IconButton
-          onClick={handleClickClose}
+          onClick={handleClickCloseBtn}
           sx={{
 
             '&:hover': {
@@ -1797,7 +1639,7 @@ function ManageAccount() {
             },
           }}
         >
-          <HighlightOffOutlinedIcon sx={{ fontSize: '28px', color: 'white' }} />
+          <HighlightOffOutlinedIcon sx={{ fontSize: '35px', color: 'white' }} />
         </IconButton>
       </Box>
       <DialogContent>
@@ -1813,7 +1655,7 @@ function ManageAccount() {
         }}
       >
         <Button
-          onClick={() => handleDelete(selectedUser?.userID)}
+          onClick={() => handleYesDelBtn(selectedUser.userID)}
           variant='contained'
           sx={{
             fontFamily: 'Poppins',
@@ -1829,7 +1671,7 @@ function ManageAccount() {
           Yes
         </Button>
         <Button
-          onClick={handleClickClose}
+          onClick={handleClickCloseBtn}
           variant='contained'
           sx={{
             fontFamily: 'Poppins',
@@ -1846,6 +1688,7 @@ function ManageAccount() {
       </DialogActions>
 
     </Dialog>
+
     <CustomAlert
       open={successAlert.open}
       onClose={() => setSuccessAlert({ ...successAlert, open: false })}
