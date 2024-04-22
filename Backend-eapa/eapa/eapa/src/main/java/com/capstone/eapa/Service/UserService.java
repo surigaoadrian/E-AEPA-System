@@ -123,10 +123,10 @@ public class UserService implements UserDetailsService {
             user.setfName(newUserDetails.getfName());
             user.setmName(newUserDetails.getmName());
             user.setlName(newUserDetails.getlName());
-            user.setPassword(newUserDetails.getPassword());
-            user.setWorkEmail(newUserDetails.getEmpStatus());
+            user.setWorkEmail(newUserDetails.getWorkEmail());
             user.setUsername(newUserDetails.getUsername());
-
+            user.setDept(newUserDetails.getDept());
+            user.setPosition(newUserDetails.getPosition());
             return userRepo.save(user);
         }else{
             throw new RuntimeException("User not found");
