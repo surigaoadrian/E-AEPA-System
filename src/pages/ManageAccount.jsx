@@ -54,18 +54,23 @@ function ManageAccount() {
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState(false);
 
-const handleUserInputChange = (event, fieldName) => {
-  setSelectedUser(prevUser => {
-    const updatedUser = {
-      ...prevUser,
-      [fieldName]: event.target.value
-    };
-    console.log('Updated User:', updatedUser); // Log the updated user object
-    return updatedUser;
-  });
+const handleUserInputChange = (e, fieldName) => {
+  const { value } = e.target;
+  let capitalizedValue = value;
+  
+  // Capitalize first letter for specific fields (fname, mName, lName)
+  if (fieldName === 'fName' || fieldName === 'mName' || fieldName === 'lName') {
+    capitalizedValue = capitalizeFirstLetter(value);
+  }
+
+  setSelectedUser(prevUser => ({
+    ...prevUser,
+    [fieldName]: capitalizedValue,
+  }));
 };
 
-  
+
+
 
   const handleEmailChange = (event) => {
     const value = event.target.value;
@@ -118,10 +123,8 @@ const handleUserInputChange = (event, fieldName) => {
   }
 
   const handleSaveEditBtn = async (userID) => {
-
     try {
-      const selectedUser = rows.find(user => user.userID === userID);
-    console.log('selectedUser:', selectedUser);
+      console.log('BEFORE UPDATING:', selectedUser);
 
       const updateUser = {
         empStatus: selectedUser.empStatus,
@@ -132,41 +135,32 @@ const handleUserInputChange = (event, fieldName) => {
         mName: selectedUser.mName,
         lName: selectedUser.lName,
         workEmail: selectedUser.workEmail,
-        dept: selectedUser.dept,
         position: selectedUser.position,
+        dept: selectedUser.dept,
 
       };
-      if(role === 'ADMIN') {
-        updateUser.workEmail = selectedUser.workEmail;
-        updateUser.username = selectedUser.username;
-        updateUser.fName = selectedUser.fName;
-        updateUser.mName = selectedUser.mName;
-        updateUser.lName = selectedUser.lName;
-      }
-
-
-      console.log ('updateUser:', updateUser);
       const response = await fetch(`http://localhost:8080/user/editUser/${userID}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(updateUser)
+        body: JSON.stringify(updateUser),
       });
+      console.log('AFTER UPDATING:', updateUser);
       if (!response.ok) {
         throw new Error('Failed to update user');
       }
-      
-      const updatedUserData = await response.json();
-      console.log('response:', updatedUserData); // Assuming the server responds with the updated user data
-      setSelectedUser(updatedUserData);
+      const updatedUser = await response.json();
+      setSelectedUser(updatedUser);
       showSuccessAlert('User updated successfully');
       fetchData();
       setOpenEditDialog(false);
     } catch (error) {
       console.error('Error updating user:', error);
+      showErrorAlert('Failed to update user. Please try again later.');
     }
-  }
+  };
+
 
   const handleClickDeleteBtn = (userID) => {
     console.log("delete user:", userID);
@@ -1174,36 +1168,73 @@ const handleUserInputChange = (event, fieldName) => {
                       style: {
                         fontSize: '16px',
                         fontFamily: 'Poppins',
-                      } 
+                      }
                     }} />
                 </Box>
               </Grid>
 
-              {Object.entries(name).map(([fieldName, value]) => (
-                <Grid item xs={4} key={fieldName}>
-                  <Box height="100%">
-                    <TextField
-                      fullWidth
-                      size="medium"
-                      label={fieldName === 'fname' ? 'First Name' : fieldName === 'mname' ? 'Middle Name' : 'Last Name'}
-                      id={fieldName}
-                      value={fieldName === 'fname' ? selectedUser?.fName || '' : fieldName === 'mname' ? selectedUser?.mName || '' : selectedUser?.lName || ''}
-                      onChange={(e) => handleUserInputChange(e, fieldName)}
-                      InputLabelProps={{
-                        style: {
-                          fontFamily: 'Poppins',
-                        },
-                      }}
-                      inputProps={{
-                        style: {
-                          fontSize: '16px',
-                          fontFamily: 'Poppins',
-                        },
-                      }}
-                    />
-                  </Box>
-                </Grid>
-              ))}
+
+              {/* Assuming selectedUser is updated separately */}
+              <Grid item xs={4}>
+                <TextField
+                  fullWidth
+                  size="medium"
+                  label="First Name"
+                  value={selectedUser.fName}
+                  onChange={(e) => handleUserInputChange(e, 'fName')}
+                  InputLabelProps={{
+                    style: {
+                      fontFamily: 'Poppins',
+                    },
+                  }}
+                  inputProps={{
+                    style: {
+                      fontSize: '16px',
+                      fontFamily: 'Poppins',
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  fullWidth
+                  size="medium"
+                  label="Middle Name"
+                  value={selectedUser.mName}
+                  onChange={(e) => handleUserInputChange(e, 'mName')}
+                  InputLabelProps={{
+                    style: {
+                      fontFamily: 'Poppins',
+                    },
+                  }}
+                  inputProps={{
+                    style: {
+                      fontSize: '16px',
+                      fontFamily: 'Poppins',
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  fullWidth
+                  size="medium"
+                  label="Last Name"
+                  value={selectedUser.lName}
+                  onChange={(e) => handleUserInputChange(e, 'lName')}
+                  InputLabelProps={{
+                    style: {
+                      fontFamily: 'Poppins',
+                    },
+                  }}
+                  inputProps={{
+                    style: {
+                      fontSize: '16px',
+                      fontFamily: 'Poppins',
+                    },
+                  }}
+                />
+              </Grid>
               <Grid item xs={12}>
                 <Box sx={{ height: '100%' }}>
                   <TextField
@@ -1382,31 +1413,66 @@ const handleUserInputChange = (event, fieldName) => {
                   />
                 </Box>
               </Grid>
-              {Object.entries(name).map(([fieldName, value]) => (
-                <Grid item xs={4} key={fieldName}>
-                  <Box height="100%">
-                    <TextField
-                      fullWidth
-                      size="medium"
-                      label={fieldName === 'fname' ? 'First Name' : fieldName === 'mname' ? 'Middle Name' : 'Last Name'}
-                      id={fieldName}
-                      value={fieldName === 'fname' ? selectedUser?.fName || '' : fieldName === 'mname' ? selectedUser?.mName || '' : selectedUser?.lName || ''}
-                      onChange={(event) => handleUserInputChange(event, 'fName' || 'mName' || 'lName')}
-                      InputLabelProps={{
-                        style: {
-                          fontFamily: 'Poppins',
-                        },
-                      }}
-                      inputProps={{
-                        style: {
-                          fontSize: '16px',
-                          fontFamily: 'Poppins',
-                        },
-                      }}
-                    />
-                  </Box>
-                </Grid>
-              ))}
+              <Grid item xs={4}>
+                <TextField
+                  fullWidth
+                  size="medium"
+                  label="First Name"
+                  value={selectedUser.fName}
+                  onChange={(e) => handleUserInputChange(e, 'fName')}
+                  InputLabelProps={{
+                    style: {
+                      fontFamily: 'Poppins',
+                    },
+                  }}
+                  inputProps={{
+                    style: {
+                      fontSize: '16px',
+                      fontFamily: 'Poppins',
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  fullWidth
+                  size="medium"
+                  label="Middle Name"
+                  value={selectedUser.mName}
+                  onChange={(e) => handleUserInputChange(e, 'mName')}
+                  InputLabelProps={{
+                    style: {
+                      fontFamily: 'Poppins',
+                    },
+                  }}
+                  inputProps={{
+                    style: {
+                      fontSize: '16px',
+                      fontFamily: 'Poppins',
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  fullWidth
+                  size="medium"
+                  label="Last Name"
+                  value={selectedUser.lName}
+                  onChange={(e) => handleUserInputChange(e, 'lName')}
+                  InputLabelProps={{
+                    style: {
+                      fontFamily: 'Poppins',
+                    },
+                  }}
+                  inputProps={{
+                    style: {
+                      fontSize: '16px',
+                      fontFamily: 'Poppins',
+                    },
+                  }}
+                />
+              </Grid>
               <Grid item xs={6} sx={{ width: '100%' }}>
                 <Box sx={{ height: '100%' }}>
                   <TextField
@@ -1459,7 +1525,7 @@ const handleUserInputChange = (event, fieldName) => {
                     label="Position"
                     id="position"
                     value={selectedUser?.position || ''}
-                    onChange= {(e) => handleUserInputChange(e, 'position')}
+                    onChange={(e) => handleUserInputChange(e, 'position')}
                     InputLabelProps={{
                       style: {
                         fontFamily: 'Poppins',
