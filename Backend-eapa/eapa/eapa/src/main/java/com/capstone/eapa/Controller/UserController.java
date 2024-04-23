@@ -51,6 +51,11 @@ public class UserController {
         return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
     }
 
+    @GetMapping("/checkUsername")
+	public boolean checkUsername(@RequestParam String username) {
+		return userServ.isUsernameUnique(username);
+	}
+
     @PutMapping("/editUser/{userID}")
     public UserEntity editUserDetails(@PathVariable int userID, @RequestBody UserEntity newDetails) {
         UserEntity user = userServ.editUserDetails(userID, newDetails);

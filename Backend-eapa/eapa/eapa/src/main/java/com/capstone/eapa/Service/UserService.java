@@ -96,6 +96,10 @@ public class UserService implements UserDetailsService {
         return userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
+    public boolean isUsernameUnique(String username) {
+		return !userRepo.existsByUsernameAndIsDeleted(username, 0);
+	}	
+
     //this method deletes a user account
     public void deleteUser(int userID) {
         UserEntity user = userRepo.findByUserID(userID);
@@ -111,12 +115,6 @@ public class UserService implements UserDetailsService {
     public UserEntity editUserDetails(int userID, UserEntity newUserDetails){
         UserEntity user = userRepo.findByUserID(userID);
         if(user != null){
-
-            if(!newUserDetails.getUsername().equals(user.getUsername())){
-                if(userRepo.existsByUsernameAndIsDeleted(newUserDetails.getUsername(),0)){
-                    throw new RuntimeException("Username already exists");
-                }
-            }
             user.setEmpStatus(newUserDetails.getEmpStatus());
             user.setProbeStatus(newUserDetails.getProbeStatus());
             user.setDateStarted(newUserDetails.getDateStarted());
