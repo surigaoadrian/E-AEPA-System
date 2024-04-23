@@ -54,12 +54,18 @@ function ManageAccount() {
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState(false);
 
-  const handleUserInputChange = (event, fieldName) => {
-    setSelectedUser({
-      ...selectedUser,
+const handleUserInputChange = (event, fieldName) => {
+  setSelectedUser(prevUser => {
+    const updatedUser = {
+      ...prevUser,
       [fieldName]: event.target.value
-    });
-  };
+    };
+    console.log('Updated User:', updatedUser); // Log the updated user object
+    return updatedUser;
+  });
+};
+
+  
 
   const handleEmailChange = (event) => {
     const value = event.target.value;
@@ -112,21 +118,48 @@ function ManageAccount() {
   }
 
   const handleSaveEditBtn = async (userID) => {
-    const selectedUser = rows.find(user => user.userID === userID);
 
-    console.log('Edit user:', userID);
     try {
+      const selectedUser = rows.find(user => user.userID === userID);
+    console.log('selectedUser:', selectedUser);
+
+      const updateUser = {
+        empStatus: selectedUser.empStatus,
+        probeStatus: selectedUser.probeStatus,
+        dateStarted: selectedUser.dateStarted,
+        username: selectedUser.username,
+        fName: selectedUser.fName,
+        mName: selectedUser.mName,
+        lName: selectedUser.lName,
+        workEmail: selectedUser.workEmail,
+        dept: selectedUser.dept,
+        position: selectedUser.position,
+
+      };
+      if(role === 'ADMIN') {
+        updateUser.workEmail = selectedUser.workEmail;
+        updateUser.username = selectedUser.username;
+        updateUser.fName = selectedUser.fName;
+        updateUser.mName = selectedUser.mName;
+        updateUser.lName = selectedUser.lName;
+      }
+
+
+      console.log ('updateUser:', updateUser);
       const response = await fetch(`http://localhost:8080/user/editUser/${userID}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(selectedUser)
+        body: JSON.stringify(updateUser)
       });
       if (!response.ok) {
         throw new Error('Failed to update user');
       }
-      const updateUser = await response.json();
+      
+      const updatedUserData = await response.json();
+      console.log('response:', updatedUserData); // Assuming the server responds with the updated user data
+      setSelectedUser(updatedUserData);
       showSuccessAlert('User updated successfully');
       fetchData();
       setOpenEditDialog(false);
@@ -197,12 +230,12 @@ function ManageAccount() {
       };
       if (role === 'ADMIN') {
         userData.workID = document.getElementById('workId')?.value || '',
-        userData.workEmail = document.getElementById('email')?.value || '';
+          userData.workEmail = document.getElementById('email')?.value || '';
         userData.username = document.getElementById('username')?.value || '';
         userData.password = document.getElementById('password')?.value || '';
         userData.fName = firstName,
-        userData.mName = middleName,
-        userData.lName = lastName
+          userData.mName = middleName,
+          userData.lName = lastName
       }
 
       const response = await fetch('http://localhost:8080/register', {
@@ -602,7 +635,7 @@ function ManageAccount() {
                 >
                   <MenuItem style={{ fontFamily: 'Poppins', }} value='ADMIN'>Admin</MenuItem>
                   <MenuItem style={{ fontFamily: 'Poppins', }} value='EMPLOYEE'>Employee</MenuItem>
-                  <MenuItem style={{ fontFamily: 'Poppins', }} value= 'DEPARTMENT HEAD'>Department Head</MenuItem>
+                  <MenuItem style={{ fontFamily: 'Poppins', }} value='DEPARTMENT HEAD'>Department Head</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -1067,7 +1100,7 @@ function ManageAccount() {
               }}
             >
               <Grid item sx={{ height: '4.1vh' }}>
-                <EditNoteTwoToneIcon sx={{ color: 'white', fontSize: '35px', ml: 1, mt:.3 }} />
+                <EditNoteTwoToneIcon sx={{ color: 'white', fontSize: '35px', ml: 1, mt: .3 }} />
               </Grid>
               <Grid item sx={{ fontSize: '18px' }}>
                 Edit User Details
@@ -1098,40 +1131,16 @@ function ManageAccount() {
 
           {selectedUser?.role === 'ADMIN' && (
             <>
-              {Object.entries(name).map(([fieldName, value]) => (
-                <Grid item xs={4} key={fieldName}>
-                  <Box height="100%">
-                    <TextField
-                      fullWidth
-                      size="medium"
-                      label={fieldName === 'fname' ? 'First Name' : fieldName === 'mname' ? 'Middle Name' : 'Last Name'}
-                      id={fieldName}
-                      value={fieldName === 'fname' ? selectedUser?.fName || '' : fieldName === 'mname' ? selectedUser?.mName || '' : selectedUser?.lName || ''}
-                      onChange={(e) => handleUserInputChange(e, 'fName' || 'mName' || 'lName')}
-                      InputLabelProps={{
-                        style: {
-                          fontFamily: 'Poppins',
-                        },
-                      }}
-                      inputProps={{
-                        style: {
-                          fontSize: '16px',
-                          fontFamily: 'Poppins',
-                        },
-                      }}
-                    />
-                  </Box>
-                </Grid>
-              ))}
               <Grid item xs={6} >
                 <Box sx={{ height: '100%' }}>
                   <TextField
+                    disabled
                     fullWidth
                     size='medium'
                     label="Work ID"
                     id="workId"
                     value={selectedUser?.workID || ''}
-                    onChange={(e) => handleUserInputChange(e, 'workID')}
+                    onChange={(e) => handleUserInputChange(e, 'workId')}
                     InputLabelProps={{
                       style: {
                         fontFamily: 'Poppins',
@@ -1147,8 +1156,55 @@ function ManageAccount() {
                   />
                 </Box>
               </Grid>
+              <Grid item xs={6} >
+                <Box sx={{ height: '100%' }}>
+                  <TextField
+                    fullWidth
+                    size='medium'
+                    label="Admin Username"
+                    id="username"
+                    value={selectedUser?.username || ''}
+                    onChange={(e) => handleUserInputChange(e, 'username')}
+                    InputLabelProps={{
+                      style: {
+                        fontFamily: 'Poppins',
+                      },
+                    }}
+                    inputProps={{
+                      style: {
+                        fontSize: '16px',
+                        fontFamily: 'Poppins',
+                      } 
+                    }} />
+                </Box>
+              </Grid>
 
-              <Grid item xs={6}>
+              {Object.entries(name).map(([fieldName, value]) => (
+                <Grid item xs={4} key={fieldName}>
+                  <Box height="100%">
+                    <TextField
+                      fullWidth
+                      size="medium"
+                      label={fieldName === 'fname' ? 'First Name' : fieldName === 'mname' ? 'Middle Name' : 'Last Name'}
+                      id={fieldName}
+                      value={fieldName === 'fname' ? selectedUser?.fName || '' : fieldName === 'mname' ? selectedUser?.mName || '' : selectedUser?.lName || ''}
+                      onChange={(e) => handleUserInputChange(e, fieldName)}
+                      InputLabelProps={{
+                        style: {
+                          fontFamily: 'Poppins',
+                        },
+                      }}
+                      inputProps={{
+                        style: {
+                          fontSize: '16px',
+                          fontFamily: 'Poppins',
+                        },
+                      }}
+                    />
+                  </Box>
+                </Grid>
+              ))}
+              <Grid item xs={12}>
                 <Box sx={{ height: '100%' }}>
                   <TextField
                     fullWidth
@@ -1171,51 +1227,6 @@ function ManageAccount() {
                     error={emailError}
                     helperText={emailError ? 'Please enter a valid email' : ''}
                   />
-                </Box>
-              </Grid>
-              <Grid item xs={6} >
-                <Box sx={{ height: '100%' }}>
-                  <TextField
-                    fullWidth
-                    size='medium'
-                    label="Admin Username"
-                    id="username"
-                    value={selectedUser?.username || ''}
-                    onChange={(e) => handleUserInputChange(e, 'username')}
-                    InputLabelProps={{
-                      style: {
-                        fontFamily: 'Poppins',
-                      },
-                    }}
-                    inputProps={{
-                      style: {
-                        fontSize: '16px',
-                        fontFamily: 'Poppins',
-                      }
-                    }} />
-                </Box>
-              </Grid>
-              <Grid item xs={6}>
-                <Box sx={{ height: '100%' }}>
-                  <TextField
-                    fullWidth
-                    size='medium'
-                    label="Admin Password"
-                    type="password"
-                    id="password"
-                    value={selectedUser?.password || ''}
-                    onChange={(e) => handleUserInputChange(e, 'password')}
-                    InputLabelProps={{
-                      style: {
-                        fontFamily: 'Poppins',
-                      },
-                    }}
-                    inputProps={{
-                      style: {
-                        fontSize: '16px',
-                        fontFamily: 'Poppins',
-                      }
-                    }} />
                 </Box>
               </Grid>
             </>
@@ -1324,7 +1335,7 @@ function ManageAccount() {
               <Grid item xs={8} sx={{ width: '100%', }}>
                 <Box sx={{ height: '100%' }}>
                   <TextField
-
+                    disabled
                     fullWidth
                     size='medium'
                     label="Employee ID"
@@ -1396,7 +1407,7 @@ function ManageAccount() {
                   </Box>
                 </Grid>
               ))}
-              <Grid item xs={8} sx={{ width: '100%' }}>
+              <Grid item xs={6} sx={{ width: '100%' }}>
                 <Box sx={{ height: '100%' }}>
                   <TextField
                     fullWidth
@@ -1418,37 +1429,6 @@ function ManageAccount() {
                     }} />
                 </Box>
 
-              </Grid>
-              <Grid item xs={4}>
-                <Box >
-                  <FormControl
-                    fullWidth
-                    size='medium'
-                    disabled>
-                    <InputLabel
-
-                      id="GenderLabel"
-                      value={gender}
-                      sx={{
-                        fontSize: '14px',
-                        fontFamily: 'Poppins',
-                      }}
-                    >
-                      Gender
-                    </InputLabel>
-                    <Select
-                      labelId="GenderLabel"
-                      id="GenderLabel"
-                      value={selectedUser?.gender}
-                      label="gender"
-                      onChange={handleGender}
-                    >
-                      <MenuItem value={'Female'}>Female</MenuItem>
-                      <MenuItem value={'Male'}>Male</MenuItem>
-                      <MenuItem value={'Other'}>Other</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Box>
               </Grid>
               <Grid item xs={6}>
                 <Box >
@@ -1472,29 +1452,6 @@ function ManageAccount() {
                     }} />
                 </Box>
               </Grid>
-              <Grid item xs={6}>
-                <Box >
-                  <TextField
-                    fullWidth
-                    size='medium'
-                    label="Password"
-                    type="password"
-                    id="password"
-                    value={selectedUser?.password || ''}
-                    onChange={(e) => handleUserInputChange(e, 'password')}
-                    InputLabelProps={{
-                      style: {
-                        fontFamily: 'Poppins',
-                      },
-                    }}
-                    inputProps={{
-                      style: {
-                        fontSize: '16px',
-                        fontFamily: 'Poppins',
-                      }
-                    }} />
-                </Box>
-              </Grid>
               <Grid item xs={6} sx={{ width: '100%' }}>
                 <Box sx={{ height: '100%' }}>
                   <TextField
@@ -1502,7 +1459,7 @@ function ManageAccount() {
                     label="Position"
                     id="position"
                     value={selectedUser?.position || ''}
-                    onChange={(e) => handleUserInputChange(e, 'position')}
+                    onChange= {(e) => handleUserInputChange(e, 'position')}
                     InputLabelProps={{
                       style: {
                         fontFamily: 'Poppins',
