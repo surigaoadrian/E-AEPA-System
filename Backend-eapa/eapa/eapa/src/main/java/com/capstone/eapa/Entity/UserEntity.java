@@ -39,9 +39,9 @@ public class UserEntity implements UserDetails {
     @Column(name = "Employment Status")
     private String empStatus;
     @Column(name = "Date Hired")
-    private Date dateHired;
+    private String dateHired;
     @Column(name = "Date Started")
-    private Date dateStarted;
+    private String dateStarted;
     @Lob
     @Column(name = "Profile Picture")
     private Blob profilePic;
@@ -180,13 +180,6 @@ public class UserEntity implements UserDetails {
         this.empStatus = empStatus;
     }
 
-    public Date getDateHired() {
-        return dateHired;
-    }
-
-    public void setDateHired(Date dateHired) {
-        this.dateHired = dateHired;
-    }
 
     public Blob getProfilePic() {
         return profilePic;
@@ -210,14 +203,6 @@ public class UserEntity implements UserDetails {
 
     public void setContactNum(String contactNum) {
         this.contactNum = contactNum;
-    }
-
-    public Date getDateStarted() {
-        return dateStarted;
-    }
-
-    public void setDateStarted(Date dateStarted) {
-        this.dateStarted = dateStarted;
     }
 
     public Blob getSignature() {
@@ -244,5 +229,19 @@ public class UserEntity implements UserDetails {
         this.probeStatus = probeStatus;
     }
 
-    
+    public String getDateHired() {
+        return dateHired;
+    }
+
+    public void setDateHired(String dateHired) {
+        this.dateHired = dateHired;
+    }
+
+    public String getDateStarted() {
+        return dateStarted;
+    }
+
+    public void setDateStarted(String dateStarted) {
+        this.dateStarted = dateStarted;
+    }
 }

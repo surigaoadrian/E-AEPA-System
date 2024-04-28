@@ -41,18 +41,19 @@ public class SecurityConfig {
                         req->req.requestMatchers(
                                 "/login/**",
                                         "/register/**",
-                                        "/user/getAllUser",
-                                        "/user/getUser/**",
+                                        "user/getAllUser",
+                                        "user/getUser/**",
+                                        "user/editUser/**",
+                                        "user/delete/**",
+                                        "user/checkUsername/**",
                                         "/auth/forgotPassword/**",
                                         "/auth/resetPassword/**",
                                         "department/getAllDepts",
                                         "department/getDept/**",
                                         "department/deleteDept/**",
                                         "department/addDept",
-                                        "department/updateDept",
-                                        "/user/checkUsername/**",
-                                        "/user/delete/**",
-                                        "user/editUser/**")
+                                        "department/updateDept"
+                                        )
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()
