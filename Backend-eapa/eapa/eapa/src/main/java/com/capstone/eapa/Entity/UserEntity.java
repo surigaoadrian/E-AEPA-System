@@ -6,6 +6,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.sql.Blob;
+import java.sql.Date;
 import java.util.Collection;
 import java.util.List;
 
@@ -38,9 +39,9 @@ public class UserEntity implements UserDetails {
     @Column(name = "Employment Status")
     private String empStatus;
     @Column(name = "Date Hired")
-    private String dateHired;
+    private Date dateHired;
     @Column(name = "Date Started")
-    private String dateStarted;
+    private Date dateStarted;
     @Lob
     @Column(name = "Profile Picture")
     private Blob profilePic;
@@ -179,11 +180,11 @@ public class UserEntity implements UserDetails {
         this.empStatus = empStatus;
     }
 
-    public String getDateHired() {
+    public Date getDateHired() {
         return dateHired;
     }
 
-    public void setDateHired(String dateHired) {
+    public void setDateHired(Date dateHired) {
         this.dateHired = dateHired;
     }
 
@@ -211,11 +212,11 @@ public class UserEntity implements UserDetails {
         this.contactNum = contactNum;
     }
 
-    public String getDateStarted() {
+    public Date getDateStarted() {
         return dateStarted;
     }
 
-    public void setDateStarted(String dateStarted) {
+    public void setDateStarted(Date dateStarted) {
         this.dateStarted = dateStarted;
     }
 

@@ -288,6 +288,7 @@ function ManageAccount() {
       setOpenEditDialog(false);
     } catch (error) {
       console.error("Error updating user:", error);
+      showErrorAlert("Failed to update user. Please try again later.");
     }
   };
 
