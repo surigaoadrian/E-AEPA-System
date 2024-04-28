@@ -32,11 +32,11 @@ function SideBar() {
       <div style={sidebarStyles}>
         {filteredSideBarData.map((item, index) => {
           return (
-            <div key={index} style={{ paddingTop: "5px" }}>
+            <div key={index} style={{ paddingTop: "5px",fontSize: "15px",}}>
               <div id="linkStyle">
                 <NavLink className="nav-link" to={item.path}>
                   <span style={{ marginRight: "15px" }}>{item.icon}</span>
-                  <span>{item.title}</span>
+                  <span style={{ margin: item.margin}}>{item.title}</span>
                 </NavLink>
               </div>
             </div>
