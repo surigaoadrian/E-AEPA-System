@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
@@ -23,10 +24,10 @@ public class UserController {
 
 
     @GetMapping("/getUser/{userID}")
-    public ResponseEntity<UserEntity> getUser (@PathVariable int userID){
-        UserEntity user = userServ.getUser(userID);
+    public ResponseEntity<Optional<UserEntity>> getUser (@PathVariable int userID){
+        Optional<UserEntity> user = userServ.getUser(userID);
 
-        if(user != null){
+        if(user.isPresent()){
             return ResponseEntity.ok(user);
         } else {
             return ResponseEntity.notFound().build();
@@ -51,12 +52,21 @@ public class UserController {
         return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
     }
 
-    @PutMapping("/editUser/{userID}")
-    public UserEntity editUserDetails(@PathVariable int userID, @RequestBody UserEntity newDetails) {
-        UserEntity user = userServ.editUserDetails(userID, newDetails);
-        if(user == null){
-            throw new RuntimeException("User not found with id: " + userID);
+    @PatchMapping ("/editUser/{userID}")
+    public ResponseEntity<UserEntity> editUserDetails(@PathVariable int userID, @RequestBody UserEntity newDetails) {
+        UserEntity updatedUser = userServ.adminUpdatesUser(userID, newDetails);
+
+        return ResponseEntity.ok(updatedUser);
+    }
+
+    @PutMapping("/checkUsername/{username}")
+    public ResponseEntity<String> checkUsernameAvailability(@PathVariable String username){
+        String result = userServ.checkUsernameAvailability(username);
+
+        if(result.equals("Username taken already")){
+            return ResponseEntity.ok(result); //username taken
+        }else {
+            return ResponseEntity.ok(result); //username avaiable
         }
-        return user;
     }
 }

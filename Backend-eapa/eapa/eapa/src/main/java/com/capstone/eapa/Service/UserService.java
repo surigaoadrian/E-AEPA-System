@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -33,10 +35,10 @@ public class UserService implements UserDetailsService {
         return userRepo.findAllByIsDeleted(0);
     }
 
-    public UserEntity getUser(int userID){
-        UserEntity user = userRepo.findByUserID(userID);
+    public Optional<UserEntity> getUser(int userID){
+        Optional<UserEntity> user = userRepo.findByUserID(userID);
 
-        if(user != null){
+        if(user.isPresent()){
             return user;
         }
 
@@ -88,6 +90,16 @@ public class UserService implements UserDetailsService {
         userRepo.save(user);
     }
 
+    //find username
+    public String checkUsernameAvailability(String username){
+        Optional<UserEntity> user = userRepo.findByUsername(username);
+
+        if(user.isPresent()){
+            return "Username already taken";
+        } else {
+            return "Username available";
+        }
+    }
 
 
     //this method returns user details
@@ -96,40 +108,52 @@ public class UserService implements UserDetailsService {
         return userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
-    //this method deletes a user account
-    public void deleteUser(int userID) {
-        UserEntity user = userRepo.findByUserID(userID);
-        if (user == null) {
-            throw new EntityNotFoundException("User not found with id: " + userID);
+//    this method deletes a user account
+    public String deleteUser(int userID) {
+        String msg = "";
+        Optional<UserEntity> optionalUser = userRepo.findByUserID(userID);
+
+        if(optionalUser.isPresent()){
+            UserEntity user = optionalUser.get();
+            user.setIsDeleted(1);
+            userRepo.save(user);
+
+            msg = "User " + user.getfName() + " " + user.getlName() + " is deleted.";
+        }else {
+            msg = "User not found";
         }
-        // Mark the user as deleted
-        user.setIsDeleted(1);
-        userRepo.save(user);
+        return msg;
     }
 
-    //this method edits user details
-    public UserEntity editUserDetails(int userID, UserEntity newUserDetails){
-        UserEntity user = userRepo.findByUserID(userID);
-        if(user != null){
+    private String emptyToNull(String str) {
+        return (str == null || str.trim().isEmpty()) ? null : str;
+    }
 
-            if(!newUserDetails.getUsername().equals(user.getUsername())){
-                if(userRepo.existsByUsernameAndIsDeleted(newUserDetails.getUsername(),0)){
-                    throw new RuntimeException("Username already exists");
-                }
-            }
-            user.setEmpStatus(newUserDetails.getEmpStatus());
-            user.setProbeStatus(newUserDetails.getProbeStatus());
-            user.setDateStarted(newUserDetails.getDateStarted());
-            user.setfName(newUserDetails.getfName());
-            user.setmName(newUserDetails.getmName());
-            user.setlName(newUserDetails.getlName());
-            user.setPassword(newUserDetails.getPassword());
-            user.setWorkEmail(newUserDetails.getEmpStatus());
-            user.setUsername(newUserDetails.getUsername());
-
+    //adi edit user
+    @Transactional
+    public UserEntity adminUpdatesUser(int userID, UserEntity newUserDetails){
+        UserEntity user = userRepo.findById(userID)
+                .orElseThrow(() -> new NoSuchElementException("User " + userID + " not found."));
+        try {
+            if (newUserDetails.getWorkID() != null) user.setWorkID(newUserDetails.getWorkID());
+            if (newUserDetails.getfName() != null) user.setfName(newUserDetails.getfName());
+            if (newUserDetails.getmName() != null) user.setmName(newUserDetails.getmName());
+            if (newUserDetails.getlName() != null) user.setlName(newUserDetails.getlName());
+            if (newUserDetails.getWorkEmail() != null) user.setWorkEmail(newUserDetails.getWorkEmail());
+            if (newUserDetails.getUsername() != null) user.setUsername(newUserDetails.getUsername());
+            if (newUserDetails.getPosition() != null) user.setPosition(newUserDetails.getPosition());
+            if (newUserDetails.getGender() != null) user.setGender(newUserDetails.getGender());
+            if (newUserDetails.getDept() != null) user.setDept(newUserDetails.getDept());
+            if (newUserDetails.getContactNum() != null) user.setContactNum(newUserDetails.getContactNum());
+            if (newUserDetails.getEmpStatus() != null) user.setEmpStatus(newUserDetails.getEmpStatus());
+            if (newUserDetails.getProbeStatus() != null) user.setProbeStatus(newUserDetails.getProbeStatus());
+            if (newUserDetails.getDateStarted() != null) user.setDateStarted(newUserDetails.getDateStarted());
             return userRepo.save(user);
-        }else{
-            throw new RuntimeException("User not found");
+        } catch (Exception e) {
+            // Log the exception along with some context
+            System.out.println("Error updating user: " + e.getMessage());
+            throw e; // rethrow or handle as appropriate
         }
     }
+
 }

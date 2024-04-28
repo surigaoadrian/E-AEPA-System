@@ -32,6 +32,7 @@ public class SecurityConfig {
 //                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 //                .build();
 //    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -48,7 +49,10 @@ public class SecurityConfig {
                                         "department/getDept/**",
                                         "department/deleteDept/**",
                                         "department/addDept",
-                                        "department/updateDept")
+                                        "department/updateDept",
+                                        "/user/checkUsername/**",
+                                        "/user/delete/**",
+                                        "user/editUser/**")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()
