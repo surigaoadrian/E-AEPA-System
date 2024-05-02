@@ -3,6 +3,7 @@ import "../styles/sidebarStyles.css";
 import { NavLink } from "react-router-dom";
 import { SideBarData } from "../data/sideBarData";
 
+
 function SideBar() {
   const [userRole, setUserRole] = useState("");
   const [filteredSideBarData, setFilteredSideBarData] = useState([]);
@@ -26,6 +27,7 @@ function SideBar() {
     paddingTop: "10px",
     borderTop: "3px solid #F8C702",
   };
+
 
   return (
     <div>

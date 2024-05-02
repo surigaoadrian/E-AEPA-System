@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+import Animated from '../components/motion';
 import Paper from '@mui/material/Paper';
 import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, IconButton, InputLabel, MenuItem, Select, Snackbar, Tab, Tabs, TextField, Typography, Alert as MuiAlert } from "@mui/material";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -399,8 +399,10 @@ function ManageAccount() {
   ];
 
 
-  return <div>
-    <Typography ml={5} mt={3} sx={{ fontFamily: 'Poppins', fontWeight: 'bold', fontSize: '25px' }} >User Accounts</Typography>
+  return (
+    <Animated>
+  <div>
+    <Typography ml={6} mt={3} sx={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '25px' }} >User Accounts</Typography>
     <Box
       sx={{
         display: 'flex',
@@ -435,13 +437,11 @@ function ManageAccount() {
           <Button
             variant="contained"
             sx={{
-              fontSize: '18px',
-              height: 45,
-              width: 145,
-              mb: 4,
+              fontSize: '15px',
+              height: 40,
+              width: 135,
               fontFamily: 'Poppins',
               backgroundColor: '#8c383e',
-              padding: '1px 1px 0 0 ',
               '&:hover': {
                 backgroundColor: '#F8C702',
                 color: 'black',
@@ -471,9 +471,9 @@ function ManageAccount() {
           </Tabs>
         </Grid>
 
-        <Paper elevation={3} sx={{ borderRadius: '10px', width: '100%', height: '70vh' }}>
+        <Paper elevation={3} sx={{ borderRadius: '10px', width: '99%', height: '80vh', }}>
 
-          <TableContainer sx={{ borderRadius: '10px 10px 0 0 ', maxHeight: '100%' }}>
+          <TableContainer sx={{ borderRadius: '5px 5px 0 0 ', maxHeight: '100%' }}>
             <Table stickyHeader aria-label="sticky table" size="small">
               <TableHead sx={{ height: '5vh' }} >
                 <TableRow>
@@ -1704,9 +1704,9 @@ function ManageAccount() {
       message={errorAlert.message}
     />
 
-
-
-  </div >;
+  </div >
+  </Animated>
+  );
 }
 
 export default ManageAccount;

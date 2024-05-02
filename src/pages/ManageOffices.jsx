@@ -10,6 +10,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { Divider, FormControl as Form } from "@mui/material";
 import axios from "axios";
+import Animated from "../components/motion";
 
 const ManageOffices = () => {
   const [users, setUsers] = useState([]);
@@ -179,11 +180,12 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
 
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
+    <Animated>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50" >
       <div className="bg-white rounded-lg shadow-md w-2/4">
         <div
           className="p-2 font-bold text-lg text-white rounded-t-lg"
-          style={{ backgroundColor: '#8C383E', border: 'none' }}
+          style={{ backgroundColor: '#8C383E', border: 'none', }}
         >
           <FontAwesomeIcon
             icon={faPenToSquare}
@@ -192,9 +194,9 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
           />
           Edit Department
         </div>
-        <div className="p-4">
+        <div className="p-4" >
           <form onSubmit={handleSubmit}>
-            <div className="mb-4">
+            <div className="mb-4"style={{width: "50%"}} >
               <label htmlFor="deptName" className="block text-sm font-medium text-gray-700">
                 Department Name
               </label>
@@ -236,13 +238,15 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
         </div>
       </div>
     </div>
+    </Animated>
   );
 };
 
 
   return (
+    <Animated>
     <div>
-      <h1 className="text-3xl font-bold text-left ml-12 mt-8 mb-2">Department</h1>
+      <h1 className="text-2xl font-bold text-left ml-12 mt-6 mb-2">Department</h1>
       <label className="ml-12 text-sm text-gray-700">All Departments ({totalDepartments})</label>
         <div className="ml-8 mt-2">
           <div className="mr-10 mb-4 flex items-center justify-between">
@@ -438,8 +442,8 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
 
       {/* EditDepartmentModal */}
       {showEditModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg shadow-md w-auto h-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center w-[80%] h-[80%]">
+          <div className="bg-white rounded-lg shadow-md w-[auto] h-auto" >
             {/* Render the EditDepartmentModal component here */}
             <EditDepartmentModal
               department={editingDepartment}
@@ -520,7 +524,7 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
         )}
 
     </div>
-    
+    </Animated>    
 
     
   );
