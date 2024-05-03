@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { styled } from "@mui/material/styles";
 import axios from "axios";
 import EndorseModal from "./EndorseModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -21,15 +20,7 @@ import Paper from "@mui/material/Paper";
 
 import { faCheckCircle, faSearch } from "@fortawesome/free-solid-svg-icons";
 import EmployeeProfile from "../pages/EmployeeProfile";
-import  Animated  from "../components/motion";
-
-const StyledTableRow = styled(TableRow)({
-	transition: "transform 125ms",
-	"&:hover": {
-		transform: "translateY(-2px)",
-	},
-});
-
+import Animated from "../components/motion";
 
 function EmployeeData() {
 	const [tab, setTab] = useState(0);
@@ -76,7 +67,6 @@ function EmployeeData() {
 
 	const changeTab = (event, newTab) => {
 		setTab(newTab);
-		a;
 	};
 
 	const handleSearchChange = (e) => {
@@ -117,7 +107,7 @@ function EmployeeData() {
 	};
 
 	const tableStyle = {
-		borderRadius: "3px 3px 0 0",
+		borderRadius: "5px 5px 0 0",
 		width: "93%",
 		marginTop: "5px",
 		boxShadow: "2px 2px 5px rgba(157, 157, 157, 0.5)",
@@ -128,7 +118,7 @@ function EmployeeData() {
 		color: "#464646",
 		fontFamily: "Poppins",
 		fontWeight: 500,
-		fontSize: "13px",
+		fontSize: "14px",
 		padding: "10px",
 	};
 
@@ -265,10 +255,7 @@ function EmployeeData() {
 													</TableRow>
 												) : (
 													filteredUsers.map((user) => (
-														<StyledTableRow
-															key={user.userID}
-															sx={rowStyle}
-														>
+														<TableRow key={user.userID} sx={rowStyle}>
 															<TableCell style={cellStyle}>
 																{user.workID}
 															</TableCell>
@@ -315,7 +302,7 @@ function EmployeeData() {
 																	View Details
 																</Button>
 															</TableCell>
-														</StyledTableRow>
+														</TableRow>
 													))
 												)}
 											</TableBody>
