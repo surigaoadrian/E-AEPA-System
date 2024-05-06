@@ -519,13 +519,13 @@ function ManageAccount() {
         return (
           <div>
             <IconButton onClick={() => handleClickEditBtn(row.userID)}>
-              <EditNoteTwoToneIcon sx={{ fontSize: "3vh" }} />
+              <EditNoteTwoToneIcon sx={{ fontSize: "1.8em" }} />
             </IconButton>
             <IconButton
               color="error"
               onClick={() => handleClickDeleteBtn(row.userID)}
             >
-              <DeleteOutlineIcon />
+              <DeleteOutlineIcon sx={{ fontSize: "1.5em" }} />
             </IconButton>
           </div>
         );
@@ -571,13 +571,13 @@ function ManageAccount() {
       format: (value, row) => (
         <div>
           <IconButton onClick={() => handleClickEditBtn(row.userID)}>
-            <EditNoteTwoToneIcon sx={{ fontSize: "3vh" }} />
+            <EditNoteTwoToneIcon sx={{ fontSize: "1.8em" }} />
           </IconButton>
           <IconButton
             color="error"
             onClick={() => handleClickDeleteBtn(row.userID)}
           >
-            <DeleteOutlineIcon />
+            <DeleteOutlineIcon sx={{ fontSize: "1.5em" }} />
           </IconButton>
         </div>
       ),
@@ -589,7 +589,7 @@ function ManageAccount() {
       <Typography
         ml={5}
         mt={3}
-        sx={{ fontFamily: "Poppins", fontWeight: "bold", fontSize: "25px" }}
+        sx={{ fontFamily: "Poppins", fontWeight: "bold", fontSize: "2em" }}
       >
         User Accounts
       </Typography>
@@ -632,8 +632,8 @@ function ManageAccount() {
               variant="contained"
               sx={{
                 fontSize: "18px",
-                height: 45,
-                width: 145,
+                height: "2.5em",
+                width: "8em",
                 mb: 4,
                 fontFamily: "Poppins",
                 backgroundColor: "#8c383e",
@@ -646,7 +646,7 @@ function ManageAccount() {
               style={{
                 textTransform: "none",
               }}
-              startIcon={<AddCircleIcon />}
+              startIcon={<AddCircleIcon  />}
               onClick={handleClickAddUserBtn}
             >
               Add User
@@ -655,7 +655,7 @@ function ManageAccount() {
           <Grid
             item
             xs={12}
-            sx={{ height: "7vh", display: "flex", padding: "0px" }}
+            sx={{ height: "4em", display: "flex", padding: "0px" }}
           >
             <Tabs
               value={selectedTab}
@@ -669,6 +669,7 @@ function ManageAccount() {
                 style={{
                   fontFamily: "Poppins",
                   textTransform: "none",
+                  fontSize: "1em",
                 }}
               />
               <Tab
@@ -676,6 +677,7 @@ function ManageAccount() {
                 style={{
                   fontFamily: "Poppins",
                   textTransform: "none",
+                  fontSize: "1em",
                 }}
               />
             </Tabs>
@@ -683,13 +685,13 @@ function ManageAccount() {
 
           <Paper
             elevation={3}
-            sx={{ borderRadius: "10px", width: "100%", height: "70vh" }}
+            sx={{ borderRadius: "10px", width: "100%", height: "52em" }}
           >
             <TableContainer
               sx={{ borderRadius: "10px 10px 0 0 ", maxHeight: "100%" }}
             >
               <Table stickyHeader aria-label="sticky table" size="small">
-                <TableHead sx={{ height: "5vh" }}>
+                <TableHead sx={{ height: "3.5em" }}>
                   <TableRow>
                     {(selectedTab === 0 ? columnsEmployees : columnsAdmins).map(
                       (column) => (
@@ -699,7 +701,8 @@ function ManageAccount() {
                             bgcolor: "#8c383e",
                             color: "white",
                             fontWeight: "bold",
-                            maxWidth: "5vh",
+                            maxWidth: "3.5em",
+                            fontSize: "1em",
                           }}
                           key={column.id}
                           align={column.align}
@@ -727,7 +730,7 @@ function ManageAccount() {
                         : columnsAdmins
                       ).map((column) => (
                         <TableCell
-                          sx={{ fontFamily: "Poppins" }}
+                          sx={{ fontFamily: "Poppins", fontSize: "1em"}}
                           key={`${row.id}-${column.id}`}
                           align={column.align}
                         >
@@ -755,28 +758,22 @@ function ManageAccount() {
       <Dialog
         open={openRegistrationDialog}
         onClose={handleClickCloseBtn}
-        sx={{
-          "@media (min-width: 600px)": {
-            width: "100vw",
-          },
-        }}
       >
         <Box
           sx={{
             bgcolor: "#8c383e",
-            height: "4vh",
+            height: "2.79em",
             width: "100%",
             display: "flex",
             justifyContent: "right",
           }}
         >
-          <Grid container spacing={0.6}>
-            <Grid item xs={12} sx={{ height: "4.5vh" }}>
+          <Grid container>
+            <Grid item xs={12}>
               <Grid
                 container
-                spacing={0.5}
+                spacing={0.6}
                 sx={{
-                  padding: "4px 0 6px 0",
                   fontFamily: "Poppins",
                   fontWeight: "bold",
                   color: "white",
@@ -784,12 +781,12 @@ function ManageAccount() {
                   alignItems: "center", // Align items vertically
                 }}
               >
-                <Grid item sx={{ height: "4.1vh" }}>
+                <Grid item sx={{ height: "3.3em"}}>
                   <PersonRoundedIcon
-                    sx={{ color: "white", fontSize: "29px", ml: 1, mt: 0.5 }}
+                    sx={{ color: "white", fontSize: "1.8em", ml: 1, mt: .8 }}
                   />
                 </Grid>
-                <Grid item sx={{ fontSize: "18px" }}>
+                <Grid item sx={{ fontSize: "1.1em" }}>
                   Register User Account
                 </Grid>
               </Grid>
@@ -804,7 +801,7 @@ function ManageAccount() {
             }}
           >
             <HighlightOffOutlinedIcon
-              sx={{ fontSize: "35px", color: "white" }}
+              sx={{ fontSize: "1.4em", color: "white" }}
             />
           </IconButton>
         </Box>
@@ -820,14 +817,14 @@ function ManageAccount() {
                 width: "100%",
               }}
             >
-              <Grid container spacing={0.1} sx={{ width: "45vh" }}>
+              <Grid container  sx={{ width: "45vh"}}>
                 <Grid item xs={3} sx={{ margin: 1 }}>
                   <Typography style={{ fontFamily: "Poppins", color: "gray" }}>
                     User Role:{" "}
                   </Typography>
                 </Grid>
                 <Grid item xs={7}>
-                  <FormControl sx={{ width: "30vh" }}>
+                  <FormControl sx={{ width: "22em" }}>
                     <Select
                       labelId="roleLabel"
                       id="role"
@@ -869,7 +866,7 @@ function ManageAccount() {
               {role === "ADMIN" && (
                 <>
                   <Grid item xs={4}>
-                    <Box style={{ fontFamily: "Poppins" }} height="100%">
+                    <Box style={{ fontFamily: "Poppins" }} >
                       <TextField
                         required
                         fullWidth
@@ -885,7 +882,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
@@ -893,7 +890,7 @@ function ManageAccount() {
                     </Box>
                   </Grid>
                   <Grid item xs={4}>
-                    <Box style={{ fontFamily: "Poppins" }} height="100%">
+                    <Box style={{ fontFamily: "Poppins" }}>
                       <TextField
                         fullWidth
                         size="medium"
@@ -908,7 +905,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
@@ -916,7 +913,7 @@ function ManageAccount() {
                     </Box>
                   </Grid>
                   <Grid item xs={4}>
-                    <Box style={{ fontFamily: "Poppins" }} height="100%">
+                    <Box style={{ fontFamily: "Poppins" }}>
                       <TextField
                         required
                         fullWidth
@@ -932,7 +929,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
@@ -940,7 +937,7 @@ function ManageAccount() {
                     </Box>
                   </Grid>
                   <Grid item xs={6}>
-                    <Box sx={{ height: "100%" }}>
+                    <Box >
                       <TextField
                         required
                         fullWidth
@@ -954,7 +951,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
@@ -964,7 +961,7 @@ function ManageAccount() {
                     </Box>
                   </Grid>
                   <Grid item xs={6}>
-                    <Box sx={{ height: "100%" }}>
+                    <Box>
                       <TextField
                         required
                         fullWidth
@@ -980,7 +977,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
@@ -997,7 +994,7 @@ function ManageAccount() {
                     </Box>
                   </Grid>
                   <Grid item xs={12}>
-                    <Box sx={{ height: "100%" }}>
+                    <Box>
                       <TextField
                         required
                         fullWidth
@@ -1013,14 +1010,10 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
-                        error={emailError}
-                        helperText={
-                          emailError ? "Please enter a valid email" : ""
-                        }
                       />
                     </Box>
                   </Grid>
@@ -1041,7 +1034,7 @@ function ManageAccount() {
                           }}
                           inputProps={{
                             style: {
-                              fontSize: "16px",
+                              fontSize: "1em",
                               fontFamily: "Poppins",
                             },
                           }}
@@ -1077,7 +1070,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
@@ -1103,13 +1096,13 @@ function ManageAccount() {
 
               {(role === "EMPLOYEE" || role === "DEPARTMENT HEAD") && (
                 <>
-                  <Grid item xs={4} sx={{ width: "100%" }}>
+                  <Grid item xs={4}>
                     <Box>
                       <FormControl fullWidth size="medium" required>
                         <InputLabel
                           id="employementStatusLabel"
                           sx={{
-                            fontSize: "14px",
+                            fontSize: ".9em",
                             fontFamily: "Poppins",
                           }}
                         >
@@ -1140,7 +1133,7 @@ function ManageAccount() {
                       </FormControl>
                     </Box>
                   </Grid>
-                  <Grid item xs={4} sx={{ width: "100%" }}>
+                  <Grid item xs={4}>
                     <Box
                       sx={{ bgcolor: empStatus ? "inherit" : "transparent" }}
                     >
@@ -1153,7 +1146,7 @@ function ManageAccount() {
                         <InputLabel
                           id="probationaryStatus"
                           sx={{
-                            fontSize: "14px",
+                            fontSize: ".9em",
                             fontFamily: "Poppins",
                           }}
                         >
@@ -1184,7 +1177,7 @@ function ManageAccount() {
                       </FormControl>
                     </Box>
                   </Grid>
-                  <Grid item xs={4} sx={{ width: "100%" }}>
+                  <Grid item xs={4}>
                     <Box
                       sx={{
                         bgcolor:
@@ -1207,7 +1200,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                           // Add a pattern to enforce the format MM/DD/YY
@@ -1220,7 +1213,7 @@ function ManageAccount() {
                     </Box>
                   </Grid>
                   <Grid item xs={4}>
-                    <Box style={{ fontFamily: "Poppins" }} height="100%">
+                    <Box style={{ fontFamily: "Poppins" }}>
                       <TextField
                         required
                         fullWidth
@@ -1236,7 +1229,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
@@ -1244,7 +1237,7 @@ function ManageAccount() {
                     </Box>
                   </Grid>
                   <Grid item xs={4}>
-                    <Box style={{ fontFamily: "Poppins" }} height="100%">
+                    <Box style={{ fontFamily: "Poppins" }}>
                       <TextField
                         fullWidth
                         size="medium"
@@ -1259,7 +1252,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
@@ -1267,7 +1260,7 @@ function ManageAccount() {
                     </Box>
                   </Grid>
                   <Grid item xs={4}>
-                    <Box style={{ fontFamily: "Poppins" }} height="100%">
+                    <Box style={{ fontFamily: "Poppins" }}>
                       <TextField
                         required
                         fullWidth
@@ -1283,15 +1276,15 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
                       />
                     </Box>
                   </Grid>
-                  <Grid item xs={5.7} sx={{ width: "100%" }}>
-                    <Box sx={{ height: "100%" }}>
+                  <Grid item xs={5.7}>
+                    <Box >
                       <TextField
                         required
                         fullWidth
@@ -1305,7 +1298,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
@@ -1314,7 +1307,7 @@ function ManageAccount() {
                       />
                     </Box>
                   </Grid>
-                  <Grid item xs={4} sx={{ width: "100%" }}>
+                  <Grid item xs={4}>
                     <Box>
                       <TextField
                         required
@@ -1333,7 +1326,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                           // Add a pattern to enforce the format MM/DD/YY
@@ -1386,8 +1379,8 @@ function ManageAccount() {
                       </FormControl>
                     </Box>
                   </Grid>
-                  <Grid item xs={6} sx={{ width: "100%" }}>
-                    <Box sx={{ height: "100%" }}>
+                  <Grid item xs={6}>
+                    <Box >
                       <TextField
                         required
                         fullWidth
@@ -1403,7 +1396,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
@@ -1416,7 +1409,7 @@ function ManageAccount() {
                         <InputLabel
                           id="deptLabel"
                           sx={{
-                            fontSize: "14px",
+                            fontSize: ".9em",
                             fontFamily: "Poppins",
                           }}
                         >
@@ -1460,8 +1453,8 @@ function ManageAccount() {
                       </FormControl>
                     </Box>
                   </Grid>
-                  <Grid item xs={6} sx={{ width: "100%" }}>
-                    <Box sx={{ height: "100%" }}>
+                  <Grid item xs={6}>
+                    <Box >
                       <TextField
                         required
                         fullWidth
@@ -1477,7 +1470,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
@@ -1501,7 +1494,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
@@ -1519,7 +1512,7 @@ function ManageAccount() {
                   </Grid>
                   <Grid item xs={6}>
                     <Box>
-                      <div style={{ position: "relative", width: "100%" }}>
+                      <div style={{ position: "relative" }}>
                         <TextField
                           required
                           fullWidth
@@ -1535,7 +1528,7 @@ function ManageAccount() {
                           }}
                           inputProps={{
                             style: {
-                              fontSize: "16px",
+                              fontSize: "1em",
                               fontFamily: "Poppins",
                             },
                           }}
@@ -1571,7 +1564,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
@@ -1599,7 +1592,7 @@ function ManageAccount() {
           <DialogActions
             sx={{
               justifyContent: "left",
-              ml: "1.3vh",
+              ml: "1em",
             }}
           >
             <Button
@@ -1625,33 +1618,28 @@ function ManageAccount() {
         </form>
       </Dialog>
 
-      {/* {POP up for edit} */}
+      {/* {pop up for edit} */}
       <Dialog
         open={openEditDialog}
-        onAbort={handleClickCloseBtn}
-        sx={{
-          "@media (min-width: 600px)": {
-            width: "100vw",
-          },
-        }}
+        onClose={handleClickCloseBtn}
+
       >
         <form onSubmit={(e) => handleEditUserSave(e, selectedUser)}>
           <Box
             sx={{
               bgcolor: "#8c383e",
-              height: "4vh",
+              height: "2.79em",
               width: "100%",
               display: "flex",
               justifyContent: "right",
             }}
           >
             <Grid container spacing={0.6}>
-              <Grid item xs={12} sx={{ height: "4.5vh" }}>
+              <Grid item xs={12}>
                 <Grid
                   container
-                  spacing={0.5}
+                  spacing={0.6}
                   sx={{
-                    padding: "4px 0 6px 0",
                     fontFamily: "Poppins",
                     fontWeight: "bold",
                     color: "white",
@@ -1659,12 +1647,12 @@ function ManageAccount() {
                     alignItems: "center", // Align items vertically
                   }}
                 >
-                  <Grid item sx={{ height: "4.1vh" }}>
+                  <Grid item sx={{ height: "3.3em" }}>
                     <EditNoteTwoToneIcon
-                      sx={{ color: "white", fontSize: "35px", ml: 1, mt: 0.3 }}
+                      sx={{ color: "white", fontSize: "2.1em", ml: 1, mt: .7 }}
                     />
                   </Grid>
-                  <Grid item sx={{ fontSize: "18px" }}>
+                  <Grid item sx={{ fontSize: "1.1em" }}>
                     Edit User Details
                   </Grid>
                 </Grid>
@@ -1679,7 +1667,7 @@ function ManageAccount() {
               }}
             >
               <HighlightOffOutlinedIcon
-                sx={{ fontSize: "35px", color: "white" }}
+                sx={{ fontSize: "1.4em", color: "white" }}
               />
             </IconButton>
           </Box>
@@ -1697,7 +1685,7 @@ function ManageAccount() {
               {selectedUser?.role === "ADMIN" && (
                 <>
                   <Grid item xs={4}>
-                    <Box style={{ fontFamily: "Poppins" }} height="100%">
+                    <Box style={{ fontFamily: "Poppins" }}>
                       <TextField
                         fullWidth
                         size="medium"
@@ -1713,7 +1701,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
@@ -1721,7 +1709,7 @@ function ManageAccount() {
                     </Box>
                   </Grid>
                   <Grid item xs={4}>
-                    <Box style={{ fontFamily: "Poppins" }} height="100%">
+                    <Box style={{ fontFamily: "Poppins" }}>
                       <TextField
                         fullWidth
                         size="medium"
@@ -1737,7 +1725,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
@@ -1745,7 +1733,7 @@ function ManageAccount() {
                     </Box>
                   </Grid>
                   <Grid item xs={4}>
-                    <Box style={{ fontFamily: "Poppins" }} height="100%">
+                    <Box style={{ fontFamily: "Poppins" }} >
                       <TextField
                         fullWidth
                         size="medium"
@@ -1761,7 +1749,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
@@ -1769,11 +1757,11 @@ function ManageAccount() {
                     </Box>
                   </Grid>
                   <Grid item xs={6}>
-                    <Box sx={{ height: "100%" }}>
+                    <Box >
                       <TextField
                         fullWidth
                         size="medium"
-                        label="Work ID"
+                        label="Id Number"
                         id="workId"
                         name="workID"
                         value={selectedUser.workID}
@@ -1785,44 +1773,15 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
                       />
                     </Box>
                   </Grid>
-
                   <Grid item xs={6}>
-                    <Box sx={{ height: "100%" }}>
-                      <TextField
-                        fullWidth
-                        size="medium"
-                        label="Institutional Email"
-                        id="email"
-                        name="workEmail"
-                        value={selectedUser.workEmail}
-                        onChange={handleUserDataChange}
-                        InputLabelProps={{
-                          style: {
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                        inputProps={{
-                          style: {
-                            fontSize: "16px",
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                        error={emailError}
-                        helperText={
-                          emailError ? "Please enter a valid email" : ""
-                        }
-                      />
-                    </Box>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Box sx={{ height: "100%" }}>
+                    <Box >
                       <TextField
                         fullWidth
                         size="medium"
@@ -1838,7 +1797,31 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                      />
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Box >
+                      <TextField
+                        fullWidth
+                        size="medium"
+                        label="Institutional Email"
+                        id="email"
+                        name="workEmail"
+                        value={selectedUser.workEmail}
+                        onChange={handleUserDataChange}
+                        InputLabelProps={{
+                          style: {
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                        inputProps={{
+                          style: {
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
@@ -1850,7 +1833,7 @@ function ManageAccount() {
               {(selectedUser?.role === "EMPLOYEE" ||
                 selectedUser?.role === "DEPARTMENT HEAD") && (
                 <>
-                  <Grid item xs={4} sx={{ width: "100%" }}>
+                  <Grid item xs={4} >
                     <Box>
                       <FormControl
                         fullWidth
@@ -1860,7 +1843,7 @@ function ManageAccount() {
                         <InputLabel
                           id="employementStatusLabel"
                           sx={{
-                            fontSize: "14px",
+                            fontSize: ".9em",
                             fontFamily: "Poppins",
                           }}
                         >
@@ -1901,7 +1884,7 @@ function ManageAccount() {
                         <InputLabel
                           id="probationaryStatus"
                           sx={{
-                            fontSize: "14px",
+                            fontSize: ".9em",
                             fontFamily: "Poppins",
                           }}
                         >
@@ -1956,7 +1939,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                           // Add a pattern to enforce the format MM/DD/YY
@@ -1966,12 +1949,84 @@ function ManageAccount() {
                       />
                     </Box>
                   </Grid>
-                  <Grid item xs={8} sx={{ width: "100%" }}>
-                    <Box sx={{ height: "100%" }}>
+                  <Grid item xs={4}>
+                    <Box style={{ fontFamily: "Poppins" }}>
                       <TextField
                         fullWidth
                         size="medium"
-                        label="Employee ID"
+                        label="First Name"
+                        id="fName"
+                        name="fName"
+                        value={selectedUser.fName}
+                        onChange={handleUserDataChange}
+                        InputLabelProps={{
+                          style: {
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                        inputProps={{
+                          style: {
+                            fontSize: "1em",
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                      />
+                    </Box>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Box style={{ fontFamily: "Poppins" }}>
+                      <TextField
+                        fullWidth
+                        size="medium"
+                        label="Middle Name"
+                        id="mName"
+                        name="mName"
+                        value={selectedUser.mName}
+                        onChange={handleUserDataChange}
+                        InputLabelProps={{
+                          style: {
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                        inputProps={{
+                          style: {
+                            fontSize: "1em",
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                      />
+                    </Box>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Box style={{ fontFamily: "Poppins" }}>
+                      <TextField
+                        fullWidth
+                        size="medium"
+                        label="Last Name"
+                        id="lName"
+                        value={selectedUser.lName}
+                        name="lName"
+                        onChange={handleUserDataChange}
+                        InputLabelProps={{
+                          style: {
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                        inputProps={{
+                          style: {
+                            fontSize: "1em",
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                      />
+                    </Box>
+                  </Grid>
+                  <Grid item xs={5.7}>
+                    <Box >
+                      <TextField
+                        fullWidth
+                        size="medium"
+                        label="ID Number"
                         id="workId"
                         name="workID"
                         value={selectedUser.workID}
@@ -1983,14 +2038,14 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
                       />
                     </Box>
                   </Grid>
-                  <Grid item xs={4} sx={{ width: "100%" }}>
+                  <Grid item xs={4} >
                     <Box>
                       <TextField
                         fullWidth
@@ -2009,7 +2064,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                           // Add a pattern to enforce the format MM/DD/YY
@@ -2019,135 +2074,14 @@ function ManageAccount() {
                       />
                     </Box>
                   </Grid>
-
-                  <Grid item xs={4}>
-                    <Box style={{ fontFamily: "Poppins" }} height="100%">
-                      <TextField
-                        fullWidth
-                        size="medium"
-                        label="First Name"
-                        id="fName"
-                        name="fName"
-                        value={selectedUser.fName}
-                        onChange={handleUserDataChange}
-                        InputLabelProps={{
-                          style: {
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                        inputProps={{
-                          style: {
-                            fontSize: "16px",
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                      />
-                    </Box>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Box style={{ fontFamily: "Poppins" }} height="100%">
-                      <TextField
-                        fullWidth
-                        size="medium"
-                        label="Middle Name"
-                        id="mName"
-                        name="mName"
-                        value={selectedUser.mName}
-                        onChange={handleUserDataChange}
-                        InputLabelProps={{
-                          style: {
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                        inputProps={{
-                          style: {
-                            fontSize: "16px",
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                      />
-                    </Box>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Box style={{ fontFamily: "Poppins" }} height="100%">
-                      <TextField
-                        fullWidth
-                        size="medium"
-                        label="Last Name"
-                        id="lName"
-                        value={selectedUser.lName}
-                        name="lName"
-                        onChange={handleUserDataChange}
-                        InputLabelProps={{
-                          style: {
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                        inputProps={{
-                          style: {
-                            fontSize: "16px",
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                      />
-                    </Box>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Box sx={{ height: "100%" }}>
-                      <TextField
-                        fullWidth
-                        size="medium"
-                        label="Work ID"
-                        id="workId"
-                        name="workID"
-                        value={selectedUser.workID}
-                        onChange={handleUserDataChange}
-                        InputLabelProps={{
-                          style: {
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                        inputProps={{
-                          style: {
-                            fontSize: "16px",
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                      />
-                    </Box>
-                  </Grid>
-                  <Grid item xs={8} sx={{ width: "100%" }}>
-                    <Box sx={{ height: "100%" }}>
-                      <TextField
-                        fullWidth
-                        size="medium"
-                        label="Institutional Email"
-                        id="email"
-                        name="workEmail"
-                        value={selectedUser.workEmail}
-                        onChange={handleUserDataChange}
-                        InputLabelProps={{
-                          style: {
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                        inputProps={{
-                          style: {
-                            fontSize: "16px",
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                      />
-                    </Box>
-                  </Grid>
-                  <Grid item xs={4}>
+                  <Grid item xs={2.3}>
                     <Box>
                       <FormControl fullWidth size="medium" disabled>
                         <InputLabel
                           id="GenderLabel"
                           value={gender}
                           sx={{
-                            fontSize: "14px",
+                            fontSize: ".9em",
                             fontFamily: "Poppins",
                           }}
                         >
@@ -2168,33 +2102,8 @@ function ManageAccount() {
                       </FormControl>
                     </Box>
                   </Grid>
-                  <Grid item xs={6}>
-                    <Box>
-                      <TextField
-                        fullWidth
-                        size="medium"
-                        label="Username"
-                        id="username"
-                        name="username"
-                        value={selectedUser.username}
-                        onChange={handleUserDataChange}
-                        InputLabelProps={{
-                          style: {
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                        inputProps={{
-                          style: {
-                            fontSize: "16px",
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                      />
-                    </Box>
-                  </Grid>
-
-                  <Grid item xs={6} sx={{ width: "100%" }}>
-                    <Box sx={{ height: "100%" }}>
+                  <Grid item xs={6} >
+                    <Box >
                       <TextField
                         fullWidth
                         size="medium"
@@ -2210,7 +2119,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "15px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
@@ -2223,7 +2132,7 @@ function ManageAccount() {
                         <InputLabel
                           id="deptLabel"
                           sx={{
-                            fontSize: "14px",
+                            fontSize: ".9em",
                             fontFamily: "Poppins",
                           }}
                         >
@@ -2260,6 +2169,54 @@ function ManageAccount() {
                       </FormControl>
                     </Box>
                   </Grid>
+                  <Grid item xs={6} >
+                    <Box >
+                      <TextField
+                        fullWidth
+                        size="medium"
+                        label="Institutional Email"
+                        id="email"
+                        name="workEmail"
+                        value={selectedUser.workEmail}
+                        onChange={handleUserDataChange}
+                        InputLabelProps={{
+                          style: {
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                        inputProps={{
+                          style: {
+                            fontSize: "1em",
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                      />
+                    </Box>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Box>
+                      <TextField
+                        fullWidth
+                        size="medium"
+                        label="Username"
+                        id="username"
+                        name="username"
+                        value={selectedUser.username}
+                        onChange={handleUserDataChange}
+                        InputLabelProps={{
+                          style: {
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                        inputProps={{
+                          style: {
+                            fontSize: "1em",
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                      />
+                    </Box>
+                  </Grid>
                 </>
               )}
             </Grid>
@@ -2293,28 +2250,23 @@ function ManageAccount() {
       <Dialog
         open={openDeleteDialog}
         onClose={handleClickCloseBtn}
-        sx={{
-          "@media (min-width: 600px)": {
-            width: "100vw",
-          },
-        }}
+
       >
         <Box
           sx={{
             bgcolor: "#8c383e",
-            height: "4vh",
+            height: "2.79em",
             width: "100%",
             display: "flex",
             justifyContent: "right",
           }}
         >
-          <Grid container spacing={0.6}>
-            <Grid item xs={12} sx={{ height: "4.5vh" }}>
+          <Grid container>
+            <Grid item xs={12}>
               <Grid
                 container
-                spacing={0.5}
+                spacing={0.6}
                 sx={{
-                  padding: "4px 0 6px 0",
                   fontFamily: "Poppins",
                   fontWeight: "bold",
                   color: "white",
@@ -2322,12 +2274,12 @@ function ManageAccount() {
                   alignItems: "center", // Align items vertically
                 }}
               >
-                <Grid item sx={{ height: "4.1vh" }}>
+                <Grid item sx={{ height: "3.3em" }}>
                   <DeleteOutlineIcon
-                    sx={{ color: "white", fontSize: "29px", ml: 1, mt: 0.5 }}
+                    sx={{ color: "white", fontSize: "1.5em", ml: 1, mt: 1.3}}
                   />
                 </Grid>
-                <Grid item sx={{ fontSize: "18px" }}>
+                <Grid item sx={{ fontSize: "1.1em" }}>
                   Delete User Account
                 </Grid>
               </Grid>
@@ -2342,7 +2294,7 @@ function ManageAccount() {
             }}
           >
             <HighlightOffOutlinedIcon
-              sx={{ fontSize: "35px", color: "white" }}
+              sx={{ fontSize: "1.4em", color: "white" }}
             />
           </IconButton>
         </Box>
@@ -2353,7 +2305,7 @@ function ManageAccount() {
               color: "black",
               display: "flex",
               justifyContent: "center",
-              mt: "15px",
+              mt: "1.3em",
             }}
           >
             Are you sure you want to delete this user account?
@@ -2387,7 +2339,7 @@ function ManageAccount() {
             sx={{
               fontFamily: "Poppins",
               bgcolor: "#8c383e",
-              ml: "1vh",
+              ml: "1em",
               "&:hover": {
                 bgcolor: "#e0e0e0",
                 color: "black",
