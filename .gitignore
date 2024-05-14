@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+#Java-specific ignores
+*.class
+/target/
+/build/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

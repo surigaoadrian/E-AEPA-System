@@ -25,6 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.sql.Blob;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -138,9 +140,7 @@ public class UserService implements UserDetailsService {
         } else {
             msg = "User not found";
         }
-        // Mark the user as deleted
-        user.setIsDeleted(1);
-        userRepo.save(user);
+        return msg;
     }
 
     private String emptyToNull(String str) {

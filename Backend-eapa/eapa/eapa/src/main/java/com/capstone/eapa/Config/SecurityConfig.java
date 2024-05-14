@@ -32,6 +32,7 @@ public class SecurityConfig {
 //                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 //                .build();
 //    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -56,8 +57,8 @@ public class SecurityConfig {
                                         "user/editAccountUsername/**",
                                         "user/editPersonalDetails/**",
                                         "user/uploadImage/**",
-                                        "user/image/**"
-                                        
+                                        "user/image/**",
+                                        "department/updateDept"
                                         )
                                 .permitAll()
                                 .anyRequest()

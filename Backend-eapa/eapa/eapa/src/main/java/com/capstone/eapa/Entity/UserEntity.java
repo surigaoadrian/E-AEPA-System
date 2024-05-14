@@ -39,9 +39,9 @@ public class UserEntity implements UserDetails {
     @Column(name = "Employment Status")
     private String empStatus;
     @Column(name = "Date Hired")
-    private Date dateHired;
+    private String dateHired;
     @Column(name = "Date Started")
-    private Date dateStarted;
+    private String dateStarted;
     @Lob
     @Column(name = "Profile Picture", columnDefinition = "LONGBLOB")
     private byte[] profilePic;
@@ -202,10 +202,6 @@ public class UserEntity implements UserDetails {
 
     public void setContactNum(String contactNum) {
         this.contactNum = contactNum;
-    }
-
-    public void setDateStarted(Date dateStarted) {
-        this.dateStarted = dateStarted;
     }
 
     public Blob getSignature() {

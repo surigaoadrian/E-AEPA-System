@@ -1,18 +1,43 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
-import Paper from '@mui/material/Paper';
-import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, IconButton, InputLabel, MenuItem, Select, Snackbar, Tab, Tabs, TextField, Typography, Alert as MuiAlert } from "@mui/material";
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
-import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import EditNoteTwoToneIcon from '@mui/icons-material/EditNoteTwoTone';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import TableRow from '@mui/material/TableRow';
+import Paper from "@mui/material/Paper";
+import {
+  Box,
+  Button,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  FormControl,
+  Grid,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  Snackbar,
+  Tab,
+  Tabs,
+  TextField,
+  Typography,
+  Alert as MuiAlert,
+} from "@mui/material";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import HighlightOffOutlinedIcon from "@mui/icons-material/HighlightOffOutlined";
+import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import EditNoteTwoToneIcon from "@mui/icons-material/EditNoteTwoTone";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import TableRow from "@mui/material/TableRow";
+import FormHelperText from "@mui/material/FormHelperText";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
 
 const CustomAlert = ({ open, onClose, severity, message }) => {
   return (
@@ -20,31 +45,34 @@ const CustomAlert = ({ open, onClose, severity, message }) => {
       open={open}
       autoHideDuration={3000} // Set the duration in milliseconds (e.g., 3000ms or 3 seconds)
       onClose={onClose}
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} // Set the Snackbar position to the center
+      anchorOrigin={{ vertical: "bottom", horizontal: "center" }} // Set the Snackbar position to the center
     >
-      <MuiAlert elevation={6} variant="filled" severity={severity} style={{ fontFamily: 'Poppins' }}>
+      <MuiAlert
+        elevation={6}
+        variant="filled"
+        severity={severity}
+        style={{ fontFamily: "Poppins" }}
+      >
         {message}
       </MuiAlert>
     </Snackbar>
   );
 };
 
-
 const capitalizeFirstLetter = (string) => {
   return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 };
 
 function ManageAccount() {
-
-  const [openRegistrationDialog, setOpenRegistrationDialog] = React.useState(false);
-  const [openEditDialog, setOpenEditDialog] = React.useState(false);
-  const [openDeleteDialog, setopenDeleteDialog] = React.useState(false);
-  const [empStatus, setempStatus] = React.useState('');
-  const [probeStatus, setProbeStatus] = React.useState('');
-  const [gender, setGender] = React.useState('');
-  const [dept, setdept] = React.useState('');
-  const [role, setRole] = React.useState('');
-  const [dateStarted, setDateStarted] = React.useState('');
+  const [openRegistrationDialog, setOpenRegistrationDialog] = useState(false);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [openDeleteDialog, setopenDeleteDialog] = useState(false);
+  const [empStatus, setempStatus] = useState("");
+  const [probeStatus, setProbeStatus] = useState("");
+  const [gender, setGender] = useState("");
+  const [dept, setdept] = useState("");
+  const [role, setRole] = useState("");
+  const [dateStarted, setDateStarted] = useState("");
   const [rows, setRows] = useState([]);
   const [selectedTab, setSelectedTab] = useState(0);
   const [selectedUser, setSelectedUser] = useState({});
@@ -76,7 +104,13 @@ function ManageAccount() {
     setShowPassword(!showPassword);
   };
 
+  const handleDateHiredChange = (e) => {
+    setDateHired(e.target.value);
+  };
 
+  const handleDateStartedChange = (e) => {
+    setDateStarted(e.target.value);
+  };
 
   const handleFNameChange = (e) => {
     setFirstName(e.target.value);
@@ -230,95 +264,128 @@ function ManageAccount() {
   };
   const handleClickAddUserBtn = () => {
     setOpenRegistrationDialog(true);
-  }
+  };
 
+  //handle selected user
   const handleClickEditBtn = async (userID) => {
     try {
-      const response = await fetch(`http://localhost:8080/user/getUser/${userID}`);
+      const response = await fetch(
+        `http://localhost:8080/user/getUser/${userID}`
+      );
       if (!response.ok) {
-        throw new Error('Failed to fetch user data');
+        throw new Error("Failed to fetch user data");
       }
       const userData = await response.json();
       setSelectedUser(userData);
       setOpenEditDialog(true);
+      console.log("Selected User:", selectedUser);
     } catch (error) {
-      console.error('Error fetching user data:', error);
+      console.error("Error fetching user data:", error);
     }
-  }
+  };
 
-  const handleSaveEditBtn = async (userID) => {
+  //handle updated user body
+  const handleUserDataChange = (e) => {
+    const { name, value } = e.target;
+    console.log("Updating:", name, value);
+    setSelectedUser((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  //save edit user account
+  const handleEditUserSave = async (e, selectedUser) => {
+    e.preventDefault();
     try {
-      console.log('BEFORE UPDATING:', selectedUser);
+      console.log("sending user data: ", selectedUser);
 
-      const updateUser = {
-        empStatus: selectedUser.empStatus,
-        probeStatus: selectedUser.probeStatus,
-        dateStarted: selectedUser.dateStarted,
-        username: selectedUser.username,
+      const userPayload = {
+        userID: selectedUser.userID,
+        workID: selectedUser.workID,
         fName: selectedUser.fName,
         mName: selectedUser.mName,
         lName: selectedUser.lName,
         workEmail: selectedUser.workEmail,
+        username: selectedUser.username,
         position: selectedUser.position,
         dept: selectedUser.dept,
-
+        empStatus: selectedUser.empStatus,
+        dateStarted: selectedUser.dateStarted,
       };
-      const response = await fetch(`http://localhost:8080/user/editUser/${userID}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updateUser),
-      });
-      console.log('AFTER UPDATING:', updateUser);
-      if (!response.ok) {
-        throw new Error('Failed to update user');
-      }
-      const updatedUser = await response.json();
-      setSelectedUser(updatedUser);
-      showSuccessAlert('User updated successfully');
-      fetchData();
+      await axios.patch(
+        `http://localhost:8080/user/editUser/${selectedUser.userID}`,
+        userPayload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      setUpdateFetch((prev) => !prev);
+      showSuccessAlert("User updated successfully");
       setOpenEditDialog(false);
     } catch (error) {
-      console.error('Error updating user:', error);
-      showErrorAlert('Failed to update user. Please try again later.');
+      console.error("Error updating user:", error);
+      showErrorAlert("Failed to update user. Please try again later.");
     }
   };
 
-
+  //handle delete user
   const handleClickDeleteBtn = (userID) => {
     console.log("delete user:", userID);
-    const selectedUser = rows.find(user => user.userID === userID);
+    const selectedUser = rows.find((user) => user.userID === userID);
     setSelectedUser(selectedUser);
     setopenDeleteDialog(true);
-  }
+    setUpdateFetch(!updateFetch);
+  };
 
   const handleYesDelBtn = async (userID) => {
-    console.log('delete Yes user:', userID);
+    console.log("delete Yes user:", userID);
     try {
-      const response = await fetch(`http://localhost:8080/user/delete/${userID}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetch(
+        `http://localhost:8080/user/delete/${userID}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       if (!response.ok) {
-        throw new Error('Failed to delete user');
+        throw new Error("Failed to delete user");
       }
       // Optionally, you can handle success or update UI accordingly
-      showSuccessAlert('User deleted successfully');
-      fetchData();
+      showSuccessAlert("User deleted successfully");
+      setUpdateFetch((prev) => !prev);
       setopenDeleteDialog(false);
     } catch (error) {
-      console.error('Error deleting user:', error);
+      console.error("Error deleting user:", error);
       // Optionally, you can show an error message to the user
     }
   };
 
   const handleClickCloseBtn = () => {
     setOpenRegistrationDialog(false);
+    setempStatus("");
+    setProbeStatus("");
+    setDateStarted("");
+    setDateHired("");
+    setCheckUsername("");
+    setWorkID("");
+    setFirstName("");
+    setMiddleName("");
+    setLastName("");
+    setEmail("");
+    setGender("");
+    setPassword("");
+    setConfirmPassword("");
+    setPosition("");
+    setdept("");
+    setRole("");
     setopenDeleteDialog(false);
     setOpenEditDialog(false);
+  };
 
   //handle create user account
   const handleCreateAccount = async (e) => {
@@ -350,199 +417,209 @@ function ManageAccount() {
         role: role,
       };
 
-      const response = await fetch('http://localhost:8080/register', {
-        method: 'POST',
+      const response = await fetch("http://localhost:8080/register", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(userData)
+        body: JSON.stringify(userData),
       });
 
       if (response.ok) {
-        fetchData();
-        showSuccessAlert('User registered successfully');
+        showSuccessAlert("User registered successfully");
+        setempStatus("");
+        setProbeStatus("");
+        setDateStarted("");
+        setDateHired("");
+        setCheckUsername("");
+        setWorkID("");
+        setFirstName("");
+        setMiddleName("");
+        setLastName("");
+        setEmail("");
+        setGender("");
+        setPassword("");
+        setConfirmPassword("");
+        setPosition("");
+        setdept("");
+        setRole("");
+        setUpdateFetch((prev) => !prev);
         setOpenRegistrationDialog(false);
       } else {
-        showErrorAlert('Failed to register user. User already exists.');
+        showErrorAlert("Failed to register user. User already exists.");
       }
     } catch (error) {
-      console.error('Network error', error);
-    }
-
-  };
-
-
-  const fetchData = async () => {
-    try {
-      const response = await fetch('http://localhost:8080/user/getAllUser');
-      if (!response.ok) {
-        throw new Error('Failed to fetch data');
-      }
-      const data = await response.json();
-      // Filter data based on selected tab
-      const filteredData = data.filter(item => {
-        if (selectedTab === 0) { // All Employees
-          return item.role !== 'ADMIN';
-        } else if (selectedTab === 1) { // All Admins
-          return item.role === 'ADMIN';
-        }
-      });
-      // Process the data and set rows
-      const processedData = filteredData.map(item => ({
-        ...item,
-        name: `${item.fName} ${item.lName}`,
-        userID: item.userID
-
-      }));
-      setRows(processedData);
-
-    } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Network error", error);
     }
   };
 
+  //handles re-rendering
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/user/getAllUser");
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        const data = await response.json();
+        // Filter data based on selected tab
+        const filteredData = data.filter((item) => {
+          if (selectedTab === 0) {
+            // All Employees
+            return item.role !== "ADMIN";
+          } else if (selectedTab === 1) {
+            // All Admins
+            return item.role === "ADMIN";
+          }
+        });
+        // Process the data and set rows
+        const processedData = filteredData.map((item) => ({
+          ...item,
+          name: `${item.fName} ${item.lName}`,
+          userID: item.userID,
+        }));
+        setRows(processedData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
     fetchData();
-  }, [selectedTab]);
-
-
-
-
+  }, [updateFetch, selectedTab]);
 
   const handleEmploymentStatus = (event) => {
     setempStatus(event.target.value);
-    if (event.target.value !== 'Probationary') {
-      setProbeStatus('');
-      setDateStarted('');
+    if (event.target.value !== "Probationary") {
+      setProbeStatus("");
+      setDateStarted("");
     }
   };
 
   const handleProbeStatus = (event) => {
     setProbeStatus(event.target.value);
-
-  }
+  };
 
   const handledept = (event) => {
     setdept(event.target.value);
-
   };
 
   const handleGender = (event) => {
     setGender(event.target.value);
-  }
+  };
 
   const columnsEmployees = [
     {
-      id: 'workID',
-      label: 'ID Number',
-      align: 'center',
-      minWidth: 150
+      id: "workID",
+      label: "ID Number",
+      align: "center",
+      minWidth: 150,
     },
 
     {
-      id: 'name',
-      label: 'Name',
+      id: "name",
+      label: "Name",
       minWidth: 170,
-      align: 'center',
-      format: value => formatName(value),
-    },
-
-
-    {
-      id: 'workEmail',
-      label: 'Email',
-      minWidth: 150,
-      align: 'center',
-      format: (value) => value ? value.toLocaleString('en-US') : '',
+      align: "center",
+      format: (value) => formatName(value),
     },
 
     {
-      id: 'dept',
-      label: 'Department',
+      id: "workEmail",
+      label: "Email",
       minWidth: 150,
-      align: 'center',
-      format: (value) => value ? value.toLocaleString('en-US') : ''
+      align: "center",
+      format: (value) => (value ? value.toLocaleString("en-US") : ""),
     },
 
     {
-      id: 'position',
-      label: 'Position',
+      id: "dept",
+      label: "Department",
       minWidth: 150,
-      align: 'center',
-      format: (value) => value ? value.toLocaleString('en-US') : ''
+      align: "center",
+      format: (value) => (value ? value.toLocaleString("en-US") : ""),
     },
 
     {
-      id: 'actions',
-      label: 'Actions',
+      id: "position",
+      label: "Position",
       minWidth: 150,
-      align: 'center',
+      align: "center",
+      format: (value) => (value ? value.toLocaleString("en-US") : ""),
+    },
+
+    {
+      id: "actions",
+      label: "Actions",
+      minWidth: 150,
+      align: "center",
       format: (value, row) => {
-
         return (
           <div>
             <IconButton onClick={() => handleClickEditBtn(row.userID)}>
-
-              <EditNoteTwoToneIcon sx={{ fontSize: '3vh' }} />
+              <EditNoteTwoToneIcon sx={{ fontSize: "1.8em" }} />
             </IconButton>
-            <IconButton color="error" onClick={() => handleClickDeleteBtn(row.userID)}>
-              <DeleteOutlineIcon />
+            <IconButton
+              color="error"
+              onClick={() => handleClickDeleteBtn(row.userID)}
+            >
+              <DeleteOutlineIcon sx={{ fontSize: "1.5em" }} />
             </IconButton>
           </div>
         );
       },
-    }
-
+    },
   ];
 
   const columnsAdmins = [
     {
-      id: 'workID',
-      label: 'ID Number',
-      align: 'center',
-      minWidth: 150
-    },
-
-    {
-      id: 'name',
-      label: 'Name',
-      minWidth: 170,
-      align: 'center',
-      format: (value) => value ? `${value.fName} ${value.lName}` : '',
-    },
-
-    {
-      id: 'username',
-      label: 'Username',
+      id: "workID",
+      label: "ID Number",
+      align: "center",
       minWidth: 150,
-      align: 'center',
-      format: (value) => value ? value.toLocaleString('en-US') : ''
     },
 
     {
-      id: 'workEmail',
-      label: 'Email',
+      id: "name",
+      label: "Name",
       minWidth: 170,
-      align: 'center'
+      align: "center",
+      format: (value) => (value ? `${value.fName} ${value.lName}` : ""),
+    },
+
+    {
+      id: "username",
+      label: "Username",
+      minWidth: 150,
+      align: "center",
+      format: (value) => (value ? value.toLocaleString("en-US") : ""),
+    },
+
+    {
+      id: "workEmail",
+      label: "Email",
+      minWidth: 170,
+      align: "center",
     },
     {
-      id: 'actions',
-      label: 'Actions',
+      id: "actions",
+      label: "Actions",
       minWidth: 150,
-      align: 'center',
+      align: "center",
       format: (value, row) => (
         <div>
           <IconButton onClick={() => handleClickEditBtn(row.userID)}>
-            <EditNoteTwoToneIcon sx={{ fontSize: '3vh' }} />
+            <EditNoteTwoToneIcon sx={{ fontSize: "1.8em" }} />
           </IconButton>
-          <IconButton color="error" onClick={() => handleClickDeleteBtn(row.userID)}>
-            <DeleteOutlineIcon />
+          <IconButton
+            color="error"
+            onClick={() => handleClickDeleteBtn(row.userID)}
+          >
+            <DeleteOutlineIcon sx={{ fontSize: "1.5em" }} />
           </IconButton>
         </div>
       ),
-    }
+    },
   ];
-
 
   return (
     <div>
@@ -592,8 +669,8 @@ function ManageAccount() {
               variant="contained"
               sx={{
                 fontSize: "18px",
-                height: 45,
-                width: 145,
+                height: "2.5em",
+                width: "8em",
                 mb: 4,
                 fontFamily: "Poppins",
                 backgroundColor: "#8c383e",
@@ -615,7 +692,7 @@ function ManageAccount() {
           <Grid
             item
             xs={12}
-            sx={{ height: "7vh", display: "flex", padding: "0px" }}
+            sx={{ height: "4em", display: "flex", padding: "0px" }}
           >
             <Tabs
               value={selectedTab}
@@ -629,6 +706,7 @@ function ManageAccount() {
                 style={{
                   fontFamily: "Poppins",
                   textTransform: "none",
+                  fontSize: "1em",
                 }}
               />
               <Tab
@@ -636,6 +714,7 @@ function ManageAccount() {
                 style={{
                   fontFamily: "Poppins",
                   textTransform: "none",
+                  fontSize: "1em",
                 }}
               />
             </Tabs>
@@ -643,13 +722,13 @@ function ManageAccount() {
 
           <Paper
             elevation={3}
-            sx={{ borderRadius: "10px", width: "100%", height: "70vh" }}
+            sx={{ borderRadius: "10px", width: "100%", height: "52em" }}
           >
             <TableContainer
               sx={{ borderRadius: "10px 10px 0 0 ", maxHeight: "100%" }}
             >
               <Table stickyHeader aria-label="sticky table" size="small">
-                <TableHead sx={{ height: "5vh" }}>
+                <TableHead sx={{ height: "3.5em" }}>
                   <TableRow>
                     {(selectedTab === 0 ? columnsEmployees : columnsAdmins).map(
                       (column) => (
@@ -659,7 +738,8 @@ function ManageAccount() {
                             bgcolor: "#8c383e",
                             color: "white",
                             fontWeight: "bold",
-                            maxWidth: "5vh",
+                            maxWidth: "3.5em",
+                            fontSize: "1em",
                           }}
                           key={column.id}
                           align={column.align}
@@ -687,7 +767,7 @@ function ManageAccount() {
                         : columnsAdmins
                       ).map((column) => (
                         <TableCell
-                          sx={{ fontFamily: "Poppins" }}
+                          sx={{ fontFamily: "Poppins", fontSize: "1em"}}
                           key={`${row.id}-${column.id}`}
                           align={column.align}
                         >
@@ -715,28 +795,22 @@ function ManageAccount() {
       <Dialog
         open={openRegistrationDialog}
         onClose={handleClickCloseBtn}
-        sx={{
-          "@media (min-width: 600px)": {
-            width: "100vw",
-          },
-        }}
       >
         <Box
           sx={{
             bgcolor: "#8c383e",
-            height: "4vh",
+            height: "2.79em",
             width: "100%",
             display: "flex",
             justifyContent: "right",
           }}
         >
-          <Grid container spacing={0.6}>
-            <Grid item xs={12} sx={{ height: "4.5vh" }}>
+          <Grid container>
+            <Grid item xs={12}>
               <Grid
                 container
-                spacing={0.5}
+                spacing={0.6}
                 sx={{
-                  padding: "4px 0 6px 0",
                   fontFamily: "Poppins",
                   fontWeight: "bold",
                   color: "white",
@@ -744,12 +818,12 @@ function ManageAccount() {
                   alignItems: "center", // Align items vertically
                 }}
               >
-                <Grid item sx={{ height: "4.1vh" }}>
+                <Grid item sx={{ height: "3.3em"}}>
                   <PersonRoundedIcon
-                    sx={{ color: "white", fontSize: "29px", ml: 1, mt: 0.5 }}
+                    sx={{ color: "white", fontSize: "1.8em", ml: 1, mt: .8 }}
                   />
                 </Grid>
-                <Grid item sx={{ fontSize: "18px" }}>
+                <Grid item sx={{ fontSize: "1.1em" }}>
                   Register User Account
                 </Grid>
               </Grid>
@@ -764,7 +838,7 @@ function ManageAccount() {
             }}
           >
             <HighlightOffOutlinedIcon
-              sx={{ fontSize: "35px", color: "white" }}
+              sx={{ fontSize: "1.4em", color: "white" }}
             />
           </IconButton>
         </Box>
@@ -780,14 +854,14 @@ function ManageAccount() {
                 width: "100%",
               }}
             >
-              <Grid container spacing={0.1} sx={{ width: "45vh" }}>
+              <Grid container  sx={{ width: "45vh"}}>
                 <Grid item xs={3} sx={{ margin: 1 }}>
                   <Typography style={{ fontFamily: "Poppins", color: "gray" }}>
                     User Role:{" "}
                   </Typography>
                 </Grid>
                 <Grid item xs={7}>
-                  <FormControl sx={{ width: "30vh" }}>
+                  <FormControl sx={{ width: "22em" }}>
                     <Select
                       labelId="roleLabel"
                       id="role"
@@ -1848,7 +1922,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
@@ -1856,7 +1930,7 @@ function ManageAccount() {
                     </Box>
                   </Grid>
                   <Grid item xs={4}>
-                    <Box style={{ fontFamily: "Poppins" }} height="100%">
+                    <Box style={{ fontFamily: "Poppins" }}>
                       <TextField
                         fullWidth
                         size="medium"
@@ -1872,7 +1946,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
@@ -1880,7 +1954,7 @@ function ManageAccount() {
                     </Box>
                   </Grid>
                   <Grid item xs={4}>
-                    <Box style={{ fontFamily: "Poppins" }} height="100%">
+                    <Box style={{ fontFamily: "Poppins" }} >
                       <TextField
                         fullWidth
                         size="medium"
@@ -1896,7 +1970,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
@@ -1904,11 +1978,11 @@ function ManageAccount() {
                     </Box>
                   </Grid>
                   <Grid item xs={6}>
-                    <Box sx={{ height: "100%" }}>
+                    <Box >
                       <TextField
                         fullWidth
                         size="medium"
-                        label="Work ID"
+                        label="Id Number"
                         id="workId"
                         name="workID"
                         value={selectedUser.workID}
@@ -1920,44 +1994,15 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
                       />
                     </Box>
                   </Grid>
-
                   <Grid item xs={6}>
-                    <Box sx={{ height: "100%" }}>
-                      <TextField
-                        fullWidth
-                        size="medium"
-                        label="Institutional Email"
-                        id="email"
-                        name="workEmail"
-                        value={selectedUser.workEmail}
-                        onChange={handleUserDataChange}
-                        InputLabelProps={{
-                          style: {
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                        inputProps={{
-                          style: {
-                            fontSize: "16px",
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                        error={emailError}
-                        helperText={
-                          emailError ? "Please enter a valid email" : ""
-                        }
-                      />
-                    </Box>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Box sx={{ height: "100%" }}>
+                    <Box >
                       <TextField
                         fullWidth
                         size="medium"
@@ -1973,7 +2018,31 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                      />
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Box >
+                      <TextField
+                        fullWidth
+                        size="medium"
+                        label="Institutional Email"
+                        id="email"
+                        name="workEmail"
+                        value={selectedUser.workEmail}
+                        onChange={handleUserDataChange}
+                        InputLabelProps={{
+                          style: {
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                        inputProps={{
+                          style: {
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
@@ -1995,7 +2064,7 @@ function ManageAccount() {
                         <InputLabel
                           id="employementStatusLabel"
                           sx={{
-                            fontSize: "14px",
+                            fontSize: ".9em",
                             fontFamily: "Poppins",
                           }}
                         >
@@ -2036,7 +2105,7 @@ function ManageAccount() {
                         <InputLabel
                           id="probationaryStatus"
                           sx={{
-                            fontSize: "14px",
+                            fontSize: ".9em",
                             fontFamily: "Poppins",
                           }}
                         >
@@ -2091,7 +2160,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                           // Add a pattern to enforce the format MM/DD/YY
@@ -2118,14 +2187,14 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
                       />
                     </Box>
                   </Grid>
-                  <Grid item xs={4} sx={{ width: "100%" }}>
+                  <Grid item xs={4} >
                     <Box>
                       <TextField
                         fullWidth
@@ -2144,7 +2213,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "16px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                           // Add a pattern to enforce the format MM/DD/YY
@@ -2154,135 +2223,14 @@ function ManageAccount() {
                       />
                     </Box>
                   </Grid>
-
-                  <Grid item xs={4}>
-                    <Box style={{ fontFamily: "Poppins" }} height="100%">
-                      <TextField
-                        fullWidth
-                        size="medium"
-                        label="First Name"
-                        id="fName"
-                        name="fName"
-                        value={selectedUser.fName}
-                        onChange={handleUserDataChange}
-                        InputLabelProps={{
-                          style: {
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                        inputProps={{
-                          style: {
-                            fontSize: "16px",
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                      />
-                    </Box>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Box style={{ fontFamily: "Poppins" }} height="100%">
-                      <TextField
-                        fullWidth
-                        size="medium"
-                        label="Middle Name"
-                        id="mName"
-                        name="mName"
-                        value={selectedUser.mName}
-                        onChange={handleUserDataChange}
-                        InputLabelProps={{
-                          style: {
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                        inputProps={{
-                          style: {
-                            fontSize: "16px",
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                      />
-                    </Box>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Box style={{ fontFamily: "Poppins" }} height="100%">
-                      <TextField
-                        fullWidth
-                        size="medium"
-                        label="Last Name"
-                        id="lName"
-                        value={selectedUser.lName}
-                        name="lName"
-                        onChange={handleUserDataChange}
-                        InputLabelProps={{
-                          style: {
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                        inputProps={{
-                          style: {
-                            fontSize: "16px",
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                      />
-                    </Box>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Box sx={{ height: "100%" }}>
-                      <TextField
-                        fullWidth
-                        size="medium"
-                        label="Work ID"
-                        id="workId"
-                        name="workID"
-                        value={selectedUser.workID}
-                        onChange={handleUserDataChange}
-                        InputLabelProps={{
-                          style: {
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                        inputProps={{
-                          style: {
-                            fontSize: "16px",
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                      />
-                    </Box>
-                  </Grid>
-                  <Grid item xs={8} sx={{ width: "100%" }}>
-                    <Box sx={{ height: "100%" }}>
-                      <TextField
-                        fullWidth
-                        size="medium"
-                        label="Institutional Email"
-                        id="email"
-                        name="workEmail"
-                        value={selectedUser.workEmail}
-                        onChange={handleUserDataChange}
-                        InputLabelProps={{
-                          style: {
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                        inputProps={{
-                          style: {
-                            fontSize: "16px",
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                      />
-                    </Box>
-                  </Grid>
-                  <Grid item xs={4}>
+                  <Grid item xs={2.3}>
                     <Box>
                       <FormControl fullWidth size="medium" disabled>
                         <InputLabel
                           id="GenderLabel"
                           value={gender}
                           sx={{
-                            fontSize: "14px",
+                            fontSize: ".9em",
                             fontFamily: "Poppins",
                           }}
                         >
@@ -2303,33 +2251,8 @@ function ManageAccount() {
                       </FormControl>
                     </Box>
                   </Grid>
-                  <Grid item xs={6}>
-                    <Box>
-                      <TextField
-                        fullWidth
-                        size="medium"
-                        label="Username"
-                        id="username"
-                        name="username"
-                        value={selectedUser.username}
-                        onChange={handleUserDataChange}
-                        InputLabelProps={{
-                          style: {
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                        inputProps={{
-                          style: {
-                            fontSize: "16px",
-                            fontFamily: "Poppins",
-                          },
-                        }}
-                      />
-                    </Box>
-                  </Grid>
-
-                  <Grid item xs={6} sx={{ width: "100%" }}>
-                    <Box sx={{ height: "100%" }}>
+                  <Grid item xs={6} >
+                    <Box >
                       <TextField
                         fullWidth
                         size="medium"
@@ -2345,7 +2268,7 @@ function ManageAccount() {
                         }}
                         inputProps={{
                           style: {
-                            fontSize: "15px",
+                            fontSize: "1em",
                             fontFamily: "Poppins",
                           },
                         }}
@@ -2358,7 +2281,7 @@ function ManageAccount() {
                         <InputLabel
                           id="deptLabel"
                           sx={{
-                            fontSize: "14px",
+                            fontSize: ".9em",
                             fontFamily: "Poppins",
                           }}
                         >
@@ -2395,6 +2318,54 @@ function ManageAccount() {
                       </FormControl>
                     </Box>
                   </Grid>
+                  <Grid item xs={6} >
+                    <Box >
+                      <TextField
+                        fullWidth
+                        size="medium"
+                        label="Institutional Email"
+                        id="email"
+                        name="workEmail"
+                        value={selectedUser.workEmail}
+                        onChange={handleUserDataChange}
+                        InputLabelProps={{
+                          style: {
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                        inputProps={{
+                          style: {
+                            fontSize: "1em",
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                      />
+                    </Box>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Box>
+                      <TextField
+                        fullWidth
+                        size="medium"
+                        label="Username"
+                        id="username"
+                        name="username"
+                        value={selectedUser.username}
+                        onChange={handleUserDataChange}
+                        InputLabelProps={{
+                          style: {
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                        inputProps={{
+                          style: {
+                            fontSize: "1em",
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                      />
+                    </Box>
+                  </Grid>
                 </>
               )}
             </Grid>
@@ -2428,29 +2399,23 @@ function ManageAccount() {
       <Dialog
         open={openDeleteDialog}
         onClose={handleClickCloseBtn}
-        sx={{
-          "@media (min-width: 600px)": {
-            width: "100vw",
-          },
-        }}
+
       >
-        
         <Box
           sx={{
             bgcolor: "#8c383e",
-            height: "4vh",
+            height: "2.79em",
             width: "100%",
             display: "flex",
             justifyContent: "right",
           }}
         >
-          <Grid container spacing={0.6}>
-            <Grid item xs={12} sx={{ height: "4.5vh" }}>
+          <Grid container>
+            <Grid item xs={12}>
               <Grid
                 container
-                spacing={0.5}
+                spacing={0.6}
                 sx={{
-                  padding: "4px 0 6px 0",
                   fontFamily: "Poppins",
                   fontWeight: "bold",
                   color: "white",
@@ -2458,12 +2423,12 @@ function ManageAccount() {
                   alignItems: "center", // Align items vertically
                 }}
               >
-                <Grid item sx={{ height: "4.1vh" }}>
+                <Grid item sx={{ height: "3.3em" }}>
                   <DeleteOutlineIcon
-                    sx={{ color: "white", fontSize: "29px", ml: 1, mt: 0.5 }}
+                    sx={{ color: "white", fontSize: "1.5em", ml: 1, mt: 1.3}}
                   />
                 </Grid>
-                <Grid item sx={{ fontSize: "18px" }}>
+                <Grid item sx={{ fontSize: "1.1em" }}>
                   Delete User Account
                 </Grid>
               </Grid>
@@ -2478,7 +2443,7 @@ function ManageAccount() {
             }}
           >
             <HighlightOffOutlinedIcon
-              sx={{ fontSize: "35px", color: "white" }}
+              sx={{ fontSize: "1.4em", color: "white" }}
             />
           </IconButton>
         </Box>
@@ -2489,7 +2454,7 @@ function ManageAccount() {
               color: "black",
               display: "flex",
               justifyContent: "center",
-              mt: "15px",
+              mt: "1.3em",
             }}
           >
             Are you sure you want to delete this user account?
@@ -2508,53 +2473,48 @@ function ManageAccount() {
               fontFamily: "Poppins",
               bgcolor: "rgba(248, 199, 2, 0.9)",
 
-            color: 'black',
-            '&:hover': {
-              bgcolor: '#e0e0e0',
-              color: 'black'
-            },
+              color: "black",
+              "&:hover": {
+                bgcolor: "#e0e0e0",
+                color: "black",
+              },
+            }}
+          >
+            Yes
+          </Button>
+          <Button
+            onClick={handleClickCloseBtn}
+            variant="contained"
+            sx={{
+              fontFamily: "Poppins",
+              bgcolor: "#8c383e",
+              ml: "1em",
+              "&:hover": {
+                bgcolor: "#e0e0e0",
+                color: "black",
+              },
+            }}
+          >
+            No
+          </Button>
+        </DialogActions>
+      </Dialog>
 
-          }}>
-          Yes
-        </Button>
-        <Button
-          onClick={handleClickCloseBtn}
-          variant='contained'
-          sx={{
-            fontFamily: 'Poppins',
-            bgcolor: '#8c383e',
-            ml: '1vh',
-            '&:hover': {
-              bgcolor: '#e0e0e0',
-              color: 'black',
-            },
+      <CustomAlert
+        open={successAlert.open}
+        onClose={() => setSuccessAlert({ ...successAlert, open: false })}
+        severity="success"
+        message={successAlert.message}
+      />
 
-          }}>
-          No
-        </Button>
-      </DialogActions>
-
-    </Dialog>
-
-    <CustomAlert
-      open={successAlert.open}
-      onClose={() => setSuccessAlert({ ...successAlert, open: false })}
-      severity="success"
-      message={successAlert.message}
-    />
-
-    {/* Render error alert */}
-    <CustomAlert
-      open={errorAlert.open}
-      onClose={() => setErrorAlert({ ...errorAlert, open: false })}
-      severity="error"
-      message={errorAlert.message}
-    />
-
-
-
-  </div >
+      {/* Render error alert */}
+      <CustomAlert
+        open={errorAlert.open}
+        onClose={() => setErrorAlert({ ...errorAlert, open: false })}
+        severity="error"
+        message={errorAlert.message}
+      />
+    </div>
   );
-}
 }
 export default ManageAccount;
