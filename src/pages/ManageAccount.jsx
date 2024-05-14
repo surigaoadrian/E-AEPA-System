@@ -14,7 +14,6 @@ import EditNoteTwoToneIcon from '@mui/icons-material/EditNoteTwoTone';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import TableRow from '@mui/material/TableRow';
 
-
 const CustomAlert = ({ open, onClose, severity, message }) => {
   return (
     <Snackbar
@@ -48,50 +47,175 @@ function ManageAccount() {
   const [dateStarted, setDateStarted] = React.useState('');
   const [rows, setRows] = useState([]);
   const [selectedTab, setSelectedTab] = useState(0);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [successAlert, setSuccessAlert] = useState({ open: false, message: '' });
-  const [errorAlert, setErrorAlert] = useState({ open: false, message: '' });
-  const [email, setEmail] = useState('');
-  const [emailError, setEmailError] = useState(false);
+  const [selectedUser, setSelectedUser] = useState({});
+  const [successAlert, setSuccessAlert] = useState({open: false,message: "",});
+  const [errorAlert, setErrorAlert] = useState({ open: false, message: "" });
+  const [email, setEmail] = useState("");
 
-const handleUserInputChange = (e, fieldName) => {
-  const { value } = e.target;
-  let capitalizedValue = value;
-  
-  // Capitalize first letter for specific fields (fname, mName, lName)
-  if (fieldName === 'fName' || fieldName === 'mName' || fieldName === 'lName') {
-    capitalizedValue = capitalizeFirstLetter(value);
-  }
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [departments, setDepartments] = useState([]);
+  const [checkUsername, setCheckUsername] = useState("");
+  const [msgInfo, setMsgInfo] = useState("");
+  const [workID, setWorkID] = useState("");
+  const [position, setPosition] = useState("");
+  const [firstname, setFirstName] = useState("");
+  const [middlename, setMiddleName] = useState("");
+  const [lastname, setLastName] = useState("");
+  const [dateHired, setDateHired] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [updateFetch, setUpdateFetch] = useState(true);
 
-  setSelectedUser(prevUser => ({
-    ...prevUser,
-    [fieldName]: capitalizedValue,
-  }));
-};
+  const [isAvailable, setIsAvailable] = useState(false);
+  const [isTaken, setIsTaken] = useState(false);
+  const [emailIsAvailable, setEmailIsAvailable] = useState(false);
+  const [emailIsTaken, setEmailIsTaken] = useState(false);
+  const [emailMsgInfo, setEmailMsgInfo] = useState("");
+
+  const handleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
 
 
 
+  const handleFNameChange = (e) => {
+    setFirstName(e.target.value);
+  };
+
+  const handleMNameChange = (e) => {
+    setMiddleName(e.target.value);
+  };
+
+  const handleLNameChange = (e) => {
+    setLastName(e.target.value);
+  };
+
+  const handleRoleChange = (e) => {
+    const selectedRole = e.target.value;
+    setRole(selectedRole);
+    // Dynamically update the position based on the selected role
+    if (selectedRole === "HEAD") {
+      setPosition("Department Head");
+    }
+  };
+
+  const handleWorkIdChange = (e) => {
+    setWorkID(e.target.value);
+  };
+
+  const handlePositionChange = (e) => {
+    setPosition(e.target.value);
+  };
+
+  const handleCheckUsername = (e) => {
+    let username;
+    if(role==="ADMIN") {
+      username = `adm_${firstname}.${lastname}`;
+    } else {
+      username = `${firstname}.${lastname}`;
+    }
+    setMsgInfo(''); 
+  };
+
+
+  //check username availability
+  useEffect(() => {
+    const fetchUsername = async () => {
+      let username
+      try {
+        if(role==="ADMIN") {
+          username = `adm_${firstname}.${lastname}`;
+        } else {
+        username = `${firstname}.${lastname}`;
+        }
+        const response = await axios.put(`http://localhost:8080/user/checkUsername/${username}`);
+        const availability = response.data === 'Username available';
+        setMsgInfo(response.data);
+        setIsAvailable(availability);
+        setIsTaken(!availability); // If available, not taken; if not available, taken
+      } catch (error) {
+        console.error('Error checking username:', error);
+        setMsgInfo('Error checking username');
+        setIsAvailable(false);
+        setIsTaken(false);
+      }
+    };
+
+    if (firstname && lastname) {
+      fetchUsername();
+    } else {
+      setMsgInfo('');
+      setIsAvailable(false);
+      setIsTaken(false);
+    }
+  }, [firstname, lastname]);
+
+  const handlePassword = (e) => {
+    setPassword(e.target.value);
+  };
+
+  const handleConfirmPassword = (e) => {
+    setConfirmPassword(e.target.value);
+  };
+
+  const isNotEmpty = password.trim() !== "" || confirmPassword.trim() !== "";
+
+  //fetch all departments
+  useEffect(() => {
+    const fetchDept = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8080/department/getAllDepts"
+        );
+        setDepartments(response.data);
+        console.log(departments);
+      } catch (error) {
+        if (error.response) {
+          //not in 200 response range
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else {
+          console.log(`Error: ${error.message}`);
+        }
+      }
+    };
+
+    fetchDept();
+  }, []);
 
   const handleEmailChange = (event) => {
-    const value = event.target.value;
-    setEmail(value);
-    setEmailError(!/^[\w.%+-]+@cit\.edu$/i.test(value));
+    const email = `${firstname}.${lastname}@cit.edu`;
+    setEmailMsgInfo(''); 
   };
 
-  const [name, setName] = useState({
-    fname: '',
-    mname: '',
-    lname: '',
-  });
+  //check username availability
+  useEffect(() => {
+    const fetchEmail = async () => {
+      try {
+        const email = `${firstname}.${lastname}@cit.edu`;
+        const response = await axios.put(`http://localhost:8080/user/checkEmail/${email}`);
+        const emailAvailability = response.data === 'Email Address is available';
+        setEmailMsgInfo(response.data);
+        setEmailIsAvailable(emailAvailability);
+        setEmailIsTaken(!emailAvailability); // If available, not taken; if not available, taken
+      } catch (error) {
+        console.error('Error checking username:', error);
+        setEmailMsgInfo('Error checking username');
+        setEmailIsAvailable(false);
+        setEmailIsTaken(false);
+      }
+    };
 
-  const handleNameChange = (event, fieldName) => {
-    const newValue = capitalizeFirstLetter(event.target.value);
-    setName((prevName) => ({
-      ...prevName,
-      [fieldName]: newValue,
-    }));
-  };
-  // Function to open success alert
+    if (firstname && lastname) {
+      fetchEmail();
+    } else {
+      setEmailMsgInfo('');
+      setEmailIsAvailable(false);
+      setEmailIsTaken(false);
+    }
+  }, [firstname, lastname]);
+
   const showSuccessAlert = (message) => {
     setSuccessAlert({ open: true, message });
   };
@@ -196,41 +320,35 @@ const handleUserInputChange = (e, fieldName) => {
     setopenDeleteDialog(false);
     setOpenEditDialog(false);
 
-  }
-
-  const handleCreateAccount = async () => {
-    // const workID = generateWorkID();
-    const firstName = capitalizeFirstLetter(document.getElementById('fname')?.value || '');
-    const middleName = capitalizeFirstLetter(document.getElementById('mname')?.value || '');
-    const lastName = capitalizeFirstLetter(document.getElementById('lname')?.value || '');
+  //handle create user account
+  const handleCreateAccount = async (e) => {
+    e.preventDefault();
+    let username
     try {
-
-      const userData = {
-        empStatus,
-        probeStatus,
-        dateStarted: document.getElementById('dateStarted')?.value || '',
-        dateHired: document.getElementById('datehired')?.value || '',
-        username: document.getElementById('username')?.value || '',
-        workID: document.getElementById('workId')?.value || '',
-        fName: firstName,
-        mName: middleName,
-        lName: lastName,
-        workEmail: document.getElementById('email')?.value || '',
-        gender,
-        password: document.getElementById('password')?.value || '',
-        position: document.getElementById('position')?.value || '',
-        dept,
-        role,
-      };
-      if (role === 'ADMIN') {
-        userData.workID = document.getElementById('workId')?.value || '',
-          userData.workEmail = document.getElementById('email')?.value || '';
-        userData.username = document.getElementById('username')?.value || '';
-        userData.password = document.getElementById('password')?.value || '';
-        userData.fName = firstName,
-          userData.mName = middleName,
-          userData.lName = lastName
+      if (role==="ADMIN") {
+        username = `adm.${firstname}.${lastname}`;
+      } else {
+        username = `${firstname}.${lastname}`;
       }
+      const email = `${firstname}.${lastname}@cit.edu`;
+      
+      const userData = {
+        empStatus: empStatus,
+        probeStatus: probeStatus,
+        dateStarted: dateStarted,
+        dateHired: dateHired,
+        username: username,
+        workID: workID,
+        fName: firstname,
+        mName: middlename,
+        lName: lastname,
+        workEmail: email,
+        gender: gender,
+        password: password,
+        position: position,
+        dept: dept,
+        role: role,
+      };
 
       const response = await fetch('http://localhost:8080/register', {
         method: 'POST',
@@ -689,7 +807,7 @@ const handleUserInputChange = (e, fieldName) => {
                       </MenuItem>
                       <MenuItem
                         style={{ fontFamily: "Poppins" }}
-                        value="DEPARTMENT HEAD"
+                        value="HEAD"
                       >
                         Department Head
                       </MenuItem>
@@ -806,14 +924,47 @@ const handleUserInputChange = (e, fieldName) => {
                     </Box>
                   </Grid>
                   <Grid item xs={6}>
-                    <Box sx={{ height: "100%" }}>
+                  <Box>
                       <TextField
                         required
                         fullWidth
                         size="medium"
-                        label="Institutional Email"
+                        label="Username"
+                        id="username"
+                        value={`adm_${firstname}.${lastname}`}
+                        onChange={handleCheckUsername}
+                        InputLabelProps={{
+                          style: {
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                        inputProps={{
+                          style: {
+                            fontSize: "1em",
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                      />
+                      {(isTaken) && (
+                        <FormHelperText
+                          style={{
+                            color:  "red",
+                          }}
+                        >
+                          {msgInfo}
+                        </FormHelperText>
+                      )}
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12}>
+                  <Box >
+                      <TextField
+                        required
+                        fullWidth
+                        size="medium"
+                        label="Admin Email Address"
                         id="email"
-                        value={email}
+                        value={`${firstname}.${lastname}@.cit.edu`}
                         onChange={handleEmailChange}
                         InputLabelProps={{
                           style: {
@@ -855,13 +1006,13 @@ const handleUserInputChange = (e, fieldName) => {
                           },
                         }}
                       />
-                      {(isAvailable || isTaken) && (
+                      {(emailIsTaken) && (
                         <FormHelperText
                           style={{
-                            color: isAvailable ? "green" : "red",
+                            color:"red",
                           }}
                         >
-                          {msgInfo}
+                          {emailMsgInfo}
                         </FormHelperText>
                       )}
                     </Box>
@@ -943,7 +1094,7 @@ const handleUserInputChange = (e, fieldName) => {
                 </>
               )}
 
-              {(role === "EMPLOYEE" || role === "DEPARTMENT HEAD") && (
+              {(role === "EMPLOYEE" || role === "HEAD") && (
                 <>
                   <Grid item xs={4} sx={{ width: "100%" }}>
                     <Box>
@@ -1435,6 +1586,147 @@ const handleUserInputChange = (e, fieldName) => {
                       </FormControl>
                     </Box>
                   </Grid>
+                  <Grid item xs={6}>
+                    <Box >
+                      <TextField
+                        required
+                        fullWidth
+                        size="medium"
+                        label="Institutional Email"
+                        id="email"
+                        value={`${firstname}.${lastname}@.cit.edu`}
+                        onChange={handleEmailChange}
+                        InputLabelProps={{
+                          style: {
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                        inputProps={{
+                          style: {
+                            fontSize: "1em",
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                      />
+                      {(emailIsTaken) && (
+                        <FormHelperText
+                          style={{
+                            color:"red",
+                          }}
+                        >
+                          {emailMsgInfo}
+                        </FormHelperText>
+                      )}
+                    </Box>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Box>
+                      <TextField
+                        required
+                        fullWidth
+                        size="medium"
+                        label="Username"
+                        id="username"
+                        value={`${firstname}.${lastname}`}
+                        onChange={handleCheckUsername}
+                        InputLabelProps={{
+                          style: {
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                        inputProps={{
+                          style: {
+                            fontSize: "1em",
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                      />
+                      {(isTaken) && (
+                        <FormHelperText
+                          style={{
+                            color:  "red",
+                          }}
+                        >
+                          {msgInfo}
+                        </FormHelperText>
+                      )}
+                    </Box>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Box>
+                      <div style={{ position: "relative" }}>
+                        <TextField
+                          required
+                          fullWidth
+                          size="medium"
+                          label="Password"
+                          type={showPassword ? "text" : "password"}
+                          id="password"
+                          value={password}
+                          InputLabelProps={{
+                            style: {
+                              fontFamily: "Poppins",
+                            },
+                          }}
+                          inputProps={{
+                            style: {
+                              fontSize: "1em",
+                              fontFamily: "Poppins",
+                            },
+                          }}
+                          onChange={handlePassword}
+                        />
+                        <FontAwesomeIcon
+                         
+                          onClick={handleShowPassword}
+                          style={{
+                            color: "#636E72",
+                            position: "absolute",
+                            right: "10px",
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            cursor: "pointer",
+                          }}
+                        />
+                      </div>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Box>
+                      <TextField
+                        fullWidth
+                        size="medium"
+                        label="ConfirmPassword"
+                        type="password"
+                        id="confirmpassword"
+                        InputLabelProps={{
+                          style: {
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                        inputProps={{
+                          style: {
+                            fontSize: "1em",
+                            fontFamily: "Poppins",
+                          },
+                        }}
+                        value={confirmPassword}
+                        onChange={handleConfirmPassword}
+                      />
+                      {isNotEmpty && (
+                        <FormHelperText
+                          style={{
+                            color:
+                              password !== confirmPassword ? "red" : "green",
+                          }}
+                        >
+                          {password !== confirmPassword
+                            ? "Passwords do not match"
+                            : "Passwords match"}
+                        </FormHelperText>
+                      )}
+                    </Box>
+                  </Grid>
                 </>
               )}
             </Grid>
@@ -1691,7 +1983,7 @@ const handleUserInputChange = (e, fieldName) => {
                 </>
               )}
               {(selectedUser?.role === "EMPLOYEE" ||
-                selectedUser?.role === "DEPARTMENT HEAD") && (
+                selectedUser?.role === "HEAD") && (
                 <>
                   <Grid item xs={4} sx={{ width: "100%" }}>
                     <Box>
@@ -2264,5 +2556,5 @@ const handleUserInputChange = (e, fieldName) => {
   </div >
   );
 }
-
+}
 export default ManageAccount;
