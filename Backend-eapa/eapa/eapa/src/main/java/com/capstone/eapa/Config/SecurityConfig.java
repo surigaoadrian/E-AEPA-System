@@ -46,12 +46,18 @@ public class SecurityConfig {
                                         "user/editUser/**",
                                         "user/delete/**",
                                         "user/checkUsername/**",
+                                        "user/checkEmail/**",
                                         "/auth/forgotPassword/**",
                                         "/auth/resetPassword/**",
                                         "department/getAllDepts",
                                         "department/getDept/**",
                                         "department/deleteDept/**",
                                         "department/addDept",
+                                        "department/updateDept",
+                                        "user/editAccountUsername/**",
+                                        "user/editPersonalDetails/**",
+                                        "user/uploadImage/**",
+                                        "user/image/**",
                                         "department/updateDept"
                                         )
                                 .permitAll()
