@@ -52,6 +52,7 @@ public class UserEntity implements UserDetails {
     private boolean isProbationary;
     @Column(name = "Probationary Status")
     private String probeStatus;
+    
     private int isDeleted = 0;
 
     public UserEntity() {
