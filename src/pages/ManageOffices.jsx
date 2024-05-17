@@ -9,6 +9,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { Alert, Dialog, Divider, FormControl, Select, MenuItem,Snackbar} from "@mui/material";
 import axios from "axios";
+import Animated from "../components/motion";
 
 const ManageOffices = () => {
   const [departments, setDepartments] = useState([]);
@@ -167,6 +168,11 @@ const ManageOffices = () => {
     setFilteredDepartments(filtered);
   };
 
+  const handleSearchQuery = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
   };
@@ -217,6 +223,7 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
 
 
   return (
+    <Animated>
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
       <div className="bg-white rounded-lg shadow-md w-2/4">
         <div
@@ -247,13 +254,38 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
               />
             </div>
             <Divider/>
+            {/* 
             <div className="mb-4 mt-5">
             <label htmlFor="deptOfficeHead" className="block text-base font-medium text-gray-700">
             Department Office Head: 
             <span className="font-medium text-black ml-4"> {editedDepartment.deptOfficeHead} </span>
           </label>
           </div>
-
+*/}
+<div className="mt-4">
+          <FormControl fullWidth className="mb-4">
+          <label htmlFor="deptOfficeHead" className="mb-2 block text-sm font-medium text-gray-700">
+              Department Office Head
+            </label>
+            <Select
+            id="deptOfficeHead"
+            name="deptOfficeHead"
+            value={editedDepartment.deptOfficeHead}
+            onChange={handleInputChange}
+            className="h-12"
+            displayEmpty
+          >
+            <MenuItem value="" disabled>
+              <em className="text-gray-700">Select an Office Head</em>
+            </MenuItem>
+            {departmentOfficeHead.map((head) => (
+              <MenuItem key={head.id} value={head.name}>
+                {head.name}
+              </MenuItem>
+            ))}
+          </Select>
+          </FormControl> 
+          </div>
             <div className="mt-2 flex justify-end">
               <button
                 type="submit"
@@ -274,11 +306,13 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
         </div>
       </div>
     </div>
+    </Animated>
   );
 };
 
 
   return (
+    <Animated>
     <div>
       <h1 className="text-3xl font-bold text-left ml-12 mt-8 mb-2">Department</h1>
       <label className="ml-12 text-sm text-gray-700">All Departments ({totalDepartments})</label>
@@ -522,7 +556,6 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
             value={departmentFormData.deptOfficeHead}
             onChange={handleDepartmentFormChange}
             className="h-12"
-            required
             displayEmpty
           >
             <MenuItem value="" disabled>
@@ -600,16 +633,14 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
       </div>
   </Dialog>
 )}
-
-
       {/* Snackbar */}
         <Snackbar open={openSnackbar} autoHideDuration={3000} anchorOrigin={{ vertical: "bottom", horizontal: "center" }} onClose={() => setOpenSnackbar(false)}>
         <Alert variant="filled" elevation={6} severity="success" sx={{ width: '100%' }} style={{ fontFamily: "Poppins" }}>
           {snackbarMessage}
         </Alert>
       </Snackbar>
-
-    </div>
+      </div>
+    </Animated>
   );
 };
 export default ManageOffices;
