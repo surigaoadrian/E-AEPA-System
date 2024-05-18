@@ -282,37 +282,37 @@ function ViewProfilePage() {
   return <div>
     <Grid container>
       <Grid item xs={6}>
-        <Typography ml={8} mt={3} sx={{ fontFamily: "Poppins", fontWeight: "bold", fontSize: "2em" }}> Profile </Typography>
+        <Typography ml={5} mt={4} sx={{ fontFamily: "Poppins", fontWeight: "bold", fontSize: "1.5em" }}> Profile </Typography>
       </Grid>
     </Grid>
-    <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml: 5, mt: 0.5, width: "95%", }, }} >
+    <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml: 2, width: "97%", }, }} >
       <Grid container spacing={1.5} sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", }}>
-        <Paper elevation={0} sx={{ borderRadius: "10px", width: "100%", height: "16em", mt: 2.5, ml: 3 }}>
+        <Paper elevation={0} sx={{ borderRadius: "5px", width: "100%", height: "10em", mt: 2.5, ml: 3 }}>
           <Grid container spacing={2}>
             <Grid item>
-              <IconButton onClick={handleSeePictureDialog} size="small" sx={{ ml: 5, mt: 5 }} aria-controls={open ? 'account-menu' : undefined} aria-haspopup="true" aria-expanded={open ? 'true' : undefined} >
+              <IconButton onClick={handleSeePictureDialog} size="small" sx={{ ml: 5, mt: 3 }} aria-controls={open ? 'account-menu' : undefined} aria-haspopup="true" aria-expanded={open ? 'true' : undefined} >
                 <Tooltip title="Profile Picture" placement="top" arrow>
                   {profilePictureUrl ?
-                    <Avatar sx={{ width: 170, height: 170 }} src={profilePictureUrl} />
+                    <Avatar sx={{ width: 150, height: 170 }} src={profilePictureUrl} />
                     :
-                    <Avatar sx={{ width: 170, height: 170 }} />
+                    <Avatar sx={{ width: 110, height: 110 }} />
                   }
                 </Tooltip>
               </IconButton>
             </Grid>
             <Grid item xs={12} sm container>
               <Grid item xs container direction="column" spacing={2} sx={{ ml: 2 }}>
-                <Grid item xs sx={{ mt: 7 }}>
-                  <Typography gutterBottom component="div" sx={{ fontFamily: 'Poppins', fontWeight: 'bold', fontSize: '1.7em' }}>
+                <Grid item xs sx={{ mt: 3.5 }}>
+                  <Typography gutterBottom component="div" sx={{ fontFamily: 'Poppins', fontWeight: 'bold', fontSize: '1.3em' }}>
                     {selectedUser.fName} {selectedUser.lName}
                   </Typography>
-                  <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '1.3em' }}>
+                  <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '.9em' }}>
                     Employee ID #: <span style={{ color: 'black', fontWeight: 'bold' }}>{selectedUser.workID}</span>
                   </Typography>
-                  <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 1, fontSize: '1.3em' }}>
+                  <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 1, fontSize: '.9em' }}>
                     Position: <span style={{ color: 'black' }}>{selectedUser.position}</span>
                   </Typography>
-                  <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 1, fontSize: '1.3em' }}>
+                  <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 1, fontSize: '.9em' }}>
                     Department: <span style={{ color: 'black' }}>{selectedUser.dept} </span>
                   </Typography>
                 </Grid>
@@ -320,16 +320,16 @@ function ViewProfilePage() {
             </Grid>
             <Grid item xs={12} sm container>
               <Grid item xs container direction="column" spacing={2} >
-                <Grid item xs sx={{ mt: 13.6 }}>
-                  <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '1.3em' }}>
-                    Employment Status: <span style={{ color: selectedUser.empStatus === 'Regular' ? '#F8C702' : selectedUser.empStatus === 'Probationary' ? '#8C383E' : 'inherit' }}>{selectedUser.empStatus}</span>
+                <Grid item xs sx={{ mt: 8.3 }}>
+                  <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '.9em' }}>
+                    Employment Status: <span style={{ color: selectedUser.empStatus === 'Regular' ? '#F8C702' : '#8C383E' }}>{selectedUser.empStatus}</span>
                   </Typography>
                   {selectedUser.empStatus !== 'Regular' && (
                     <>
-                      <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 1, fontSize: '1.3em' }}>
+                      <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 1, fontSize: '.9em' }}>
                         Probationary Status: <span style={{ color: 'black' }}>{selectedUser.probeStatus}</span>
                       </Typography>
-                      <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 1, fontSize: '1.3em' }}>
+                      <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 1, fontSize: '.9em' }}>
                         Probationary Date Started: <span style={{ color: 'black' }}>{selectedUser.dateStarted}</span>
                       </Typography>
                     </>
@@ -342,17 +342,17 @@ function ViewProfilePage() {
         </Paper>
         <Grid container spacing={(.9)}>
           <Grid item xs={5.85} sx={{ mt: 1 }}>
-            <Paper elevation={0} sx={{ borderRadius: "10px", width: "100%", height: "19em", ml: 3 }}>
+            <Paper elevation={0} sx={{ borderRadius: "5px", width: "99%", height: "12.5em", ml: 3 }}>
               <Grid item xs={12} sm container>
                 <Grid item xs container spacing={2} sx={{ ml: 1 }}>
                   <Grid item xs >
-                    <Typography sx={{ fontFamily: 'Poppins', fontWeight: 'bold', fontSize: '1.7em', mt: 1 }}>Personal Details</Typography>
+                    <Typography sx={{ fontFamily: 'Poppins', fontWeight: 'bold', fontSize: '1.3em', mt: 1 }}>Personal Details</Typography>
                   </Grid>
-                  <Grid item xs sx={{ display: "flex", justifyContent: "right", height: '4em', mr: '1em', mt: .5 }} >
+                  <Grid item xs sx={{ display: "flex", justifyContent: "right", height: '3em', mr: '1em', mt: .5 }} >
                     {!isPrsnlEditMode && (
                       <Tooltip title="Edit Details" arrow>
                         <IconButton onClick={handlePrsnlEditClick}>
-                          <BorderColorRoundedIcon sx={{ fontSize: "1.4em", color: 'rgba(140, 56, 62, 0.5)', "&:hover": { color: "#8c383e", }, }} />
+                          <BorderColorRoundedIcon sx={{ fontSize: "1em", color: 'rgba(140, 56, 62, 0.5)', "&:hover": { color: "#8c383e", }, }} />
                         </IconButton>
                       </Tooltip>
                     )}
@@ -361,37 +361,33 @@ function ViewProfilePage() {
               </Grid>
               {/* for edit  */}
               {isPrsnlEditMode ? (
-                <>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '1.3em', ml: 6.4, mt: 3 }}>First Name:</Typography>
-                      <TextField type="text" name="fName" value={selectedUser.fName} onChange={handleDetailsChange} variant="outlined" size="small" sx={{ ml: 1, mt: 2.6 }}
-                        InputLabelProps={{ style: { fontFamily: "Poppins", }, }} inputProps={{ style: { fontSize: "1em", fontFamily: "Poppins", }, }} />
-                      <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '1.3em', ml: 20.2, mt: 3 }}>Gender:</Typography>
-                      <Select labelId="gender" id="gender" value={selectedUser.gender} name="gender" sx={{ ml: 1, mt: 2.6, width: '10em', height: '2.5em', fontSize: '1em', fontFamily: 'Poppins' }} onChange={handleDetailsChange}>
-                        <MenuItem value={"Female"}>Female</MenuItem>
-                        <MenuItem value={"Male"}>Male</MenuItem>
-                        <MenuItem value={"Other"}>Other</MenuItem>
-                      </Select>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '1.3em', ml: 3, mt: 3 }}>Middle Name:</Typography>
-                      <TextField type="text" name="mName" value={selectedUser.mName} onChange={handleDetailsChange} variant="outlined" size="small" sx={{ ml: 1, mt: 2.6 }}
-                        InputLabelProps={{ style: { fontFamily: "Poppins", }, }} inputProps={{ style: { fontSize: "1em", fontFamily: "Poppins", }, }} />
-                      <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '1.3em', ml: 10, mt: 3 }}> Mobile Number: </Typography>
-                      <TextField type="text" name="contactNum" value={selectedUser.contactNum} onChange={handleDetailsChange} variant="outlined" size="small" sx={{ ml: 1, mt: 2 }}
-                        InputLabelProps={{ style: { fontFamily: "Poppins", }, }} inputProps={{ style: { fontSize: "1em", fontFamily: "Poppins", }, }} />
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '1.3em', ml: 6.5, mt: 3 }}>Last Name: </Typography>
-                      <TextField type="text" name="lName" value={selectedUser.lName} onChange={handleDetailsChange} variant="outlined" size="small" sx={{ ml: 1, mt: 2 }}
-                        InputLabelProps={{ style: { fontFamily: "Poppins", }, }} inputProps={{ style: { fontSize: "1em", fontFamily: "Poppins", }, }} />
-                    </div>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '.8em', ml: 3, mt: 2, }}>First Name:</Typography>
+                    <TextField type="text" name="fName" value={selectedUser.fName} onChange={handleDetailsChange} variant="outlined" size="small" sx={{ ml: 3.2, mt: 1.5, width: '10em' }}
+                      InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }} />
+                    <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '.8em', ml: 9.2, mt: 2, }}>Gender:</Typography>
+                    <Select labelId="gender" id="gender" value={selectedUser.gender} name="gender" sx={{ ml: 1, mt: 1.5, mr: 4, width: '10em', height: '2.5em', fontSize: '.9em', fontFamily: 'Poppins', }} onChange={handleDetailsChange}>
+                      <MenuItem value={"Female"}>Female</MenuItem>
+                      <MenuItem value={"Male"}>Male</MenuItem>
+                      <MenuItem value={"Other"}>Other</MenuItem>
+                    </Select>
                   </div>
-                  <Grid sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '.8em', ml: 3, mt: 2 }}>Middle Name:</Typography>
+                    <TextField type="text" name="mName" value={selectedUser.mName} onChange={handleDetailsChange} variant="outlined" size="small" sx={{ ml: 1, mt: 1.5, width: '10em' }}
+                      InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }} />
+                    <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '.8em', ml: 3, mt: 2, }}> Mobile Number: </Typography>
+                    <TextField type="text" name="contactNum" value={selectedUser.contactNum} onChange={handleDetailsChange} variant="outlined" size="small" sx={{ ml: 1, mt: 1.5, width: '10em' }}
+                      InputLabelProps={{ style: { fontFamily: "Poppins", }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }} />
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '.8em', ml: 3, mt: 2 }}>Last Name: </Typography>
+                    <TextField type="text" name="lName" value={selectedUser.lName} onChange={handleDetailsChange} variant="outlined" size="small" sx={{ ml: 3.2, mt: 1.5, width: '10em' }}
+                      InputLabelProps={{ style: { fontFamily: "Poppins", }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }} />
                     <Button variant="contained" onClick={(e) => handleSavePrsnlChanges(e, selectedUser)}
                       sx={{
-                        fontSize: "15px", height: "2em", width: "7em", mr: 2, fontFamily: "Poppins", backgroundColor: "#8c383e", padding: "1px 1px 0 0 ",
+                        height: "2em", width: "7em", mr: 2, ml: 10, mt: 3, fontFamily: "Poppins", backgroundColor: "#8c383e", padding: "1px 1px 0 0 ",
                         "&:hover": { backgroundColor: "#F8C702", color: "black", },
                       }} style={{ textTransform: "none", }}
                       startIcon={<SaveAsRoundedIcon />}
@@ -399,28 +395,28 @@ function ViewProfilePage() {
                     >Save </Button>
                     <Button variant="contained"
                       sx={{
-                        fontSize: "15px", color: 'black', height: "2em", width: "7em", mr: 11, fontFamily: "Poppins", backgroundColor: "hsl(0, 0%, 78%)", padding: "1px 1px 0 0 ",
+                        color: 'black', height: "2em", width: "7em", mr: 2, mt: 3, fontFamily: "Poppins", backgroundColor: "hsl(0, 0%, 78%)", padding: "1px 1px 0 0 ",
                         "&:hover": { backgroundColor: "#a9a9a9", color: "white", },
                       }} style={{ textTransform: "none", }}
                       startIcon={<CancelOutlinedIcon />}
                       onClick={handlePrsnlEditClose}
                     >Cancel</Button>
-                  </Grid>
-                </>
+                  </div>
+                </div>
               ) : (
                 <>
                   {/* for display only */}
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm container>
-                      <Grid item xs container direction="column" spacing={2} sx={{ ml: 2 }}>
+                      <Grid item xs container direction="column" spacing={2} sx={{ ml: 1 }}>
                         <Grid item xs >
-                          <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 3, fontSize: '1.3em' }}>
+                          <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 3, fontSize: '1em' }}>
                             First Name: <span style={{ color: 'black' }}>{selectedUser.fName}</span>
                           </Typography>
-                          <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 2.7, fontSize: '1.3em' }}>
+                          <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 3, fontSize: '1em' }}>
                             Middle Name: <span style={{ color: 'black' }}>{selectedUser.mName}</span>
                           </Typography>
-                          <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 2.7, fontSize: '1.3em' }}>
+                          <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 3, fontSize: '1em' }}>
                             Last Name: <span style={{ color: 'black' }}>{selectedUser.lName}</span>
                           </Typography>
                         </Grid>
@@ -429,10 +425,10 @@ function ViewProfilePage() {
                     <Grid item xs={12} sm container>
                       <Grid item xs container direction="column" spacing={2} >
                         <Grid item xs sx={{ mt: 3 }}>
-                          <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '1.3em' }}>
+                          <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '1em' }}>
                             Gender: <span style={{ color: 'black' }}>{selectedUser.gender}</span>
                           </Typography>
-                          <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 2.7, fontSize: '1.3em' }}>
+                          <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 3, fontSize: '1em' }}>
                             Mobile Number: <span style={{ color: 'black' }}>{selectedUser.contactNum}</span>
                           </Typography>
                         </Grid>
@@ -444,69 +440,76 @@ function ViewProfilePage() {
             </Paper>
           </Grid>
           <Grid item xs={6} sx={{ mt: 1 }}>
-            <Paper elevation={0} sx={{ borderRadius: "10px", width: "100%", height: "19em", ml: 3 }}>
+            <Paper elevation={0} sx={{ borderRadius: "5px", width: "99%", height: "12.5em", ml: 2.7 }}>
               <Grid item xs={12} sm container>
                 <Grid item xs container spacing={2} sx={{ ml: 1 }}>
                   <Grid item xs >
-                    <Typography sx={{ fontFamily: 'Poppins', fontWeight: 'bold', fontSize: '1.7em', mt: 1 }}>Account Details</Typography>
+                    <Typography sx={{ fontFamily: 'Poppins', fontWeight: 'bold', fontSize: '1.3em', mt: 1 }}>Account Details</Typography>
                   </Grid>
                 </Grid>
               </Grid>
-              <Grid item xs={12} sm container>
+              <Grid sm container>
                 <Grid item xs container spacing={2} sx={{ ml: 1 }}>
                   {/* for editing */}
                   {isAccntEditUnameMode ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                       <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '1.3em', ml: 2, mt: 5 }}> Username:</Typography>
+                        <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '.8em', ml: 2, mt: 4 }}> Username:</Typography>
                         <FormControl >
-                          <TextField type="text" id="username" name="username" value={selectedUser.username} onChange={handleDetailsChange} variant="outlined" size="small" sx={{ ml: 1, mt: 5, }}
-                            InputLabelProps={{ style: { fontFamily: "Poppins", }, }} inputProps={{ style: { fontSize: "1em", fontFamily: "Poppins", }, }} />
+                          <TextField type="text" id="username" name="username" value={selectedUser.username} onChange={handleDetailsChange} variant="outlined" size="small" sx={{ ml: 1, mt: 3.5, }}
+                            InputLabelProps={{ style: { fontFamily: "Poppins", }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }} />
                         </FormControl>
+                        <Grid sx={{ mt: 3, ml: 1 }}>
+                          <Tooltip title="Save Changes" placement="top" arrow>
+                            <IconButton onClick={(e) => handleSaveUsernameChanges(e, selectedUser)}
+                              sx={{
+                                height: "1.3em", width: "1.2em", fontFamily: "Poppins", padding: "1px 1px 0 0 ", color: 'green',
+                                "&:hover": { bgcolor: 'transparent', color: "#F8C702", },
+                              }} style={{ textTransform: "none", }}
+
+                              disabled={!saveDisabled}
+                            ><SaveAsRoundedIcon sx={{ fontSize: '.8em' }} /></IconButton>
+                          </Tooltip>
+                          <Tooltip title="Cancel Changes" placement="top" arrow>
+                            <IconButton
+                              sx={{
+                                color: 'black', height: "1.3em", width: "1.3em", fontFamily: "Poppins", padding: "1px 1px 0 0 ",
+                                "&:hover": { bgcolor: 'transparent', color: "#8C383E", },
+                              }} style={{ textTransform: "none", }}
+
+                              onClick={handleAccntUnameClose}
+                            ><CancelOutlinedIcon sx={{ fontSize: '.8em' }} />
+                            </IconButton>
+                          </Tooltip>
+
+                        </Grid>
                       </div>
                       {!isAvailable && (
                         <FormHelperText
                           style={{
                             color: "red",
-                            marginLeft: 138,
+                            marginLeft: 95,
                             marginTop: '-10px',
+                            fontFamily: "Poppins",
+                            fontSize: "0.6em",
                           }}
                         >
                           {msgInfo}
                         </FormHelperText>
                       )}
-                      <Grid sx={{ ml: 17 }}>
-                        <Button onClick={(e) => handleSaveUsernameChanges(e, selectedUser)} variant="contained"
-                          sx={{
-                            fontSize: "15px", height: "2em", width: "7em", mr: 2, fontFamily: "Poppins", backgroundColor: "#8c383e", padding: "1px 1px 0 0 ",
-                            "&:hover": { backgroundColor: "#F8C702", color: "black", },
-                          }} style={{ textTransform: "none", }}
-                          startIcon={<SaveAsRoundedIcon />}
-                          disabled={!saveDisabled}
-                        >Save</Button>
-                        <Button variant="contained"
-                          sx={{
-                            fontSize: "15px", color: 'black', height: "2em", width: "7em", mr: 2, fontFamily: "Poppins", backgroundColor: "hsl(0, 0%, 78%)", padding: "1px 1px 0 0 ",
-                            "&:hover": { backgroundColor: "#a9a9a9", color: "white", },
-                          }} style={{ textTransform: "none", }}
-                          startIcon={<CancelOutlinedIcon />}
-                          onClick={handleAccntUnameClose}
-                        >Cancel</Button>
-                      </Grid>
                     </div>
-
                   ) : (
                     // for display only
-                    <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '1.3em', mt: 5, ml: 2 }}>
+                    <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '1em', mt: 5, ml: 2 }}>
                       Username: <span style={{ color: 'black' }}>{selectedUser.username}</span>
                     </Typography>
                   )}
-                  <Grid item xs sx={{ display: "flex", justifyContent: "left", height: '3em', mr: '1em', mt: 2.5, }} >
+                  <Grid item xs sx={{ display: "flex", justifyContent: "left", height: '3em', mr: '1em', mt: 2, }} >
                     {!isAccntEditUnameMode && (
                       <Tooltip title="Change Username" placement="right" arrow>
                         <IconButton onClick={handleAccntEditUnameClick}>
                           <BorderColorRoundedIcon sx={{
-                            fontSize: "1em", color: 'rgba(140, 56, 62, 0.5)',
+                            fontSize: ".8em", color: 'rgba(140, 56, 62, 0.5)',
                             "&:hover": { color: "#8c383e", },
                           }} />
                         </IconButton>
@@ -515,22 +518,22 @@ function ViewProfilePage() {
                   </Grid>
                 </Grid>
               </Grid>
-              <Grid item xs={12} sm container>
+              <Grid item sm container>
                 {/* for edit */}
                 {isAccntEditPassMode ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '1.3em', ml: 3, mt: 3 }}>Current Password:</Typography>
-                      <TextField type="password" variant="outlined" size="small" sx={{ ml: 1, mt: 2 }} />
-                      <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '1.3em', ml: 3, mt: 3 }}>New Password:</Typography>
-                      <TextField type="password" variant="outlined" size="small" sx={{ ml: 1, mt: 2 }} />
+                      <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '.8em', ml: 3, mt: 1, }}>Current Password:</Typography>
+                      <TextField type="password" variant="outlined" size="small" sx={{ ml: 1, mt: 1, width: '12em', fontSize: '.8em', fontFamily: 'Poppins' }} />
+                      <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '.8em', ml: 3, mt: 1 }}>New Password:</Typography>
+                      <TextField type="password" variant="outlined" size="small" sx={{ ml: 1, mt: 1, width: '12em', fontSize: '.8em', fontFamily: 'Poppins' }} />
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '1.3em', ml: 3 }}>Confirm New Password: </Typography>
-                      <TextField type="password" variant="outlined" size="small" sx={{ ml: 1 }} />
+                      <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '.8em', ml: 3, mt: .6 }}>Confirm New Password: </Typography>
+                      <TextField type="password" variant="outlined" size="small" sx={{ ml: 1, fontSize: '.8em', width: '12.5em', fontFamily: 'Poppins' }} />
                       <Button variant="contained"
                         sx={{
-                          fontSize: "15px", height: "2em", width: "7em", mr: 2, ml: 5, fontFamily: "Poppins", backgroundColor: "#8c383e", padding: "1px 1px 0 0 ",
+                          height: "2em", width: "7em", mr: 1, ml: 5, fontFamily: "Poppins", backgroundColor: "#8c383e", padding: "1px 1px 0 0 ",
                           "&:hover": { backgroundColor: "#F8C702", color: "black", },
                         }}
                         style={{ textTransform: "none", }}
@@ -538,7 +541,7 @@ function ViewProfilePage() {
                       >Save</Button>
                       <Button variant="contained"
                         sx={{
-                          fontSize: "15px", color: 'black', height: "2em", width: "7em", mr: 2, fontFamily: "Poppins", backgroundColor: "hsl(0, 0%, 78%)", padding: "1px 1px 0 0 ",
+                          color: 'black', height: "2em", width: "7em", mr: 2, fontFamily: "Poppins", backgroundColor: "hsl(0, 0%, 78%)", padding: "1px 1px 0 0 ",
                           "&:hover": { backgroundColor: "#a9a9a9", color: "white", },
                         }}
                         style={{ textTransform: "none", }}
@@ -549,16 +552,16 @@ function ViewProfilePage() {
                   </div>
                 ) : (
                   //for display only
-                  <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '1.3em', mt: 4, ml: 3 }}>
+                  <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '1em', mt: 3, ml: 3 }}>
                     Password: <span style={{ color: 'black' }}>**********</span>
                   </Typography>
                 )}
-                <Grid item xs sx={{ display: "flex", justifyContent: "left", height: '3em', mr: '1em', ml: 2, mt: 2.5 }} >
+                <Grid item xs sx={{ display: "flex", justifyContent: "left", height: '2em', ml: 2, mt: 2 }} >
                   {!isAccntEditPassMode && (
                     <Tooltip title="Change Password" placement="right" arrow>
                       <IconButton onClick={handleAccntEditPassClick}>
                         <BorderColorRoundedIcon sx={{
-                          fontSize: "1em", color: 'rgba(140, 56, 62, 0.5)',
+                          fontSize: ".8em", color: 'rgba(140, 56, 62, 0.5)',
                           "&:hover": { color: "#8c383e", },
                         }} />
                       </IconButton>
@@ -569,22 +572,22 @@ function ViewProfilePage() {
             </Paper>
           </Grid>
         </Grid>
-        <Paper elevation={0} sx={{ borderRadius: "10px", width: "100%", height: "20.5em", mt: .8, ml: 3 }}>
+        <Paper elevation={0} sx={{ borderRadius: "5px", width: "100%", height: "13em", mt: .8, ml: 3 }}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm container>
               <Grid item xs container direction="column" spacing={2} sx={{ ml: 2 }}>
                 <Grid item xs >
-                  <Typography gutterBottom component="div" sx={{ fontFamily: 'Poppins', fontWeight: 'bold', mt: 3, fontSize: '1.7em' }}>Work Details</Typography>
-                  <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 4, fontSize: '1.3em' }}>
+                  <Typography gutterBottom component="div" sx={{ fontFamily: 'Poppins', fontWeight: 'bold', mt: .5, fontSize: '1.3em' }}>Work Details</Typography>
+                  <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 2, fontSize: '1em' }}>
                     Employee ID #: <span style={{ color: 'black', }}>{selectedUser.workID}</span>
                   </Typography>
-                  <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 2.7, fontSize: '1.3em' }}>
+                  <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 2, fontSize: '1em' }}>
                     Department: <span style={{ color: 'black', }}>{selectedUser.dept}</span>
                   </Typography>
-                  <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 2.7, fontSize: '1.3em' }}>
+                  <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 2, fontSize: '1em' }}>
                     Position: <span style={{ color: 'black', }}>{selectedUser.position}</span>
                   </Typography>
-                  <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 2.7, fontSize: '1.3em' }}>
+                  <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 2, fontSize: '1em' }}>
                     Institutional Email: <span style={{ color: 'black', }}>{selectedUser.workEmail}</span>
                   </Typography>
                 </Grid>
@@ -592,11 +595,11 @@ function ViewProfilePage() {
             </Grid>
             <Grid item xs={12} sm container>
               <Grid item xs container direction="column" spacing={2} sx={{ ml: 2 }}>
-                <Grid item xs sx={{ mt: 12.3 }}>
-                  <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '1.3em' }}>
+                <Grid item xs sx={{ mt: 6.5 }}>
+                  <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', fontSize: '1em' }}>
                     Date Hired: <span style={{ color: 'black', fontWeight: 'bold' }}>{selectedUser.dateHired}</span>
                   </Typography>
-                  <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 2.7, fontSize: '1.3em' }}>
+                  <Typography color="text.secondary" sx={{ fontFamily: 'Poppins', mt: 2, fontSize: '1em' }}>
                     Signature: <span style={{ color: 'black', }}>{selectedUser.signature}</span>
                   </Typography>
                 </Grid>
