@@ -103,9 +103,9 @@ public class UserService implements UserDetailsService {
         boolean usernameExist = userRepo.existsByUsernameAndIsDeleted(username, 0);
 
         if (usernameExist) {
-            return "Username already taken";
+            return "Username already exists";
         } else {
-            return "Username available";
+            return "Username is available";
         }
     }
 
@@ -114,11 +114,42 @@ public class UserService implements UserDetailsService {
         boolean emailExists = userRepo.existsByWorkEmailAndIsDeleted(workEmail, 0);
 
         if (emailExists) {
-            return "Email Address is already taken";
+            return "Email Address already exists";
         } else {
             return "Email Address is available";
         }
     }
+
+    // public String checkUsernameAvailabilityForEditAdmin(String username, String currentUsername){
+    //     if (username.equals(currentUsername)) {
+    //         return "Username is the same as current";
+    //     }
+    
+    //     boolean usernameExists = userRepo.existsByUsernameAndIsDeleted(username, 0);
+    
+    //     if (usernameExists) {
+    //         return "Username already exists";
+    //     } else {
+    //         return "Username is available";
+    //     }
+    // }
+
+        // // Service method to check email availability
+        // public String checkEmailAvailabilityForEditAdmin(String workEmail, String currentEmail) {
+        //     if (workEmail.equals(currentEmail)) {
+        //         return "Username is the same as current";
+        //     }
+
+        //     boolean emailExists = userRepo.existsByWorkEmailAndIsDeleted(workEmail, 0);
+    
+        //     if (emailExists) {
+        //         return "Email Address already exists";
+        //     } else {
+        //         return "Email Address is available";
+        //     }
+        // }
+
+
 
     // this method returns user details
     @Override
@@ -147,41 +178,40 @@ public class UserService implements UserDetailsService {
         return (str == null || str.trim().isEmpty()) ? null : str;
     }
 
-    // adi edit user
     @Transactional
-    public UserEntity adminUpdatesUser(int userID, UserEntity newUserDetails) {
+    public UserEntity editUserDetails(int userID, UserEntity newDetails) {
         UserEntity user = userRepo.findById(userID)
                 .orElseThrow(() -> new NoSuchElementException("User " + userID + " not found."));
         try {
-            if (newUserDetails.getWorkID() != null)
-                user.setWorkID(newUserDetails.getWorkID());
-            if (newUserDetails.getfName() != null)
-                user.setfName(newUserDetails.getfName());
-            if (newUserDetails.getmName() != null)
-                user.setmName(newUserDetails.getmName());
-            if (newUserDetails.getlName() != null)
-                user.setlName(newUserDetails.getlName());
-            if (newUserDetails.getWorkEmail() != null)
-                user.setWorkEmail(newUserDetails.getWorkEmail());
-            if (newUserDetails.getUsername() != null)
-                user.setUsername(newUserDetails.getUsername());
-            if (newUserDetails.getPosition() != null)
-                user.setPosition(newUserDetails.getPosition());
-            if (newUserDetails.getGender() != null)
-                user.setGender(newUserDetails.getGender());
-            if (newUserDetails.getDept() != null)
-                user.setDept(newUserDetails.getDept());
-            if (newUserDetails.getContactNum() != null)
-                user.setContactNum(newUserDetails.getContactNum());
-            if (newUserDetails.getEmpStatus() != null)
-                user.setEmpStatus(newUserDetails.getEmpStatus());
-            if (newUserDetails.getProbeStatus() != null)
-                user.setProbeStatus(newUserDetails.getProbeStatus());
-            if (newUserDetails.getDateStarted() != null)
-                user.setDateStarted(newUserDetails.getDateStarted());
+            if (newDetails.getfName() != null)
+                user.setfName(newDetails.getfName());
+            if (newDetails.getmName() != null)
+                user.setmName(newDetails.getmName());
+            if (newDetails.getlName() != null)
+                user.setlName(newDetails.getlName());
+            if (newDetails.getWorkID() != null)
+                user.setWorkID(newDetails.getWorkID());
+            if (newDetails.getGender() != null)
+                user.setGender(newDetails.getGender());
+            if (newDetails.getEmpStatus() != null)
+                user.setEmpStatus(newDetails.getEmpStatus());
+            if (newDetails.getDateHired() != null)
+                user.setDateHired(newDetails.getDateHired());
+            if (newDetails.getProbeStatus() != null)
+                user.setProbeStatus(newDetails.getProbeStatus());
+            if (newDetails.getDateStarted() !=null)
+                user.setDateStarted(newDetails.getDateStarted());
+            if (newDetails.getPosition() != null)
+                user.setPosition(newDetails.getPosition());
+            if (newDetails.getDept() != null)
+                user.setDept(newDetails.getDept());
+            if (newDetails.getWorkEmail() != null)
+                user.setWorkEmail(newDetails.getWorkEmail());
+            if (newDetails.getUsername() != null)
+                user.setUsername(newDetails.getUsername());
             return userRepo.save(user);
-        }finally{
-            throw new RuntimeException("User not found");
+        } catch (Exception e) {
+            throw e; 
         }
     }
 
@@ -195,8 +225,6 @@ public class UserService implements UserDetailsService {
                 user.setUsername(newDetails.getUsername());
             return userRepo.save(user);
         } catch (Exception e) {
-            // Log the exception along with some context
-            System.out.println("Error updating user: " + e.getMessage());
             throw e; // rethrow or handle as appropriate
         }
     }
@@ -210,8 +238,6 @@ public class UserService implements UserDetailsService {
                 user.setPassword(newDetails.getPassword());
             return userRepo.save(user);
         } catch (Exception e) {
-            // Log the exception along with some context
-            System.out.println("Error updating user: " + e.getMessage());
             throw e; // rethrow or handle as appropriate
         }
     }
@@ -234,9 +260,7 @@ public class UserService implements UserDetailsService {
                 user.setContactNum(newDetails.getContactNum());
             return userRepo.save(user);
         } catch (Exception e) {
-            // Log the exception along with some context
-            System.out.println("Error updating user: " + e.getMessage());
-            throw e; // rethrow or handle as appropriate
+            throw e; 
         }
     }
 
