@@ -237,14 +237,16 @@ function ViewProfilePage() {
 
   };
   const handleCancel = () => {
+    setImage(null);
     if (prevProfilePictureUrl) {
       setProfilePictureUrl(prevProfilePictureUrl); // Restore the previous profile picture URL
     }
-    setImage(null);
+    
   };
   const handleImageClick = () => {
     inputRef.current.click();
   }
+  
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     setImage(file);
@@ -293,7 +295,7 @@ function ViewProfilePage() {
               <IconButton onClick={handleSeePictureDialog} size="small" sx={{ ml: 5, mt: 3 }} aria-controls={open ? 'account-menu' : undefined} aria-haspopup="true" aria-expanded={open ? 'true' : undefined} >
                 <Tooltip title="Profile Picture" placement="top" arrow>
                   {profilePictureUrl ?
-                    <Avatar sx={{ width: 150, height: 170 }} src={profilePictureUrl} />
+                    <Avatar sx={{ width: 110, height: 110 }} src={profilePictureUrl} />
                     :
                     <Avatar sx={{ width: 110, height: 110 }} />
                   }
@@ -609,28 +611,28 @@ function ViewProfilePage() {
         </Paper>
       </Grid>
       <Dialog open={openSeePictureDialog} onClose={handleCloseDialog} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" >
-        <Box sx={{ bgcolor: "#8c383e", height: "2.79em", width: "100%", display: "flex", justifyContent: "right", }}>
+        <Box sx={{ bgcolor: "#8c383e", height: "2em", width: "100%", display: "flex", justifyContent: "right", }}>
           <Grid container spacing={0.6} sx={{ fontFamily: "Poppins", fontWeight: "bold", color: "white", backgroundColor: "transparent", display: "flex", mt: .5, justifyContent: "center", }}>
-            <Grid item sx={{ fontSize: "1.3em" }}>Profile Picture</Grid>
+            <Grid item sx={{ fontSize: "1em" }}>Profile Picture</Grid>
           </Grid>
           <IconButton onClick={handleCloseDialog} sx={{ "&:hover": { color: "#F8C702", }, }}>
-            <HighlightOffOutlinedIcon sx={{ fontSize: "1.4em", color: "white" }} />
+            <HighlightOffOutlinedIcon sx={{ fontSize: "1em", color: "white" }} />
           </IconButton>
         </Box>
-        <DialogContent sx={{ width: '37.5em', height: '41em', }} >
+        <DialogContent sx={{ width: '30em', height: '35em', }} >
           <DialogContentText id="alert-dialog-description">
-            <Box sx={{ width: '100%', height: '35em', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <Box sx={{ width: '100%', height: '20em', display: 'flex', justifyContent: 'center', alignItems: 'center',mt:5 }}>
               {profilePictureUrl ?
-                <Avatar sx={{ width: '85%', height: '85%' }} src={profilePictureUrl} onClick={handleImageClick} />
+                <Avatar sx={{ width: '75%', height: '100%' }} src={profilePictureUrl} onClick={handleImageClick} />
                 :
-                <Avatar sx={{ width: '85%', height: '85%' }} onClick={handleImageClick} />
+                <Avatar sx={{ width: '75%', height: '100%' }} onClick={handleImageClick} />
               }
             </Box>
           </DialogContentText>
-          <DialogActions sx={{ display: "flex", justifyContent: 'center', alignItems: 'center', }}>
+          <DialogActions sx={{ display: "flex", justifyContent: 'center', alignItems: 'center',mt:9 }}>
             {!image && (
               <Button component="label" type="submit" sx={{
-                fontSize: "1em", bgcolor: "#8c383e", color: "white", width: "96.5%",
+                borderRadius: "20px",fontSize: "1em", bgcolor: "#8c383e", color: "white", width: "80%",
                 "&:hover": { backgroundColor: "#F8C702", color: "black", },
               }}
                 style={{ textTransform: "none", fontFamily: "Poppins", }} startIcon={<CameraAltOutlinedIcon />}> Change Picture
@@ -639,10 +641,9 @@ function ViewProfilePage() {
             )}
             {image && (
               <>
-                <Button component="label" type="submit" sx={{ fontSize: "1em", color: "black", width: "35%", "&:hover": { backgroundColor: "#F8C702", }, }}
+                <Button component="label" type="submit" sx={{borderRadius:'25px', fontSize: "1em", color: "black", width: "30%", "&:hover": { backgroundColor: "rgba(248, 199, 2, 0.5)", }, }}
                   style={{ textTransform: "none", fontFamily: "Poppins", }} onClick={handleCancel}> Cancel </Button>
-                <Button component="label" type="submit" sx={{
-                  bgcolor: "rgba(248, 199, 2, 0.7)", color: "black", fontSize: "1em", width: "48%",
+                <Button component="label" type="submit" sx={{borderRadius:'25px',bgcolor: "rgba(248, 199, 2, 0.7)", color: "black", fontSize: "1em", width: "50%",
                   "&:hover": { backgroundColor: "#F8C702", color: "black", },
                 }}
                   style={{ textTransform: "none", fontFamily: "Poppins", }} onClick={handleSavePicture}>Save as Profile Picture
