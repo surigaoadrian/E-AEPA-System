@@ -22,7 +22,7 @@ function App() {
         <Route
           path="/"
           element={
-            <PrivateRoute requiredRoles={["EMPLOYEE", "ADMIN"]}>
+            <PrivateRoute requiredRoles={["EMPLOYEE", "ADMIN", "HEAD"]}>
               <HomeShowcase />
             </PrivateRoute>
           }

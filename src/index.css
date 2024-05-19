@@ -16,3 +16,6 @@ body {
 button {
   font-family: "poppins";
 }
+.no-select {
+  user-select: none;
+}
