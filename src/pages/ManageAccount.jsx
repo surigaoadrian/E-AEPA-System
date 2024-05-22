@@ -17,6 +17,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'; //password
 import axios from "axios";
+import { faPenToSquare,  faTrash, } from "@fortawesome/free-solid-svg-icons";
 
 const CustomAlert = ({ open, onClose, severity, message }) => {
   return (
@@ -506,12 +507,14 @@ function ManageAccount() {
       checkUsernameAvailability(value)
         .then((availability) => {
           console.log("Username availability:", availability);
-          if (availability === "Username already exists") {
-            setIsAvailable(false);
-            setMsgInfo("Username already exists");
-          } else {
+          if (availability === "Username is available") {
             setIsAvailable(true);
+            setIsTaken(false);
             setMsgInfo("");
+          } else {
+            setIsAvailable(false);
+            setIsTaken(true);
+            setMsgInfo("Username already exists");
           }
         })
         .catch((error) => {
@@ -687,15 +690,18 @@ function ManageAccount() {
       format: (value, row) => {
         return (
           <div>
-            <IconButton onClick={() => handleClickEditBtn(row.userID)}>
-              <EditNoteTwoToneIcon />
-            </IconButton>
-            <IconButton
-              color="error"
-              onClick={() => handleClickDeleteBtn(row.userID)}
-            >
-              <DeleteOutlineIcon />
-            </IconButton>
+          <IconButton onClick={() => handleClickEditBtn(row.userID)}>
+            <FontAwesomeIcon
+              icon={faPenToSquare}
+              style={{ color: '#8C383E', fontSize: '1rem', cursor: 'pointer' }}
+            />
+          </IconButton>
+          <IconButton color="error" onClick={() => handleClickDeleteBtn(row.userID)}>
+            <FontAwesomeIcon
+              icon={faTrash}
+              style={{ color: '#8C383E', fontSize: '1rem', cursor: 'pointer' }}
+            />
+          </IconButton>
           </div>
         );
       },
@@ -737,15 +743,23 @@ function ManageAccount() {
       format: (value, row) => (
         <div>
           <IconButton onClick={() => handleClickEditBtn(row.userID)}>
-            <EditNoteTwoToneIcon />
+            <FontAwesomeIcon
+              icon={faPenToSquare}
+              style={{ color: '#8C383E', fontSize: '1rem', cursor: 'pointer' }}
+            />
           </IconButton>
           <IconButton color="error" onClick={() => handleClickDeleteBtn(row.userID)}>
-            <DeleteOutlineIcon />
+            <FontAwesomeIcon
+              icon={faTrash}
+              style={{ color: '#8C383E', fontSize: '1rem', cursor: 'pointer' }}
+            />
           </IconButton>
         </div>
       ),
     },
   ];
+
+  
 
   return (
     <div>
@@ -781,7 +795,7 @@ function ManageAccount() {
                 </TableHead>
                 <TableBody>
                   {rows.map((row) => (
-                    <TableRow sx={{ "&:hover": { backgroundColor: "rgba(248, 199, 2, 0.5)", color: "black", }, }} key={row.id}>
+                    <TableRow sx={{ bgcolor:'white',"&:hover": { backgroundColor: "rgba(248, 199, 2, 0.4)", color: "black", }, }} key={row.id}>
                       {(selectedTab === 0 ? columnsEmployees : columnsAdmins)
                         .map((column) => (
                           <TableCell sx={{ fontFamily: "Poppins", }} key={`${row.id}-${column.id}`} align={column.align}>
@@ -848,7 +862,7 @@ function ManageAccount() {
                   </Grid>
                   <Grid item xs={4}>
                     <Box>
-                      <TextField placeholder="First Name" size="small" required fullWidth id="fName" value={firstname} onChange={handleFNameChange}
+                      <TextField  placeholder="First Name" size="small" required fullWidth id="fName" value={firstname} onChange={handleFNameChange}
                         InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.9em' }, }} inputProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' } }} />
                     </Box>
                   </Grid>
@@ -1075,7 +1089,7 @@ function ManageAccount() {
                           <MenuItem disabled style={{ fontFamily: "Poppins", fontSize: '.8em' }} value="">Department</MenuItem>
                           {departments.map((dept, index) => {
                             return (
-                              <MenuItem key={index} style={{ fontFamily: "Poppins", fontSize: '.8em' }} value={dept.deptName} sx={{ fontFamily: "Poppins", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "300px", }}>{dept.deptName}</MenuItem>
+                              <MenuItem key={index} style={{ fontFamily: "Poppins", fontSize: '.8em' }} value={dept.deptName} sx={{ fontFamily: "Poppins", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "300px" }}>{dept.deptName}</MenuItem>
                             );
                           })}
                         </Select>
@@ -1194,7 +1208,7 @@ function ManageAccount() {
                 <>
                   <Grid item xs={4}>
                     <Box style={{ fontFamily: "Poppins" }} height="100%">
-                      <TextField fullWidth size="small" label="First Name" id="fName" name="fName" value={selectedUser.fName} onChange={handleUserDataChange}
+                      <TextField required fullWidth size="small" label="First Name" id="fName" name="fName" value={selectedUser.fName} onChange={handleUserDataChange}
                         InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }}
                       />
                     </Box>
@@ -1207,19 +1221,19 @@ function ManageAccount() {
                   </Grid>
                   <Grid item xs={4}>
                     <Box style={{ fontFamily: "Poppins" }} >
-                      <TextField fullWidth size="small" label="Last Name" id="lName" value={selectedUser.lName} name="lName" onChange={handleUserDataChange}
+                      <TextField required fullWidth size="small" label="Last Name" id="lName" value={selectedUser.lName} name="lName" onChange={handleUserDataChange}
                         InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }} />
                     </Box>
                   </Grid>
                   <Grid item xs={6}>
                     <Box >
-                      <TextField fullWidth size="small" label="Id Number" id="workId" name="workID" value={selectedUser.workID} onChange={handleUserDataChange}
+                      <TextField required fullWidth size="small" label="Id Number" id="workId" name="workID" value={selectedUser.workID} onChange={handleUserDataChange}
                         InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }} />
                     </Box>
                   </Grid>
                   <Grid item xs={6}>
                     <Box >
-                      <TextField fullWidth size="small" label="Admin Username" id="username" name="username" value={selectedUser.username} onChange={handleUserDataChange}
+                      <TextField required fullWidth size="small" label="Admin Username" id="username" name="username" value={selectedUser.username} onChange={handleUserDataChange}
                         InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }}
                       />
                       {!isAvailable && (
@@ -1229,7 +1243,7 @@ function ManageAccount() {
                   </Grid>
                   <Grid item xs={12}>
                     <Box >
-                      <TextField fullWidth size="small" label="Institutional Email" id="email" name="workEmail" value={selectedUser.workEmail} onChange={handleUserDataChange}
+                      <TextField required fullWidth size="small" label="Institutional Email" id="email" name="workEmail" value={selectedUser.workEmail} onChange={handleUserDataChange}
                         InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }}
                       />
                       {(!emailIsAvailable) && (
@@ -1244,7 +1258,7 @@ function ManageAccount() {
                   <>
                     <Grid item xs={4}>
                       <Box style={{ fontFamily: "Poppins" }} height="100%">
-                        <TextField fullWidth size="small" label="First Name" id="fName" name="fName" value={selectedUser.fName} onChange={handleUserDataChange}
+                        <TextField required fullWidth size="small" label="First Name" id="fName" name="fName" value={selectedUser.fName} onChange={handleUserDataChange}
                           InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }}
                         />
                       </Box>
@@ -1257,13 +1271,13 @@ function ManageAccount() {
                     </Grid>
                     <Grid item xs={4}>
                       <Box style={{ fontFamily: "Poppins" }} >
-                        <TextField fullWidth size="small" label="Last Name" id="lName" value={selectedUser.lName} name="lName" onChange={handleUserDataChange}
+                        <TextField required fullWidth size="small" label="Last Name" id="lName" value={selectedUser.lName} name="lName" onChange={handleUserDataChange}
                           InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }} />
                       </Box>
                     </Grid>
                     <Grid item xs={6} sx={{ width: "100%" }}>
                       <Box sx={{ height: "100%" }}>
-                        <TextField fullWidth size="small" label="Employee ID" id="workId" name="workID" value={selectedUser.workID} onChange={handleUserDataChange}
+                        <TextField required fullWidth size="small" label="Employee ID" id="workId" name="workID" value={selectedUser.workID} onChange={handleUserDataChange}
                           InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }} />
                         {(workIDMsg) && (
                           <FormHelperText style={{ color: "red", }}>{workIDMsg}</FormHelperText>
@@ -1272,9 +1286,9 @@ function ManageAccount() {
                     </Grid>
                     <Grid item xs={6}>
                       <Box>
-                        <FormControl fullWidth size="small" disabled>
+                        <FormControl required fullWidth size="small" disabled>
                           <InputLabel id="GenderLabel" value={gender} sx={{ fontSize: ".8em", fontFamily: "Poppins", }}>Gender</InputLabel>
-                          <Select labelId="GenderLabel" id="GenderLabel" value={selectedUser.gender} label="gender" name="gender" sx={{ fontFamily: "Poppins", fontSize: '.8em' }}>
+                          <Select  labelId="GenderLabel" id="GenderLabel" value={selectedUser.gender} label="gender" name="gender" sx={{ fontFamily: "Poppins", fontSize: '.8em' }}>
                             <MenuItem value={"Female"}>Female</MenuItem>
                             <MenuItem value={"Male"}>Male</MenuItem>
                             <MenuItem value={"Other"}>Other</MenuItem>
@@ -1284,7 +1298,7 @@ function ManageAccount() {
                     </Grid>
                     <Grid item xs={6} sx={{ width: "100%" }}>
                       <Box>
-                        <FormControl size='small' fullWidth disabled={selectedUser?.role === "HEAD"}>
+                        <FormControl required size='small' fullWidth disabled={selectedUser?.role === "HEAD"}>
                           <InputLabel id="employementStatusLabel" sx={{ fontSize: ".8em", fontFamily: "Poppins", }}>Employment Status
                           </InputLabel>
                           <Select labelId="employementStatusLabel" id="employementStatus" name="empStatus" value={selectedUser.empStatus} label="employment status" onChange={handleUserDataChange} sx={{ fontFamily: "Poppins", fontSize: ".8em" }}>
@@ -1296,13 +1310,13 @@ function ManageAccount() {
                     </Grid>
                     <Grid item xs={6} >
                       <Box>
-                        <TextField fullWidth size="small" label="Date Hired " id="datehired" type="date" name="dateHired" value={selectedUser.dateHired} onChange={handleUserDataChange}
+                        <TextField required fullWidth size="small" label="Date Hired " id="datehired" type="date" name="dateHired" value={selectedUser.dateHired} onChange={handleUserDataChange}
                           InputLabelProps={{ shrink: true, style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, pattern: "(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/[0-9]{2}", }} />
                       </Box>
                     </Grid>
                     <Grid item xs={6} sx={{ width: "100%" }}>
                       <Box>
-                        <FormControl size='small' fullWidth disabled={selectedUser?.empStatus === "Regular" || selectedUser?.role === "HEAD"}>
+                        <FormControl required size='small' fullWidth disabled={selectedUser?.empStatus === "Regular" || selectedUser?.role === "HEAD"}>
                           <InputLabel id="probationaryStatus" sx={{ fontSize: ".8em", fontFamily: "Poppins", }}>Probationary Status</InputLabel>
                           <Select labelId="probationaryStatusLabel" id="probeStat" name="probeStatus" value={selectedUser.probeStatus} label="probationary status" onChange={handleUserDataChange} sx={{ fontFamily: "Poppins", fontSize: '.8em' }}>
                             <MenuItem style={{ fontFamily: "Poppins" }} value={"3rd Probationary"}>3rd Probationary</MenuItem>
@@ -1313,19 +1327,19 @@ function ManageAccount() {
                     </Grid>
                     <Grid item xs={6} sx={{ width: "100%" }}>
                       <Box>
-                        <TextField fullWidth disabled={selectedUser?.empStatus === "Regular" || selectedUser?.role === "HEAD"} size="small" label="Date Started " id="dateStarted" type="date" name="dateStarted" value={selectedUser.dateStarted} onChange={handleUserDataChange}
+                        <TextField required fullWidth disabled={selectedUser?.empStatus === "Regular" || selectedUser?.role === "HEAD"} size="small" label="Date Started " id="dateStarted" type="date" name="dateStarted" value={selectedUser.dateStarted} onChange={handleUserDataChange}
                           InputLabelProps={{ shrink: true, style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, pattern: "(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/[0-9]{2}", }} />
                       </Box>
                     </Grid>
                     <Grid item xs={4.8} >
                       <Box >
-                        <TextField fullWidth size="small" label="Position" id="position" name="position" value={selectedUser.position} onChange={handleUserDataChange}
+                        <TextField required fullWidth size="small" label="Position" id="position" name="position" value={selectedUser.position} onChange={handleUserDataChange}
                           InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }} />
                       </Box>
                     </Grid>
                     <Grid item xs={7.2}>
                       <Box>
-                        <FormControl fullWidth size="small">
+                        <FormControl required fullWidth size="small">
                           <InputLabel id="deptLabel" sx={{ fontSize: ".8em", fontFamily: "Poppins", }}>Department</InputLabel>
                           <Select labelId="deptLabel" name="dept" id="dept" value={selectedUser.dept} label="dept" onChange={handleUserDataChange} sx={{ fontFamily: "Poppins", fontSize: '.8em' }}>
                             {departments.map((dept, index) => {
@@ -1337,7 +1351,7 @@ function ManageAccount() {
                     </Grid>
                     <Grid item xs={6.5} >
                       <Box >
-                        <TextField fullWidth size="small" label="Institutional Email" id="email" name="workEmail" value={selectedUser.workEmail} onChange={handleUserDataChange}
+                        <TextField required fullWidth size="small" label="Institutional Email" id="email" name="workEmail" value={selectedUser.workEmail} onChange={handleUserDataChange}
                           InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }}
                         />
                         {(!emailIsAvailable) && (
@@ -1347,10 +1361,10 @@ function ManageAccount() {
                     </Grid>
                     <Grid item xs={5.5}>
                       <Box>
-                        <TextField fullWidth size="small" label="Username" id="username" name="username" value={selectedUser.username} onChange={handleUserDataChange}
+                        <TextField required fullWidth size="small" label="Username" id="username" name="username" value={selectedUser.username} onChange={handleUserDataChange}
                           InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }}
                         />
-                        {!isAvailable && (
+                        {(!isAvailable) && (
                           <FormHelperText style={{ color: "red", fontFamily: "Poppins", fontSize: "0.6em", }}>{msgInfo}</FormHelperText>
                         )}
 
