@@ -15,7 +15,7 @@ const CustomAlert = ({ open, onClose, severity, message }) => {
   );
 };
 
-function ViewProfilePage() {
+function ViewProfilePageAdmin() {
   const userID = sessionStorage.getItem("userID");
   const [openSeePictureDialog, setOpenSeePictureDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
@@ -662,4 +662,4 @@ function ViewProfilePage() {
   </div >;
 }
 
-export default ViewProfilePage;
+export default ViewProfilePageAdmin;

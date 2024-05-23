@@ -26,10 +26,10 @@ public class UserController {
     }
 
     @GetMapping("/getUser/{userID}")
-    public ResponseEntity<Optional<UserEntity>> getUser (@PathVariable int userID){
+    public ResponseEntity<Optional<UserEntity>> getUser(@PathVariable int userID){
         Optional<UserEntity> user = userServ.getUser(userID);
 
-        if(user.isPresent()){
+        if(user.isPresent()) {
             return ResponseEntity.ok(user);
         } else {
             return ResponseEntity.notFound().build();
@@ -53,34 +53,50 @@ public class UserController {
         return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
     }
 
-    @PatchMapping ("/editUser/{userID}")
+    @PatchMapping("/editUser/{userID}")
     public ResponseEntity<UserEntity> editUserDetails(@PathVariable int userID, @RequestBody UserEntity newDetails) {
-        UserEntity updatedUser = userServ.adminUpdatesUser(userID, newDetails);
+        UserEntity updatedUser = userServ.editUserDetails(userID, newDetails);
 
         return ResponseEntity.ok(updatedUser);
     }
 
     @PutMapping("/checkUsername/{username}")
-    public ResponseEntity<String> checkUsernameAvailability(@PathVariable String username){
+    public ResponseEntity<String> checkUsernameAvailability(@PathVariable String username) {
         String result = userServ.checkUsernameAvailability(username);
 
-        if(result.equals("Username taken already")){
-            return ResponseEntity.ok(result); //username taken
-        }else {
-            return ResponseEntity.ok(result); //username avaiable
+        if (result.equals("Username already exists")) {
+            return ResponseEntity.ok(result); // username taken
+        } else {
+            return ResponseEntity.ok(result); // username avaiable
         }
     }
+
+    // @PutMapping("/checkUsernameEdit/{username}")
+    // public ResponseEntity<String> checkUsernameAvailabilityForEditAdmin(
+    //         @PathVariable String username,
+    //         @RequestParam String currentUsername) {
+    //     String result = userServ.checkUsernameAvailabilityForEditAdmin(username, currentUsername);
+    //     return ResponseEntity.ok(result); // Return the result directly
+    // }
 
     @PutMapping("/checkEmail/{workEmail}")
     public ResponseEntity<String> checkEmailAvailability(@PathVariable String workEmail) {
         String result = userServ.checkEmailAvailability(workEmail);
 
-        if (result.equals("Email Address is already taken")) {
+        if (result.equals("Email Address already exists")) {
             return ResponseEntity.status(HttpStatus.OK).body(result);
         } else {
             return ResponseEntity.status(HttpStatus.OK).body(result);
         }
     }
+
+    // @PutMapping("/checkEmailEdit/{workEmail}")
+    // public ResponseEntity<String> checkEmailAvailabilityForEditAdmin(
+    //         @PathVariable String workEmail,
+    //         @RequestParam String currentEmail) {
+    //     String result = userServ.checkEmailAvailabilityForEditAdmin(workEmail, currentEmail);
+    //     return ResponseEntity.ok(result); // Return the result directly
+    // }
 
     // for edit employee: account details
     @PatchMapping("/editAccountUsername/{userID}")
