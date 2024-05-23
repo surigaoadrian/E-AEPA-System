@@ -143,12 +143,13 @@ function NavBar() {
         </div>
         <div className="nav-profile-picture">
           <div
-            className="nav-profile-img"
+            className="nav-profile-img rounded-full "
             style={{
               height: "40px",
               width: "40px",
               borderRadius: "100%",
               overflow: "hidden",
+              border: '2px solid #F8C702' 
             }}
           >
             <img
