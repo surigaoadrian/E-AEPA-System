@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import logo from "../assets/e-AEPA-logo.png";
-import profile from "../assets/rick.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faCaretDown } from "@fortawesome/free-solid-svg-icons";
 import Typography from "@mui/material/Typography";
@@ -25,6 +24,9 @@ function NavBar() {
     setAnchorEl(null);
   };
 
+  function base64ToDataURL(base64String) {
+		return `data:image/png;base64,${base64String}`;
+	  }
   //fetch user
   useEffect(() => {
     const fetchUser = async () => {
@@ -153,9 +155,10 @@ function NavBar() {
             }}
           >
             <img
-              src={profile}
+              src={loggedUserData?.profilePic ? base64ToDataURL(loggedUserData.profilePic) : '/user.png'}
               alt="nav-profile-picture"
               style={{ width: "100%", height: "100%" }}
+              className="rounded-full ring-4 ring-black"
             />
           </div>
         </div>

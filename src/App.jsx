@@ -101,6 +101,14 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/ViewProfileAdmin"
+          element={
+            <PrivateRoute requiredRoles={["HEAD"]}>
+              <ViewProfilePageAdmin />
+            </PrivateRoute>
+          }
+        />
       </Route>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/forgotPassword" element={<ForgotPasswordPage />} />
