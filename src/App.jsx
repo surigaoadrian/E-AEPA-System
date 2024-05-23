@@ -2,11 +2,13 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import HomeShowcase from "./pages/HomeShowcase";
 import ViewProfilePage from "./pages/ViewProfilePage";
+import ViewProfilePageAdmin from "./pages/ViewProfilePageAdmin";
 import TakeEvaluationPage from "./pages/TakeEvaluationPage";
 import ViewRatingsPage from "./pages/ViewRatingsPage";
 import ManageAccount from "./pages/ManageAccount";
 import ManageEmployee from "./pages/ManageEmployee";
 import ManageOffices from "./pages/ManageOffices";
+import TrackEmployee from "./pages/TrackEmployee";
 import Layout from "./pages/Layout";
 import LoginPage from "./pages/LoginPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
@@ -78,6 +80,24 @@ function App() {
           element={
             <PrivateRoute requiredRoles={["ADMIN"]}>
               <ManageEmployee />
+            </PrivateRoute>
+          }
+        />
+
+
+        <Route
+          path="/TrackEmployee"
+          element={
+            <PrivateRoute requiredRoles={["HEAD"]}>
+              <TrackEmployee />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/ViewProfileAdmin"
+          element={
+            <PrivateRoute requiredRoles={["HEAD"]}>
+              <ViewProfilePageAdmin />
             </PrivateRoute>
           }
         />
