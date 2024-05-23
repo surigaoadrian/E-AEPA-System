@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCirclePlus,
-  faTrash,
-  faSearch,
-  faPenToSquare,
-  faPlusCircle,
-} from "@fortawesome/free-solid-svg-icons";
+import {faCirclePlus,faTrash,faSearch,faPenToSquare,faPlusCircle,} from "@fortawesome/free-solid-svg-icons";
 import { Alert, Dialog, Divider, FormControl, Select, MenuItem,Snackbar} from "@mui/material";
 import axios from "axios";
 import Animated from "../components/motion";
@@ -22,8 +16,8 @@ const ManageOffices = () => {
   const [departmentToDelete, setDepartmentToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbar, setSnackbar] = useState({open: false, message: "", severity: "info", });
+  const showSnackbar = (message, severity) => {setSnackbar({open: true,message: message,severity: severity,});};
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingDepartment, setEditingDepartment] = useState(null);
   const [departmentOfficeHead, setDepartmentOfficeHead] = useState([]);
@@ -39,6 +33,34 @@ const ManageOffices = () => {
     secretary: '',
     staff: []
   });
+
+  //fetch all users 
+  useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const userResponse = await axios.get("http://localhost:8080/user/getAllUser");
+            const deptResponse = await axios.get("http://localhost:8080/department/getAllDepts");
+
+            const fetchedUsers = userResponse.data;
+            const fetchedDepts = deptResponse.data;
+
+            // Assign office heads to their departments
+            const updatedDepts = fetchedDepts.map(dept => {
+                const officeHead = fetchedUsers.find(user => (user.position === "Office Head" || user.position === "Department Head") && user.dept === dept.deptName);
+                return {
+                    ...dept,
+                    deptOfficeHead: officeHead ? `${officeHead.fName} ${officeHead.mName ? officeHead.mName.charAt(0) + '.' : ''} ${officeHead.lName}` : ''
+                };
+            });
+
+            setDepartments(updatedDepts);
+            setFilteredDepartments(updatedDepts); 
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    };
+    fetchData();
+}, []); 
 
   //fetch all users with "office head" position
   useEffect(() => {
@@ -60,6 +82,7 @@ const ManageOffices = () => {
     fetchUsers();
   }, []);
   
+
   //fetch all departments
   useEffect(() => {
     const fetchDepartments= async () => {
@@ -87,15 +110,13 @@ const ManageOffices = () => {
       const updatedUsers = await axios.get("http://localhost:8080/department/getAllDepts");
       setDepartments(updatedUsers.data);
       setFilteredDepartments(updatedUsers.data);
-      setSnackbarMessage("Department deleted successfully");
-      setOpenSnackbar(true);
+      showSnackbar("Department added successfully", "success");
       toggleConfirmationDialog(); 
 
     } catch (error) {
       console.error("Error deleting user:", error);
     }
   };
-
 
   const handleAddDepartment = () => {
     setShowAddDepartmentModal(true);
@@ -134,24 +155,28 @@ const ManageOffices = () => {
     setShowDetailsDialog(true);
   };
 
-
   //Add Department
   const handleDepartmentFormSubmit = async (e) => {
     e.preventDefault();
+    const existingDept = departments.find(dept => dept.deptName.toLowerCase() === departmentFormData.deptName.toLowerCase());
+    if (existingDept) {
+      showSnackbar("Department already exists", "warning");
+        return;  // Prevent the form submission
+    }
     try {
       await axios.post("http://localhost:8080/department/addDept", departmentFormData);
 
       const updatedDepartments = await axios.get("http://localhost:8080/department/getAllDepts");
       setDepartments(updatedDepartments.data);
       setFilteredDepartments(updatedDepartments.data);
-      setSnackbarMessage("Department added successfully");
-      setOpenSnackbar(true);
+      showSnackbar("Department added successfully", "success");
       setShowAddDepartmentModal(false);
       setDepartmentFormData({
         deptName: "",
         deptOfficeHead: "",
       });
     } catch (error) {
+      showSnackbar("Failed to add department due to an error", "error");
       console.error("Error adding department:", error);
     }
   };
@@ -160,19 +185,12 @@ const ManageOffices = () => {
 
   const handleSearch = () => {
     const searchTermLowerCase = searchTerm.toLowerCase();
-    const filtered = departments.filter(
-      (user) =>
-        user.deptName.toLowerCase().includes(searchTermLowerCase) ||
-        user.deptOfficeHead.toLowerCase().includes(searchTermLowerCase)
+    const filtered = departments.filter(dept =>
+        dept.deptName.toLowerCase().includes(searchTermLowerCase) ||
+        (dept.deptOfficeHead && dept.deptOfficeHead.toLowerCase().includes(searchTermLowerCase))
     );
-    setFilteredDepartments(filtered);
-  };
-
-  const handleSearchQuery = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
-
+    setDepartments(filtered);
+};
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
   };
@@ -197,17 +215,16 @@ const ManageOffices = () => {
       setDepartments(updatedUsers.data);
       setFilteredDepartments(updatedUsers.data);
       setShowEditModal(false);
-      setSnackbarMessage("Department updated successfully");
-      setOpenSnackbar(true);
+      showSnackbar("Department updated successfully", "success");
     } catch (error) {
       console.error("Error updating department:", error);
+      showSnackbar("Failed to update department due to an error", "error");
     }
   };
 
 // EditDepartmentModal component
 const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
   const [editedDepartment, setEditedDepartment] = useState(department);
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEditedDepartment((prevDepartment) => ({
@@ -220,7 +237,6 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
     e.preventDefault();
     onUpdate(editedDepartment);
   };
-
 
   return (
     <Animated>
@@ -254,15 +270,15 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
               />
             </div>
             <Divider/>
-            {/* 
+   
             <div className="mb-4 mt-5">
             <label htmlFor="deptOfficeHead" className="block text-base font-medium text-gray-700">
             Department Office Head: 
             <span className="font-medium text-black ml-4"> {editedDepartment.deptOfficeHead} </span>
           </label>
           </div>
-*/}
-<div className="mt-4">
+
+         {/* <div className="mt-4">
           <FormControl fullWidth className="mb-4">
           <label htmlFor="deptOfficeHead" className="mb-2 block text-sm font-medium text-gray-700">
               Department Office Head
@@ -285,7 +301,7 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
             ))}
           </Select>
           </FormControl> 
-          </div>
+          </div>*/}
             <div className="mt-2 flex justify-end">
               <button
                 type="submit"
@@ -634,11 +650,16 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
   </Dialog>
 )}
       {/* Snackbar */}
-        <Snackbar open={openSnackbar} autoHideDuration={3000} anchorOrigin={{ vertical: "bottom", horizontal: "center" }} onClose={() => setOpenSnackbar(false)}>
-        <Alert variant="filled" elevation={6} severity="success" sx={{ width: '100%' }} style={{ fontFamily: "Poppins" }}>
-          {snackbarMessage}
+      <Snackbar 
+        open={snackbar.open} 
+        autoHideDuration={3000} 
+        onClose={() => setSnackbar({...snackbar, open: false})}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+    >
+        <Alert variant= "filled"  elevation={6} severity={snackbar.severity} sx={{ width: '100%' }} style={{ fontFamily: "Poppins" }}>
+            {snackbar.message}
         </Alert>
-      </Snackbar>
+    </Snackbar>
       </div>
     </Animated>
   );
