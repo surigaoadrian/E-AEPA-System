@@ -42,13 +42,16 @@ public class UserEntity implements UserDetails {
     @Column(name = "Date Started")
     private String dateStarted;
     @Lob
-    @Column(name = "Profile Picture")
-    private Blob profilePic;
+    @Column(name = "Profile Picture", columnDefinition = "LONGBLOB")
+    private byte[] profilePic;
+    @Column(name = "image_format")
+    private String imageFormat;
     @Lob
     private Blob signature;
     private boolean isProbationary;
-    @Column (name = "Probationary Status")
+    @Column(name = "Probationary Status")
     private String probeStatus;
+    
     private int isDeleted = 0;
 
     public UserEntity() {
@@ -104,22 +107,22 @@ public class UserEntity implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true; //make this true by default
+        return true; // make this true by default
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true; //make this true by default
+        return true; // make this true by default
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true; //make this true by default
+        return true; // make this true by default
     }
 
     @Override
     public boolean isEnabled() {
-        return true; //make this true by default
+        return true; // make this true by default
     }
 
     public void setUsername(String username) {
@@ -136,7 +139,7 @@ public class UserEntity implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name())); //return list of roles our user have
+        return List.of(new SimpleGrantedAuthority(role.name())); // return list of roles our user have
     }
 
     public String getPassword() {
@@ -178,20 +181,10 @@ public class UserEntity implements UserDetails {
     public void setEmpStatus(String empStatus) {
         this.empStatus = empStatus;
     }
-
-    public String getDateHired() {
-        return dateHired;
-    }
-
-    public void setDateHired(String dateHired) {
-        this.dateHired = dateHired;
-    }
-
-    public Blob getProfilePic() {
+     public byte[] getProfilePic() {
         return profilePic;
-    }
-
-    public void setProfilePic(Blob profilePic) {
+     }
+    public void setProfilePic(byte[] profilePic) {
         this.profilePic = profilePic;
     }
 
@@ -209,14 +202,6 @@ public class UserEntity implements UserDetails {
 
     public void setContactNum(String contactNum) {
         this.contactNum = contactNum;
-    }
-
-    public String getDateStarted() {
-        return dateStarted;
-    }
-
-    public void setDateStarted(String dateStarted) {
-        this.dateStarted = dateStarted;
     }
 
     public Blob getSignature() {
@@ -241,6 +226,30 @@ public class UserEntity implements UserDetails {
 
     public void setProbeStatus(String probeStatus) {
         this.probeStatus = probeStatus;
+    }
+
+    public String getDateHired() {
+        return dateHired;
+    }
+
+    public void setDateHired(String dateHired) {
+        this.dateHired = dateHired;
+    }
+
+    public String getDateStarted() {
+        return dateStarted;
+    }
+
+    public void setDateStarted(String dateStarted) {
+        this.dateStarted = dateStarted;
+    }
+
+    public String getImageFormat() {
+        return imageFormat;
+    }
+
+    public void setImageFormat(String imageFormat) {
+        this.imageFormat = imageFormat;
     }
 
     

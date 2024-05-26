@@ -1,7 +1,9 @@
 import React from "react";
-
+import UserHome from "../components/UserHome";
 function HomeShowcase() {
-  return <div>Home</div>;
+	return (
+			<UserHome />
+	);
 }
 
 export default HomeShowcase;

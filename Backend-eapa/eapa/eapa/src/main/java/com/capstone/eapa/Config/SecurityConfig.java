@@ -32,6 +32,7 @@ public class SecurityConfig {
 //                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 //                .build();
 //    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -40,15 +41,25 @@ public class SecurityConfig {
                         req->req.requestMatchers(
                                 "/login/**",
                                         "/register/**",
-                                        "/user/getAllUser",
-                                        "/user/getUser/**",
+                                        "user/getAllUser",
+                                        "user/getUser/**",
+                                        "user/editUser/**",
+                                        "user/delete/**",
+                                        "user/checkUsername/**",
+                                        "user/checkEmail/**",
                                         "/auth/forgotPassword/**",
                                         "/auth/resetPassword/**",
                                         "department/getAllDepts",
                                         "department/getDept/**",
                                         "department/deleteDept/**",
                                         "department/addDept",
-                                        "department/updateDept")
+                                        "department/updateDept",
+                                        "user/editAccountUsername/**",
+                                        "user/editPersonalDetails/**",
+                                        "user/uploadImage/**",
+                                        "user/image/**",
+                                        "department/updateDept"
+                                        )
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()
