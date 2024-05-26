@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Box, Typography } from "@mui/material/";
-import logo from "C:/Users/Zan/Documents/GitHub/E-AEPA-System/src/assets/cit.png";
+import logo from "../assets/cit.png";
 
 function UserHome() {
 	const [loggedUserData, setLoggedUserData] = useState(null);
