@@ -3,6 +3,9 @@ import { Grid, Typography, Table, TableHead, TableRow, TableCell, TableBody, Box
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import {faEye} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ViewResults from "../modals/ViewResults";
 import axios from 'axios';
 
 function TrackEmployee() {
@@ -19,7 +22,9 @@ function TrackEmployee() {
   const [viewResultFilter, setViewResultFilter] = useState('');
   const [anchorEl, setAnchorEl] = useState(null);
   const [filterColumn, setFilterColumn] = useState('');
-
+  const [showViewRatingsModal, setViewRatingsModal] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+ 
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -82,8 +87,11 @@ function TrackEmployee() {
   };
 
   const handleViewResultClick = (employee) => {
+    console.log("Selected Employee:", employee);
     setSnackbarMessage(`Redirecting to view result for ${employee.name}`);
     setSnackbarOpen(true);
+    setSelectedEmployee(employee);
+    setViewRatingsModal(true);
   };
 
   const handleFilterClick = (event, column) => {
@@ -118,6 +126,7 @@ function TrackEmployee() {
   });
 
   return (
+    <>
     <Grid container spacing={1}>
       <Grid item xs={12}>
         <Typography
@@ -195,12 +204,21 @@ function TrackEmployee() {
                       <TableCell sx={{ textAlign: 'center' }}>{employee.finalResult}</TableCell>
                       <TableCell sx={{ textAlign: 'center' }}>
                         {employee.viewresult === 'View' ? (
-                          <Typography 
-                            sx={{ fontWeight: 'bold', color: 'black', cursor: 'pointer' }} 
-                            onClick={() => handleViewResultClick(employee)}
-                          >
-                            {employee.viewresult}
-                          </Typography>
+                      <div className="flex items-center justify-center">
+                      <button 
+                      className="flex items-center text-white px-3 py-2 rounded" 
+                      style={{ backgroundColor: '#8C383E', border: 'none' }} 
+                      onClick={() => handleViewResultClick(employee)}
+                    >
+                      <FontAwesomeIcon
+                        icon={faEye}
+                        className="mr-2"
+                        style={{ cursor: 'pointer', color: 'white', fontSize: '1.3rem' }}
+                        
+                      />
+                      <span className="text-sm">View </span>
+                    </button>
+                      </div>
                         ) : (
                           employee.viewresult
                         )}
@@ -247,6 +265,8 @@ function TrackEmployee() {
           <>
             <MenuItem onClick={() => handleFilterSelect('View')}>View</MenuItem>
             <MenuItem onClick={() => handleFilterSelect('-')}>-</MenuItem>
+
+            
           </>
         )}
       </Menu>
@@ -257,6 +277,14 @@ function TrackEmployee() {
         message={snackbarMessage}
       />
     </Grid>
+
+        <ViewResults
+        open={showViewRatingsModal}
+        onClose={() => setViewRatingsModal(false)}
+        employee={selectedEmployee}
+        />
+        </>
+
   );
 }
 
