@@ -58,6 +58,9 @@ const VerifiedIconWrapper = ({ verified }) => {
 	const iconColor = verified ? "green" : "gray"; // Set the color based on the verified value
 	return <VerifiedIcon htmlColor={iconColor} />;
 };
+function base64ToDataURL(base64String) {
+	return `data:image/png;base64,${base64String}`;
+}
 
 function EmployeeProfile({ user, handleBack }) {
 	const containerStyle = {
@@ -197,24 +200,23 @@ function EmployeeProfile({ user, handleBack }) {
 							margin: "10px 10px 10px 14px",
 							width: "97%",
 							backgroundColor: "white",
-							p: 2,
 							borderBottom: "2px solid #e0e0e0",
 						}}
 					>
-						<Box sx={{ ml: 2, mb: 2 }}>
+						<Box sx={{ ml: 5, mb: 2 }}>
 							<Avatar
 								alt="Employee"
-								//src={image}
-								sx={{ width: 140, height: 140, mr: 2 }}
+								src={user.profilePic ? base64ToDataURL(user.profilePic) : "/user.png"}
+								sx={{ width: 150, height: 150, mr: 2 }}
 							/>
 						</Box>
 						<Box sx={{ ml: 5 }}>
-							<Grid container spacing={1}>
+							<Grid container spacing={2}>
 								<Grid item xs={12} sm={6}>
 									<Typography
 										variant="body2"
 										fontFamily="Poppins"
-										fontSize="12px"
+										fontSize="14px"
 										color="#9D9D9D"
 										mb={1}
 									>
@@ -225,7 +227,7 @@ function EmployeeProfile({ user, handleBack }) {
 										fontFamily="Poppins"
 										mb={2}
 										fontWeight={500}
-										fontSize="15px"
+										fontSize="16px"
 									>
 										{user.workID}
 									</Typography>
@@ -234,7 +236,7 @@ function EmployeeProfile({ user, handleBack }) {
 									<Typography
 										variant="body2"
 										fontFamily="Poppins"
-										fontSize="12px"
+										fontSize="14px"
 										color="#9D9D9D"
 										mb={1}
 									>
@@ -245,7 +247,7 @@ function EmployeeProfile({ user, handleBack }) {
 										fontFamily="Poppins"
 										mb={2}
 										fontWeight={500}
-										fontSize="15px"
+										fontSize="16px"
 									>
 										{`${user.fName} ${user.lName}`}
 									</Typography>
@@ -255,7 +257,7 @@ function EmployeeProfile({ user, handleBack }) {
 										variant="body2"
 										fontFamily="Poppins"
 										mb={1}
-										fontSize="12px"
+										fontSize="14px"
 										color="#9D9D9D"
 									>
 										Position:
@@ -265,7 +267,7 @@ function EmployeeProfile({ user, handleBack }) {
 										fontFamily="Poppins"
 										mb={2}
 										fontWeight={500}
-										fontSize="15px"
+										fontSize="16px"
 									>
 										{user.position}
 									</Typography>
@@ -274,7 +276,7 @@ function EmployeeProfile({ user, handleBack }) {
 									<Typography
 										variant="body2"
 										fontFamily="Poppins"
-										fontSize="12px"
+										fontSize="14px"
 										mb={1}
 										color="#9D9D9D"
 									>
@@ -285,7 +287,7 @@ function EmployeeProfile({ user, handleBack }) {
 										fontFamily="Poppins"
 										mb={2}
 										fontWeight={500}
-										fontSize="15px"
+										fontSize="16px"
 									>
 										{user.dept}
 									</Typography>
@@ -293,7 +295,6 @@ function EmployeeProfile({ user, handleBack }) {
 							</Grid>
 						</Box>
 					</Box>
-
 					<Box sx={{ display: "flex", alignItems: "center" }}>
 						<Box sx={{ mr: 1 }}>
 							<Typography

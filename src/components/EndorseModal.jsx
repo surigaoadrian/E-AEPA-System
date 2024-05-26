@@ -10,7 +10,6 @@ function EndorseModal({ open, handleClose, handleEndorse }) {
 			onClose={handleClose}
 			aria-labelledby="endorsement"
 			aria-describedby="confirmation"
-
 		>
 			<Fade in={open}>
 				<div

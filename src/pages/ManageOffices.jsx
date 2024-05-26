@@ -1,131 +1,280 @@
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faCirclePlus,faTrash,faSearch,faPenToSquare,faPlusCircle,} from "@fortawesome/free-solid-svg-icons";
-import { Alert, Dialog, Divider, FormControl, Select, MenuItem,Snackbar} from "@mui/material";
+import {
+	faCirclePlus,
+	faTrash,
+	faSearch,
+	faPenToSquare,
+	faPlusCircle,
+} from "@fortawesome/free-solid-svg-icons";
+import {
+	Alert,
+	Dialog,
+	Divider,
+	FormControl,
+	Select,
+	MenuItem,
+	Snackbar,
+	TextField,
+  InputAdornment,
+} from "@mui/material";
 import axios from "axios";
 import Animated from "../components/motion";
 
 const ManageOffices = () => {
-  const [users, setUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [activeRow, setActiveRow] = useState(null);
-  const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
-  const [showAddDepartmentModal, setShowAddDepartmentModal] = useState(false);
-  const [departmentFormData, setDepartmentFormData] = useState({
-    deptName: "",
-    deptOfficeHead: "",
-  });
-  const [userToDelete, setUserToDelete] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+	const [departments, setDepartments] = useState([]);
+	const [filteredDepartments, setFilteredDepartments] = useState([]);
+	const [searchTerm, setSearchTerm] = useState("");
+	const [activeRow, setActiveRow] = useState(null);
+	const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
+	const [showAddDepartmentModal, setShowAddDepartmentModal] = useState(false);
+	const [departmentFormData, setDepartmentFormData] = useState({
+		deptName: "",
+		deptOfficeHead: "",
+	});
+	const [departmentToDelete, setDepartmentToDelete] = useState(null);
+	const [currentPage, setCurrentPage] = useState(1);
+	const itemsPerPage = 10;
+	const [snackbar, setSnackbar] = useState({
+		open: false,
+		message: "",
+		severity: "info",
+	});
+	const showSnackbar = (message, severity) => {
+		setSnackbar({ open: true, message: message, severity: severity });
+	};
+	const [showEditModal, setShowEditModal] = useState(false);
+	const [editingDepartment, setEditingDepartment] = useState(null);
+	const [departmentOfficeHead, setDepartmentOfficeHead] = useState([]);
+	const startIndex = (currentPage - 1) * itemsPerPage;
+	const endIndex = startIndex + itemsPerPage;
+	const displayedDepartments = filteredDepartments.slice(startIndex, endIndex);
+	const totalPages = Math.ceil(filteredDepartments.length / itemsPerPage);
+	const [allUsers, setAllUsers] = useState([]);
+	const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+	const [selectedDepartmentDetails, setSelectedDepartmentDetails] = useState({
+		deptName: "",
+		officeHead: "",
+		secretary: "",
+		staff: [],
+	});
 
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editingDepartment, setEditingDepartment] = useState(null);
+	//fetch all users
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const userResponse = await axios.get(
+					"http://localhost:8080/user/getAllUser"
+				);
+				const deptResponse = await axios.get(
+					"http://localhost:8080/department/getAllDepts"
+				);
 
-    // Define a hardcoded list of names for the dropdown temporarily
-    const [officeHeadOptions] = useState([
-      "Janzen Joseph G. Sevilla",
-      "Alein B. Navares",
-      "Larmie S. Feliscuzo",
-      "Rafaeliza P. Diano",
-      "Nicarter V. Teves",
-      "Erlyn Ivy O. Rago",
-      "Arnie Ernesta M. Tacdoro",
-      "Roberto P. Base, Jr."
-    ]);
-    
+				const fetchedUsers = userResponse.data;
+				const fetchedDepts = deptResponse.data;
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await axios.get("http://localhost:8080/department/getAllDepts");
-        setUsers(response.data);
-        setFilteredUsers(response.data);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      }
-    };
+				// Assign office heads to their departments
+				const updatedDepts = fetchedDepts.map((dept) => {
+					const officeHead = fetchedUsers.find(
+						(user) =>
+							(user.position === "Office Head" ||
+								user.position === "Department Head") &&
+							user.dept === dept.deptName
+					);
+					return {
+						...dept,
+						deptOfficeHead: officeHead
+							? `${officeHead.fName} ${
+									officeHead.mName ? officeHead.mName.charAt(0) + "." : ""
+							  } ${officeHead.lName}`
+							: "",
+					};
+				});
 
-    fetchUsers();
-  }, []);
+				setDepartments(updatedDepts);
+				setFilteredDepartments(updatedDepts);
+			} catch (error) {
+				console.error("Error fetching data:", error);
+			}
+		};
+		fetchData();
+	}, []);
 
+	//fetch all users with "office head" position
+	useEffect(() => {
+		const fetchUsers = async () => {
+			try {
+				const response = await axios.get(
+					"http://localhost:8080/user/getAllUser"
+				);
+				setAllUsers(response.data);
+				const officeHeads = response.data
+					.filter(
+						(user) =>
+							user.position === "Office Head" ||
+							user.position === "Department Head" ||
+							user.position === "Head"
+					)
+					.map((user) => ({
+						id: user.id,
+						name: `${user.fName} ${
+							user.mName ? user.mName.charAt(0) + "." : ""
+						} ${user.lName}`,
+					}));
+				setDepartmentOfficeHead(officeHeads);
+			} catch (error) {
+				console.error("Error fetching users:", error);
+			}
+		};
 
-  const handleDeleteUser = (deptId) => {
-    toggleConfirmationDialog(deptId);
-  };
+		fetchUsers();
+	}, []);
 
+	//fetch all departments
+	useEffect(() => {
+		const fetchDepartments = async () => {
+			try {
+				const response = await axios.get(
+					"http://localhost:8080/department/getAllDepts"
+				);
+				setDepartments(response.data);
+				setFilteredDepartments(response.data);
+			} catch (error) {
+				console.error("Error fetching departments:", error);
+			}
+		};
 
-  const toggleConfirmationDialog = (deptId = null) => {
-    setUserToDelete(deptId);
-    setShowConfirmationDialog(!showConfirmationDialog);
-  };
+		fetchDepartments();
+	}, []);
+	// delete department
+	const toggleConfirmationDialog = (deptId = null) => {
+		setDepartmentToDelete(deptId);
+		setShowConfirmationDialog(!showConfirmationDialog);
+	};
 
-  const confirmDeleteDepartment = async () => {
-    try {
-      await axios.delete(`http://localhost:8080/department/deleteDept/${userToDelete}`);
-      const updatedUsers = await axios.get("http://localhost:8080/department/getAllDepts");
-      setUsers(updatedUsers.data);
-      setFilteredUsers(updatedUsers.data);
-      toggleConfirmationDialog(); 
-
-    } catch (error) {
-      console.error("Error deleting user:", error);
-    }
-  };
-
+	const confirmDeleteDepartment = async () => {
+		try {
+			await axios.delete(
+				`http://localhost:8080/department/deleteDept/${departmentToDelete}`
+			);
+			const updatedUsers = await axios.get(
+				"http://localhost:8080/department/getAllDepts"
+			);
+			setDepartments(updatedUsers.data);
+			setFilteredDepartments(updatedUsers.data);
+			showSnackbar("Department added successfully", "success");
+			toggleConfirmationDialog();
+		} catch (error) {
+			console.error("Error deleting user:", error);
+		}
+	};
 
 	const handleAddDepartment = () => {
 		setShowAddDepartmentModal(true);
 	};
 
-  const handleDepartmentFormChange = (e) => {
-    const { name, value } = e.target;
-    setDepartmentFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+	const handleDepartmentFormChange = (e) => {
+		const { name, value } = e.target;
+		setDepartmentFormData((prevData) => ({
+			...prevData,
+			[name]: value,
+		}));
+	};
 
-  const handleDepartmentFormSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post("http://localhost:8080/department/addDept", departmentFormData);
+	const handleDeleteUser = (deptId) => {
+		toggleConfirmationDialog(deptId);
+	};
+	//Department Mapping
+	const departmentFullNames = {
+		MIS: "Management Information System",
+		HRD: "Human Resources Department",
+		PCO: "Property Custodian Office",
+	};
 
-      const updatedDepartments = await axios.get("http://localhost:8080/department/getAllDepts");
-      setUsers(updatedDepartments.data);
-      setFilteredUsers(updatedDepartments.data);
-      setShowAddDepartmentModal(false);
-      setDepartmentFormData({
-        deptName: "",
-        deptOfficeHead: "",
-      });
-    } catch (error) {
-      console.error("Error adding department:", error);
-    }
-  };
-  const totalDepartments = users.length;
+	//View Department Details
+	const handleRowDoubleClick = (department) => {
+		const usersInDepartment = allUsers.filter(
+			(user) => user.dept === department.deptName
+		);
+		const deptFullName = departmentFullNames[department.deptName];
+		const secretary = usersInDepartment.find(
+			(user) => user.position === "Secretary" || user.position === "secretary"
+		);
+		const staffMembers = usersInDepartment.filter(
+			(user) => user.role === "EMPLOYEE" && user.userID !== secretary?.userID
+		);
 
+		setSelectedDepartmentDetails({
+			deptName: deptFullName || "N/A",
+			officeHead: department.deptOfficeHead || "N/A",
+			secretary: secretary
+				? `${secretary.fName} ${
+						secretary.mName ? secretary.mName.charAt(0) + "." : ""
+				  } ${secretary.lName}`
+				: "N/A",
+			staff: staffMembers.map((staff) => ({
+				id: staff.userID,
+				name: `${staff.fName} ${
+					staff.mName ? staff.mName.charAt(0) + "." : ""
+				} ${staff.lName}`,
+				status: staff.empStatus,
+			})),
+		});
 
-  const handleSearch = () => {
-    const searchTermLowerCase = searchTerm.toLowerCase();
-    const filtered = users.filter(
-      (user) =>
-        user.deptName.toLowerCase().includes(searchTermLowerCase) ||
-        user.deptOfficeHead.toLowerCase().includes(searchTermLowerCase)
-    );
-    setFilteredUsers(filtered);
-  };
+		setShowDetailsDialog(true);
+	};
 
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const displayedUsers = filteredUsers.slice(startIndex, endIndex);
+	//Add Department
+	const handleDepartmentFormSubmit = async (e) => {
+		e.preventDefault();
+		const existingDept = departments.find(
+			(dept) =>
+				dept.deptName.toLowerCase() ===
+				departmentFormData.deptName.toLowerCase()
+		);
+		if (existingDept) {
+			showSnackbar("Department already exists", "warning");
+			return; // Prevent the form submission
+		}
+		try {
+			await axios.post(
+				"http://localhost:8080/department/addDept",
+				departmentFormData
+			);
 
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+			const updatedDepartments = await axios.get(
+				"http://localhost:8080/department/getAllDepts"
+			);
+			setDepartments(updatedDepartments.data);
+			setFilteredDepartments(updatedDepartments.data);
+			showSnackbar("Department added successfully", "success");
+			setShowAddDepartmentModal(false);
+			setDepartmentFormData({
+				deptName: "",
+				deptOfficeHead: "",
+			});
+		} catch (error) {
+			showSnackbar("Failed to add department due to an error", "error");
+			console.error("Error adding department:", error);
+		}
+	};
 
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
-  };
+	useEffect(() => {
+		const filtered = departments.filter(
+			(dept) =>
+				dept.deptName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				dept.deptOfficeHead.toLowerCase().includes(searchTerm.toLowerCase())
+		);
+		setFilteredDepartments(filtered);
+	}, [searchTerm, departments]);
+
+	//Handle search term change
+	const handleSearchChange = (e) => {
+		setSearchTerm(e.target.value);
+	};
+	const handlePageChange = (newPage) => {
+		setCurrentPage(newPage);
+	};
 
 	const handlePrevPage = () => {
 		setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
@@ -135,127 +284,174 @@ const ManageOffices = () => {
 		setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
 	};
 
-  const handleEditDepartment = (user) => {
-    setEditingDepartment(user);
-    setShowEditModal(true);
-  };
+	const handleEditDepartment = (user) => {
+		setEditingDepartment(user);
+		setShowEditModal(true);
+	};
+	//Update Department
+	const handleUpdateDepartment = async (editedDepartment) => {
+		try {
+			await axios.put(
+				`http://localhost:8080/department/updateDept?deptID=${editedDepartment.deptID}`,
+				editedDepartment
+			);
+			const updatedUsers = await axios.get(
+				"http://localhost:8080/department/getAllDepts"
+			);
+			setDepartments(updatedUsers.data);
+			setFilteredDepartments(updatedUsers.data);
+			setShowEditModal(false);
+			showSnackbar("Department updated successfully", "success");
+		} catch (error) {
+			console.error("Error updating department:", error);
+			showSnackbar("Failed to update department due to an error", "error");
+		}
+	};
 
-  const handleUpdateDepartment = async (editedDepartment) => {
-    try {
-      await axios.put(`http://localhost:8080/department/updateDept?deptID=${editedDepartment.deptID}`, editedDepartment);
-      const updatedUsers = await axios.get("http://localhost:8080/department/getAllDepts");
-      setUsers(updatedUsers.data);
-      setFilteredUsers(updatedUsers.data);
-      setShowEditModal(false);
-    } catch (error) {
-      console.error("Error updating department:", error);
-    }
-  };
+	// EditDepartmentModal component
+	const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
+		const [editedDepartment, setEditedDepartment] = useState(department);
+		const handleInputChange = (e) => {
+			const { name, value } = e.target;
+			setEditedDepartment((prevDepartment) => ({
+				...prevDepartment,
+				[name]: value,
+			}));
+		};
 
-// EditDepartmentModal component
-const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
-  const [editedDepartment, setEditedDepartment] = useState(department);
+		const handleSubmit = (e) => {
+			e.preventDefault();
+			onUpdate(editedDepartment);
+		};
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setEditedDepartment((prevDepartment) => ({
-      ...prevDepartment,
-      [name]: value,
-    }));
-  };
+		return (
+			<Animated>
+				<div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
+					<div className="bg-white rounded-lg shadow-md w-2/4">
+						<div
+							className="p-2 font-bold text-lg text-white rounded-t-lg"
+							style={{ backgroundColor: "#8C383E", border: "none" }}
+						>
+							<FontAwesomeIcon
+								icon={faPenToSquare}
+								className="mr-2 ml-2"
+								style={{
+									color: "white",
+									fontSize: "1.2rem",
+									cursor: "pointer",
+								}}
+							/>
+							Edit Department
+						</div>
+						<div className="p-4">
+							<form onSubmit={handleSubmit}>
+								<div className="mb-4">
+									<label
+										htmlFor="deptName"
+										className="block text-sm font-medium text-gray-700"
+									>
+										Department Name
+									</label>
+									<input
+										type="text"
+										id="deptName"
+										name="deptName"
+										value={editedDepartment.deptName}
+										onChange={handleInputChange}
+										className="mt-1 p-2 border border-gray-300 rounded-md w-full"
+										required
+									/>
+								</div>
+								<Divider />
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onUpdate(editedDepartment);
-  };
+								<div className="mb-4 mt-5">
+									<label
+										htmlFor="deptOfficeHead"
+										className="block text-base font-medium text-gray-700"
+									>
+										Department Office Head:
+										<span className="font-medium text-black ml-4">
+											{" "}
+											{editedDepartment.deptOfficeHead}{" "}
+										</span>
+									</label>
+								</div>
+								<div className="mt-2 flex justify-end">
+									<button
+										type="submit"
+										className="text-white px-3 py-1 w-auto rounded mr-2"
+										style={{ backgroundColor: "#8C383E", border: "none" }}
+									>
+										Save
+									</button>
+									<button
+										type="button"
+										className="bg-gray-300 text-gray-700 px-3 w-auto py-1 rounded"
+										onClick={onClose}
+									>
+										Cancel
+									</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</Animated>
+		);
+	};
 
-
-
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-md w-2/4">
-        <div
-          className="p-2 font-bold text-lg text-white rounded-t-lg"
-          style={{ backgroundColor: '#8C383E', border: 'none' }}
-        >
-          <FontAwesomeIcon
-            icon={faPenToSquare}
-            className="mr-2 ml-2"
-            style={{ color: 'white', fontSize: '1.2rem', cursor: 'pointer' }}
-          />
-          Edit Department
-        </div>
-        <div className="p-4">
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label htmlFor="deptName" className="block text-sm font-medium text-gray-700">
-                Department Name
-              </label>
-              <input
-                type="text"
-                id="deptName"
-                name="deptName"
-                value={editedDepartment.deptName}
-                onChange={handleInputChange}
-                className="mt-1 p-2 border border-gray-300 rounded-md w-full"
-                required
-              />
-            </div>
-            <Divider/>
-            <div className="mb-4 mt-5">
-            <label htmlFor="deptOfficeHead" className="block text-base font-medium text-gray-700">
-            Department Office Head: 
-            <span className="font-medium text-black ml-4"> {editedDepartment.deptOfficeHead} </span>
-          </label>
-          </div>
-
-            <div className="mt-2 flex justify-end">
-              <button
-                type="submit"
-                className="text-white px-3 py-1 w-auto rounded mr-2"
-                style={{ backgroundColor: '#8C383E', border: 'none' }}
-              >
-                Save
-              </button>
-              <button
-                type="button"
-                className="bg-gray-300 text-gray-700 px-3 w-auto py-1 rounded"
-                onClick={onClose}
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-
-  return (
-    <div>
-      <h1 className="text-3xl font-bold text-left ml-12 mt-8 mb-2">Department</h1>
-      <label className="ml-12 text-sm text-gray-700">All Departments ({totalDepartments})</label>
-        <div className="ml-8 mt-2">
-          <div className="mr-10 mb-4 flex items-center justify-between">
-            <div className="ml-4 flex items-center justify-start">
-              <input
-                type="text"
-                placeholder="Search"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="border rounded px-2 py-1 mr-2"
-              />
-              <button
-                className="text-white px-3 py-1 rounded"
-                onClick={handleSearch}
-                style={{ backgroundColor: '#8C383E' }}
-              >
-                <FontAwesomeIcon icon={faSearch} />
-              </button>
-            </div>
+	return (
+		<Animated>
+			<div>
+				<h1 className="text-2xl font-bold text-left ml-12 mt-6 mb-1">
+					Department
+				</h1>
+				<label className="ml-12 text-sm text-gray-700">
+					All Departments ({filteredDepartments.length})
+				</label>
+				<div className="ml-8 mt-2">
+					<div className="mr-10 mb-4 flex items-center justify-between">
+						<div className="ml-4 flex items-center justify-start" > 
+							<TextField
+								placeholder="Search Department..."
+								value={searchTerm}
+								onChange={handleSearchChange}
+								sx={{
+                  
+									"& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
+										borderWidth: "1px",
+										borderColor: "#e0e0e0",
+									},
+									"&:hover .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
+										{
+											borderColor: "#e0e0e0",
+										},
+									"&:focus-within": {
+										"& fieldset": {
+											borderColor: "#8C383E !important",
+											borderWidth: "1px !important",
+										},
+									},
+									"& .MuiInputBase-input": {
+										padding: "10px 10px",
+										fontSize: "13px",
+										fontFamily: "Poppins",
+									},
+                  minWidth:"110%",
+								
+								}}
+								InputProps={{
+									startAdornment: (
+										<InputAdornment>
+											<FontAwesomeIcon
+												icon={faSearch}
+												style={{ fontSize: "13px", padding: "0" }}
+											/>
+										</InputAdornment>
+									),
+								}}
+							/>
+						</div>
 
 						<div className="flex items-center">
 							<button
@@ -277,59 +473,105 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
 						</div>
 					</div>
 
-          <div className="mr-10 ml-4 rounded-lg border border-gray-200" style={{ position: 'relative', height:'423px' }}>
-            <div className="overflow-x-auto rounded-t-lg">
-              <table className="w-full divide-y-2 divide-gray-200 bg-white text-sm">
-                <thead className="text-left" style={{ backgroundColor: '#8C383E' }} >
-                  <tr>
-                      <th></th>
-                      <th className="whitespace-nowrap px-4 py-3 text-sm text-gray-50">Department</th>
-                      <th className="whitespace-nowrap px-4 py-3 text-sm text-gray-50">Office Head</th>
-                      <th className="whitespace-nowrap px-4 py-3 text-sm text-gray-50">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {displayedUsers.map((user, index) => (
-                    <tr
-                      key={user.userID}
-                      className={`cursor-pointer ${activeRow === user.deptID ? 'bg-gray-200' : ''}`}
-                      style={{
-                        backgroundColor: activeRow === user.deptID ? '#FFECA1' : 'transparent',
-                        transition: 'background-color 0.1s ease', // Optional: Add transition for smoother effect
-                      }}
-                      onMouseEnter={() => setActiveRow(user.deptID)}
-                      onMouseLeave={() => setActiveRow(null)}
-                      
-                    >
-                  <td className="justify-center whitespace-nowrap px-4 py-2 text-gray-700">{index + 1 + (currentPage - 1) * itemsPerPage}</td>
-
-                                        <td className="whitespace-nowrap px-4 py-2 text-gray-700">{user.deptName}</td>
-                              <td className="whitespace-nowrap px-4 py-2 text-gray-700">{user.deptOfficeHead}</td>
-                              <td className='whitespace-nowrap px-4 py-2 text-gray-700'>
-                                      <div className='flex items-center'>
-                                        <FontAwesomeIcon
-                                          icon={faPenToSquare}
-                                          className='mr-2'
-                                          style={{ color: '#8C383E', fontSize: '1.3rem', cursor: 'pointer'  }}
-                                          onClick={() => handleEditDepartment(user)}
-                                        />
-                                        <FontAwesomeIcon
-                                          icon={faTrash}
-                                          className='mr-2'
-                                          style={{ color: '#8C383E', fontSize: '1.3rem', cursor: 'pointer'  }}
-                                          onClick={(e) => {
-                                            e.stopPropagation(); // Prevent row click from triggering
-                                            handleDeleteUser(user.deptID);
-                                          }}
-                                        />
-                                      </div>
-                              </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+					<div
+						className="mr-10 ml-4 rounded-lg border border-gray-200"
+						style={{ position: "relative", height: "423px" }}
+					>
+						<div className="overflow-x-auto rounded-t-lg">
+							<table className="w-full divide-y-2 divide-gray-200 bg-white text-sm">
+								<thead
+									className="text-left"
+									style={{ backgroundColor: "#8C383E" }}
+								>
+									<tr>
+										<th></th>
+										<th className="whitespace-nowrap px-4 py-3 text-sm text-gray-50">
+											Department
+										</th>
+										<th className="whitespace-nowrap px-4 py-3 text-sm text-gray-50">
+											Office Head
+										</th>
+										<th className="whitespace-nowrap px-4 py-3 text-sm text-gray-50">
+											Action
+										</th>
+									</tr>
+								</thead>
+								<tbody className="divide-y divide-gray-200">
+									{displayedDepartments.length === 0 ? (
+										<tr>
+											<td
+												colSpan="4"
+												style={{
+													fontFamily: "Poppins",
+													fontWeight: 500,
+													textAlign: "center",
+													padding: "1rem",
+												}}
+											>
+												Oops! We couldn't find any results matching your search.
+											</td>
+										</tr>
+									) : (
+										displayedDepartments.map((dept, index) => (
+											<tr
+												key={dept.deptID}
+												onDoubleClick={() => handleRowDoubleClick(dept)}
+												className={`cursor-pointer ${
+													activeRow === dept.deptID ? "bg-gray-200" : ""
+												} no-select`}
+												style={{
+													backgroundColor:
+														activeRow === dept.deptID
+															? "#FFECA1"
+															: "transparent",
+													transition: "background-color 0.1s ease", // Optional: Add transition for smoother effect
+												}}
+												onMouseEnter={() => setActiveRow(dept.deptID)}
+												onMouseLeave={() => setActiveRow(null)}
+											>
+												<td className="justify-center whitespace-nowrap px-4 py-2 text-gray-700">
+													{index + 1 + (currentPage - 1) * itemsPerPage}
+												</td>
+												<td className="whitespace-nowrap px-4 py-2 text-gray-700">
+													{dept.deptName}
+												</td>
+												<td className="whitespace-nowrap px-4 py-2 text-gray-700">
+													{dept.deptOfficeHead}
+												</td>
+												<td className="whitespace-nowrap px-4 py-2 text-gray-700">
+													<div className="flex items-center">
+														<FontAwesomeIcon
+															icon={faPenToSquare}
+															className="mr-2"
+															style={{
+																color: "#8C383E",
+																fontSize: "1.3rem",
+																cursor: "pointer",
+															}}
+															onClick={() => handleEditDepartment(dept)}
+														/>
+														<FontAwesomeIcon
+															icon={faTrash}
+															className="mr-2"
+															style={{
+																color: "#8C383E",
+																fontSize: "1.3rem",
+																cursor: "pointer",
+															}}
+															onClick={(e) => {
+																e.stopPropagation(); // Prevent row click from triggering
+																handleDeleteUser(dept.deptID);
+															}}
+														/>
+													</div>
+												</td>
+											</tr>
+										))
+									)}
+								</tbody>
+							</table>
+						</div>
+					</div>
 
 					{/* Pagination */}
 					<div
@@ -338,7 +580,6 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
 							position: "absolute",
 							display: "flex",
 							alignItems: "center",
-							marginTop: "30px",
 						}}
 					>
 						<ol className="flex justify-end gap-1 text-xs font-medium">
@@ -380,42 +621,45 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
 								</li>
 							))}
 
-                <li>
-                  <a
-                    href="#"
-                    className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180"
-                    onClick={handleNextPage}
-                  >
-                    <span className="sr-only">Next Page</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-3 w-3"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </a>
-                </li>
-              </ol>
-            </div>
-        </div>
-
-      {showConfirmationDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
-          <div className="bg-white rounded-lg shadow-md w-auto h-44">
-            
-            <div className="p-2 font-bold text-lg text-white rounded-t-lg" 
-            style={{ backgroundColor: '#8C383E', border: 'none' }}>
-            <FontAwesomeIcon
-          icon={faTrash}
-          className="mr-2 ml-2"
-          style={{ color: 'white', fontSize: '1rem'}}
-        />Delete Department</div>
+							<li>
+								<a
+									href="#"
+									className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180"
+									onClick={handleNextPage}
+								>
+									<span className="sr-only">Next Page</span>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										className="h-3 w-3"
+										viewBox="0 0 20 20"
+										fill="currentColor"
+									>
+										<path
+											fillRule="evenodd"
+											d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+											clipRule="evenodd"
+										/>
+									</svg>
+								</a>
+							</li>
+						</ol>
+					</div>
+				</div>
+				{/* DeleteDepartmentModal */}
+				{showConfirmationDialog && (
+					<div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
+						<div className="bg-white rounded-lg shadow-md w-auto h-44">
+							<div
+								className="p-2 font-bold text-lg text-white rounded-t-lg"
+								style={{ backgroundColor: "#8C383E", border: "none" }}
+							>
+								<FontAwesomeIcon
+									icon={faTrash}
+									className="mr-2 ml-2"
+									style={{ color: "white", fontSize: "1rem" }}
+								/>
+								Delete Department
+							</div>
 
 							<div className="p-4">
 								<p className="mt-2 mb-5">
@@ -442,96 +686,188 @@ const EditDepartmentModal = ({ department, onClose, onUpdate }) => {
 					</div>
 				)}
 
-      {/* EditDepartmentModal */}
-      {showEditModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg shadow-md w-auto h-auto">
-            {/* Render the EditDepartmentModal component here */}
-            <EditDepartmentModal
-              department={editingDepartment}
-              onClose={() => setShowEditModal(false)}
-              onUpdate={handleUpdateDepartment}
-            />
-          </div>
-        </div>
-      )}
+				{/* EditDepartmentModal */}
+				{showEditModal && (
+					<div className="fixed inset-0 z-50 flex items-center justify-center">
+						<div className="bg-white rounded-lg shadow-md w-auto h-auto">
+							<EditDepartmentModal
+								department={editingDepartment}
+								onClose={() => setShowEditModal(false)}
+								onUpdate={handleUpdateDepartment}
+							/>
+						</div>
+					</div>
+				)}
+				{/* AddDepartmentModal */}
+				{showAddDepartmentModal && (
+					<div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
+						<div className="bg-white rounded-lg shadow-md w-1/3">
+							<div
+								className="p-2 font-bold text-lg text-white rounded-t-lg"
+								style={{ backgroundColor: "#8C383E", border: "none" }}
+							>
+								<FontAwesomeIcon
+									icon={faPlusCircle}
+									className="mr-2 ml-2"
+									style={{
+										color: "white",
+										fontSize: "1.2rem",
+										cursor: "pointer",
+									}}
+								/>
+								Add Department
+							</div>
+							<div className="p-4">
+								<form onSubmit={handleDepartmentFormSubmit}>
+									<div className="mb-4">
+										<label
+											htmlFor="deptName"
+											className="block text-sm font-medium text-gray-700"
+										>
+											Department Name
+										</label>
+										<input
+											type="text"
+											id="deptName"
+											name="deptName"
+											value={departmentFormData.deptName}
+											onChange={handleDepartmentFormChange}
+											className="mt-1 p-2 border border-gray-300 rounded-md w-full"
+											required
+										/>
+									</div>
+									<FormControl fullWidth className="mb-4">
+										<label
+											htmlFor="deptOfficeHead"
+											className="mb-2 block text-sm font-medium text-gray-700"
+										>
+											Department Office Head
+										</label>
+										<Select
+											id="deptOfficeHead"
+											name="deptOfficeHead"
+											value={departmentFormData.deptOfficeHead}
+											onChange={handleDepartmentFormChange}
+											className="h-12"
+											displayEmpty
+										>
+											<MenuItem value="" disabled>
+												<em className="text-gray-700">Select an Office Head</em>
+											</MenuItem>
+											{departmentOfficeHead.map((head) => (
+												<MenuItem key={head.id} value={head.name}>
+													{head.name}
+												</MenuItem>
+											))}
+										</Select>
+									</FormControl>
+									<div className="mt-2 flex justify-end">
+										<button
+											type="submit"
+											className="text-white px-3 py-1 w-auto rounded mr-2"
+											style={{ backgroundColor: "#8C383E", border: "none" }}
+										>
+											Add
+										</button>
+										<button
+											type="button"
+											className="bg-gray-300 text-gray-700 px-3 w-auto py-1 rounded"
+											onClick={() => setShowAddDepartmentModal(false)}
+										>
+											Cancel
+										</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				)}
 
-        {showAddDepartmentModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
-            <div className="bg-white rounded-lg shadow-md w-1/3" >
-              <div className="p-2 font-bold text-lg text-white rounded-t-lg" style={{ backgroundColor: '#8C383E', border: 'none' }} >
-                  <FontAwesomeIcon
-              icon={faPlusCircle}
-              className="mr-2 ml-2"
-              style={{ color: 'white', fontSize: '1.2rem', cursor: 'pointer' }}
-            />
-                Add Department
-              </div>
-              <div className="p-4">
-                <form onSubmit={handleDepartmentFormSubmit}>
-                  <div className="mb-4">
-                    <label htmlFor="deptName" className="block text-sm font-medium text-gray-700">
-                      Department Name
-                    </label>
-                    <input
-                      type="text"
-                      id="deptName"
-                      name="deptName"
-                      value={departmentFormData.deptName}
-                      onChange={handleDepartmentFormChange}
-                      className="mt-1 p-2 border border-gray-300 rounded-md w-full"
-                      required
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label htmlFor="deptOfficeHead" className="block text-sm font-medium text-gray-700">
-                      Department Office Head
-                    </label>
-                    <select
-                      id="deptOfficeHead"
-                      name="deptOfficeHead"
-                      value={departmentFormData.deptOfficeHead}
-                      onChange={handleDepartmentFormChange}
-                      className="mt-1 p-2 border border-gray-300 rounded-md w-full"
-                      required
-                    >
-                      <option value="">Select Office Head</option>
-                      {officeHeadOptions.map((name) => (
-                        <option key={name} value={name}>
-                          {name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="mt-2 flex justify-end">
-                    <button
-                      type="submit"
-                      className=" text-white px-3 py-1 w-auto rounded mr-2"
-                      style={{ backgroundColor: '#8C383E', border: 'none' }} 
-                    >
-                      Add
-                    </button>
-                    <button
-                      type="button"
-                      className="bg-gray-300 text-gray-700 px-3 w-auto py-1 rounded"
-                      onClick={() => setShowAddDepartmentModal(false)}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        )}
-
-    </div>
-    
-
-    
-  );
+				{/* Department Details Dialog */}
+				{showDetailsDialog && (
+					<Dialog
+						open={showDetailsDialog}
+						onClose={() => setShowDetailsDialog(false)}
+						aria-labelledby="department-details-dialog-title"
+						sx={{
+							"& .MuiDialog-paper": {
+								width: "66.666667%",
+								maxWidth: "s",
+							},
+						}}
+						PaperProps={{
+							style: {
+								borderRadius: 14,
+							},
+						}}
+					>
+						<div
+							className="p-4 h-8"
+							style={{ backgroundColor: "#8C383E", border: "none" }}
+						></div>
+						<div className="ml-2 mr-2 p-2">
+							<h3
+								className="text-lg font-semibold mt-2 mb-4"
+								style={{ fontWeight: 500 }}
+							>
+								{selectedDepartmentDetails.deptName}
+							</h3>
+							<Divider />
+						</div>
+						<div className="-mt-2 p-4">
+							<p>
+								<strong>Office Head:</strong>{" "}
+								{selectedDepartmentDetails.officeHead}
+							</p>
+							<p>
+								<strong>Secretary:</strong>{" "}
+								{selectedDepartmentDetails.secretary}
+							</p>
+							<div className="mt-4">
+								<strong>Office Staff:</strong>
+								<ul>
+									{selectedDepartmentDetails.staff.map((staffMember) => (
+										<li
+											key={staffMember.id}
+											className="flex items-center"
+											style={{ gap: "10px" }}
+										>
+											<span className="ml-28 flex-1">{staffMember.name}</span>
+											<span
+												className="ml-14 flex-1 text-left"
+												style={{
+													color:
+														staffMember.status === "Regular" ? "green" : "red",
+												}}
+											>
+												{staffMember.status}
+											</span>
+										</li>
+									))}
+								</ul>
+							</div>
+						</div>
+					</Dialog>
+				)}
+				{/* Snackbar */}
+				<Snackbar
+					open={snackbar.open}
+					autoHideDuration={3000}
+					onClose={() => setSnackbar({ ...snackbar, open: false })}
+					anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+				>
+					<Alert
+						variant="filled"
+						elevation={6}
+						severity={snackbar.severity}
+						sx={{ width: "100%" }}
+						style={{ fontFamily: "Poppins" }}
+					>
+						{snackbar.message}
+					</Alert>
+				</Snackbar>
+			</div>
+		</Animated>
+	);
 };
-
-
-
 export default ManageOffices;

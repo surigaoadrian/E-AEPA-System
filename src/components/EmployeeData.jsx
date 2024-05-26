@@ -187,7 +187,7 @@ function EmployeeData() {
 												<TableRow>
 													<TableCell sx={{ borderBottom: "0 solid #8C383E" }}>
 														<TextField
-															placeholder="Search by ID or Name"
+															placeholder="Search ID or Name..."
 															value={searchQuery}
 															onChange={handleSearchChange}
 															sx={{
