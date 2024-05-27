@@ -4,7 +4,7 @@ import { Box } from '@mui/material';
 import matrix from "../assets/matrix.png";
 import arrow from "../assets/arrow.png";
 import boxes from "../assets/matrixboxes.png";
-
+import bottomArrow from "../assets/bottomarrow.png";
 // Custom shape function that renders an emoji
 const renderPin = (props) => {
   const { cx, cy } = props;
@@ -26,7 +26,7 @@ const CustomTooltip = ({ active, payload }) => {
 
 const Matrix = () => {
   const employeeData = [
-    { id: 1, valuesPerformance: 4.5, jobsPerformance: 5.0 }
+    { id: 1, valuesPerformance: 3.5, jobsPerformance: 4.0 }
   ];
 
   return (
@@ -83,6 +83,10 @@ const Matrix = () => {
         </div>
         <img src={boxes} className='ml-16' style={{ width: 'auto', height: '500px' }} />
       </div>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginRight:'124px' }}>
+  <img src={bottomArrow} alt="Bottom Arrow" style={{ width: 'auto', height: '100px' }} />
+</div>
+
     </div>
   );
 };
