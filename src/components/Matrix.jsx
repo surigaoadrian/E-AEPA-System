@@ -1,14 +1,15 @@
 import React from 'react';
 import { ScatterChart, Scatter, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer, Label } from 'recharts';
 import { Box } from '@mui/material';
-import matrix from "../assets/matrix.png";
+import matrix from "../assets/matrixx.png";
 import arrow from "../assets/arrow.png";
 import boxes from "../assets/matrixboxes.png";
 import bottomArrow from "../assets/bottomarrow.png";
+
 // Custom shape function that renders an emoji
 const renderPin = (props) => {
   const { cx, cy } = props;
-  return <text x={cx} y={cy} dy={5} fontSize={20} >✅</text>;
+  return <text x={cx} y={cy} dy={5} dx={-15} fontSize={20} >✅</text>;
 };
 
 // Custom tooltip function
@@ -58,9 +59,9 @@ const Matrix = () => {
           <ScatterChart
             margin={{
               top: 20,
-              right: 20,
+              right: 15,
               bottom: 20,
-              left: 20,
+              left: 10,
             }}
           >
             <defs>
