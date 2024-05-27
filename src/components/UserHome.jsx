@@ -117,12 +117,14 @@ function UserHome() {
 					Welcome to the{" "}
 					<span style={{ fontWeight: 600, color: "#8C383E" }}>
 						Expanded Administrative Employee Performance Appraisal (e-AEPA)
-						System
-					</span>{" "}
-					at CIT-U, we are committed to enhancing the way we evaluate our team.
+						System!
+					</span>{" "}<br/>
+					<div style={{marginTop: "10px"}}>
+					At CIT-U, we are committed to enhancing the way we evaluate our team.
 					The e-AEPA system is designed to modernize and streamline the employee
 					evaluation process, transitioning from traditional manual Excel-based
 					assessments to a comprehensive digital platform.
+					</div>
 				</Typography>
 
 				<Typography
