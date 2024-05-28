@@ -163,9 +163,10 @@ const ManageOffices = () => {
 			);
 			setDepartments(updatedUsers.data);
 			setFilteredDepartments(updatedUsers.data);
-			showSnackbar("Department added successfully", "success");
+			showSnackbar("Department deleted successfully", "success");
 			toggleConfirmationDialog();
 		} catch (error) {
+			showSnackbar("Failed to delete department due to an error", "error");
 			console.error("Error deleting user:", error);
 		}
 	};
@@ -201,7 +202,7 @@ const ManageOffices = () => {
 		);
 
 		setSelectedDepartmentDetails({
-			deptName: deptFullName || "N/A",
+			deptName: department.deptName || "N/A",
 			officeHead: department.deptOfficeHead || "N/A",
 			secretary: secretary
 				? `${secretary.fName} ${
@@ -416,18 +417,24 @@ const ManageOffices = () => {
 								value={searchTerm}
 								onChange={handleSearchChange}
 								sx={{
+									"& .MuiOutlinedInput-root": {
+										backgroundColor: "#ffffff", // Set the background color for the entire input area
+									  },
 									"& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
 										borderWidth: "1px",
 										borderColor: "#e0e0e0",
+										
 									},
 									"&:hover .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
 										{
 											borderColor: "#e0e0e0",
+											
 										},
 									"&:focus-within": {
 										"& fieldset": {
 											borderColor: "#8C383E !important",
 											borderWidth: "1px !important",
+											
 										},
 									},
 									"& .MuiInputBase-input": {

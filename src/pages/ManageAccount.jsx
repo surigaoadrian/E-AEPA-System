@@ -14,7 +14,7 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import TableRow from "@mui/material/TableRow";
 import FormHelperText from "@mui/material/FormHelperText";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faEyeSlash,faTrash, faPenToSquare} from "@fortawesome/free-solid-svg-icons";
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'; //password
 import axios from "axios";
 import Animated from "../components/motion";
@@ -661,15 +661,28 @@ function ManageAccount() {
       format: (value, row) => {
         return (
           <div>
-            <IconButton onClick={() => handleClickEditBtn(row.userID)}>
-              <EditNoteTwoToneIcon />
-            </IconButton>
-            <IconButton
-              color="error"
-              onClick={() => handleClickDeleteBtn(row.userID)}
-            >
-              <DeleteOutlineIcon />
-            </IconButton>
+            <FontAwesomeIcon
+															icon={faPenToSquare}
+															className="mr-2"
+															style={{
+																color: "#8C383E",
+																fontSize: "1.3rem",
+																cursor: "pointer",
+															}}
+															onClick={() => handleClickEditBtn(row.userID)}
+														/>
+								<FontAwesomeIcon
+															icon={faTrash}
+															className="mr-2"
+															style={{
+																color: "#8C383E",
+																fontSize: "1.3rem",
+																cursor: "pointer",
+															}}
+															onClick={(e) => {
+																e.stopPropagation(); // Prevent row click from triggering
+																handleClickDeleteBtn(row.userID);}}
+														/>                           
           </div>
         );
       },
@@ -711,10 +724,10 @@ function ManageAccount() {
       format: (value, row) => (
         <div>
           <IconButton onClick={() => handleClickEditBtn(row.userID)}>
-            <EditNoteTwoToneIcon />
+            <faPenToSquare />
           </IconButton>
           <IconButton color="error" onClick={() => handleClickDeleteBtn(row.userID)}>
-            <DeleteOutlineIcon />
+            <faPenTrash />
           </IconButton>
         </div>
       ),
@@ -1153,7 +1166,7 @@ function ManageAccount() {
               <Grid item xs={12}>
                 <Grid container spacing={0.6} sx={{ fontFamily: "Poppins", fontWeight: "bold", color: "white", backgroundColor: "transparent", alignItems: "center", }}>
                   <Grid item sx={{ height: "2.6em" }}>
-                    <EditNoteTwoToneIcon sx={{ color: "white", fontSize: "1.65em", ml: '.2em', mt: '0.2em' }} />
+                    <faPenToSquare sx={{ color: "black", fontSize: "1.65em", ml: '.2em', mt: '0.2em' }} />
                   </Grid>
                   <Grid item >Edit User Details</Grid>
                 </Grid>
@@ -1343,8 +1356,9 @@ function ManageAccount() {
           <Grid container>
             <Grid item xs={12}>
               <Grid container spacing={0.6} sx={{ fontFamily: "Poppins", fontWeight: "bold", color: "white", backgroundColor: "transparent", alignItems: "center", }}>
-                <Grid item sx={{ height: "2.6em" }}>
-                  <DeleteOutlineIcon sx={{ color: "white", fontSize: "1.5em", ml: '.2em', mt: '0.2em' }} />
+                <Grid item sx={{ height: "em" }}>
+                  <FontAwesomeIcon icon={faTrash} sx={{ color: "white", fontSize: "1.5em", ml: '.5em', mt: '0.2em' }} />
+                 
                 </Grid>
                 <Grid item >Delete User Account</Grid>
               </Grid>
