@@ -43,7 +43,7 @@ export const SideBarData = [
 		path: "/manageAccount",
 		role: "ADMIN",
 		icon: <FontAwesomeIcon icon={faUsers} style={{ fontSize: "15px" }} />,
-    margin: "0 0 0 0",
+    	margin: "0 0 0 0",
 	},
 	{
 		title: "Manage Offices",

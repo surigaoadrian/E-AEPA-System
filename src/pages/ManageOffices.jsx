@@ -348,7 +348,7 @@ const ManageOffices = () => {
 								<div className="mb-4">
 									<label
 										htmlFor="deptName"
-										className="block text-sm font-medium text-gray-700"
+										style={{fontSize: "14px",  color: "#515151"}}
 									>
 										Department Name
 									</label>
@@ -367,7 +367,7 @@ const ManageOffices = () => {
 								<div className="mb-4 mt-5">
 									<label
 										htmlFor="deptOfficeHead"
-										className="block text-base font-medium text-gray-700"
+										style={{fontSize: "14px",  color: "#515151"}}
 									>
 										Assigned Office Head:
 										<span className="font-medium text-black ml-4">
@@ -377,20 +377,43 @@ const ManageOffices = () => {
 									</label>
 								</div>
 								<div className="mt-2 flex justify-end">
-									<button
-										type="submit"
-										className="text-white px-3 py-1 w-auto rounded mr-2"
-										style={{ backgroundColor: "#8C383E", border: "none" }}
-									>
-										Save
-									</button>
-									<button
+									<Button
 										type="button"
-										className="bg-gray-300 text-gray-700 px-3 w-auto py-1 rounded"
+										variant="outlined"
 										onClick={onClose}
+										sx={{
+											marginRight: "8px",
+											borderColor: "#B4B4B4",
+											color: "#1E1E1E",
+											width: "18%",
+											textTransform: "none",
+											fontFamily: "Poppins",
+											"&:hover": {
+												backgroundColor: "#ECECEE",
+												borderColor: "#ECECEE",
+												color: "#1E1E1E",
+											},
+										}}
 									>
 										Cancel
-									</button>
+									</Button>
+									<Button
+										type="submit"
+										variant="contained"
+										color="primary"
+										sx={{
+											backgroundColor: "#8C383E",
+											width: "18%",
+											borderRadius: "5px 5px",
+											textTransform: "none",
+											fontFamily: "Poppins",
+											"&:hover": {
+												backgroundColor: "#762F34",
+											},
+										}}
+									>
+										Add
+									</Button>
 								</div>
 							</form>
 						</div>
@@ -419,22 +442,19 @@ const ManageOffices = () => {
 								sx={{
 									"& .MuiOutlinedInput-root": {
 										backgroundColor: "#ffffff", // Set the background color for the entire input area
-									  },
+									},
 									"& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
 										borderWidth: "1px",
 										borderColor: "#e0e0e0",
-										
 									},
 									"&:hover .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
 										{
 											borderColor: "#e0e0e0",
-											
 										},
 									"&:focus-within": {
 										"& fieldset": {
 											borderColor: "#8C383E !important",
 											borderWidth: "1px !important",
-											
 										},
 									},
 									"& .MuiInputBase-input": {
@@ -659,7 +679,7 @@ const ManageOffices = () => {
 					<div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
 						<div className="bg-white rounded-lg shadow-md w-auto h-44">
 							<div
-								className="p-2 font-bold text-lg text-white rounded-t-lg"
+								className="p-2 font-medium text-lg text-white rounded-t-lg"
 								style={{ backgroundColor: "#8C383E", border: "none" }}
 							>
 								<FontAwesomeIcon
@@ -670,25 +690,49 @@ const ManageOffices = () => {
 								Delete Department
 							</div>
 
-							<div className="p-4">
-								<p className="mt-2 mb-5">
+							<div className="p-5">
+								<p className="mt-1 mb-5">
 									Are you sure you want to delete this department?
 								</p>
 								<Divider />
 								<div className="mt-4 mb-4 flex justify-end">
-									<button
-										className="text-white px-3 py-1 w-14 rounded mr-2"
-										style={{ backgroundColor: "#8C383E", border: "none" }}
-										onClick={confirmDeleteDepartment}
-									>
-										Yes
-									</button>
-									<button
-										className="bg-gray-300 text-gray-700 px-3 w-14 py-1 rounded"
-										onClick={() => toggleConfirmationDialog()}
-									>
-										No
-									</button>
+								<Button
+											type="button"
+											variant="outlined"
+											onClick={() => toggleConfirmationDialog()}
+											sx={{
+												marginRight: "8px",
+												borderColor: "#B4B4B4",
+												color: "#1E1E1E",
+												width: "18%",
+												textTransform: "none",
+												fontFamily: "Poppins",
+												"&:hover": {
+													backgroundColor: "#ECECEE",
+													borderColor: "#ECECEE",
+													color: "#1E1E1E",
+												},
+											}}
+										>
+											Cancel
+										</Button>
+										<Button
+											onClick={confirmDeleteDepartment}
+											variant="contained"
+											color="primary"
+											sx={{
+												backgroundColor: "#8C383E",
+												width: "18%",
+												borderRadius: "5px 5px",
+												textTransform: "none",
+												fontFamily: "Poppins",
+												"&:hover": {
+													backgroundColor: "#762F34",
+												},
+											}}
+										>
+											Yes
+										</Button>
 								</div>
 							</div>
 						</div>
@@ -748,7 +792,7 @@ const ManageOffices = () => {
 									<FormControl fullWidth className="mb-4">
 										<label
 											htmlFor="deptOfficeHead"
-											className="mb-2 block text-sm font-medium text-gray-700"
+											className="mb-2 block text-sm font-medium text-gray-900"
 										>
 											Assign Office Head
 										</label>
@@ -790,6 +834,7 @@ const ManageOffices = () => {
 												color: "#1E1E1E",
 												width: "18%",
 												textTransform: "none",
+												fontFamily: "Poppins",
 												"&:hover": {
 													backgroundColor: "#ECECEE",
 													borderColor: "#ECECEE",
@@ -806,7 +851,7 @@ const ManageOffices = () => {
 											sx={{
 												backgroundColor: "#8C383E",
 												width: "18%",
-												borderRadius:"5px 5px",
+												borderRadius: "5px 5px",
 												textTransform: "none",
 												fontFamily: "Poppins",
 												"&:hover": {

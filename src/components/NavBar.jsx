@@ -59,7 +59,7 @@ function NavBar() {
 					`http://localhost:8080/user/getUser/${userID}`
 				);
 				setLoggedUserData(response.data);
-				if (response.data.role !== "ADMIN") {
+				if (response.data.role !== "ADMIN" && response.data.role !== "HEAD") {
 					const imageUrl = await getImageUrl(userID);
 					setProfilePictureUrl(imageUrl);
 				} else {
@@ -85,10 +85,6 @@ function NavBar() {
 		sessionStorage.removeItem("userRole");
 		sessionStorage.removeItem("userID");
 		navigate("/login");
-	};
-
-	const handleViewProfile = () => {
-		navigate("/viewProfile");
 	};
 
 	const navBarStyle = {
