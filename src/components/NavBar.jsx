@@ -14,9 +14,11 @@ import MenuItem from "@mui/material/MenuItem";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ListItemIcon } from "@mui/material";
+import profile from "../assets/logo.png";
 
 function NavBar() {
 	const [loggedUserData, setLoggedUserData] = useState({});
+	const [profilePictureUrl, setProfilePictureUrl] = useState(null);
 	const [anchorEl, setAnchorEl] = React.useState(null);
 	const open = Boolean(anchorEl);
 	const navigate = useNavigate();
@@ -30,10 +32,25 @@ function NavBar() {
 		setAnchorEl(null);
 	};
 
-	function base64ToDataURL(base64String) {
-		return `data:image/png;base64,${base64String}`;
-	}
-	//fetch user
+	const getImageUrl = async (userID) => {
+		try {
+			const response = await axios.get(
+				`http://localhost:8080/user/image/${userID}`,
+				{
+					responseType: "arraybuffer",
+				}
+			);
+			const imageBlob = new Blob([response.data], {
+				type: response.headers["content-type"],
+			});
+			const imageUrl = URL.createObjectURL(imageBlob);
+			return imageUrl;
+		} catch (error) {
+			console.error("Error fetching profile picture:", error);
+			return null;
+		}
+	};
+
 	useEffect(() => {
 		const fetchUser = async () => {
 			try {
@@ -41,10 +58,13 @@ function NavBar() {
 				const response = await axios.get(
 					`http://localhost:8080/user/getUser/${userID}`
 				);
-
 				setLoggedUserData(response.data);
-				console.log(userID);
-				console.log(loggedUserData);
+				if (response.data.role !== "ADMIN") {
+					const imageUrl = await getImageUrl(userID);
+					setProfilePictureUrl(imageUrl);
+				} else {
+					setProfilePictureUrl(profile); // Default profile picture for admin
+				}
 			} catch (error) {
 				if (error.response) {
 					//not in 200 response range
@@ -58,15 +78,12 @@ function NavBar() {
 		};
 
 		fetchUser();
-		
-	}, [loggedUserData]);
-	
+	}, [getImageUrl]);
+
 	const handleLogout = () => {
 		localStorage.removeItem("token");
-
 		sessionStorage.removeItem("userRole");
 		sessionStorage.removeItem("userID");
-
 		navigate("/login");
 	};
 
@@ -163,11 +180,7 @@ function NavBar() {
 					}}
 				>
 					<img
-						src={
-							loggedUserData?.profilePic
-								? base64ToDataURL(loggedUserData.profilePic)
-								: "/user.png"
-						}
+						src={profilePictureUrl}
 						alt="nav-profile-picture"
 						style={{ width: "100%", height: "100%", objectFit: "cover" }}
 						className="rounded-full ring-4 ring-black"
