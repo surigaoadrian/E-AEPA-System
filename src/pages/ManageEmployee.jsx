@@ -1,7 +1,7 @@
 import React from "react";
+import EmployeeData from "../components/EmployeeData";
 
 function ManageEmployee() {
-  return <div>This is manage employee page</div>;
+	return <EmployeeData />;
 }
-
 export default ManageEmployee;

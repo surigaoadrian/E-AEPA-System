@@ -3,6 +3,7 @@ import "../styles/sidebarStyles.css";
 import { NavLink } from "react-router-dom";
 import { SideBarData } from "../data/sideBarData";
 
+
 function SideBar() {
   const [userRole, setUserRole] = useState("");
   const [filteredSideBarData, setFilteredSideBarData] = useState([]);
@@ -27,16 +28,17 @@ function SideBar() {
     borderTop: "3px solid #F8C702",
   };
 
+
   return (
     <div>
       <div style={sidebarStyles}>
         {filteredSideBarData.map((item, index) => {
           return (
-            <div key={index} style={{ paddingTop: "5px" }}>
+            <div key={index} style={{ paddingTop: "5px",fontSize: "15px",}}>
               <div id="linkStyle">
                 <NavLink className="nav-link" to={item.path}>
                   <span style={{ marginRight: "15px" }}>{item.icon}</span>
-                  <span>{item.title}</span>
+                  <span style={{ margin: item.margin}}>{item.title}</span>
                 </NavLink>
               </div>
             </div>

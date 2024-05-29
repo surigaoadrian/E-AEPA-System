@@ -16,6 +16,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import NotAuthorized from "./pages/NotAuthorized";
 import PrivateRoute from "./components/PrivateRoute";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import EmployeeProfile from "./pages/EmployeeProfile";
 
 function App() {
   return (
@@ -30,50 +31,50 @@ function App() {
           }
         />
 
-        <Route
-          path="/viewProfile"
-          element={
-            <PrivateRoute requiredRoles={["EMPLOYEE"]}>
-              <ViewProfilePage />
-            </PrivateRoute>
-          }
-        />
+				<Route
+					path="/viewProfile"
+					element={
+						<PrivateRoute requiredRoles={["EMPLOYEE"]}>
+							<ViewProfilePage />
+						</PrivateRoute>
+					}
+				/>
 
-        <Route
-          path="/takeEvaluation"
-          element={
-            <PrivateRoute requiredRoles={["EMPLOYEE"]}>
-              <TakeEvaluationPage />
-            </PrivateRoute>
-          }
-        />
+				<Route
+					path="/takeEvaluation"
+					element={
+						<PrivateRoute requiredRoles={["EMPLOYEE"]}>
+							<TakeEvaluationPage />
+						</PrivateRoute>
+					}
+				/>
 
-        <Route
-          path="/viewRatings"
-          element={
-            <PrivateRoute requiredRoles={["EMPLOYEE"]}>
-              <ViewRatingsPage />
-            </PrivateRoute>
-          }
-        />
+				<Route
+					path="/viewRatings"
+					element={
+						<PrivateRoute requiredRoles={["EMPLOYEE"]}>
+							<ViewRatingsPage />
+						</PrivateRoute>
+					}
+				/>
 
-        <Route
-          path="/manageAccount"
-          element={
-            <PrivateRoute requiredRoles={["ADMIN"]}>
-              <ManageAccount />
-            </PrivateRoute>
-          }
-        />
+				<Route
+					path="/manageAccount"
+					element={
+						<PrivateRoute requiredRoles={["ADMIN"]}>
+							<ManageAccount />
+						</PrivateRoute>
+					}
+				/>
 
-        <Route
-          path="/manageOffices"
-          element={
-            <PrivateRoute requiredRoles={["ADMIN"]}>
-              <ManageOffices />
-            </PrivateRoute>
-          }
-        />
+				<Route
+					path="/manageOffices"
+					element={
+						<PrivateRoute requiredRoles={["ADMIN"]}>
+							<ManageOffices />
+						</PrivateRoute>
+					}
+				/>
 
         <Route
           path="/manageEmployee"
@@ -90,6 +91,14 @@ function App() {
           element={
             <PrivateRoute requiredRoles={["HEAD"]}>
               <TrackEmployee />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/ViewProfileAdmin"
+          element={
+            <PrivateRoute requiredRoles={["HEAD"]}>
+              <ViewProfilePageAdmin />
             </PrivateRoute>
           }
         />
