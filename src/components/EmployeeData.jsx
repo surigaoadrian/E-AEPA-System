@@ -36,9 +36,9 @@ function EmployeeData() {
 				const response = await axios.get(
 					"http://localhost:8080/user/getAllUser"
 				);
-				const sortedUsers = response.data.filter(
-					(user) => user.role === "EMPLOYEE"
-				);
+				const sortedUsers = response.data
+					.filter((user) => user.role === "EMPLOYEE")
+					.sort((a, b) => b.userID - a.userID);
 				setUsers(sortedUsers);
 			} catch (error) {
 				console.error("Error fetching users:", error);

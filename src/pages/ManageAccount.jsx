@@ -293,7 +293,7 @@ function ManageAccount() {
           } else if (selectedTab === 1) {
             return item.role === "ADMIN";
           }
-        });
+        }).sort((a, b) => b.userID - a.userID);
         const processedData = filteredData.map((item) => ({
           ...item,
           name: `${item.fName} ${item.lName}`,
@@ -761,7 +761,7 @@ function ManageAccount() {
                     {(selectedTab === 0 ? columnsEmployees : columnsAdmins).map(
                       (column) => (
                         <TableCell sx={{
-                          fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: "bold", maxWidth: "2em",
+                          fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: 500, maxWidth: "2em",
                         }} key={column.id} align={column.align} style={{ minWidth: column.minWidth }}>{column.label}</TableCell>
                       )
                     )}
@@ -772,7 +772,7 @@ function ManageAccount() {
                     <TableRow sx={{ "&:hover": { backgroundColor: "rgba(248, 199, 2, 0.5)", color: "black", }, }} key={row.id}>
                       {(selectedTab === 0 ? columnsEmployees : columnsAdmins)
                         .map((column) => (
-                          <TableCell sx={{ fontFamily: "Poppins", }} key={`${row.id}-${column.id}`} align={column.align}>
+                          <TableCell sx={{ fontFamily: "Poppins", fontWeight: 500, }} key={`${row.id}-${column.id}`} align={column.align}>
                             {column.id === "name" ? row.name : column.id === "actions" ? column.format ? column.format(row[column.id], row) : null : column.format ? column.format(row[column.id]) : row[column.id]}
                           </TableCell>
                         ))}
@@ -1385,3 +1385,6 @@ function ManageAccount() {
   );
 }
 export default ManageAccount;
+
+
+

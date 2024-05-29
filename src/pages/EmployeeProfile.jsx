@@ -114,7 +114,7 @@ function EmployeeProfile({ user, handleBack }) {
 		};
 
 		const columnStyle = {
-			width: "160px", // Adjust the width as needed (replace with desired width)
+			width: "160px",
 			textAlign: "center",
 			backgroundColor: "#8C383E",
 			color: "white",
@@ -126,7 +126,7 @@ function EmployeeProfile({ user, handleBack }) {
 		};
 
 		return (
-			<TableContainer component={Paper} sx={{ width: "100%", }}>
+			<TableContainer component={Paper} sx={{ width: "100%" }}>
 				<Table>
 					<TableBody>
 						<TableRow>
@@ -203,11 +203,15 @@ function EmployeeProfile({ user, handleBack }) {
 							borderBottom: "2px solid #e0e0e0",
 						}}
 					>
-						<Box sx={{ ml: 5, mb: 2 }}>
+						<Box sx={{ ml: 8, mb: 2 }}>
 							<Avatar
 								alt="Employee"
-								src={user.profilePic ? base64ToDataURL(user.profilePic) : "/user.png"}
-								sx={{ width: 150, height: 150, mr: 2 }}
+								src={
+									user.profilePic
+										? base64ToDataURL(user.profilePic)
+										: "/user.png"
+								}
+								sx={{ width: "120px", height: "120px" }}
 							/>
 						</Box>
 						<Box sx={{ ml: 5 }}>
@@ -356,7 +360,11 @@ function EmployeeProfile({ user, handleBack }) {
 										label={tab.label}
 										value={tab.value}
 										key={tab.value}
-										sx={{ textTransform: "none", fontFamily: "poppins", fontWeight: 500, }}
+										sx={{
+											textTransform: "none",
+											fontFamily: "poppins",
+											fontWeight: 500,
+										}}
 									/>
 								))}
 							</TabList>
