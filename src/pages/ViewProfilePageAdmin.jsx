@@ -1,9 +1,8 @@
-import {Alert as MuiAlert, Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, Grid, IconButton, MenuItem, Paper, Snackbar, TextField, Tooltip, Typography, Select, FormHelperText, FormControl,
+import {Alert as MuiAlert, Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, Grid, IconButton, MenuItem, Paper, Snackbar, TextField, Tooltip, Typography, Select,
 } from "@mui/material";
 import React, { useState, useEffect, useRef } from "react";
 import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
 import SaveAsRoundedIcon from "@mui/icons-material/SaveAsRounded";
-import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import axios from "axios";
 import HighlightOffOutlinedIcon from "@mui/icons-material/HighlightOffOutlined";
 import CameraAltOutlinedIcon from "@mui/icons-material/CameraAltOutlined";
@@ -66,10 +65,6 @@ function ViewProfilePage() {
 		setIsPrsnlEditMode(false);
 		setSaveDisabled(false);
 	};
-
-
-
-
 
 	const handleDetailsChange = (e) => {
 		const { name, value } = e.target;
@@ -198,6 +193,7 @@ function ViewProfilePage() {
 			setProfilePictureUrl(prevProfilePictureUrl); // Restore the previous profile picture URL
 		}
 	};
+	
 	const handleImageClick = () => {
 		inputRef.current.click();
 	};
@@ -921,7 +917,7 @@ function ViewProfilePage() {
 												{selectedUser.dateHired}
 											</span>
 										</Typography>
-										<Typography
+										{/* <Typography
 											color="text.secondary"
 											sx={{ fontFamily: "Poppins", mt: 2, fontSize: "1em" }}
 										>
@@ -929,7 +925,7 @@ function ViewProfilePage() {
 											<span style={{ color: "black" }}>
 												{selectedUser.signature}
 											</span>
-										</Typography>
+										</Typography> */}
 									</Grid>
 								</Grid>
 							</Grid>
@@ -1035,7 +1031,6 @@ function ViewProfilePage() {
 								</Button>
 							)}
 							{image && (
-								<>
 									<Box
 										sx={{
 											display: "flex",
@@ -1085,7 +1080,6 @@ function ViewProfilePage() {
 											Cancel
 										</Button>
 									</Box>
-								</>
 							)}
 						</DialogActions>
 					</DialogContent>
