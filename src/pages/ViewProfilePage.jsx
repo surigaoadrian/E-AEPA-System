@@ -1,23 +1,4 @@
-import {
-	Alert as MuiAlert,
-	Avatar,
-	Box,
-	Button,
-	Dialog,
-	DialogActions,
-	DialogContent,
-	DialogContentText,
-	Grid,
-	IconButton,
-	MenuItem,
-	Paper,
-	Snackbar,
-	TextField,
-	Tooltip,
-	Typography,
-	Select,
-	FormHelperText,
-	FormControl,
+import {Alert as MuiAlert, Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, Grid, IconButton, MenuItem, Paper, Snackbar, TextField, Tooltip, Typography, Select, FormHelperText, FormControl,
 } from "@mui/material";
 import React, { useState, useEffect, useRef } from "react";
 import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
@@ -66,8 +47,6 @@ function ViewProfilePage() {
 	const [saveDisabled, setSaveDisabled] = useState(false);
 	const [updateFetch, setUpdateFetch] = useState(true);
 	const [isPrsnlEditMode, setIsPrsnlEditMode] = useState(false);
-	const [isAccntEditUnameMode, setIsAcctEditUnameMode] = useState(false);
-	const [isAccntEditPassMode, setIsAcctEditPassMode] = useState(false);
 	const [successAlert, setSuccessAlert] = useState({
 		open: false,
 		message: "",
@@ -92,43 +71,15 @@ function ViewProfilePage() {
 		setIsPrsnlEditMode(!isPrsnlEditMode);
 	};
 
-	const handleAccntEditUnameClick = () => {
-		setIsAcctEditUnameMode(!isAccntEditUnameMode);
-	};
-
-	const handleAccntEditPassClick = () => {
-		setIsAcctEditPassMode(!isAccntEditPassMode);
-	};
-
 	const handlePrsnlEditClose = () => {
 		setSelectedUser(originalUser);
 		setIsPrsnlEditMode(false);
 		setSaveDisabled(false);
 	};
 
-	const handleAccntUnameClose = () => {
-		setSelectedUser(originalUser);
-		setSaveDisabled(false);
-		setIsAcctEditUnameMode(false);
-		setMsgInfo("");
-	};
 
-	const handleAccntPassClose = () => {
-		setSelectedUser(originalUser);
-		setIsAcctEditPassMode(false);
-	};
 
-	const checkUsernameAvailability = async (username) => {
-		try {
-			const response = await axios.put(
-				`http://localhost:8080/user/checkUsername/${username}`
-			);
-			return response.data; // Returns "Username already taken" or "Username available"
-		} catch (error) {
-			console.error("Error checking username availability:", error);
-			return "Failed to check username availability";
-		}
-	};
+
 
 	const handleDetailsChange = (e) => {
 		const { name, value } = e.target;
@@ -137,30 +88,14 @@ function ViewProfilePage() {
 
 		let trimmedValue = value;
 
-		if (name === "fName" || name === "mName" || name === "lName") {
+		if (name === "fName"  || name === "lName") {
 			if (!onlyLettersRegex.test(value) && value !== "") return;
 		} else if (name === "contactNum") {
 			trimmedValue = value.slice(0, 11);
-			if (trimmedValue !== "" && !trimmedValue.startsWith("09")) {
+			if (trimmedValue !== "" ) {
 				trimmedValue = trimmedValue;
 			}
 			if (!onlyNumbersRegex.test(trimmedValue) && trimmedValue !== "") return;
-		}
-		if (name === "username") {
-			checkUsernameAvailability(value)
-				.then((availability) => {
-					console.log("Username availability:", availability);
-					if (availability === "Username already taken") {
-						setMsgInfo("Username already taken");
-						setSaveDisabled(false);
-					} else {
-						setMsgInfo("");
-						setSaveDisabled(true);
-					}
-				})
-				.catch((error) => {
-					console.error("Error checking username availability:", error);
-				});
 		}
 		setSelectedUser((prevData) => ({
 			...prevData,
@@ -169,40 +104,11 @@ function ViewProfilePage() {
 		if (
 			trimmedValue.trim() === "" ||
 			selectedUser.fName.trim() === "" ||
-			selectedUser.mName.trim() === "" ||
 			selectedUser.lName.trim() === ""
 		) {
 			setSaveDisabled(false);
 		} else {
 			setSaveDisabled(true);
-		}
-	};
-
-	//save edit username
-	const handleSaveUsernameChanges = async (e, selectedUser) => {
-		e.preventDefault();
-		try {
-			console.log("sending user data: ", selectedUser);
-
-			const userPayload = {
-				username: selectedUser.username,
-			};
-			await axios.patch(
-				`http://localhost:8080/user/editAccountUsername/${selectedUser.userID}`,
-				userPayload,
-				{
-					headers: {
-						"Content-Type": "application/json",
-					},
-				}
-			);
-			setUpdateFetch((prev) => !prev);
-			setOriginalUser(selectedUser);
-			showSuccessAlert("User updated successfully");
-			setIsAcctEditUnameMode(false);
-			setSaveDisabled(false);
-		} catch (error) {
-			showErrorAlert("Failed to update user. Please try again later.");
 		}
 	};
 
@@ -406,7 +312,7 @@ function ViewProfilePage() {
 												src={profilePictureUrl}
 											/>
 										) : (
-											<Avatar sx={{ width: 110, height: 110 }} />
+											<Avatar alt="User" src="/user.png" sx={{ width: 110, height: 110 }} />
 										)}
 									</Tooltip>
 								</IconButton>
@@ -902,109 +808,6 @@ function ViewProfilePage() {
 								</Grid>
 								<Grid sm container>
 									<Grid item xs container spacing={2} sx={{ ml: 1 }}>
-										{/* for editing */}
-										{isAccntEditUnameMode ? (
-											<div
-												style={{
-													display: "flex",
-													flexDirection: "column",
-													gap: "16px",
-												}}
-											>
-												<div style={{ display: "flex", alignItems: "center" }}>
-													<Typography
-														color="text.secondary"
-														sx={{
-															fontFamily: "Poppins",
-															fontSize: ".8em",
-															ml: 2,
-															mt: 4,
-														}}
-													>
-														{" "}
-														Username:
-													</Typography>
-													<FormControl>
-														<TextField
-															type="text"
-															id="username"
-															name="username"
-															value={selectedUser.username}
-															onChange={handleDetailsChange}
-															variant="outlined"
-															size="small"
-															sx={{ ml: 1, mt: 3.5 }}
-															InputLabelProps={{
-																style: { fontFamily: "Poppins" },
-															}}
-															inputProps={{
-																style: {
-																	fontSize: ".8em",
-																	fontFamily: "Poppins",
-																},
-															}}
-														/>
-													</FormControl>
-													<Grid sx={{ mt: 3, ml: 1 }}>
-														<Tooltip title="Save" placement="top" arrow>
-															<IconButton
-																onClick={(e) =>
-																	handleSaveUsernameChanges(e, selectedUser)
-																}
-																sx={{
-																	height: "1.3em",
-																	width: "1.2em",
-																	fontFamily: "Poppins",
-																	padding: "1px 1px 0 0 ",
-																	color: "green",
-																	"&:hover": {
-																		bgcolor: "transparent",
-																		color: "#F8C702",
-																	},
-																}}
-																style={{ textTransform: "none" }}
-																disabled={!saveDisabled}
-															>
-																<SaveAsRoundedIcon sx={{ fontSize: ".8em" }} />
-															</IconButton>
-														</Tooltip>
-														<Tooltip title="Cancel" placement="top" arrow>
-															<IconButton
-																sx={{
-																	color: "black",
-																	height: "1.3em",
-																	width: "1.3em",
-																	fontFamily: "Poppins",
-																	padding: "1px 1px 0 0 ",
-																	"&:hover": {
-																		bgcolor: "transparent",
-																		color: "#8C383E",
-																	},
-																}}
-																style={{ textTransform: "none" }}
-																onClick={handleAccntUnameClose}
-															>
-																<CancelOutlinedIcon sx={{ fontSize: ".8em" }} />
-															</IconButton>
-														</Tooltip>
-													</Grid>
-												</div>
-												{!isAvailable && (
-													<FormHelperText
-														style={{
-															color: "red",
-															marginLeft: 95,
-															marginTop: "-10px",
-															fontFamily: "Poppins",
-															fontSize: "0.6em",
-														}}
-													>
-														{msgInfo}
-													</FormHelperText>
-												)}
-											</div>
-										) : (
-											// for display only
 											<Typography
 												color="text.secondary"
 												sx={{
@@ -1019,7 +822,6 @@ function ViewProfilePage() {
 													{selectedUser.username}
 												</span>
 											</Typography>
-										)}
 										<Grid
 											item
 											xs
@@ -1031,153 +833,10 @@ function ViewProfilePage() {
 												mt: 2,
 											}}
 										>
-											{!isAccntEditUnameMode && (
-												<Tooltip
-													title="Change Username"
-													placement="right"
-													arrow
-												>
-													<IconButton onClick={handleAccntEditUnameClick}>
-														<BorderColorRoundedIcon
-															sx={{
-																fontSize: ".8em",
-																color: "rgba(140, 56, 62, 0.5)",
-																"&:hover": { color: "#8c383e" },
-															}}
-														/>
-													</IconButton>
-												</Tooltip>
-											)}
 										</Grid>
 									</Grid>
 								</Grid>
 								<Grid item sm container>
-									{/* for edit */}
-									{isAccntEditPassMode ? (
-										<div
-											style={{
-												display: "flex",
-												flexDirection: "column",
-												gap: "12px",
-											}}
-										>
-											<div style={{ display: "flex", alignItems: "center" }}>
-												<Typography
-													color="text.secondary"
-													sx={{
-														fontFamily: "Poppins",
-														fontSize: ".8em",
-														ml: 3,
-														mt: 1,
-													}}
-												>
-													Current Password:
-												</Typography>
-												<TextField
-													type="password"
-													variant="outlined"
-													size="small"
-													sx={{
-														ml: 1,
-														mt: 1,
-														width: "12em",
-														fontSize: ".8em",
-														fontFamily: "Poppins",
-													}}
-												/>
-												<Typography
-													color="text.secondary"
-													sx={{
-														fontFamily: "Poppins",
-														fontSize: ".8em",
-														ml: 3,
-														mt: 1,
-													}}
-												>
-													New Password:
-												</Typography>
-												<TextField
-													type="password"
-													variant="outlined"
-													size="small"
-													sx={{
-														ml: 1,
-														mt: 1,
-														width: "12em",
-														fontSize: ".8em",
-														fontFamily: "Poppins",
-													}}
-												/>
-											</div>
-											<div style={{ display: "flex", alignItems: "center" }}>
-												<Typography
-													color="text.secondary"
-													sx={{
-														fontFamily: "Poppins",
-														fontSize: ".8em",
-														ml: 3,
-														mt: 0.6,
-													}}
-												>
-													Confirm New Password:{" "}
-												</Typography>
-												<TextField
-													type="password"
-													variant="outlined"
-													size="small"
-													sx={{
-														ml: 1,
-														fontSize: ".8em",
-														width: "12.5em",
-														fontFamily: "Poppins",
-													}}
-												/>
-												<Button
-													variant="outlined"
-													sx={{
-														color: "#1E1E1E",
-														height: "2.3em",
-														width: "7em",
-														mr: 1,
-														ml: 5,
-														fontFamily: "Poppins",
-														backgroundColor: "transparent",
-														borderColor: "#E4E8EF",
-														padding: "1px 1px 0 0 ",
-														"&:hover": {
-															backgroundColor: "#E4E8EF",
-															borderColor: "#E4E8EF",
-															color: "#1E1E1E",
-														},
-													}}
-													style={{ textTransform: "none" }}
-													onClick={handleAccntPassClose}
-												>
-													Cancel
-												</Button>
-												<Button
-													variant="contained"
-													sx={{
-														height: "2.3em",
-														width: "7em",
-														mr: 2,
-														fontFamily: "Poppins",
-														backgroundColor: "#8c383e",
-														padding: "1px 1px 0 0 ",
-														"&:hover": {
-															backgroundColor: "#762F34",
-															color: "white",
-														},
-													}}
-													style={{ textTransform: "none" }}
-													startIcon={<SaveAsRoundedIcon />}
-												>
-													Save
-												</Button>
-											</div>
-										</div>
-									) : (
-										//for display only
 										<Typography
 											color="text.secondary"
 											sx={{
@@ -1192,7 +851,6 @@ function ViewProfilePage() {
 												**********
 											</span>
 										</Typography>
-									)}
 									<Grid
 										item
 										xs
@@ -1204,19 +862,6 @@ function ViewProfilePage() {
 											mt: 2,
 										}}
 									>
-										{!isAccntEditPassMode && (
-											<Tooltip title="Change Password" placement="right" arrow>
-												<IconButton onClick={handleAccntEditPassClick}>
-													<BorderColorRoundedIcon
-														sx={{
-															fontSize: ".8em",
-															color: "rgba(140, 56, 62, 0.5)",
-															"&:hover": { color: "#8c383e" },
-														}}
-													/>
-												</IconButton>
-											</Tooltip>
-										)}
 									</Grid>
 								</Grid>
 							</Paper>
@@ -1384,12 +1029,12 @@ function ViewProfilePage() {
 							>
 								{profilePictureUrl ? (
 									<Avatar
-										sx={{ width: "auto", height: "100%" }}
+										sx={{ width: "15em", height: "15em" }}
 										src={profilePictureUrl}
 										onClick={handleImageClick}
 									/>
 								) : (
-									<Avatar
+									<Avatar alt="User" src="/user.png"
 										sx={{ width: "15em", height: "15em" }}
 										onClick={handleImageClick}
 									/>
