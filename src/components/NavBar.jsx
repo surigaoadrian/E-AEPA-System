@@ -59,7 +59,7 @@ function NavBar() {
 
 		fetchUser();
 		
-	}, [loggedUserData]);
+	}, []);
 	
 	const handleLogout = () => {
 		localStorage.removeItem("token");
