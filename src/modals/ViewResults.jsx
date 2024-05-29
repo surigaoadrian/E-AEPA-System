@@ -310,7 +310,7 @@ const ViewResults = ({ open, onClose, employee }) => {
   <TableContainer sx={{ maxWidth: 'auto', maxHeight: '100%', mb: 2, mx: 1, border: '2px solid #ccc', borderRadius: '4px' }}>
     <Table size="small">
       <TableHead>
-        <TableRow >  {/* Adjust the height of the header row */}
+        <TableRow >  
           <TableCell sx={{fontFamily: 'Poppins'}}>Weight of Reference</TableCell>
           <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins'}} align="center">60%</TableCell>
           <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins'}} align="center">20%</TableCell>
@@ -319,7 +319,7 @@ const ViewResults = ({ open, onClose, employee }) => {
       </TableHead>
       <TableBody>
         <TableRow>  
-          <TableCell sx={{backgroundColor: 'grey', color: 'white', fontWeight: 'bold', fontFamily: 'Poppins'}}>Assessment Factor</TableCell>
+          <TableCell sx={{backgroundColor: 'grey', color: 'white', border: '1px solid #ccc', fontFamily: 'Poppins'}}>Assessment Factor</TableCell>
           <TableCell sx={{ backgroundColor: '#151515', color: 'white', fontWeight: 'bold', border: '1px solid #ccc', fontFamily: 'Poppins'}} align="center">Head</TableCell>
           <TableCell sx={{ backgroundColor: '#FF0000', color: 'white', fontWeight: 'bold',border: '1px solid #ccc', fontFamily: 'Poppins'}} align="center">Self</TableCell>
           <TableCell sx={{ backgroundColor: '#FCDC2A', color: 'black', fontWeight: 'bold',border: '1px solid #ccc', fontFamily: 'Poppins'}} align="center">Peer</TableCell>

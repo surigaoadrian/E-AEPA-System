@@ -16,7 +16,7 @@ const renderPin = (props) => {
 const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     return (
-      <div style={{ backgroundColor: '#fff', border: '1px solid #999', padding: '10px' }}>
+      <div style={{ backgroundColor: '#fff', border: '1px solid #999', padding: '8px', fontSize:'0.8em' }}>
         <p>Values-Based Performance: {payload[0].payload.valuesPerformance}</p>
         <p>Jobs-Based Performance: {payload[0].payload.jobsPerformance}</p>
       </div>
@@ -72,10 +72,10 @@ const Matrix = () => {
             <rect x="0" y="0" width="100%" height="100%" fill="url(#backgroundImage)" />
             
             <XAxis type="number" dataKey="valuesPerformance" name="Values-Based Performance" domain={[1, 5]}>
-              <Label value="Values-Based Performance" offset={-20} position="insideBottom" />
+              <Label value="Values-Based Performance" offset={-20} position="insideBottom" style={{ fontWeight:'bold',textAnchor: 'middle' }} />
             </XAxis>
             <YAxis type="number" dataKey="jobsPerformance" name="Jobs-Based Performance" domain={[1, 5]}>
-              <Label value="Jobs-Based Performance" angle={-90} position="insideLeft" offset={10} style={{ textAnchor: 'middle' }}/>
+              <Label value="Jobs-Based Performance" angle={-90} position="insideLeft" offset={10} style={{ fontWeight:'bold',textAnchor: 'middle' }}/>
             </YAxis>
             <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3' }} />
             <Scatter name="Employee Performance" data={employeeData} fill="#f00" shape={renderPin} />
