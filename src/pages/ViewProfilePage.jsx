@@ -3,7 +3,6 @@ import {Alert as MuiAlert, Avatar, Box, Button, Dialog, DialogActions, DialogCon
 import React, { useState, useEffect, useRef } from "react";
 import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
 import SaveAsRoundedIcon from "@mui/icons-material/SaveAsRounded";
-import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import axios from "axios";
 import HighlightOffOutlinedIcon from "@mui/icons-material/HighlightOffOutlined";
 import CameraAltOutlinedIcon from "@mui/icons-material/CameraAltOutlined";
