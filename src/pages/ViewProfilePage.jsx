@@ -67,10 +67,6 @@ function ViewProfilePage() {
 		setSaveDisabled(false);
 	};
 
-
-
-
-
 	const handleDetailsChange = (e) => {
 		const { name, value } = e.target;
 		const onlyLettersRegex = /^[A-Za-z]+$/;
@@ -198,6 +194,7 @@ function ViewProfilePage() {
 			setProfilePictureUrl(prevProfilePictureUrl); // Restore the previous profile picture URL
 		}
 	};
+	
 	const handleImageClick = () => {
 		inputRef.current.click();
 	};
@@ -921,7 +918,7 @@ function ViewProfilePage() {
 												{selectedUser.dateHired}
 											</span>
 										</Typography>
-										<Typography
+										{/* <Typography
 											color="text.secondary"
 											sx={{ fontFamily: "Poppins", mt: 2, fontSize: "1em" }}
 										>
@@ -929,7 +926,7 @@ function ViewProfilePage() {
 											<span style={{ color: "black" }}>
 												{selectedUser.signature}
 											</span>
-										</Typography>
+										</Typography> */}
 									</Grid>
 								</Grid>
 							</Grid>
@@ -1035,7 +1032,6 @@ function ViewProfilePage() {
 								</Button>
 							)}
 							{image && (
-								<>
 									<Box
 										sx={{
 											display: "flex",
@@ -1085,7 +1081,6 @@ function ViewProfilePage() {
 											Cancel
 										</Button>
 									</Box>
-								</>
 							)}
 						</DialogActions>
 					</DialogContent>
