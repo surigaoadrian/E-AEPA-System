@@ -89,7 +89,7 @@ function TrackEmployee() {
   const handleViewResultClick = (employee) => {
     console.log("Selected Employee:", employee);
     setSnackbarMessage(`Redirecting to view result for ${employee.name}`);
-    setSnackbarOpen(true);
+    setSnackbarOpen(false);
     setSelectedEmployee(employee);
     setViewRatingsModal(true);
   };
