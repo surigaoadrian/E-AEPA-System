@@ -52,6 +52,7 @@ public class UserService implements UserDetailsService {
         throw new RuntimeException("User not found.");
     }
 
+    //forgot password
     @Transactional
     public void generateResetPassTokenForUser(String email) {
         UserEntity user = userRepo.findByWorkEmail(email);
@@ -118,37 +119,6 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    // public String checkUsernameAvailabilityForEditAdmin(String username, String currentUsername){
-    //     if (username.equals(currentUsername)) {
-    //         return "Username is the same as current";
-    //     }
-    
-    //     boolean usernameExists = userRepo.existsByUsernameAndIsDeleted(username, 0);
-    
-    //     if (usernameExists) {
-    //         return "Username already exists";
-    //     } else {
-    //         return "Username is available";
-    //     }
-    // }
-
-        // // Service method to check email availability
-        // public String checkEmailAvailabilityForEditAdmin(String workEmail, String currentEmail) {
-        //     if (workEmail.equals(currentEmail)) {
-        //         return "Username is the same as current";
-        //     }
-
-        //     boolean emailExists = userRepo.existsByWorkEmailAndIsDeleted(workEmail, 0);
-    
-        //     if (emailExists) {
-        //         return "Email Address already exists";
-        //     } else {
-        //         return "Email Address is available";
-        //     }
-        // }
-
-
-
     // this method returns user details
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -210,33 +180,6 @@ public class UserService implements UserDetailsService {
             return userRepo.save(user);
         } catch (Exception e) {
             throw e; 
-        }
-    }
-
-    // for edit employee: account details
-    @Transactional
-    public UserEntity editAccountUnameDetails(int userID, UserEntity newDetails) {
-        UserEntity user = userRepo.findById(userID)
-                .orElseThrow(() -> new NoSuchElementException("User " + userID + " not found."));
-        try {
-            if (newDetails.getUsername() != null)
-                user.setUsername(newDetails.getUsername());
-            return userRepo.save(user);
-        } catch (Exception e) {
-            throw e; // rethrow or handle as appropriate
-        }
-    }
-
-    @Transactional
-    public UserEntity changeAccountPassDetails(int userID, UserEntity newDetails) {
-        UserEntity user = userRepo.findById(userID)
-                .orElseThrow(() -> new NoSuchElementException("User " + userID + " not found."));
-        try {
-            if (newDetails.getPassword() != null)
-                user.setPassword(newDetails.getPassword());
-            return userRepo.save(user);
-        } catch (Exception e) {
-            throw e; // rethrow or handle as appropriate
         }
     }
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Paper from "@mui/material/Paper";
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, FormControl, Grid, IconButton, InputLabel, MenuItem, Select, Snackbar, Tab, Tabs, TextField, Typography, Alert as MuiAlert, ListItem, ListItemIcon, Chip, } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, FormControl, Grid, IconButton, InputLabel, MenuItem, Select, Snackbar, Tab, Tabs, TextField, Typography, Alert as MuiAlert, ListItem, ListItemIcon, Chip, Tooltip, } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import HighlightOffOutlinedIcon from "@mui/icons-material/HighlightOffOutlined";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
@@ -456,7 +456,7 @@ function ManageAccount() {
         setUpdateFetch((prev) => !prev);
         setOpenRegistrationDialog(false);
       } else {
-        showErrorAlert("Failed to register user. User already exists.");
+        showErrorAlert("Failed to register user.");
       }
     } catch (error) {
       console.error("Network error", error);
@@ -504,12 +504,18 @@ function ManageAccount() {
   const handleUserDataChange = (e) => {
     const { name, value } = e.target;
 
+    // Check if the name is 'workID' and if the value is not a number
+    if (name === 'workID' && isNaN(value)) {
+      // Prevent updating the state
+      return;
+    }
 
     setSelectedUser((prevData) => ({
       ...prevData,
       [name]: value,
     }));
   };
+
 
   const handleEditUserSave = async (e, selectedUser) => {
     e.preventDefault();
@@ -661,7 +667,7 @@ function ManageAccount() {
       format: (value, row) => {
         return (
           <div>
-            <IconButton sx={{width:'1.5em'}}>
+            <IconButton sx={{ width: '1.5em' }}>
               <FontAwesomeIcon
                 icon={faPenToSquare}
                 style={{
@@ -672,7 +678,7 @@ function ManageAccount() {
                 onClick={() => handleClickEditBtn(row.userID)}
               />
             </IconButton>
-            <IconButton sx={{width:'1.5em'}}>
+            <IconButton sx={{ width: '1.5em' }}>
               <FontAwesomeIcon
                 icon={faTrash}
                 style={{
@@ -726,34 +732,36 @@ function ManageAccount() {
       align: "center",
       format: (value, row) => (
         <div>
-         <IconButton sx={{width:'1.5em'}}>
-              <FontAwesomeIcon
-                icon={faPenToSquare}
-                style={{
-                  color: "#8C383E",
-                  fontSize: "1.3rem",
-                  cursor: "pointer",
-                }}
-                onClick={() => handleClickEditBtn(row.userID)}
-              />
-            </IconButton>
-            <IconButton sx={{width:'1.5em'}}>
-              <FontAwesomeIcon
-                icon={faTrash}
-                style={{
-                  color: "#8C383E",
-                  fontSize: "1.3rem",
-                  cursor: "pointer",
-                }}
-                onClick={() => {
-                  handleClickDeleteBtn(row.userID);
-                }}
-              />
-            </IconButton>
+          <IconButton sx={{ width: '1.5em' }}>
+            <FontAwesomeIcon
+              icon={faPenToSquare}
+              style={{
+                color: "#8C383E",
+                fontSize: "1.3rem",
+                cursor: "pointer",
+              }}
+              onClick={() => handleClickEditBtn(row.userID)}
+            />
+          </IconButton>
+          <IconButton sx={{ width: '1.5em' }}>
+            <FontAwesomeIcon
+              icon={faTrash}
+              style={{
+                color: "#8C383E",
+                fontSize: "1.3rem",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                handleClickDeleteBtn(row.userID);
+              }}
+            />
+          </IconButton>
         </div>
       ),
     },
   ];
+
+
 
   return (
     <div>
@@ -908,7 +916,7 @@ function ManageAccount() {
                           <TextField size="small" required fullWidth placeholder="Password" type={showPassword ? "text" : "password"} id="password" onChange={handlePassword}
                             InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }}
                           />
-                          <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} onClick={handleShowPassword} style={{ color: "#636E72", position: "absolute", right: "17px", top: "50%", transform: "translateY(-41%)", cursor: "pointer", }} />
+                          <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} onClick={handleShowPassword} style={{ color: "#636E72", position: "absolute", right: "10px", top: "47%", transform: "translateY(-41%)", cursor: "pointer", }} />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                           {passwordStrong ? (
@@ -949,7 +957,7 @@ function ManageAccount() {
                           <TextField required size="small" fullWidth placeholder="Confirm Password" type={showConfirmPassword ? "text" : "password"} id="confirmpassword" onChange={handleConfirmPassword}
                             InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: ".8em", }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }}
                           />
-                          <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} onClick={handleShowConfirmPassword} style={{ color: "#636E72", position: "absolute", right: "17px", top: "50%", transform: "translateY(-41%)", cursor: "pointer", }}
+                          <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} onClick={handleShowConfirmPassword} style={{ color: "#636E72", position: "absolute", right: "10px", top: "47%", transform: "translateY(-41%)", cursor: "pointer", }}
                           />
 
                         </div>
@@ -1116,7 +1124,7 @@ function ManageAccount() {
                         <div style={{ position: "relative", width: "100%" }}>
                           <TextField size="small" required fullWidth label="Password" type={showPassword ? "text" : "password"} id="password" onChange={handlePassword}
                             InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: ".8em" }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }} />
-                          <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} onClick={handleShowPassword} style={{ color: "#636E72", position: "absolute", right: "17px", top: "50%", transform: "translateY(-41%)", cursor: "pointer", }} />
+                          <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} onClick={handleShowPassword} style={{ color: "#636E72", position: "absolute", right: "10px", top: "47%", transform: "translateY(-41%)", cursor: "pointer", }} />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                           {passwordStrong ? (
@@ -1157,7 +1165,7 @@ function ManageAccount() {
                           <TextField required size="small" fullWidth placeholder="Confirm Password" type={showConfirmPassword ? "text" : "password"} id="confirmpassword" onChange={handleConfirmPassword}
                             InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: ".8em", }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }}
                           />
-                          <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} onClick={handleShowConfirmPassword} style={{ color: "#636E72", position: "absolute", right: "17px", top: "50%", transform: "translateY(-41%)", cursor: "pointer", }}
+                          <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} onClick={handleShowConfirmPassword} style={{ color: "#636E72", position: "absolute", right: "10px", top: "47%", transform: "translateY(-41%)", cursor: "pointer", }}
                           />
 
                         </div>
@@ -1186,9 +1194,9 @@ function ManageAccount() {
               <Grid container>
                 <Grid item xs={12}>
                   <Grid container spacing={0.6} sx={{ fontFamily: "Poppins", fontWeight: "bold", color: "white", backgroundColor: "transparent", alignItems: "center", }}>
-                    <Grid item sx={{height:'2.2em', ml:'.5em',mt:'.3em' }}>
-                    <FontAwesomeIcon icon={faPenToSquare} sx={{ color: "white", fontSize: "1.5em"}} />
-                  </Grid>
+                    <Grid item sx={{ height: '2.2em', ml: '.5em', mt: '.3em' }}>
+                      <FontAwesomeIcon icon={faPenToSquare} sx={{ color: "white", fontSize: "1.5em" }} />
+                    </Grid>
                     <Grid item >Edit User Details</Grid>
                   </Grid>
                 </Grid>
@@ -1203,7 +1211,7 @@ function ManageAccount() {
                   <>
                     <Grid item xs={4}>
                       <Box style={{ fontFamily: "Poppins" }} height="100%">
-                        <TextField fullWidth size="small" label="First Name" id="fName" name="fName" value={selectedUser.fName} onChange={handleUserDataChange}
+                        <TextField required fullWidth size="small" label="First Name" id="fName" name="fName" value={selectedUser.fName} onChange={handleUserDataChange}
                           InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }}
                         />
                       </Box>
@@ -1216,15 +1224,18 @@ function ManageAccount() {
                     </Grid>
                     <Grid item xs={4}>
                       <Box style={{ fontFamily: "Poppins" }} >
-                        <TextField fullWidth size="small" label="Last Name" id="lName" value={selectedUser.lName} name="lName" onChange={handleUserDataChange}
+                        <TextField required fullWidth size="small" label="Last Name" id="lName" value={selectedUser.lName} name="lName" onChange={handleUserDataChange}
                           InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }} />
                       </Box>
                     </Grid>
                     <Grid item xs={6}>
-                      <Box >
-                        <TextField fullWidth size="small" label="Id Number" id="workId" name="workID" value={selectedUser.workID} onChange={handleUserDataChange}
-                          InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }} />
-                      </Box>
+                      <Tooltip title="ID Numbers should be numbers only" arrow>
+                        <Box >
+                          <TextField fullWidth size="small" label="Id Number" id="workId" name="workID" value={selectedUser.workID} onChange={handleUserDataChange}
+                            InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }} />
+                        </Box>
+                      </Tooltip>
+
                     </Grid>
                     <Grid item xs={6}>
                       <Box >
@@ -1271,13 +1282,28 @@ function ManageAccount() {
                         </Box>
                       </Grid>
                       <Grid item xs={6} sx={{ width: "100%" }}>
+
                         <Box sx={{ height: "100%" }}>
-                          <TextField fullWidth size="small" label="Employee ID" id="workId" name="workID" value={selectedUser.workID} onChange={handleUserDataChange}
-                            InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }} />
-                          {(workIDMsg) && (
-                            <FormHelperText style={{ color: "red", }}>{workIDMsg}</FormHelperText>
-                          )}
+                          <Tooltip title="ID Numbers should be numbers only" placement="left" arrow slotProps={{
+                            popper: {
+                              modifiers: [
+                                {
+                                  name: 'offset',
+                                  options: {
+                                    offset: [0, -14],
+                                  },
+                                },
+                              ],
+                            },
+                          }}
+                          >
+                            <TextField fullWidth size="small" label="ID Number" id="workId" name="workID" value={selectedUser.workID} onChange={handleUserDataChange}
+                              InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }} />
+                          </Tooltip>
                         </Box>
+
+
+
                       </Grid>
                       <Grid item xs={6}>
                         <Box>
@@ -1377,8 +1403,8 @@ function ManageAccount() {
             <Grid container>
               <Grid item xs={12}>
                 <Grid container spacing={0.6} sx={{ fontFamily: "Poppins", fontWeight: "bold", color: "white", backgroundColor: "transparent", alignItems: "center", }}>
-                  <Grid item sx={{height:'2em', ml:'.3em',mt:'.3em' }}>
-                    <FontAwesomeIcon icon={faTrash} sx={{ color: "white", fontSize: "1.5em"}} />
+                  <Grid item sx={{ height: '2em', ml: '.3em', mt: '.3em' }}>
+                    <FontAwesomeIcon icon={faTrash} sx={{ color: "white", fontSize: "1.5em" }} />
                   </Grid>
                   <Grid item >Delete User Account</Grid>
                 </Grid>
