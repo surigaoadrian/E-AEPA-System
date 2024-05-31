@@ -2,7 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import HomeShowcase from "./pages/HomeShowcase";
 import ViewProfilePage from "./pages/ViewProfilePage";
-import ViewProfilePageAdmin from "./pages/ViewProfilePageAdmin";
+import ViewProfilePageHead from "./pages/ViewProfilePageHead";
 import TakeEvaluationPage from "./pages/TakeEvaluationPage";
 import ViewRatingsPage from "./pages/ViewRatingsPage";
 import ManageAccount from "./pages/ManageAccount";
@@ -95,21 +95,14 @@ function App() {
           }
         />
         <Route
-          path="/ViewProfileAdmin"
+          path="/ViewProfileHead"
           element={
             <PrivateRoute requiredRoles={["HEAD"]}>
-              <ViewProfilePageAdmin />
+              <ViewProfilePageHead />
             </PrivateRoute>
           }
         />
-        <Route
-          path="/ViewProfileAdmin"
-          element={
-            <PrivateRoute requiredRoles={["HEAD"]}>
-              <ViewProfilePageAdmin />
-            </PrivateRoute>
-          }
-        />
+
       </Route>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/forgotPassword" element={<ForgotPasswordPage />} />
