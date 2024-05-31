@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Paper from "@mui/material/Paper";
-import { Box, Button, Grid, IconButton, Snackbar, Typography, Alert as MuiAlert, Tooltip, Menu, } from "@mui/material";
+import { Box, Button, Grid, Typography, Menu, } from "@mui/material";
 import MenuItem from '@mui/material/MenuItem';
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -8,7 +8,6 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import FormHelperText from "@mui/material/FormHelperText";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileLines } from "@fortawesome/free-solid-svg-icons";
 import Animated from "../components/motion";
@@ -20,7 +19,6 @@ function EvaluateEmployee() {
 
     const [selectedTab, setSelectedTab] = useState(0);
     const [updateFetch, setUpdateFetch] = useState(true);
-    const [selectedUser, setSelectedUser] = useState({});
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
     const handleClick = (event) => {
@@ -39,15 +37,14 @@ function EvaluateEmployee() {
                 const data = await response.json();
 
                 const processedData = data
-                    .filter((item) => item.role === "EMPLOYEE" )
+                    .filter((item) => item.role === "EMPLOYEE")
                     .map((item) => ({
                         ...item,
                         name: `${item.fName} ${item.lName}`,
                         userID: item.userID,
                     }));
-                
+
                 setRows(processedData);
-                setSelectedUser(processedData);
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -145,30 +142,28 @@ function EvaluateEmployee() {
                                 <Table stickyHeader aria-label="sticky table" size="small">
                                     <TableHead sx={{ height: "2em" }}>
                                         <TableRow>
-                                            {(selectedTab === 0 ? columnsEmployees : columnsAdmins).map(
-                                                (column) => (
-                                                    <TableCell sx={{
-                                                        fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: "bold", maxWidth: "2em",
-                                                    }} key={column.id} align={column.align} style={{ minWidth: column.minWidth }}>{column.label}</TableCell>
-                                                )
-                                            )}
+                                            {columnsEmployees.map((column) => (
+                                                <TableCell sx={{
+                                                    fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: "bold", maxWidth: "2em",
+                                                }} key={column.id} align={column.align} style={{ minWidth: column.minWidth }}>{column.label}</TableCell>
+                                            ))}
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
                                         {rows.map((row) => (
                                             <TableRow sx={{ bgcolor: 'white', "&:hover": { backgroundColor: "rgba(248, 199, 2, 0.5)", color: "black", }, }} key={row.id}>
-                                                {(selectedTab === 0 ? columnsEmployees : columnsAdmins)
-                                                    .map((column) => (
-                                                        <TableCell sx={{ fontFamily: "Poppins", }} key={`${row.id}-${column.id}`} align={column.align}>
-                                                            {column.id === "name" ? row.name : column.id === "actions" ? column.format ? column.format(row[column.id], row) : null : column.format ? column.format(row[column.id]) : row[column.id]}
-                                                        </TableCell>
-                                                    ))}
+                                                {columnsEmployees.map((column) => (
+                                                    <TableCell sx={{ fontFamily: "Poppins", }} key={`${row.id}-${column.id}`} align={column.align}>
+                                                        {column.id === "name" ? row.name : column.id === "actions" ? column.format ? column.format(row[column.id], row) : null : column.format ? column.format(row[column.id]) : row[column.id]}
+                                                    </TableCell>
+                                                ))}
                                             </TableRow>
                                         ))}
                                     </TableBody>
                                 </Table>
                             </TableContainer>
                         </Paper>
+
                     </Grid>
                 </Box>
             </Animated>
