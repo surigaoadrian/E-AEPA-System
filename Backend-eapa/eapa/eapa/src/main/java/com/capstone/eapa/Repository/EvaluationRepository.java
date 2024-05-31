@@ -1,3 +1,4 @@
+
 package com.capstone.eapa.Repository;
 
 import com.capstone.eapa.Entity.EvaluationEntity;
@@ -18,5 +19,6 @@ public interface EvaluationRepository extends JpaRepository<EvaluationEntity, In
     //Query to check evaluation status SELF and PEER
     @Query(value = "SELECT status FROM tblevaluation WHERE TRIM(user_id) = :userID AND TRIM(period) = :period AND TRIM(stage) = :stage AND TRIM(eval_type) = :evalType AND TRIM(is_deleted) = 0", nativeQuery = true)
     String findStatusByUserIDPeriodStageAndEvalType(int userID, String period, String stage, String evalType);
+
 
 }

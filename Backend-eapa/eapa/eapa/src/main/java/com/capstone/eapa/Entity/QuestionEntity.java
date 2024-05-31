@@ -86,5 +86,4 @@ public class QuestionEntity {
         this.isDeleted = isDeleted;
     }
 
-
 }

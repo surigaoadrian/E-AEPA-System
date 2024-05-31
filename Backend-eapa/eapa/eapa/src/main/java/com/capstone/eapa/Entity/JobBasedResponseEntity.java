@@ -1,3 +1,4 @@
+
 package com.capstone.eapa.Entity;
 
 import jakarta.persistence.*;
@@ -75,4 +76,5 @@ public class JobBasedResponseEntity {
     public void setIsDeleted(int isDeleted) {
         this.isDeleted = isDeleted;
     }
+
 }

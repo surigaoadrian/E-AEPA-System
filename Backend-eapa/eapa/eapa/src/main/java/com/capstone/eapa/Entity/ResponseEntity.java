@@ -99,4 +99,5 @@ public class ResponseEntity {
     public void setIsDeleted(int isDeleted) {
         this.isDeleted = isDeleted;
     }
+
 }

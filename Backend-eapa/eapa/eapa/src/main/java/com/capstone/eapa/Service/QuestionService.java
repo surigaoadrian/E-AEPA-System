@@ -1,3 +1,4 @@
+
 package com.capstone.eapa.Service;
 
 import com.capstone.eapa.Entity.QuestionEntity;
@@ -19,4 +20,5 @@ public class QuestionService {
     public List<QuestionEntity> getAllQuestions(){
         return quesRepo.findAllQuestions();
     }
+
 }

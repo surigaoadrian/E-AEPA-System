@@ -1,3 +1,4 @@
+
 package com.capstone.eapa.Repository;
 
 import com.capstone.eapa.Entity.QuestionEntity;
@@ -13,4 +14,5 @@ public interface ResponseRepository extends JpaRepository<ResponseEntity, Intege
 
     @Query(value = "SELECT * FROM tblresponse resp WHERE resp.is_deleted = 0", nativeQuery = true)
     List<ResponseEntity> findAllResponse();
+
 }
