@@ -16,7 +16,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import NotAuthorized from "./pages/NotAuthorized";
 import PrivateRoute from "./components/PrivateRoute";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
-import EmployeeProfile from "./pages/EmployeeProfile";
+import EvaluateEmployee from "./pages/EvaluateEmployee";
 
 function App() {
   return (
@@ -31,7 +31,7 @@ function App() {
           }
         />
 
-        <Route
+ <Route
           path="/viewProfile"
           element={
             <PrivateRoute requiredRoles={["EMPLOYEE"]}>
@@ -43,7 +43,7 @@ function App() {
         <Route
           path="/takeEvaluation"
           element={
-            <PrivateRoute requiredRoles={["EMPLOYEE", "HEAD"]}>
+            <PrivateRoute requiredRoles={["EMPLOYEE"]}>
               <TakeEvaluationPage />
             </PrivateRoute>
           }
@@ -85,6 +85,7 @@ function App() {
           }
         />
 
+
         <Route
           path="/TrackEmployee"
           element={
@@ -101,8 +102,14 @@ function App() {
             </PrivateRoute>
           }
         />
-
-      </Route>
+        <Route
+          path="/EvaluateEmployee"
+          element={
+            <PrivateRoute requiredRoles={["HEAD"]}>
+              <EvaluateEmployee />
+            </PrivateRoute>
+          }
+        />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/forgotPassword" element={<ForgotPasswordPage />} />
       <Route path="/resetPassword/:token" element={<ResetPasswordPage />} />
