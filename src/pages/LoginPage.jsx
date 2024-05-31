@@ -37,28 +37,36 @@ function LoginPage() {
 	const handleLogin = async (e) => {
 		e.preventDefault();
 		setMessage("");
+	
+		// Check if username or password is blank
+		if (!username || !password) {
+			setTimeout(() =>setMessage("Username or password is missing"),0);
+			return;
+		}
+	
 		try {
 			const response = await axios.post("http://localhost:8080/login", {
 				username: username,
 				password: password,
 			});
-
+	
 			const token = response.data.token;
 			localStorage.setItem("token", token);
-
+	
 			const decodedToken = jwtDecode(token);
 			const role = decodedToken.role;
 			const userID = decodedToken.userID;
-
+	
 			sessionStorage.setItem("userRole", role);
 			sessionStorage.setItem("userID", userID);
-
+	
 			navigate("/");
 		} catch (error) {
 			setTimeout(() => setMessage("Invalid username or password."), 0);
 			console.error("Login failed", error);
 		}
 	};
+	
 
 	const centerDiv = {
 		minHeight: "95vh",
