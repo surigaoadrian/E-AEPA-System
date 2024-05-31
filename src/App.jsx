@@ -31,50 +31,50 @@ function App() {
           }
         />
 
-				<Route
-					path="/viewProfile"
-					element={
-						<PrivateRoute requiredRoles={["EMPLOYEE"]}>
-							<ViewProfilePage />
-						</PrivateRoute>
-					}
-				/>
+        <Route
+          path="/viewProfile"
+          element={
+            <PrivateRoute requiredRoles={["EMPLOYEE"]}>
+              <ViewProfilePage />
+            </PrivateRoute>
+          }
+        />
 
-				<Route
-					path="/takeEvaluation"
-					element={
-						<PrivateRoute requiredRoles={["EMPLOYEE"]}>
-							<TakeEvaluationPage />
-						</PrivateRoute>
-					}
-				/>
+        <Route
+          path="/takeEvaluation"
+          element={
+            <PrivateRoute requiredRoles={["EMPLOYEE", "HEAD"]}>
+              <TakeEvaluationPage />
+            </PrivateRoute>
+          }
+        />
 
-				<Route
-					path="/viewRatings"
-					element={
-						<PrivateRoute requiredRoles={["EMPLOYEE"]}>
-							<ViewRatingsPage />
-						</PrivateRoute>
-					}
-				/>
+        <Route
+          path="/viewRatings"
+          element={
+            <PrivateRoute requiredRoles={["EMPLOYEE"]}>
+              <ViewRatingsPage />
+            </PrivateRoute>
+          }
+        />
 
-				<Route
-					path="/manageAccount"
-					element={
-						<PrivateRoute requiredRoles={["ADMIN"]}>
-							<ManageAccount />
-						</PrivateRoute>
-					}
-				/>
+        <Route
+          path="/manageAccount"
+          element={
+            <PrivateRoute requiredRoles={["ADMIN"]}>
+              <ManageAccount />
+            </PrivateRoute>
+          }
+        />
 
-				<Route
-					path="/manageOffices"
-					element={
-						<PrivateRoute requiredRoles={["ADMIN"]}>
-							<ManageOffices />
-						</PrivateRoute>
-					}
-				/>
+        <Route
+          path="/manageOffices"
+          element={
+            <PrivateRoute requiredRoles={["ADMIN"]}>
+              <ManageOffices />
+            </PrivateRoute>
+          }
+        />
 
         <Route
           path="/manageEmployee"
@@ -84,7 +84,6 @@ function App() {
             </PrivateRoute>
           }
         />
-
 
         <Route
           path="/TrackEmployee"

@@ -312,52 +312,6 @@ function EvaluationForm({
       let response = null;
       let updateEval = null;
 
-      // if (stage === "VALUES") {
-      //   response = await axios.post(
-      //     "http://localhost:8080/response/createResponses",
-      //     responses
-      //   );
-
-      //   updateEval = await axios.patch(
-      //     `http://localhost:8080/evaluation/updateEvaluation/${evaluationID}`,
-      //     evalPayload,
-      //     {
-      //       headers: {
-      //         "Content-Type": "application/json",
-      //       },
-      //     }
-      //   );
-      // } else if (stage === "JOB") {
-      //   response = await axios.post(
-      //     "http://localhost:8080/jobbasedresponse/createResponses",
-      //     jobResponses
-      //   );
-
-      //   updateEval = await axios.patch(
-      //     `http://localhost:8080/evaluation/updateEvaluation/${evaluationID}`,
-      //     evalPayload,
-      //     {
-      //       headers: {
-      //         "Content-Type": "application/json",
-      //       },
-      //     }
-      //   );
-      // }else if(stage === "VALUES" && evalType === "PEER"){
-      //   response = await axios.post(
-      //     "http://localhost:8080/response/createResponses",
-      //     responses
-      //   );
-
-      //   updateEval = await axios.patch(
-      //     `http://localhost:8080/evaluation/updateEvaluation/${evaluationID}`,
-      //     peerEvalPayload,
-      //     {
-      //       headers: {
-      //         "Content-Type": "application/json",
-      //       },
-      //     }
-      //   );
-      // }
       if (stage === "VALUES" && evalType === "PEER") {
         response = await axios.post(
           "http://localhost:8080/response/createResponses",
