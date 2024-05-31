@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Modal, Box, Typography, Divider, Paper, Table, TableHead,TableBody, TableCell, TableRow, TableContainer, Tabs, Tab } from '@mui/material';
 import Chart from 'react-apexcharts';
-import Matrix from "../components/Matrix";
+import Matrix from "../modals/Matrix";
+import ThirdMonthComments from "../modals/ThirdMonthComments";
+import FifthMonthComments from "../modals/FifthMonthComments";
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -151,7 +153,7 @@ const ViewResults = ({ open, onClose, employee }) => {
   };
   
   return (
-    <>
+
     <Modal
       open={open}
       onClose={onClose}
@@ -230,6 +232,10 @@ const ViewResults = ({ open, onClose, employee }) => {
                   <TableCell sx={{width: '40%',border: '1px solid #ccc' ,fontFamily: 'Poppins'}}>Employee Position</TableCell>
                   <TableCell sx={{border: '1px solid #ccc' ,fontFamily: 'Poppins'}}>ETO - Staff</TableCell>
                 </TableRow>
+                <TableRow>
+                      <TableCell sx={{width: '40%',border: '1px solid #ccc' ,fontFamily: 'Poppins'}}>Department</TableCell>
+                      <TableCell sx={{border: '1px solid #ccc' ,fontFamily: 'Poppins'}}>(ETO) Enrolment Technical Office</TableCell>
+                    </TableRow>
               </TableBody>
             </Table>
           </TableContainer>
@@ -243,14 +249,14 @@ const ViewResults = ({ open, onClose, employee }) => {
               <TableRow>
                 <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Weight</TableCell>
                 <TableCell sx={{ backgroundColor: '#151515', textAlign: 'center', color: 'white', fontWeight: 'bold', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Overall AEPA</TableCell>
-                <TableCell sx={{ backgroundColor: 'grey', color: 'black', border: '1px solid #ccc' }}></TableCell>
+                <TableCell sx={{ backgroundColor: 'grey', color: 'white', border: '1px solid #ccc', fontWeight: 'bold', fontSize:"1em" }}>4.70</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               <TableRow>
                 <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}>60%</TableCell>
                 <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }}>Values-Based Performance Assessment</TableCell>
-                <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}} align="right">4.50</TableCell>
+                <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}} align="right">5.00</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}>40%</TableCell>
@@ -265,24 +271,29 @@ const ViewResults = ({ open, onClose, employee }) => {
   
 
   {/* Rating Period Table */}
-    <TableContainer sx={{ maxWidth: 500, maxHeight: 220, mb: 2, mx: 1, border: '2px solid #ccc', borderRadius: '4px' }}>
-      <Table size="small">
-        <TableBody>
-          <TableRow>
-            <TableCell sx={{ width: '40%', backgroundColor: 'grey', color: 'white', fontWeight: 'bold', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Rating Period</TableCell>
-            <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold', border: '1px solid #ccc', fontFamily: 'Poppins' }}>3rd Month Evaluation</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell sx={{ width: '40%', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Date of Appraisal</TableCell>
-            <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }}>02/20/2024</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell sx={{ width: '40%', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Date Hired</TableCell>
-            <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }}>02/20/2024</TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-    </TableContainer>
+      {/* Rating Period Table */}
+      <TableContainer sx={{ maxWidth: 500, maxHeight: 220, mb: 2, mx: 1, border: '2px solid #ccc', borderRadius: '4px' }}>
+          <Table size="small">
+            <TableBody>
+              <TableRow>
+                <TableCell sx={{ width: '40%', backgroundColor: 'grey', color: 'white', fontWeight: 'bold', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Rating Period</TableCell>
+                <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold', border: '1px solid #ccc', fontFamily: 'Poppins' }}>3RD MONTH PERIOD EVALUATION</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell sx={{ width: '40%', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Date of Appraisal</TableCell>
+                <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }}>02/20/2024</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell sx={{ width: '40%', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Date Hired</TableCell>
+                <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }}>02/20/2024</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell sx={{ width: '40%', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Date of Review</TableCell>
+                <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }}>02/20/2024</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
 
 
           {/* Flex Container for Charts */}
@@ -310,37 +321,37 @@ const ViewResults = ({ open, onClose, employee }) => {
   <TableContainer sx={{ maxWidth: 'auto', maxHeight: '100%', mb: 2, mx: 1, border: '2px solid #ccc', borderRadius: '4px' }}>
     <Table size="small">
       <TableHead>
-        <TableRow >  {/* Adjust the height of the header row */}
-          <TableCell>Weight of Reference</TableCell>
+        <TableRow >  
+          <TableCell sx={{fontFamily: 'Poppins'}}>Weight of Reference</TableCell>
           <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins'}} align="center">60%</TableCell>
           <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins'}} align="center">20%</TableCell>
           <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins'}} align="center">20%</TableCell>
         </TableRow>
       </TableHead>
       <TableBody>
-        <TableRow>  {/* Adjust the height of the first body row */}
-          <TableCell sx={{backgroundColor: 'grey', color: 'white', fontWeight: 'bold'}}>Assessment Factor</TableCell>
+        <TableRow>  
+          <TableCell sx={{backgroundColor: 'grey', color: 'white', border: '1px solid #ccc', fontFamily: 'Poppins'}}>Assessment Factor</TableCell>
           <TableCell sx={{ backgroundColor: '#151515', color: 'white', fontWeight: 'bold', border: '1px solid #ccc', fontFamily: 'Poppins'}} align="center">Head</TableCell>
           <TableCell sx={{ backgroundColor: '#FF0000', color: 'white', fontWeight: 'bold',border: '1px solid #ccc', fontFamily: 'Poppins'}} align="center">Self</TableCell>
           <TableCell sx={{ backgroundColor: '#FCDC2A', color: 'black', fontWeight: 'bold',border: '1px solid #ccc', fontFamily: 'Poppins'}} align="center">Peer</TableCell>
         </TableRow>
-        <TableRow sx={{ height: '20px' }}>  {/* Adjust the height of the second body row */}
-          <TableCell>Values-Based Performance</TableCell>
-          <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins'}}>4.50</TableCell>
-          <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins'}}>4.50</TableCell>
-          <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins'}}>4.50</TableCell>
+        <TableRow>  
+          <TableCell sx={{fontFamily: 'Poppins'}}>Values-Based Performance</TableCell>
+          <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins',textAlign:'center'}}>4.50</TableCell>
+          <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins',textAlign:'center'}}>4.50</TableCell>
+          <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins',textAlign:'center'}}>4.50</TableCell>
         </TableRow>
-        <TableRow sx={{ height: '20px' }}>  {/* Adjust the height of the third body row */}
-          <TableCell>Job-Based Performance</TableCell>
-          <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins'}}></TableCell>
-          <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins'}}>5.00</TableCell>
-          <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins'}}></TableCell>
+        <TableRow>  
+          <TableCell sx={{ fontFamily: 'Poppins' }}>Job-Based Performance</TableCell>
+          <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins',textAlign:'center'}}></TableCell>
+          <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins',textAlign:'center'}}>5.00</TableCell>
+          <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins',textAlign:'center'}}></TableCell>
         </TableRow>
-        <TableRow sx={{ height: '20px' }}>  {/* Adjust the height of the fourth body row */}
-          <TableCell sx={{backgroundColor: 'grey', color: 'white', fontWeight: 'bold'}}>Reference Average</TableCell>
-          <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold',border: '1px solid #ccc', fontFamily: 'Poppins'}}></TableCell>
-          <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold',border: '1px solid #ccc', fontFamily: 'Poppins'}}>4.70</TableCell>
-          <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold',border: '1px solid #ccc', fontFamily: 'Poppins'}}>4.50</TableCell>
+        <TableRow>  
+          <TableCell sx={{backgroundColor: 'grey', color: 'white', fontWeight: 'bold', fontFamily: 'Poppins'}}>Reference Average</TableCell>
+          <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold',border: '1px solid #ccc', fontFamily: 'Poppins',textAlign:'center'}}></TableCell>
+          <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold',border: '1px solid #ccc', fontFamily: 'Poppins',textAlign:'center'}}>4.70</TableCell>
+          <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold',border: '1px solid #ccc', fontFamily: 'Poppins',textAlign:'center'}}>4.50</TableCell>
         </TableRow>
       </TableBody>
     </Table>
@@ -353,7 +364,7 @@ const ViewResults = ({ open, onClose, employee }) => {
     <Table size="small">
       <TableHead>
         <TableRow>
-        <TableCell sx={{backgroundColor: 'grey', color: 'white', fontWeight: 'bold'}}>Assessment Factor</TableCell>
+        <TableCell sx={{backgroundColor: 'grey', color: 'white', fontWeight: 'bold', fontFamily: 'Poppins'}}>Assessment Factor</TableCell>
           <TableCell sx={{ backgroundColor: '#151515', color: 'white', fontWeight: 'bold', border: '1px solid #ccc' , fontFamily: 'Poppins'}} align="center">Head</TableCell>
           <TableCell sx={{ backgroundColor: '#FF0000', color: 'white', fontWeight: 'bold',border: '1px solid #ccc' , fontFamily: 'Poppins'}} align="center">Self</TableCell>
           <TableCell sx={{ backgroundColor: '#FCDC2A', color: 'black', fontWeight: 'bold',border: '1px solid #ccc' , fontFamily: 'Poppins'}} align="center">Peer</TableCell>
@@ -361,34 +372,34 @@ const ViewResults = ({ open, onClose, employee }) => {
       </TableHead>
       <TableBody>
       <TableRow> 
-      <TableCell>Culture of Excellence</TableCell>
-          <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}>4.50</TableCell>
-          <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}>4.50</TableCell>
-          <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}>4.50</TableCell>
+      <TableCell sx={{fontFamily: 'Poppins'}}>Culture of Excellence</TableCell>
+          <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins',textAlign:'center'}}>4.50</TableCell>
+          <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins',textAlign:'center'}}>4.50</TableCell>
+          <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins',textAlign:'center'}}>4.50</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell>Integrity</TableCell>
-          <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}>4.50</TableCell>
-          <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}>4.50</TableCell>
-          <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}>4.50</TableCell>
+          <TableCell sx={{fontFamily: 'Poppins'}}>Integrity</TableCell>
+          <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins',textAlign:'center'}}>4.50</TableCell>
+          <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins',textAlign:'center'}}>4.50</TableCell>
+          <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins',textAlign:'center'}}>4.50</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell>Teamwork</TableCell>
-          <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}></TableCell>
-          <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}>5.00</TableCell>
-          <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}></TableCell>
+          <TableCell sx={{fontFamily: 'Poppins'}}>Teamwork</TableCell>
+          <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins',textAlign:'center'}}></TableCell>
+          <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins',textAlign:'center'}}>5.00</TableCell>
+          <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins',textAlign:'center'}}></TableCell>
         </TableRow>
         <TableRow>
-          <TableCell>Universality</TableCell>
-          <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}></TableCell>
-          <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}>5.00</TableCell>
-          <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}></TableCell>
+          <TableCell sx={{fontFamily: 'Poppins'}}>Universality</TableCell>
+          <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins',textAlign:'center'}}></TableCell>
+          <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins',textAlign:'center'}}>5.00</TableCell>
+          <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins',textAlign:'center'}}></TableCell>
         </TableRow>
         <TableRow>
-          <TableCell sx={{backgroundColor: 'grey', color: 'white', fontWeight: 'bold'}}>Overall VBPA</TableCell>
-          <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold',border: '1px solid #ccc' , fontFamily: 'Poppins'}}></TableCell>
-          <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold',border: '1px solid #ccc' , fontFamily: 'Poppins'}}>4.70</TableCell>
-          <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold',border: '1px solid #ccc' , fontFamily: 'Poppins'}}>4.50</TableCell>
+          <TableCell sx={{backgroundColor: 'grey', color: 'white', fontWeight: 'bold', fontFamily: 'Poppins'}}>Overall VBPA</TableCell>
+          <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold',border: '1px solid #ccc' , fontFamily: 'Poppins',textAlign:'center'}}></TableCell>
+          <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold',border: '1px solid #ccc' , fontFamily: 'Poppins',textAlign:'center'}}>4.70</TableCell>
+          <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold',border: '1px solid #ccc' , fontFamily: 'Poppins',textAlign:'center'}}>4.50</TableCell>
         </TableRow>
       </TableBody>
     </Table>
@@ -396,7 +407,8 @@ const ViewResults = ({ open, onClose, employee }) => {
   </Box>
 </Box>
 
-<Matrix/> 
+      <Matrix/> 
+      <ThirdMonthComments/>
         </TabPanel>
       </div>
 
@@ -439,6 +451,10 @@ const ViewResults = ({ open, onClose, employee }) => {
                       <TableCell sx={{width: '40%',border: '1px solid #ccc' ,fontFamily: 'Poppins'}}>Employee Position</TableCell>
                       <TableCell sx={{border: '1px solid #ccc' ,fontFamily: 'Poppins'}}>ETO - Staff</TableCell>
                     </TableRow>
+                    <TableRow>
+                      <TableCell sx={{width: '40%',border: '1px solid #ccc' ,fontFamily: 'Poppins'}}>Department</TableCell>
+                      <TableCell sx={{border: '1px solid #ccc' ,fontFamily: 'Poppins'}}>(ETO) Enrolment Technical Office</TableCell>
+                    </TableRow>
                   </TableBody>
                 </Table>
               </TableContainer>
@@ -449,11 +465,11 @@ const ViewResults = ({ open, onClose, employee }) => {
               <TableContainer sx={{ maxWidth: 500, height: 'auto', mb: 2, mx: 1, border: '2px solid #ccc', borderRadius: '4px' }}>
               <Table size="small">
                 <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Weight</TableCell>
-                    <TableCell sx={{ backgroundColor: '#151515', textAlign: 'center', color: 'white', fontWeight: 'bold', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Overall AEPA</TableCell>
-                    <TableCell sx={{ backgroundColor: 'grey', color: 'black', border: '1px solid #ccc' }}></TableCell>
-                  </TableRow>
+                <TableRow>
+                <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Weight</TableCell>
+                <TableCell sx={{ backgroundColor: '#151515', textAlign: 'center', color: 'white', fontWeight: 'bold', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Overall AEPA</TableCell>
+                <TableCell sx={{ backgroundColor: 'grey', color: 'white', border: '1px solid #ccc', fontWeight: 'bold', fontSize:"1em" }}>4.70</TableCell>
+              </TableRow>
                 </TableHead>
                 <TableBody>
                   <TableRow>
@@ -479,7 +495,7 @@ const ViewResults = ({ open, onClose, employee }) => {
             <TableBody>
               <TableRow>
                 <TableCell sx={{ width: '40%', backgroundColor: 'grey', color: 'white', fontWeight: 'bold', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Rating Period</TableCell>
-                <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold', border: '1px solid #ccc', fontFamily: 'Poppins' }}>5th Month Evaluation</TableCell>
+                <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold', border: '1px solid #ccc', fontFamily: 'Poppins' }}>5TH MONTH PERIOD EVALUATION</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell sx={{ width: '40%', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Date of Appraisal</TableCell>
@@ -487,6 +503,10 @@ const ViewResults = ({ open, onClose, employee }) => {
               </TableRow>
               <TableRow>
                 <TableCell sx={{ width: '40%', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Date Hired</TableCell>
+                <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }}>02/20/2024</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell sx={{ width: '40%', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Date of Review</TableCell>
                 <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }}>02/20/2024</TableCell>
               </TableRow>
             </TableBody>
@@ -535,21 +555,21 @@ const ViewResults = ({ open, onClose, employee }) => {
             </TableRow>
             <TableRow sx={{ height: '20px' }}>  {/* Adjust the height of the second body row */}
               <TableCell>Values-Based Performance</TableCell>
-              <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins'}}>4.50</TableCell>
-              <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins'}}>4.50</TableCell>
-              <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins'}}>4.50</TableCell>
+              <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins', textAlign: 'center'}}>4.50</TableCell>
+              <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins', textAlign: 'center'}}>4.50</TableCell>
+              <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins', textAlign: 'center'}}>4.50</TableCell>
             </TableRow>
             <TableRow sx={{ height: '20px' }}>  {/* Adjust the height of the third body row */}
               <TableCell>Job-Based Performance</TableCell>
-              <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins'}}></TableCell>
-              <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins'}}>5.00</TableCell>
-              <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins'}}></TableCell>
+              <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins', textAlign: 'center'}}>5.00</TableCell>
+              <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins', textAlign: 'center'}}>5.00</TableCell>
+              <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins', textAlign: 'center'}}></TableCell>
             </TableRow>
             <TableRow sx={{ height: '20px' }}>  {/* Adjust the height of the fourth body row */}
               <TableCell sx={{backgroundColor: 'grey', color: 'white', fontWeight: 'bold'}}>Reference Average</TableCell>
-              <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold',border: '1px solid #ccc', fontFamily: 'Poppins'}}></TableCell>
-              <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold',border: '1px solid #ccc', fontFamily: 'Poppins'}}>4.70</TableCell>
-              <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold',border: '1px solid #ccc', fontFamily: 'Poppins'}}>4.50</TableCell>
+              <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold',border: '1px solid #ccc', fontFamily: 'Poppins', textAlign: 'center'}}>4.70</TableCell>
+              <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold',border: '1px solid #ccc', fontFamily: 'Poppins', textAlign: 'center'}}>4.70</TableCell>
+              <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold',border: '1px solid #ccc', fontFamily: 'Poppins', textAlign: 'center'}}>4.50</TableCell>
             </TableRow>
           </TableBody>
         </Table>
@@ -571,53 +591,49 @@ const ViewResults = ({ open, onClose, employee }) => {
           <TableBody>
           <TableRow> 
           <TableCell>Culture of Excellence</TableCell>
-              <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}>4.50</TableCell>
-              <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}>4.50</TableCell>
-              <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}>4.50</TableCell>
+              <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins', textAlign: 'center'}}>4.50</TableCell>
+              <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins', textAlign: 'center'}}>4.50</TableCell>
+              <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins', textAlign: 'center'}}>4.50</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Integrity</TableCell>
-              <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}>4.50</TableCell>
-              <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}>4.50</TableCell>
-              <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}>4.50</TableCell>
+              <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins', textAlign: 'center'}}>4.50</TableCell>
+              <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins', textAlign: 'center'}}>4.50</TableCell>
+              <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins', textAlign: 'center'}}>4.50</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Teamwork</TableCell>
-              <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}></TableCell>
-              <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}>5.00</TableCell>
-              <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}></TableCell>
+              <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins', textAlign: 'center'}}></TableCell>
+              <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins', textAlign: 'center'}}>5.00</TableCell>
+              <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins', textAlign: 'center'}}></TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Universality</TableCell>
-              <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}></TableCell>
-              <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}>5.00</TableCell>
-              <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins'}}></TableCell>
+              <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins', textAlign: 'center'}}></TableCell>
+              <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins', textAlign: 'center'}}>5.00</TableCell>
+              <TableCell sx={{ border: '1px solid #ccc' , fontFamily: 'Poppins', textAlign: 'center'}}></TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{backgroundColor: 'grey', color: 'white', fontWeight: 'bold'}}>Overall VBPA</TableCell>
-              <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold',border: '1px solid #ccc' , fontFamily: 'Poppins'}}></TableCell>
-              <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold',border: '1px solid #ccc' , fontFamily: 'Poppins'}}>4.70</TableCell>
-              <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold',border: '1px solid #ccc' , fontFamily: 'Poppins'}}>4.50</TableCell>
+              <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold',border: '1px solid #ccc' , fontFamily: 'Poppins', textAlign: 'center'}}></TableCell>
+              <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold',border: '1px solid #ccc' , fontFamily: 'Poppins', textAlign: 'center'}}>4.70</TableCell>
+              <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold',border: '1px solid #ccc' , fontFamily: 'Poppins', textAlign: 'center'}}>4.50</TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </TableContainer>
       </Box>
     </Box>
-
+    <Matrix/> 
+      <FifthMonthComments/>
         </TabPanel>
       </div>
-
-   
-
-
 
       </Box>
     </Modal>
     
 
 
-    </>
     
   );
 };
