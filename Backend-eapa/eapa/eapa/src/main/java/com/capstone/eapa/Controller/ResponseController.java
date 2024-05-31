@@ -1,3 +1,4 @@
+
 package com.capstone.eapa.Controller;
 
 import com.capstone.eapa.Entity.ResponseEntity;
@@ -23,4 +24,5 @@ public class ResponseController {
     public List<ResponseEntity> getAllResponses(){
         return resServ.getAllResponse();
     }
+
 }

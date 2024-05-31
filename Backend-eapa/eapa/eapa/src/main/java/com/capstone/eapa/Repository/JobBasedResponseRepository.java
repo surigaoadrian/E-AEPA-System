@@ -1,3 +1,4 @@
+
 package com.capstone.eapa.Repository;
 
 import com.capstone.eapa.Entity.JobBasedResponseEntity;
@@ -12,4 +13,5 @@ public interface JobBasedResponseRepository extends JpaRepository<JobBasedRespon
 
     @Query(value = "SELECT * FROM tbljobbasedresponse resp WHERE resp.is_deleted = 0", nativeQuery = true)
     List<JobBasedResponseEntity> findAllResponse();
+
 }

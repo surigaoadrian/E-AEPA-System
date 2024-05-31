@@ -1,3 +1,4 @@
+
 package com.capstone.eapa.Entity;
 
 import jakarta.persistence.*;
@@ -111,4 +112,5 @@ public class EvaluationEntity {
     public void setIsDeleted(int isDeleted) {
         this.isDeleted = isDeleted;
     }
+
 }

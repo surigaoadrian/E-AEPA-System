@@ -1,3 +1,4 @@
+
 package com.capstone.eapa.Repository;
 
 import com.capstone.eapa.Entity.QuestionEntity;
@@ -11,4 +12,5 @@ import java.util.List;
 public interface QuestionRepository extends JpaRepository<QuestionEntity, Integer> {
     @Query(value = "SELECT * FROM tblquestions ques WHERE ques.is_deleted = 0", nativeQuery = true)
     List<QuestionEntity> findAllQuestions();
+
 }

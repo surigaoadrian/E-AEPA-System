@@ -1,3 +1,4 @@
+
 package com.capstone.eapa.Controller;
 
 import com.capstone.eapa.Entity.JobBasedResponseEntity;
@@ -23,5 +24,6 @@ public class JobBasedResponseController {
     public List<JobBasedResponseEntity> getAllResponses(){
         return jbrespServ.getAllResponse();
     }
+
 
 }
