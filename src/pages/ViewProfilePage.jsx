@@ -6,6 +6,7 @@ import SaveAsRoundedIcon from "@mui/icons-material/SaveAsRounded";
 import axios from "axios";
 import HighlightOffOutlinedIcon from "@mui/icons-material/HighlightOffOutlined";
 import CameraAltOutlinedIcon from "@mui/icons-material/CameraAltOutlined";
+import Animated from "../components/motion";
 
 const CustomAlert = ({ open, onClose, severity, message }) => {
 	return (
@@ -19,13 +20,22 @@ const CustomAlert = ({ open, onClose, severity, message }) => {
 				elevation={6}
 				variant="filled"
 				severity={severity}
-				style={{ fontFamily: "Poppins" }}
+				style={{ fontFamily: "Poppins", fontWeight: 500 }}
 			>
 				{" "}
 				{message}{" "}
 			</MuiAlert>
 		</Snackbar>
 	);
+};
+
+const formatDate = (dateString) => {
+	const date = new Date(dateString);
+	return date.toLocaleDateString("en-US", {
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+	});
 };
 
 function ViewProfilePage() {
@@ -238,12 +248,12 @@ function ViewProfilePage() {
 	};
 
 	return (
-		<div>
+		<Animated>
 			<Grid container>
 				<Grid item xs={6}>
 					<Typography
-						ml={5}
-						mt={4}
+						ml={6}
+						mt={2}
 						sx={{
 							fontFamily: "Poppins",
 							fontWeight: "bold",
@@ -258,7 +268,7 @@ function ViewProfilePage() {
 				sx={{
 					display: "flex",
 					flexWrap: "wrap",
-					"& > :not(style)": { ml: 2, width: "97%" },
+					"& > :not(style)": { ml: 1.5, width: "97%" },
 				}}
 			>
 				<Grid
@@ -278,6 +288,7 @@ function ViewProfilePage() {
 							height: "10em",
 							mt: 2.5,
 							ml: 3,
+							boxShadow: "2px 2px 10px rgba(0, 0, 0, 0.3)",
 						}}
 					>
 						<Grid container spacing={2}>
@@ -311,7 +322,7 @@ function ViewProfilePage() {
 									spacing={2}
 									sx={{ ml: 2 }}
 								>
-									<Grid item xs sx={{ mt: 3 }}>
+									<Grid item xs sx={{ mt: 2.5 }}>
 										<Typography
 											gutterBottom
 											component="div"
@@ -328,7 +339,13 @@ function ViewProfilePage() {
 											sx={{ fontFamily: "Poppins", fontSize: ".9em" }}
 										>
 											Employee ID:{" "}
-											<span style={{ color: "black", fontWeight: 500, }}>
+											<span
+												style={{
+													color: "black",
+													fontWeight: 500,
+													fontSize: "15px",
+												}}
+											>
 												{selectedUser.workID}
 											</span>
 										</Typography>
@@ -337,7 +354,13 @@ function ViewProfilePage() {
 											sx={{ fontFamily: "Poppins", mt: 1, fontSize: ".9em" }}
 										>
 											Position:{" "}
-											<span style={{ color: "black", fontWeight: 500, }}>
+											<span
+												style={{
+													color: "black",
+													fontWeight: 500,
+													fontSize: "15px",
+												}}
+											>
 												{selectedUser.position}
 											</span>
 										</Typography>
@@ -346,7 +369,13 @@ function ViewProfilePage() {
 											sx={{ fontFamily: "Poppins", mt: 1, fontSize: ".9em" }}
 										>
 											Department:{" "}
-											<span style={{ color: "black", fontWeight: 500, }}>
+											<span
+												style={{
+													color: "black",
+													fontWeight: 500,
+													fontSize: "15px",
+												}}
+											>
 												{selectedUser.dept}{" "}
 											</span>
 										</Typography>
@@ -367,7 +396,8 @@ function ViewProfilePage() {
 														selectedUser.empStatus === "Regular"
 															? "green"
 															: "red",
-                              fontWeight: 500,
+													fontWeight: 500,
+													fontSize: "15px",
 												}}
 											>
 												{selectedUser.empStatus}
@@ -384,7 +414,7 @@ function ViewProfilePage() {
 													}}
 												>
 													Probationary Status:{" "}
-													<span style={{ color: "black", fontWeight: 500, }}>
+													<span style={{ color: "black", fontWeight: 500 }}>
 														{selectedUser.probeStatus}
 													</span>
 												</Typography>
@@ -397,7 +427,7 @@ function ViewProfilePage() {
 													}}
 												>
 													Probationary Date Started:{" "}
-													<span style={{ color: "black", fontWeight: 500, }}>
+													<span style={{ color: "black", fontWeight: 500 }}>
 														{selectedUser.dateStarted}
 													</span>
 												</Typography>
@@ -415,8 +445,9 @@ function ViewProfilePage() {
 								sx={{
 									borderRadius: "5px",
 									width: "99%",
-									height: "12.5em",
+									height: "12.4em",
 									ml: 3,
+									boxShadow: "2px 2px 5px rgba(0, 0, 0, 0.3)",
 								}}
 							>
 								<Grid item xs={12} sm container>
@@ -672,7 +703,13 @@ function ViewProfilePage() {
 															}}
 														>
 															First Name:{" "}
-															<span style={{ color: "black", fontWeight: 500 }}>
+															<span
+																style={{
+																	color: "black",
+																	fontWeight: 500,
+																	fontSize: "16px",
+																}}
+															>
 																{selectedUser.fName}
 															</span>
 														</Typography>
@@ -744,8 +781,9 @@ function ViewProfilePage() {
 								sx={{
 									borderRadius: "5px",
 									width: "99%",
-									height: "12.5em",
+									height: "12.4em",
 									ml: 2.7,
+									boxShadow: "2px 2px 5px rgba(0, 0, 0, 0.3)",
 								}}
 							>
 								<Grid item xs={12} sm container>
@@ -830,9 +868,10 @@ function ViewProfilePage() {
 						sx={{
 							borderRadius: "5px",
 							width: "100%",
-							height: "13em",
+							height: "13.5em",
 							mt: 0.8,
 							ml: 3,
+							boxShadow: "2px 2px 5px rgba(0, 0, 0, 0.3)",
 						}}
 					>
 						<Grid container spacing={2}>
@@ -914,7 +953,7 @@ function ViewProfilePage() {
 										>
 											Date Hired:{" "}
 											<span style={{ color: "black", fontWeight: 500 }}>
-												{selectedUser.dateHired}
+												{formatDate(selectedUser.dateHired)}
 											</span>
 										</Typography>
 										{/* <Typography
@@ -1035,7 +1074,7 @@ function ViewProfilePage() {
 										sx={{
 											display: "flex",
 											width: "100%",
-											gap: 2,
+											gap: 1,
 											flexDirection: "column",
 										}}
 									>
@@ -1047,13 +1086,15 @@ function ViewProfilePage() {
 												bgcolor: "#8C383E",
 												color: "white",
 												fontSize: "1em",
-												width: "100%",
+												width: "80%",
 												"&:hover": {
 													backgroundColor: "#762F34",
 													color: "white",
 												},
+												textTransform: "none",
+												fontFamily: "Poppins",
+												ml: 5,
 											}}
-											style={{ textTransform: "none", fontFamily: "Poppins" }}
 											onClick={handleSavePicture}
 										>
 											Save Picture
@@ -1066,15 +1107,17 @@ function ViewProfilePage() {
 												borderRadius: "5px",
 												borderColor: "#E0E0E0",
 												fontSize: "1em",
-												color: "#B4B4B4",
-												width: "100%",
+												color: "#1E1E1E",
+												width: "80%",
 												"&:hover": {
 													bgcolor: "#E0E0E0",
 													color: "#1E1E1E",
 													borderColor: "#E0E0E0",
 												},
+												ml: 5,
+												textTransform: "none",
+												fontFamily: "Poppins",
 											}}
-											style={{ textTransform: "none", fontFamily: "Poppins" }}
 											onClick={handleCancel}
 										>
 											Cancel
@@ -1100,7 +1143,7 @@ function ViewProfilePage() {
 				severity="error"
 				message={errorAlert.message}
 			/>
-		</div>
+		</Animated>
 	);
 }
 

@@ -293,7 +293,7 @@ function ManageAccount() {
           } else if (selectedTab === 1) {
             return item.role === "ADMIN";
           }
-        });
+        }).sort((a, b) => b.userID - a.userID);
         const processedData = filteredData.map((item) => ({
           ...item,
           name: `${item.fName} ${item.lName}`,
@@ -1431,3 +1431,6 @@ function ManageAccount() {
   );
 }
 export default ManageAccount;
+
+
+

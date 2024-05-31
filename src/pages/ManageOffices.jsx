@@ -16,7 +16,8 @@ import {
 	MenuItem,
 	Snackbar,
 	TextField,
-  InputAdornment,
+	InputAdornment,
+	Button,
 } from "@mui/material";
 import axios from "axios";
 import Animated from "../components/motion";
@@ -186,19 +187,13 @@ const ManageOffices = () => {
 		toggleConfirmationDialog(deptId);
 	};
 	//Department Mapping
-	const departmentFullNames = {
-		MIS: "Management Information Systems",
-		HRD: "Human Resources Department",
-		PCO: "Property Custodian Office",
-		FD: "Finance Department",
-	};
 
 	//View Department Details
 	const handleRowDoubleClick = (department) => {
 		const usersInDepartment = allUsers.filter(
 			(user) => user.dept === department.deptName
 		);
-		const deptFullName = departmentFullNames[department.deptName];
+		const deptFullName = [department.deptName];
 		const secretary = usersInDepartment.find(
 			(user) => user.position === "Secretary" || user.position === "secretary"
 		);
@@ -329,7 +324,10 @@ const ManageOffices = () => {
 		return (
 			<Animated>
 				<div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
-					<div className="bg-white rounded-lg shadow-md w-2/4">
+					<div
+						className="bg-white rounded-lg shadow-md "
+						style={{ width: "35%" }}
+					>
 						<div
 							className="p-2 font-bold text-lg text-white rounded-t-lg"
 							style={{ backgroundColor: "#8C383E", border: "none" }}
@@ -350,7 +348,7 @@ const ManageOffices = () => {
 								<div className="mb-4">
 									<label
 										htmlFor="deptName"
-										className="block text-sm font-medium text-gray-700"
+										style={{fontSize: "14px",  color: "#515151"}}
 									>
 										Department Name
 									</label>
@@ -369,9 +367,9 @@ const ManageOffices = () => {
 								<div className="mb-4 mt-5">
 									<label
 										htmlFor="deptOfficeHead"
-										className="block text-base font-medium text-gray-700"
+										style={{fontSize: "14px",  color: "#515151"}}
 									>
-										Department Office Head:
+										Assigned Office Head:
 										<span className="font-medium text-black ml-4">
 											{" "}
 											{editedDepartment.deptOfficeHead}{" "}
@@ -379,20 +377,43 @@ const ManageOffices = () => {
 									</label>
 								</div>
 								<div className="mt-2 flex justify-end">
-									<button
-										type="submit"
-										className="text-white px-3 py-1 w-auto rounded mr-2"
-										style={{ backgroundColor: "#8C383E", border: "none" }}
-									>
-										Save
-									</button>
-									<button
+									<Button
 										type="button"
-										className="bg-gray-300 text-gray-700 px-3 w-auto py-1 rounded"
+										variant="outlined"
 										onClick={onClose}
+										sx={{
+											marginRight: "8px",
+											borderColor: "#B4B4B4",
+											color: "#1E1E1E",
+											width: "18%",
+											textTransform: "none",
+											fontFamily: "Poppins",
+											"&:hover": {
+												backgroundColor: "#ECECEE",
+												borderColor: "#ECECEE",
+												color: "#1E1E1E",
+											},
+										}}
 									>
 										Cancel
-									</button>
+									</Button>
+									<Button
+										type="submit"
+										variant="contained"
+										color="primary"
+										sx={{
+											backgroundColor: "#8C383E",
+											width: "18%",
+											borderRadius: "5px 5px",
+											textTransform: "none",
+											fontFamily: "Poppins",
+											"&:hover": {
+												backgroundColor: "#762F34",
+											},
+										}}
+									>
+										Add
+									</Button>
 								</div>
 							</form>
 						</div>
@@ -413,7 +434,7 @@ const ManageOffices = () => {
 				</label>
 				<div className="ml-8 mt-2">
 					<div className="mr-10 mb-4 flex items-center justify-between">
-						<div className="ml-4 flex items-center justify-start" > 
+						<div className="ml-4 flex items-center justify-start">
 							<TextField
 								placeholder="Search Department..."
 								value={searchTerm}
@@ -421,22 +442,19 @@ const ManageOffices = () => {
 								sx={{
 									"& .MuiOutlinedInput-root": {
 										backgroundColor: "#ffffff", // Set the background color for the entire input area
-									  },
+									},
 									"& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
 										borderWidth: "1px",
 										borderColor: "#e0e0e0",
-										
 									},
 									"&:hover .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
 										{
 											borderColor: "#e0e0e0",
-											
 										},
 									"&:focus-within": {
 										"& fieldset": {
 											borderColor: "#8C383E !important",
 											borderWidth: "1px !important",
-											
 										},
 									},
 									"& .MuiInputBase-input": {
@@ -444,8 +462,7 @@ const ManageOffices = () => {
 										fontSize: "13px",
 										fontFamily: "Poppins",
 									},
-                  minWidth:"110%",
-								
+									minWidth: "110%",
 								}}
 								InputProps={{
 									startAdornment: (
@@ -461,25 +478,28 @@ const ManageOffices = () => {
 						</div>
 
 						<div className="flex items-center">
-							<button
-								className="flex items-center text-white px-3 py-2 rounded"
-								style={{ backgroundColor: "#8C383E", border: "none" }}
+							<Button
+								variant="contained"
+								sx={{
+									backgroundColor: "#8C383E",
+									"&:hover": { backgroundColor: "#732D32" },
+									color: "white",
+									fontFamily: "Poppins",
+									textTransform: "none",
+									borderRadius: "5px 5px",
+								}}
+								startIcon={
+									<FontAwesomeIcon
+										icon={faCirclePlus}
+										style={{ fontSize: "1.2rem" }}
+									/>
+								}
 								onClick={handleAddDepartment}
 							>
-								<FontAwesomeIcon
-									icon={faCirclePlus}
-									className="mr-2"
-									style={{
-										cursor: "pointer",
-										color: "white",
-										fontSize: "1.3rem",
-									}}
-								/>
-								<span className="text-sm">Add Department</span>
-							</button>
+								Add Department
+							</Button>
 						</div>
 					</div>
-
 					<div
 						className="mr-10 ml-4 rounded-lg border border-gray-200"
 						style={{ position: "relative", height: "423px" }}
@@ -531,7 +551,9 @@ const ManageOffices = () => {
 														activeRow === dept.deptID
 															? "#FFECA1"
 															: "transparent",
-													transition: "background-color 0.1s ease", // Optional: Add transition for smoother effect
+													transition: "background-color 0.1s ease",
+													fontFamily: "Poppins",
+													fontWeight: 500,
 												}}
 												onMouseEnter={() => setActiveRow(dept.deptID)}
 												onMouseLeave={() => setActiveRow(null)}
@@ -657,7 +679,7 @@ const ManageOffices = () => {
 					<div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
 						<div className="bg-white rounded-lg shadow-md w-auto h-44">
 							<div
-								className="p-2 font-bold text-lg text-white rounded-t-lg"
+								className="p-2 font-medium text-lg text-white rounded-t-lg"
 								style={{ backgroundColor: "#8C383E", border: "none" }}
 							>
 								<FontAwesomeIcon
@@ -668,25 +690,49 @@ const ManageOffices = () => {
 								Delete Department
 							</div>
 
-							<div className="p-4">
-								<p className="mt-2 mb-5">
+							<div className="p-5">
+								<p className="mt-1 mb-5">
 									Are you sure you want to delete this department?
 								</p>
 								<Divider />
 								<div className="mt-4 mb-4 flex justify-end">
-									<button
-										className="text-white px-3 py-1 w-14 rounded mr-2"
-										style={{ backgroundColor: "#8C383E", border: "none" }}
-										onClick={confirmDeleteDepartment}
-									>
-										Yes
-									</button>
-									<button
-										className="bg-gray-300 text-gray-700 px-3 w-14 py-1 rounded"
-										onClick={() => toggleConfirmationDialog()}
-									>
-										No
-									</button>
+								<Button
+											type="button"
+											variant="outlined"
+											onClick={() => toggleConfirmationDialog()}
+											sx={{
+												marginRight: "8px",
+												borderColor: "#B4B4B4",
+												color: "#1E1E1E",
+												width: "18%",
+												textTransform: "none",
+												fontFamily: "Poppins",
+												"&:hover": {
+													backgroundColor: "#ECECEE",
+													borderColor: "#ECECEE",
+													color: "#1E1E1E",
+												},
+											}}
+										>
+											Cancel
+										</Button>
+										<Button
+											onClick={confirmDeleteDepartment}
+											variant="contained"
+											color="primary"
+											sx={{
+												backgroundColor: "#8C383E",
+												width: "18%",
+												borderRadius: "5px 5px",
+												textTransform: "none",
+												fontFamily: "Poppins",
+												"&:hover": {
+													backgroundColor: "#762F34",
+												},
+											}}
+										>
+											Yes
+										</Button>
 								</div>
 							</div>
 						</div>
@@ -739,16 +785,16 @@ const ManageOffices = () => {
 											name="deptName"
 											value={departmentFormData.deptName}
 											onChange={handleDepartmentFormChange}
-											className="mt-1 p-2 border border-gray-300 rounded-md w-full"
+											className="mt-1 p-3 border border-gray-300 rounded-md w-full text-sm"
 											required
 										/>
 									</div>
 									<FormControl fullWidth className="mb-4">
 										<label
 											htmlFor="deptOfficeHead"
-											className="mb-2 block text-sm font-medium text-gray-700"
+											className="mb-2 block text-sm font-medium text-gray-900"
 										>
-											Department Office Head
+											Assign Office Head
 										</label>
 										<Select
 											id="deptOfficeHead"
@@ -759,30 +805,62 @@ const ManageOffices = () => {
 											displayEmpty
 										>
 											<MenuItem value="" disabled>
-												<em className="text-gray-700">Select an Office Head</em>
+												<span
+													className="text-gray-700"
+													style={{ fontSize: "13px", color: "#B4B4B4" }}
+												>
+													Select an Office Head
+												</span>
 											</MenuItem>
 											{departmentOfficeHead.map((head) => (
-												<MenuItem key={head.id} value={head.name}>
+												<MenuItem
+													key={head.id}
+													value={head.name}
+													style={{ fontFamily: "Poppins", fontWeight: 500 }}
+												>
 													{head.name}
 												</MenuItem>
 											))}
 										</Select>
 									</FormControl>
 									<div className="mt-2 flex justify-end">
-										<button
-											type="submit"
-											className="text-white px-3 py-1 w-auto rounded mr-2"
-											style={{ backgroundColor: "#8C383E", border: "none" }}
-										>
-											Add
-										</button>
-										<button
+										<Button
 											type="button"
-											className="bg-gray-300 text-gray-700 px-3 w-auto py-1 rounded"
+											variant="outlined"
 											onClick={() => setShowAddDepartmentModal(false)}
+											sx={{
+												marginRight: "8px",
+												borderColor: "#B4B4B4",
+												color: "#1E1E1E",
+												width: "18%",
+												textTransform: "none",
+												fontFamily: "Poppins",
+												"&:hover": {
+													backgroundColor: "#ECECEE",
+													borderColor: "#ECECEE",
+													color: "#1E1E1E",
+												},
+											}}
 										>
 											Cancel
-										</button>
+										</Button>
+										<Button
+											type="submit"
+											variant="contained"
+											color="primary"
+											sx={{
+												backgroundColor: "#8C383E",
+												width: "18%",
+												borderRadius: "5px 5px",
+												textTransform: "none",
+												fontFamily: "Poppins",
+												"&:hover": {
+													backgroundColor: "#762F34",
+												},
+											}}
+										>
+											Add
+										</Button>
 									</div>
 								</form>
 							</div>
@@ -861,7 +939,7 @@ const ManageOffices = () => {
 					open={snackbar.open}
 					autoHideDuration={3000}
 					onClose={() => setSnackbar({ ...snackbar, open: false })}
-					anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+					anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
 				>
 					<Alert
 						variant="filled"
