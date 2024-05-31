@@ -31,7 +31,7 @@ function App() {
           }
         />
 
-        <Route
+ <Route
           path="/viewProfile"
           element={
             <PrivateRoute requiredRoles={["EMPLOYEE"]}>
@@ -110,8 +110,6 @@ function App() {
             </PrivateRoute>
           }
         />
-
-      </Route>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/forgotPassword" element={<ForgotPasswordPage />} />
       <Route path="/resetPassword/:token" element={<ResetPasswordPage />} />
