@@ -24,50 +24,51 @@ public class SecurityConfig {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        return http
-//                .csrf(AbstractHttpConfigurer::disable)
-//                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                .build();
-//    }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(
-                        req->req.requestMatchers(
-                                "/login/**",
-                                        "/register/**",
-                                        "user/getAllUser",
-                                        "user/getUser/**",
-                                        "user/editUser/**",
-                                        "user/delete/**",
-                                        "user/checkUsername/**",
-                                        "user/checkEmail/**",
-                                        "/auth/forgotPassword/**",
-                                        "/auth/resetPassword/**",
-                                        "department/getAllDepts",
-                                        "department/getDept/**",
-                                        "department/deleteDept/**",
-                                        "department/addDept",
-                                        "department/updateDept",
-                                        "user/editAccountUsername/**",
-                                        "user/editPersonalDetails/**",
-                                        "user/uploadImage/**",
-                                        "user/image/**",
-                                        "department/updateDept"
-                                        )
-                                .permitAll()
-                                .anyRequest()
-                                .authenticated()
-                ).userDetailsService(userService)
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
+
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        return http
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .authorizeHttpRequests(
+//                        req->req.requestMatchers(
+//                                "/login/**",
+//                                        "/register/**",
+//                                        "user/getAllUser",
+//                                        "user/getUser/**",
+//                                        "user/editUser/**",
+//                                        "user/delete/**",
+//                                        "user/checkUsername/**",
+//                                        "user/checkEmail/**",
+//                                        "/auth/forgotPassword/**",
+//                                        "/auth/resetPassword/**",
+//                                        "department/getAllDepts",
+//                                        "department/getDept/**",
+//                                        "department/deleteDept/**",
+//                                        "department/addDept",
+//                                        "department/updateDept",
+//                                        "user/editAccountUsername/**",
+//                                        "user/editPersonalDetails/**",
+//                                        "user/uploadImage/**",
+//                                        "user/image/**",
+//                                        "department/updateDept"
+
+//                                        )
+//                                .permitAll()
+//                                .anyRequest()
+//                                .authenticated()
+//                ).userDetailsService(userService)
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+//                .build();
+//    }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
