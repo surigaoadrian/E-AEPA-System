@@ -16,6 +16,7 @@ import Fade from '@mui/material/Fade';
 
 function EvaluateEmployee() {
     const userID = sessionStorage.getItem("userID");
+    const [user, setUser] = useState({});
     const [rows, setRows] = useState([]);
     const [updateFetch, setUpdateFetch] = useState(true);
     const [anchorEl, setAnchorEl] = useState(null);
@@ -36,7 +37,7 @@ function EvaluateEmployee() {
                   throw new Error("Failed to fetch user data");
                 }
                 const userData = await userResponse.json();
-
+                setUser(userData);
 
                 // Fetch all users
                 const allUsersResponse = await fetch("http://localhost:8080/user/getAllUser");
@@ -139,7 +140,7 @@ function EvaluateEmployee() {
     return (
         <div>
             <Animated>
-                <Typography ml={6.5} mt={3} sx={{ fontFamily: "Poppins", fontWeight: "bold", fontSize: "1.5em" }}>List of Employees of DeptName</Typography>
+                <Typography ml={6.5} mt={3} sx={{ fontFamily: "Poppins", fontWeight: "bold", fontSize: "1.5em" }}>List of Employees </Typography>
                 <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml: 6, mt: 4, width: "93.5%" }, }}>
                     <Grid container spacing={1.5} sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", }}>
 
