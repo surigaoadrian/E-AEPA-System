@@ -51,6 +51,29 @@ function NavBar() {
     }
   };
 
+  // useEffect(() => {
+  //   const getImageUrl = async (userID) => {
+  //     try {
+  //       const response = await axios.get(
+  //         `http://localhost:8080/user/image/${userID}`,
+  //         {
+  //           responseType: "arraybuffer",
+  //         }
+  //       );
+  //       const imageBlob = new Blob([response.data], {
+  //         type: response.headers["content-type"],
+  //       });
+  //       const imageUrl = URL.createObjectURL(imageBlob);
+  //       return imageUrl;
+  //     } catch (error) {
+  //       console.error("Error fetching profile picture:", error);
+  //       return null;
+  //     }
+  //   };
+
+  //   getImageUrl();
+  // }, []);
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -78,7 +101,7 @@ function NavBar() {
     };
 
     fetchUser();
-  }, [getImageUrl]);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");

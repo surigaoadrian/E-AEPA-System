@@ -2,7 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import HomeShowcase from "./pages/HomeShowcase";
 import ViewProfilePage from "./pages/ViewProfilePage";
-import ViewProfilePageAdmin from "./pages/ViewProfilePageAdmin";
+import ViewProfilePageHead from "./pages/ViewProfilePageHead";
 import TakeEvaluationPage from "./pages/TakeEvaluationPage";
 import ViewRatingsPage from "./pages/ViewRatingsPage";
 import ManageAccount from "./pages/ManageAccount";
@@ -16,7 +16,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import NotAuthorized from "./pages/NotAuthorized";
 import PrivateRoute from "./components/PrivateRoute";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
-import EmployeeProfile from "./pages/EmployeeProfile";
+import EvaluateEmployee from "./pages/EvaluateEmployee";
 
 function App() {
   return (
@@ -31,50 +31,50 @@ function App() {
           }
         />
 
-				<Route
-					path="/viewProfile"
-					element={
-						<PrivateRoute requiredRoles={["EMPLOYEE"]}>
-							<ViewProfilePage />
-						</PrivateRoute>
-					}
-				/>
+ <Route
+          path="/viewProfile"
+          element={
+            <PrivateRoute requiredRoles={["EMPLOYEE"]}>
+              <ViewProfilePage />
+            </PrivateRoute>
+          }
+        />
 
-				<Route
-					path="/takeEvaluation"
-					element={
-						<PrivateRoute requiredRoles={["EMPLOYEE"]}>
-							<TakeEvaluationPage />
-						</PrivateRoute>
-					}
-				/>
+        <Route
+          path="/takeEvaluation"
+          element={
+            <PrivateRoute requiredRoles={["EMPLOYEE"]}>
+              <TakeEvaluationPage />
+            </PrivateRoute>
+          }
+        />
 
-				<Route
-					path="/viewRatings"
-					element={
-						<PrivateRoute requiredRoles={["EMPLOYEE"]}>
-							<ViewRatingsPage />
-						</PrivateRoute>
-					}
-				/>
+        <Route
+          path="/viewRatings"
+          element={
+            <PrivateRoute requiredRoles={["EMPLOYEE"]}>
+              <ViewRatingsPage />
+            </PrivateRoute>
+          }
+        />
 
-				<Route
-					path="/manageAccount"
-					element={
-						<PrivateRoute requiredRoles={["ADMIN"]}>
-							<ManageAccount />
-						</PrivateRoute>
-					}
-				/>
+        <Route
+          path="/manageAccount"
+          element={
+            <PrivateRoute requiredRoles={["ADMIN"]}>
+              <ManageAccount />
+            </PrivateRoute>
+          }
+        />
 
-				<Route
-					path="/manageOffices"
-					element={
-						<PrivateRoute requiredRoles={["ADMIN"]}>
-							<ManageOffices />
-						</PrivateRoute>
-					}
-				/>
+        <Route
+          path="/manageOffices"
+          element={
+            <PrivateRoute requiredRoles={["ADMIN"]}>
+              <ManageOffices />
+            </PrivateRoute>
+          }
+        />
 
         <Route
           path="/manageEmployee"
@@ -95,18 +95,18 @@ function App() {
           }
         />
         <Route
-          path="/ViewProfileAdmin"
+          path="/ViewProfileHead"
           element={
             <PrivateRoute requiredRoles={["HEAD"]}>
-              <ViewProfilePageAdmin />
+              <ViewProfilePageHead />
             </PrivateRoute>
           }
         />
         <Route
-          path="/ViewProfileAdmin"
+          path="/EvaluateEmployee"
           element={
             <PrivateRoute requiredRoles={["HEAD"]}>
-              <ViewProfilePageAdmin />
+              <EvaluateEmployee />
             </PrivateRoute>
           }
         />

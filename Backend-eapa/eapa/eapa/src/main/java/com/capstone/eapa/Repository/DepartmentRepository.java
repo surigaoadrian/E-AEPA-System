@@ -12,4 +12,6 @@ public interface DepartmentRepository extends JpaRepository<DepartmentEntity, In
 
     @Query(value = "SELECT * FROM tbldepartment dept WHERE dept.is_deleted = 0", nativeQuery = true)
     List<DepartmentEntity> findAllDepts();
+    //Track Employee - finds the departments under the department head using the name
+    List<DepartmentEntity> findByDeptOfficeHead(String headName);
 }

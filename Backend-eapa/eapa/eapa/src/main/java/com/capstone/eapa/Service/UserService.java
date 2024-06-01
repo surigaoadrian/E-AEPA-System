@@ -249,4 +249,17 @@ public class UserService implements UserDetailsService {
         Random rand = new Random();
         return users.get(rand.nextInt(users.size()));
     }
+
+    //Get Employees under Department Head
+    public List<UserEntity> getAllEmployeesFromDepartmentHead(String headName) {
+
+        List<DepartmentEntity> departments = departmentRepository.findByDeptOfficeHead(headName);
+
+        List<String> departmentNames = departments.stream()
+                .map(DepartmentEntity::getDeptName)
+                .collect(Collectors.toList());
+
+
+        return userRepo.findByDeptIn(departmentNames);
+    }
 }
