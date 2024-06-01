@@ -140,8 +140,10 @@ function EvaluateEmployee() {
     return (
         <div>
             <Animated>
+
                 <Typography ml={6.5} mt={3} sx={{ fontFamily: "Poppins", fontWeight: "bold", fontSize: "1.5em" }}>List of Employees </Typography>
                 <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml: 6, mt: 4, width: "93.5%" }, }}>
+
                     <Grid container spacing={1.5} sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", }}>
 
 

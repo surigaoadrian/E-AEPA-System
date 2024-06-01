@@ -28,7 +28,27 @@ const TabPanel = (props) => {
 const ViewResults = ({ open, onClose, employee }) => {
   const [tabIndex, setTabIndex] = useState(0);
 
-  if (!employee) return null;
+    //Fetch user details
+    useEffect(() => {
+      const fetchUser = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:8080/user/getUser/${userId}`
+          );
+          setEmployee(response.data);
+        } catch (error) {
+          if (error.response) {
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          } else {
+            console.log(`Error: ${error.message}`);
+          }
+        }
+      };
+      fetchUser();
+    }, []);
+  
 
   const handleTabChange = (event, newIndex) => {
     setTabIndex(newIndex);
@@ -125,7 +145,7 @@ const ViewResults = ({ open, onClose, employee }) => {
     data: [4.0, 3]
   }, {
     name: 'Peer',
-    data: [4.4, 4.3]
+    data: [4.4,null]
   }];
 
   const VBPChartSeries = [{
@@ -138,6 +158,7 @@ const ViewResults = ({ open, onClose, employee }) => {
     name: 'Peer',
     data: [4.4, 4.6, 3, 4.6]
   }];
+  
   const tabStyle = {
     textTransform: "none",
     color: "#9D9D9D",
