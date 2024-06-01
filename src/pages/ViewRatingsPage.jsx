@@ -141,7 +141,7 @@ function ViewRatingsPage() {
     },
     {
       name: "Peer",
-      data: [4.4, 4.3],
+      data: [4.4, null],
     },
   ];
 
