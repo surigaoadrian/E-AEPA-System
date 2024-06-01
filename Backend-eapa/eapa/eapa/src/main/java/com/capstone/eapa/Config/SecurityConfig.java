@@ -58,8 +58,8 @@ public class SecurityConfig {
 //                                        "user/editPersonalDetails/**",
 //                                        "user/uploadImage/**",
 //                                        "user/image/**",
-//                                        "department/updateDept"
-
+//                                        "department/updateDept",
+//                                        "user/employees-with-head"
 //                                        )
 //                                .permitAll()
 //                                .anyRequest()

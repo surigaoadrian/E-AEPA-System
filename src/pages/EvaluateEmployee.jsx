@@ -15,9 +15,9 @@ import Animated from "../components/motion";
 import Fade from '@mui/material/Fade';
 
 function EvaluateEmployee() {
+    const userID = sessionStorage.getItem("userID");
+    const [user, setUser] = useState({});
     const [rows, setRows] = useState([]);
-
-    const [selectedTab, setSelectedTab] = useState(0);
     const [updateFetch, setUpdateFetch] = useState(true);
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
@@ -27,32 +27,40 @@ function EvaluateEmployee() {
     const handleClose = () => {
         setAnchorEl(null);
     };
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch("http://localhost:8080/user/getAllUser");
-                if (!response.ok) {
-                    throw new Error("Failed to fetch data");
+    	//fetch the user data
+        useEffect(() => {
+            const fetchData = async () => {
+              try {
+                // Fetch specific user data based on userID
+                const userResponse = await fetch(`http://localhost:8080/user/getUser/${userID}`);
+                if (!userResponse.ok) {
+                  throw new Error("Failed to fetch user data");
                 }
-                const data = await response.json();
+                const userData = await userResponse.json();
+                setUser(userData);
 
-                const processedData = data
-                    .filter((item) => item.role === "EMPLOYEE")
-                    .map((item) => ({
-                        ...item,
-                        name: `${item.fName} ${item.lName}`,
-                        userID: item.userID,
-                    }));
-
+                // Fetch all users
+                const allUsersResponse = await fetch("http://localhost:8080/user/getAllUser");
+                if (!allUsersResponse.ok) {
+                  throw new Error("Failed to fetch all users data");
+                }
+                const allUsersData = await allUsersResponse.json();
+                const processedData = allUsersData
+                  .filter((item) => item.role === "EMPLOYEE" && item.dept === userData.dept)
+                  .map((item) => ({
+                    ...item,
+                    name: `${item.fName} ${item.lName}`,
+                    userID: item.userID,
+                  }));
+          
                 setRows(processedData);
-            } catch (error) {
+              } catch (error) {
                 console.error("Error fetching data:", error);
-            }
-        };
-
-        fetchData();
-    }, [updateFetch]);
-
+              }
+            };
+          
+            fetchData();
+          }, [userID, updateFetch]);
 
     const columnsEmployees = [
         {
@@ -132,8 +140,10 @@ function EvaluateEmployee() {
     return (
         <div>
             <Animated>
-                <Typography  ml={6.5} mt={3} mb={2} sx={{ fontFamily: "Poppins", fontWeight: "bold", fontSize: "1.5em" }}>Employee Evaluation</Typography>
-                <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml: 6, mt: 0.1, width: "93.5%" }, }}>
+
+                <Typography ml={6.5} mt={3} sx={{ fontFamily: "Poppins", fontWeight: "bold", fontSize: "1.5em" }}>List of Employees </Typography>
+                <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml: 6, mt: 4, width: "93.5%" }, }}>
+
                     <Grid container spacing={1.5} sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", }}>
 
 

@@ -309,13 +309,31 @@ function ManageAccount() {
   }, [updateFetch, selectedTab]);
 
   useEffect(() => {
-    const fetchDept = async () => {
+    const fetchDeptAndUsers = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8080/department/getAllDepts"
-        );
-        setDepartments(response.data);
-        console.log(departments);
+        const deptResponse = await axios.get("http://localhost:8080/department/getAllDepts");
+        const userResponse = await axios.get("http://localhost:8080/user/getAllUser");
+
+        const fetchedDepartments = deptResponse.data;
+        const fetchedUsers = userResponse.data;
+
+        // Assign office heads to their departments
+        const departmentsWithHeads = fetchedDepartments.map((dept) => {
+          const officeHead = fetchedUsers.find(
+            (user) =>
+              (user.position === "Office Head" || user.position === "Department Head") &&
+              user.dept === dept.deptName
+          );
+          return {
+            ...dept,
+            deptOfficeHead: officeHead
+              ? `${officeHead.fName} ${officeHead.mName ? officeHead.mName.charAt(0) + "." : ""} ${officeHead.lName}`
+              : "",
+          };
+        });
+
+        setDepartments(departmentsWithHeads);
+        console.log(departmentsWithHeads);
       } catch (error) {
         if (error.response) {
           console.log(error.response.data);
@@ -327,7 +345,7 @@ function ManageAccount() {
       }
     };
 
-    fetchDept();
+    fetchDeptAndUsers();
   }, []);
 
   useEffect(() => {
@@ -463,6 +481,10 @@ function ManageAccount() {
     }
   };
 
+  const availableDepartments = role === "HEAD"
+    ? departments.filter((dept) => !dept.deptOfficeHead)
+    : departments;
+
   const handleClickEditBtn = async (userID) => {
     try {
       const response = await fetch(
@@ -480,26 +502,6 @@ function ManageAccount() {
     }
   };
 
-  const checkUsernameAvailability = async (username) => {
-    try {
-      const response = await axios.put(`http://localhost:8080/user/checkUsername/${username}`);
-      return response.data; // Returns "Username already taken" or "Username available"
-    } catch (error) {
-      console.error("Error checking username availability:", error);
-      return "Failed to check username availability";
-    }
-  };
-
-
-  const checkEmailAvailability = async (email) => {
-    try {
-      const response = await axios.put(`http://localhost:8080/user/checkEmail/${email}`);
-      return response.data; // Returns "Email already taken" or "Email available"
-    } catch (error) {
-      console.error("Error checking email availability:", error);
-      return "Failed to check email availability";
-    }
-  };
 
   const handleUserDataChange = (e) => {
     const { name, value } = e.target;
@@ -1079,22 +1081,44 @@ function ManageAccount() {
                     <Grid item xs={6}>
                       <Box>
                         <FormControl required fullWidth size="small">
-                          <Select required labelId="deptLabel" id="dept" value={dept} placeholder="Department" onChange={handledept}
-                            MenuProps={{ PaperProps: { style: { maxWidth: "300px", }, }, }}
+                          <Select
+                            required
+                            labelId="deptLabel"
+                            id="dept"
+                            value={dept}
+                            placeholder="Department"
+                            onChange={handledept}
+                            MenuProps={{
+                              PaperProps: {
+                                style: { maxWidth: "300px" },
+                              },
+                            }}
                             displayEmpty
-                            sx={{ fontSize: '.8em', fontFamily: 'Poppins', }}
+                            sx={{ fontSize: '.8em', fontFamily: 'Poppins' }}
                             renderValue={(selected) => {
                               if (selected.length === 0) {
                                 return <Box sx={{ color: 'gray' }}>Department</Box>;
                               }
                               return selected;
-                            }}>
+                            }}
+                          >
                             <MenuItem disabled style={{ fontFamily: "Poppins", fontSize: '.8em' }} value="">Department</MenuItem>
-                            {departments.map((dept, index) => {
-                              return (
-                                <MenuItem key={index} style={{ fontFamily: "Poppins", fontSize: '.8em' }} value={dept.deptName} sx={{ fontFamily: "Poppins", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "300px", }}>{dept.deptName}</MenuItem>
-                              );
-                            })}
+                            {availableDepartments.map((dept, index) => (
+                              <MenuItem
+                                key={index}
+                                style={{ fontFamily: "Poppins", fontSize: '.8em' }}
+                                value={dept.deptName}
+                                sx={{
+                                  fontFamily: "Poppins",
+                                  whiteSpace: "nowrap",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  maxWidth: "300px",
+                                }}
+                              >
+                                {dept.deptName}
+                              </MenuItem>
+                            ))}
                           </Select>
                         </FormControl>
                       </Box>
