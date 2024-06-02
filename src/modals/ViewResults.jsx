@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Box, Typography, Divider, Paper, Table, TableHead,TableBody, TableCell, TableRow, TableContainer, Tabs, Tab } from '@mui/material';
 import Chart from 'react-apexcharts';
 import Matrix from "../modals/Matrix";
@@ -27,7 +27,7 @@ const TabPanel = (props) => {
 
 const ViewResults = ({ open, onClose, employee }) => {
   const [tabIndex, setTabIndex] = useState(0);
-
+  
     //Fetch user details
     useEffect(() => {
       const fetchUser = async () => {
