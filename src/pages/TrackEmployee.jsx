@@ -82,9 +82,9 @@ function TrackEmployee() {
   const columnsEmployees = [
     {
       id: "workID",
-      label: "ID Number",
+      label: "ID No.",
       align: "center",
-      minWidth: 150,
+      minWidth: 100,
     },
     {
       id: "name",
@@ -105,6 +105,27 @@ function TrackEmployee() {
     {
       id: "empStatus",
       label: "Employee Status",
+      minWidth: 150,
+      align: "center",
+      format: (value) => (value ? value.toLocaleString("en-US") : ""),
+    },
+    {
+      id: "empStatus",
+      label: "S-JBPA Status",
+      minWidth: 150,
+      align: "center",
+      format: (value) => (value ? value.toLocaleString("en-US") : ""),
+    },
+    {
+      id: "empStatus",
+      label: "S-VBPA Status",
+      minWidth: 150,
+      align: "center",
+      format: (value) => (value ? value.toLocaleString("en-US") : ""),
+    },
+    {
+      id: "empStatus",
+      label: "P-VBPA Status",
       minWidth: 150,
       align: "center",
       format: (value) => (value ? value.toLocaleString("en-US") : ""),
