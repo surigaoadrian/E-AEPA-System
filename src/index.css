@@ -1,6 +1,6 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 * {
   font-family: "poppins";
@@ -18,4 +18,55 @@ button {
 }
 .no-select {
   user-select: none;
+}
+
+input[type="radio"] {
+  display: none;
+}
+
+.custom-radio {
+  position: relative;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #999999;
+  transition: border-color 0.3s; /* Smooth transition */
+}
+
+.custom-radio::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  background: #8c383e;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+}
+
+input[type="radio"]:checked + .custom-radio {
+  border-color: #8c383e;
+}
+
+input[type="radio"]:checked + .custom-radio::after {
+  display: block;
+}
+
+::-webkit-scrollbar {
+  background: transparent;
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: none;
+  margin-left: 15px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d9d9d9;
+  border-radius: 100px;
+  margin-left: 15px;
 }

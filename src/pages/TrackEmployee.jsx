@@ -1,291 +1,213 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Grid, Typography, Table, TableHead, TableRow, TableCell, TableBody, Box, CircularProgress, TableFooter, TablePagination, IconButton, Snackbar, Menu, MenuItem, ClickAwayListener } from '@mui/material';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import {faEye} from "@fortawesome/free-solid-svg-icons";
+import React, { useState, useEffect } from "react";
+import Paper from "@mui/material/Paper";
+import { Box, Button, Grid, Typography, Menu, } from "@mui/material";
+import MenuItem from '@mui/material/MenuItem';
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye } from "@fortawesome/free-solid-svg-icons";
+import Animated from "../components/motion";
 import ViewResults from "../modals/ViewResults";
-import axios from 'axios';
+import Fade from '@mui/material/Fade';
 
 function TrackEmployee() {
-  const [employeeData, setEmployeeData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [selectedRow, setSelectedRow] = useState(null);
-  const [notifications, setNotifications] = useState({});
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [evaluationStatusFilter, setEvaluationStatusFilter] = useState('');
-  const [finalResultFilter, setFinalResultFilter] = useState('');
-  const [viewResultFilter, setViewResultFilter] = useState('');
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [filterColumn, setFilterColumn] = useState('');
+  const userID = sessionStorage.getItem("userID");
+  const [user, setUser] = useState({});
+  const [rows, setRows] = useState([]);
+  const [updateFetch, setUpdateFetch] = useState(true);
   const [showViewRatingsModal, setViewRatingsModal] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
- 
+  const [selectedEmployee, setSelectedEmployee] = useState({});
+
+  //fetch the user data
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const mockData = [
-          { id: 1, name: 'John Doe', position: 'Software Engineer', evaluationPeriod: 'Q1 2024', evaluationStatus: 'Not Yet Evaluated', finalResult: 'In Progress', viewresult: '-' },
-          { id: 2, name: 'Jane Smith', position: 'UI/UX Designer', evaluationPeriod: 'Q1 2024', evaluationStatus: 'Completed', finalResult: 'Completed', viewresult: 'View' },
-          // Add more sample data as needed
-        ];
-        setEmployeeData(mockData);
-        setLoading(false);
+        // Fetch specific user data based on userID
+        const userResponse = await fetch(`http://localhost:8080/user/getUser/${userID}`);
+        if (!userResponse.ok) {
+          throw new Error("Failed to fetch user data");
+        }
+        const userData = await userResponse.json();
+        setUser(userData);
+        console.log("User data:", userData.status);
+
+        // Fetch all users
+        const allUsersResponse = await fetch("http://localhost:8080/user/getAllUser");
+        if (!allUsersResponse.ok) {
+          throw new Error("Failed to fetch all users data");
+        }
+        const allUsersData = await allUsersResponse.json();
+        const processedData = allUsersData
+          .filter((item) => item.role === "EMPLOYEE" && item.dept === userData.dept)
+          .map((item) => ({
+            ...item,
+            name: `${item.fName} ${item.lName}`,
+            userID: item.userID,
+          }));
+
+        setRows(processedData);
+
       } catch (error) {
-        console.error(error);
-        setEmployeeData([]);
-        setLoading(false);
+        console.error("Error fetching data:", error);
       }
     };
 
     fetchData();
-  }, []);
+  }, [userID, updateFetch]);
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
+  const handleViewResultClick = async (userID) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/user/getUser/${userID}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch user data");
+      }
+      const userData = await response.json();
+      setViewRatingsModal(true);
+      setSelectedEmployee(userData);
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  const handleRowClick = (employee) => {
-    setSelectedRow(employee.id);
-  };
-
-  const clearSelectedRow = (event) => {
-    if (!tableRef.current.contains(event.target)) {
-      setSelectedRow(null);
+      console.log("Selected employee:", selectedEmployee);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
     }
   };
 
-  useEffect(() => {
-    document.body.addEventListener('click', clearSelectedRow);
 
-    return () => {
-      document.body.removeEventListener('click', clearSelectedRow);
-    };
-  }, []);
 
-  const handleNotificationClick = (id) => {
-    setNotifications((prev) => {
-      const newNotifications = { ...prev, [id]: !prev[id] };
-      const message = newNotifications[id] ? 'You have successfully sent a reminder to this person!' : 'Notification removed';
-      setSnackbarMessage(message);
-      setSnackbarOpen(true);
-      return newNotifications;
-    });
-  };
+  const columnsEmployees = [
+    {
+      id: "workID",
+      label: "ID No.",
+      align: "center",
+      minWidth: 100,
+    },
+    {
+      id: "name",
+      label: "Name",
+      minWidth: 170,
+      align: "center",
+      format: (value) => formatName(value),
+    },
 
-  const handleCloseSnackbar = () => {
-    setSnackbarOpen(false);
-  };
 
-  const handleViewResultClick = (employee) => {
-    console.log("Selected Employee:", employee);
-    setSnackbarMessage(`Redirecting to view result for ${employee.name}`);
-    setSnackbarOpen(true);
-    setSelectedEmployee(employee);
-    setViewRatingsModal(true);
-  };
+    {
+      id: "position",
+      label: "Position",
+      minWidth: 150,
+      align: "center",
+      format: (value) => (value ? value.toLocaleString("en-US") : ""),
+    },
+    {
+      id: "empStatus",
+      label: "Employee Status",
+      minWidth: 150,
+      align: "center",
+      format: (value) => (value ? value.toLocaleString("en-US") : ""),
+    },
+    {
+      id: "empStatus",
+      label: "S-JBPA Status",
+      minWidth: 150,
+      align: "center",
+      format: (value) => (value ? value.toLocaleString("en-US") : ""),
+    },
+    {
+      id: "empStatus",
+      label: "S-VBPA Status",
+      minWidth: 150,
+      align: "center",
+      format: (value) => (value ? value.toLocaleString("en-US") : ""),
+    },
+    {
+      id: "empStatus",
+      label: "P-VBPA Status",
+      minWidth: 150,
+      align: "center",
+      format: (value) => (value ? value.toLocaleString("en-US") : ""),
+    },
+    // {
+    //   id: "status",
+    //   label: "Evaluation Status",
+    //   minWidth: 150,
+    //   align: "center",
+    //   format: (value) => (value ? value.toLocaleString("en-US") : ""),
+    // },
 
-  const handleFilterClick = (event, column) => {
-    setAnchorEl(event.currentTarget);
-    setFilterColumn(column);
-  };
+    {
+      id: "actions",
+      label: "Result",
+      minWidth: 150,
+      align: "center",
+      format: (value, row) => {
+        return (
+          <div>
+            {row.empStatus === "Probationary" && (
+              <Button sx={{
+                color: '#8c383e',
+                fontSize: '.9em', "&:hover": { color: "red", },
+              }}
+                style={{ textTransform: "none", }} startIcon={<FontAwesomeIcon icon={faEye} style={{ fontSize: ".8rem", }} />}
+                onClick={() => handleViewResultClick(row.userID)}>
+                View
+              </Button>
+            )}
 
-  const handleFilterClose = () => {
-    setAnchorEl(null);
-    setFilterColumn('');
-  };
-
-  const handleFilterSelect = (filterValue) => {
-    if (filterColumn === 'evaluationStatus') {
-      setEvaluationStatusFilter(filterValue);
-    } else if (filterColumn === 'finalResult') {
-      setFinalResultFilter(filterValue);
-    } else if (filterColumn === 'viewResult') {
-      setViewResultFilter(filterValue);
-    }
-    handleFilterClose();
-  };
-
-  const tableRef = useRef(null);
-
-  const filteredData = employeeData.filter((employee) => {
-    return (
-      (evaluationStatusFilter === '' || employee.evaluationStatus.includes(evaluationStatusFilter)) &&
-      (finalResultFilter === '' || employee.finalResult.includes(finalResultFilter)) &&
-      (viewResultFilter === '' || employee.viewresult.includes(viewResultFilter))
-    );
-  });
+          </div>
+        );
+      },
+    },
+  ];
 
   return (
-    <>
-    <Grid container spacing={1}>
-      <Grid item xs={12}>
-        <Typography
-          variant="h5"
-          component="div"
-          sx={{
-            fontWeight: 'bold',
-            fontFamily: 'Poppins',
-            paddingTop: '2rem',
-            paddingLeft: '2rem'
-          }}
-        >
-          Track Employee
-        </Typography>
-      </Grid>
-      <Grid item xs={12}>
-        <Box sx={{ border: 'none', padding: '1rem', margin: '.1rem' }}>
-          {loading ? (
-            <CircularProgress />
-          ) : (
-            <Table ref={tableRef} sx={{ backgroundColor: 'white' }}>
-              <TableHead sx={{ backgroundColor: 'maroon' }}>
-                <TableRow>
-                  <TableCell sx={{ color: 'white', fontWeight: 'bold', textAlign: 'center', borderRight: '1px solid white' }}>Employee ID</TableCell>
-                  <TableCell sx={{ color: 'white', fontWeight: 'bold', textAlign: 'center', borderRight: '1px solid white' }}>Name</TableCell>
-                  <TableCell sx={{ color: 'white', fontWeight: 'bold', textAlign: 'center', borderRight: '1px solid white' }}>Position</TableCell>
-                  <TableCell sx={{ color: 'white', fontWeight: 'bold', textAlign: 'center', borderRight: '1px solid white' }}>Evaluation Period</TableCell>
-                  <TableCell sx={{ color: 'white', fontWeight: 'bold', textAlign: 'center', borderRight: '1px solid white' }}>
-                    Evaluation Status
-                    <IconButton onClick={(e) => handleFilterClick(e, 'evaluationStatus')} sx={{ color: 'white' }}>
-                      <ArrowDropDownIcon />
-                    </IconButton>
-                  </TableCell>
-                  <TableCell sx={{ color: 'white', fontWeight: 'bold', textAlign: 'center', borderRight: '1px solid white' }}>
-                    Final Result
-                    <IconButton onClick={(e) => handleFilterClick(e, 'finalResult')} sx={{ color: 'white' }}>
-                      <ArrowDropDownIcon />
-                    </IconButton>
-                  </TableCell>
-                  <TableCell sx={{ color: 'white', fontWeight: 'bold', textAlign: 'center' }}>
-                    View Result
-                    <IconButton onClick={(e) => handleFilterClick(e, 'viewResult')} sx={{ color: 'white' }}>
-                      <ArrowDropDownIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filteredData
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((employee) => (
-                    <TableRow 
-                      key={employee.id}
-                      onClick={() => handleRowClick(employee)}
-                      sx={{ backgroundColor: selectedRow === employee.id ? 'lightyellow' : 'inherit', cursor: 'pointer' }}
-                    >
-                      <TableCell sx={{ textAlign: 'center' }}>{employee.id}</TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>{employee.name}</TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>{employee.position}</TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>{employee.evaluationPeriod}</TableCell>
-                      <TableCell sx={{ 
-                        textAlign: 'center', 
-                        display: 'flex', 
-                        justifyContent: 'center', 
-                        alignItems: 'center', 
-                        color: employee.evaluationStatus === 'Not Yet Evaluated' ? 'red' : 'inherit' 
-                      }}>
-                        {employee.evaluationStatus}
-                        {employee.evaluationStatus === 'Not Yet Evaluated' && (
-                          <IconButton onClick={() => handleNotificationClick(employee.id)} sx={{ ml: 1 }}>
-                            {notifications[employee.id] ? <NotificationsActiveIcon sx={{ color: 'yellow' }} /> : <NotificationsIcon />}
-                          </IconButton>
-                        )}
-                      </TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>{employee.finalResult}</TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>
-                        {employee.viewresult === 'View' ? (
-                      <div className="flex items-center justify-center">
-                      <button 
-                      className="flex items-center text-white px-3 py-2 rounded" 
-                      style={{ backgroundColor: '#8C383E', border: 'none' }} 
-                      onClick={() => handleViewResultClick(employee)}
-                    >
-                      <FontAwesomeIcon
-                        icon={faEye}
-                        className="mr-2"
-                        style={{ cursor: 'pointer', color: 'white', fontSize: '1.3rem' }}
-                        
-                      />
-                      <span className="text-sm">View </span>
-                    </button>
-                      </div>
-                        ) : (
-                          employee.viewresult
-                        )}
-                      </TableCell>
+    <div>
+      <Animated>
+        <Typography ml={6.5} mt={3} sx={{ fontFamily: "Poppins", fontWeight: "bold", fontSize: "1.5em" }}>List of Employees </Typography>
+        <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml: 6, mt: 4, width: "93.5%" }, }}>
+          <Grid container spacing={1.5} sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", }}>
+            <Paper elevation={1} sx={{ borderRadius: "5px", width: "100%", height: "32em", backgroundColor: "transparent", mt: '.2%' }}>
+              <TableContainer sx={{ borderRadius: "5px 5px 0 0 ", maxHeight: "100%", }} >
+                <Table stickyHeader aria-label="sticky table" size="small">
+                  <TableHead sx={{ height: "2em" }}>
+                    <TableRow>
+                      {columnsEmployees.map((column) => (
+                        <TableCell sx={{
+                          fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: "bold", maxWidth: "2em",
+                        }} key={column.id} align={column.align} style={{ minWidth: column.minWidth }}>{column.label}</TableCell>
+                      ))}
                     </TableRow>
-                  ))}
-              </TableBody>
-              <TableFooter>
-                <TableRow>
-                  <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
-                    colSpan={7}
-                    count={filteredData.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                  />
-                </TableRow>
-              </TableFooter>
-            </Table>
-          )}
+                  </TableHead>
+                  <TableBody>
+                    {rows.map((row) => (
+                      <TableRow sx={{ bgcolor: 'white', "&:hover": { backgroundColor: "rgba(248, 199, 2, 0.5)", color: "black", }, }} key={row.id}>
+                        {columnsEmployees.map((column) => (
+                          <TableCell sx={{ fontFamily: "Poppins", }} key={`${row.id}-${column.id}`} align={column.align}>
+                            {column.id === "name" ? row.name : column.id === "actions" ? column.format ? column.format(row[column.id], row) : null : column.format ? column.format(row[column.id]) : row[column.id]}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
+          </Grid>
+          <ViewResults
+            open={showViewRatingsModal}
+            onClose={() => setViewRatingsModal(false)}
+            employee={selectedEmployee}
+          />
         </Box>
-      </Grid>
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleFilterClose}
-      >
-        <MenuItem onClick={() => handleFilterSelect('')}>All</MenuItem>
-        {filterColumn === 'evaluationStatus' && (
-          <>
-            <MenuItem onClick={() => handleFilterSelect('Not Yet Evaluated')}>Not Yet Evaluated</MenuItem>
-            <MenuItem onClick={() => handleFilterSelect('Completed')}>Completed</MenuItem>
-          </>
-        )}
-        {filterColumn === 'finalResult' && (
-          <>
-            <MenuItem onClick={() => handleFilterSelect('In Progress')}>In Progress</MenuItem>
-            <MenuItem onClick={() => handleFilterSelect('Completed')}>Completed</MenuItem>
-          </>
-        )}
-        {filterColumn === 'viewResult' && (
-          <>
-            <MenuItem onClick={() => handleFilterSelect('View')}>View</MenuItem>
-            <MenuItem onClick={() => handleFilterSelect('-')}>-</MenuItem>
-
-            
-          </>
-        )}
-      </Menu>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleCloseSnackbar}
-        message={snackbarMessage}
-      />
-    </Grid>
-
-        <ViewResults
-        open={showViewRatingsModal}
-        onClose={() => setViewRatingsModal(false)}
-        employee={selectedEmployee}
-        />
-        </>
-
+      </Animated>
+    </div>
   );
 }
 
 export default TrackEmployee;
+
+
+

@@ -1,6 +1,7 @@
 package com.capstone.eapa.Service;
 
 import com.capstone.eapa.Entity.PasswordResetToken;
+import com.capstone.eapa.Entity.Role;
 import com.capstone.eapa.Entity.UserEntity;
 import com.capstone.eapa.Repository.PasswordResetTokenRepository;
 import com.capstone.eapa.Repository.UserRepository;
@@ -24,10 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Blob;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -54,6 +52,7 @@ public class UserService implements UserDetailsService {
         throw new RuntimeException("User not found.");
     }
 
+    //forgot password
     @Transactional
     public void generateResetPassTokenForUser(String email) {
         UserEntity user = userRepo.findByWorkEmail(email);
@@ -120,37 +119,6 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    // public String checkUsernameAvailabilityForEditAdmin(String username, String currentUsername){
-    //     if (username.equals(currentUsername)) {
-    //         return "Username is the same as current";
-    //     }
-    
-    //     boolean usernameExists = userRepo.existsByUsernameAndIsDeleted(username, 0);
-    
-    //     if (usernameExists) {
-    //         return "Username already exists";
-    //     } else {
-    //         return "Username is available";
-    //     }
-    // }
-
-        // // Service method to check email availability
-        // public String checkEmailAvailabilityForEditAdmin(String workEmail, String currentEmail) {
-        //     if (workEmail.equals(currentEmail)) {
-        //         return "Username is the same as current";
-        //     }
-
-        //     boolean emailExists = userRepo.existsByWorkEmailAndIsDeleted(workEmail, 0);
-    
-        //     if (emailExists) {
-        //         return "Email Address already exists";
-        //     } else {
-        //         return "Email Address is available";
-        //     }
-        // }
-
-
-
     // this method returns user details
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -215,33 +183,6 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    // for edit employee: account details
-    @Transactional
-    public UserEntity editAccountUnameDetails(int userID, UserEntity newDetails) {
-        UserEntity user = userRepo.findById(userID)
-                .orElseThrow(() -> new NoSuchElementException("User " + userID + " not found."));
-        try {
-            if (newDetails.getUsername() != null)
-                user.setUsername(newDetails.getUsername());
-            return userRepo.save(user);
-        } catch (Exception e) {
-            throw e; // rethrow or handle as appropriate
-        }
-    }
-
-    @Transactional
-    public UserEntity changeAccountPassDetails(int userID, UserEntity newDetails) {
-        UserEntity user = userRepo.findById(userID)
-                .orElseThrow(() -> new NoSuchElementException("User " + userID + " not found."));
-        try {
-            if (newDetails.getPassword() != null)
-                user.setPassword(newDetails.getPassword());
-            return userRepo.save(user);
-        } catch (Exception e) {
-            throw e; // rethrow or handle as appropriate
-        }
-    }
-
     // for edit employee: personal details
     @Transactional
     public UserEntity editPersonalDetails(int userID, UserEntity newDetails) {
@@ -290,4 +231,40 @@ public class UserService implements UserDetailsService {
             throw new NoSuchElementException("User " + userID + " not found.");
         }
     }
+
+    //randomize peer
+//    public UserEntity getRandomPeer(String dept, int excludedUserID) {
+//        List<UserEntity> users = userRepo.findByDeptAndRoleNotAndUserIDNot(dept, Role.HEAD, excludedUserID);
+//        if (users.isEmpty()) {
+//            throw new NoSuchElementException("No users found in the department excluding heads and the logged-in user.");
+//        }
+//        Random rand = new Random();
+//        return users.get(rand.nextInt(users.size()));
+//    }
+    public UserEntity getRandomPeer(String dept, int excludedUserID) {
+        List<UserEntity> users = userRepo.findPeersByDeptRoleNotUserIDNotAndPositionNotSecretary(dept, Role.HEAD.name(), excludedUserID);
+        if (users.isEmpty()) {
+            throw new NoSuchElementException("No users found in the department excluding heads and the logged-in user.");
+        }
+        Random rand = new Random();
+        return users.get(rand.nextInt(users.size()));
+    }
+
+    public List<UserEntity> getAllEmployeesFromDepartmentHead(String headName) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAllEmployeesFromDepartmentHead'");
+    }
+
+    //Get Employees under Department Head
+    // public List<UserEntity> getAllEmployeesFromDepartmentHead(String headName) {
+
+    //     List<DepartmentEntity> departments = departmentRepository.findByDeptOfficeHead(headName);
+
+    //     List<String> departmentNames = departments.stream()
+    //             .map(DepartmentEntity::getDeptName)
+    //             .collect(Collectors.toList());
+
+
+    //     return userRepo.findByDeptIn(departmentNames);
+    // }
 }

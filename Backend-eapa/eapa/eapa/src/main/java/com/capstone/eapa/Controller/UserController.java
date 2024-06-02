@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RestController
@@ -20,10 +21,6 @@ public class UserController {
     @Autowired
     private UserService userServ;
 
-    @GetMapping("/print")
-    public String print() {
-        return "Konichiwa";
-    }
 
     @GetMapping("/getUser/{userID}")
     public ResponseEntity<Optional<UserEntity>> getUser(@PathVariable int userID){
@@ -71,14 +68,6 @@ public class UserController {
         }
     }
 
-    // @PutMapping("/checkUsernameEdit/{username}")
-    // public ResponseEntity<String> checkUsernameAvailabilityForEditAdmin(
-    //         @PathVariable String username,
-    //         @RequestParam String currentUsername) {
-    //     String result = userServ.checkUsernameAvailabilityForEditAdmin(username, currentUsername);
-    //     return ResponseEntity.ok(result); // Return the result directly
-    // }
-
     @PutMapping("/checkEmail/{workEmail}")
     public ResponseEntity<String> checkEmailAvailability(@PathVariable String workEmail) {
         String result = userServ.checkEmailAvailability(workEmail);
@@ -90,30 +79,6 @@ public class UserController {
         }
     }
 
-    // @PutMapping("/checkEmailEdit/{workEmail}")
-    // public ResponseEntity<String> checkEmailAvailabilityForEditAdmin(
-    //         @PathVariable String workEmail,
-    //         @RequestParam String currentEmail) {
-    //     String result = userServ.checkEmailAvailabilityForEditAdmin(workEmail, currentEmail);
-    //     return ResponseEntity.ok(result); // Return the result directly
-    // }
-
-    // for edit employee: account details
-    @PatchMapping("/editAccountUsername/{userID}")
-    public ResponseEntity<UserEntity> editAccountUsername(@PathVariable int userID,
-            @RequestBody UserEntity newDetails) {
-        UserEntity updatedUser = userServ.editAccountUnameDetails(userID, newDetails);
-
-        return ResponseEntity.ok(updatedUser);
-    }
-
-    @PatchMapping("/changeAccountPassword/{userID}")
-    public ResponseEntity<UserEntity> changeAccountPassword(@PathVariable int userID,
-            @RequestBody UserEntity newDetails) {
-        UserEntity updatedUser = userServ.changeAccountPassDetails(userID, newDetails);
-
-        return ResponseEntity.ok(updatedUser);
-    }
 
     // for edit employee: personal details
     @PatchMapping("/editPersonalDetails/{userID}")
@@ -160,5 +125,24 @@ public class UserController {
                 .contentType(mediaType)
                 .body(user.getProfilePic());
     }
+
+    //randomize peer
+    @GetMapping("/randomPeer")
+    public ResponseEntity<UserEntity> getRandomPeer(@RequestParam String dept, @RequestParam int excludedUserID) {
+        try {
+            UserEntity randomPeer = userServ.getRandomPeer(dept, excludedUserID);
+            return ResponseEntity.ok(randomPeer);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    //get the employees' data with the corresponding department head - Track Employee
+    //  @GetMapping("/employees-with-head")
+    // public ResponseEntity<List<UserEntity>> getAllEmployeesFromDepartmentHead(@RequestParam String headName) {
+    //     List<UserEntity> employees = userServ.getAllEmployeesFromDepartmentHead(headName);
+    //     return ResponseEntity.ok(employees);
+    // }
+
 
 }

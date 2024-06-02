@@ -61,46 +61,54 @@ const ManageOffices = () => {
 		staff: [],
 	});
 
-	//fetch all users
-	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const userResponse = await axios.get(
-					"http://localhost:8080/user/getAllUser"
+// fetch all users
+useEffect(() => {
+	const fetchData = async () => {
+		try {
+			const userResponse = await axios.get(
+				"http://localhost:8080/user/getAllUser"
+			);
+			const deptResponse = await axios.get(
+				"http://localhost:8080/department/getAllDepts"
+			);
+
+			const fetchedUsers = userResponse.data;
+			const fetchedDepts = deptResponse.data;
+
+			// Assign office heads to their departments
+			const updatedDepts = fetchedDepts.map((dept) => {
+				const officeHead = fetchedUsers.find(
+					(user) =>
+						(user.position === "Office Head" ||
+							user.position === "Department Head") &&
+						user.dept === dept.deptName
 				);
-				const deptResponse = await axios.get(
-					"http://localhost:8080/department/getAllDepts"
+				return {
+					...dept,
+					deptOfficeHead: officeHead
+						? `${officeHead.fName} ${
+								officeHead.mName ? officeHead.mName.charAt(0) + "." : ""
+						  } ${officeHead.lName}`
+						: "",
+				};
+			});
+
+			// Update the departments in the database
+			for (const dept of updatedDepts) {
+				await axios.put(
+					`http://localhost:8080/department/updateDept?deptID=${dept.deptID}`,
+					dept
 				);
-
-				const fetchedUsers = userResponse.data;
-				const fetchedDepts = deptResponse.data;
-
-				// Assign office heads to their departments
-				const updatedDepts = fetchedDepts.map((dept) => {
-					const officeHead = fetchedUsers.find(
-						(user) =>
-							(user.position === "Office Head" ||
-								user.position === "Department Head") &&
-							user.dept === dept.deptName
-					);
-					return {
-						...dept,
-						deptOfficeHead: officeHead
-							? `${officeHead.fName} ${
-									officeHead.mName ? officeHead.mName.charAt(0) + "." : ""
-							  } ${officeHead.lName}`
-							: "",
-					};
-				});
-
-				setDepartments(updatedDepts);
-				setFilteredDepartments(updatedDepts);
-			} catch (error) {
-				console.error("Error fetching data:", error);
 			}
-		};
-		fetchData();
-	}, []);
+
+			setDepartments(updatedDepts);
+			setFilteredDepartments(updatedDepts);
+		} catch (error) {
+			console.error("Error fetching data:", error);
+		}
+	};
+	fetchData();
+}, []);
 
 	//fetch all users with "office head" position
 	useEffect(() => {

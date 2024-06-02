@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Paper from "@mui/material/Paper";
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, FormControl, Grid, IconButton, InputLabel, MenuItem, Select, Snackbar, Tab, Tabs, TextField, Typography, Alert as MuiAlert, ListItem, ListItemIcon, Chip, } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, FormControl, Grid, IconButton, InputLabel, MenuItem, Select, Snackbar, Tab, Tabs, TextField, Typography, Alert as MuiAlert, ListItem, ListItemIcon, Chip, Tooltip, } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import HighlightOffOutlinedIcon from "@mui/icons-material/HighlightOffOutlined";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
@@ -309,13 +309,31 @@ function ManageAccount() {
   }, [updateFetch, selectedTab]);
 
   useEffect(() => {
-    const fetchDept = async () => {
+    const fetchDeptAndUsers = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8080/department/getAllDepts"
-        );
-        setDepartments(response.data);
-        console.log(departments);
+        const deptResponse = await axios.get("http://localhost:8080/department/getAllDepts");
+        const userResponse = await axios.get("http://localhost:8080/user/getAllUser");
+
+        const fetchedDepartments = deptResponse.data;
+        const fetchedUsers = userResponse.data;
+
+        // Assign office heads to their departments
+        const departmentsWithHeads = fetchedDepartments.map((dept) => {
+          const officeHead = fetchedUsers.find(
+            (user) =>
+              (user.position === "Office Head" || user.position === "Department Head") &&
+              user.dept === dept.deptName
+          );
+          return {
+            ...dept,
+            deptOfficeHead: officeHead
+              ? `${officeHead.fName} ${officeHead.mName ? officeHead.mName.charAt(0) + "." : ""} ${officeHead.lName}`
+              : "",
+          };
+        });
+
+        setDepartments(departmentsWithHeads);
+        console.log(departmentsWithHeads);
       } catch (error) {
         if (error.response) {
           console.log(error.response.data);
@@ -327,7 +345,7 @@ function ManageAccount() {
       }
     };
 
-    fetchDept();
+    fetchDeptAndUsers();
   }, []);
 
   useEffect(() => {
@@ -456,12 +474,16 @@ function ManageAccount() {
         setUpdateFetch((prev) => !prev);
         setOpenRegistrationDialog(false);
       } else {
-        showErrorAlert("Failed to register user. User already exists.");
+        showErrorAlert("Failed to register user.");
       }
     } catch (error) {
       console.error("Network error", error);
     }
   };
+
+  const availableDepartments = role === "HEAD"
+    ? departments.filter((dept) => !dept.deptOfficeHead)
+    : departments;
 
   const handleClickEditBtn = async (userID) => {
     try {
@@ -480,36 +502,22 @@ function ManageAccount() {
     }
   };
 
-  const checkUsernameAvailability = async (username) => {
-    try {
-      const response = await axios.put(`http://localhost:8080/user/checkUsername/${username}`);
-      return response.data; // Returns "Username already taken" or "Username available"
-    } catch (error) {
-      console.error("Error checking username availability:", error);
-      return "Failed to check username availability";
-    }
-  };
-
-
-  const checkEmailAvailability = async (email) => {
-    try {
-      const response = await axios.put(`http://localhost:8080/user/checkEmail/${email}`);
-      return response.data; // Returns "Email already taken" or "Email available"
-    } catch (error) {
-      console.error("Error checking email availability:", error);
-      return "Failed to check email availability";
-    }
-  };
 
   const handleUserDataChange = (e) => {
     const { name, value } = e.target;
 
+    // Check if the name is 'workID' and if the value is not a number
+    if (name === 'workID' && isNaN(value)) {
+      // Prevent updating the state
+      return;
+    }
 
     setSelectedUser((prevData) => ({
       ...prevData,
       [name]: value,
     }));
   };
+
 
   const handleEditUserSave = async (e, selectedUser) => {
     e.preventDefault();
@@ -661,7 +669,7 @@ function ManageAccount() {
       format: (value, row) => {
         return (
           <div>
-            <IconButton sx={{width:'1.5em'}}>
+            <IconButton sx={{ width: '1.5em' }}>
               <FontAwesomeIcon
                 icon={faPenToSquare}
                 style={{
@@ -672,7 +680,7 @@ function ManageAccount() {
                 onClick={() => handleClickEditBtn(row.userID)}
               />
             </IconButton>
-            <IconButton sx={{width:'1.5em'}}>
+            <IconButton sx={{ width: '1.5em' }}>
               <FontAwesomeIcon
                 icon={faTrash}
                 style={{
@@ -726,34 +734,36 @@ function ManageAccount() {
       align: "center",
       format: (value, row) => (
         <div>
-         <IconButton sx={{width:'1.5em'}}>
-              <FontAwesomeIcon
-                icon={faPenToSquare}
-                style={{
-                  color: "#8C383E",
-                  fontSize: "1.3rem",
-                  cursor: "pointer",
-                }}
-                onClick={() => handleClickEditBtn(row.userID)}
-              />
-            </IconButton>
-            <IconButton sx={{width:'1.5em'}}>
-              <FontAwesomeIcon
-                icon={faTrash}
-                style={{
-                  color: "#8C383E",
-                  fontSize: "1.3rem",
-                  cursor: "pointer",
-                }}
-                onClick={() => {
-                  handleClickDeleteBtn(row.userID);
-                }}
-              />
-            </IconButton>
+          <IconButton sx={{ width: '1.5em' }}>
+            <FontAwesomeIcon
+              icon={faPenToSquare}
+              style={{
+                color: "#8C383E",
+                fontSize: "1.3rem",
+                cursor: "pointer",
+              }}
+              onClick={() => handleClickEditBtn(row.userID)}
+            />
+          </IconButton>
+          <IconButton sx={{ width: '1.5em' }}>
+            <FontAwesomeIcon
+              icon={faTrash}
+              style={{
+                color: "#8C383E",
+                fontSize: "1.3rem",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                handleClickDeleteBtn(row.userID);
+              }}
+            />
+          </IconButton>
         </div>
       ),
     },
   ];
+
+
 
   return (
     <div>
@@ -908,7 +918,7 @@ function ManageAccount() {
                           <TextField size="small" required fullWidth placeholder="Password" type={showPassword ? "text" : "password"} id="password" onChange={handlePassword}
                             InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }}
                           />
-                          <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} onClick={handleShowPassword} style={{ color: "#636E72", position: "absolute", right: "17px", top: "50%", transform: "translateY(-41%)", cursor: "pointer", }} />
+                          <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} onClick={handleShowPassword} style={{ color: "#636E72", position: "absolute", right: "10px", top: "47%", transform: "translateY(-41%)", cursor: "pointer", }} />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                           {passwordStrong ? (
@@ -949,7 +959,7 @@ function ManageAccount() {
                           <TextField required size="small" fullWidth placeholder="Confirm Password" type={showConfirmPassword ? "text" : "password"} id="confirmpassword" onChange={handleConfirmPassword}
                             InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: ".8em", }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }}
                           />
-                          <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} onClick={handleShowConfirmPassword} style={{ color: "#636E72", position: "absolute", right: "17px", top: "50%", transform: "translateY(-41%)", cursor: "pointer", }}
+                          <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} onClick={handleShowConfirmPassword} style={{ color: "#636E72", position: "absolute", right: "10px", top: "47%", transform: "translateY(-41%)", cursor: "pointer", }}
                           />
 
                         </div>
@@ -1071,22 +1081,44 @@ function ManageAccount() {
                     <Grid item xs={6}>
                       <Box>
                         <FormControl required fullWidth size="small">
-                          <Select required labelId="deptLabel" id="dept" value={dept} placeholder="Department" onChange={handledept}
-                            MenuProps={{ PaperProps: { style: { maxWidth: "300px", }, }, }}
+                          <Select
+                            required
+                            labelId="deptLabel"
+                            id="dept"
+                            value={dept}
+                            placeholder="Department"
+                            onChange={handledept}
+                            MenuProps={{
+                              PaperProps: {
+                                style: { maxWidth: "300px" },
+                              },
+                            }}
                             displayEmpty
-                            sx={{ fontSize: '.8em', fontFamily: 'Poppins', }}
+                            sx={{ fontSize: '.8em', fontFamily: 'Poppins' }}
                             renderValue={(selected) => {
                               if (selected.length === 0) {
                                 return <Box sx={{ color: 'gray' }}>Department</Box>;
                               }
                               return selected;
-                            }}>
+                            }}
+                          >
                             <MenuItem disabled style={{ fontFamily: "Poppins", fontSize: '.8em' }} value="">Department</MenuItem>
-                            {departments.map((dept, index) => {
-                              return (
-                                <MenuItem key={index} style={{ fontFamily: "Poppins", fontSize: '.8em' }} value={dept.deptName} sx={{ fontFamily: "Poppins", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "300px", }}>{dept.deptName}</MenuItem>
-                              );
-                            })}
+                            {availableDepartments.map((dept, index) => (
+                              <MenuItem
+                                key={index}
+                                style={{ fontFamily: "Poppins", fontSize: '.8em' }}
+                                value={dept.deptName}
+                                sx={{
+                                  fontFamily: "Poppins",
+                                  whiteSpace: "nowrap",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  maxWidth: "300px",
+                                }}
+                              >
+                                {dept.deptName}
+                              </MenuItem>
+                            ))}
                           </Select>
                         </FormControl>
                       </Box>
@@ -1116,7 +1148,7 @@ function ManageAccount() {
                         <div style={{ position: "relative", width: "100%" }}>
                           <TextField size="small" required fullWidth label="Password" type={showPassword ? "text" : "password"} id="password" onChange={handlePassword}
                             InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: ".8em" }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }} />
-                          <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} onClick={handleShowPassword} style={{ color: "#636E72", position: "absolute", right: "17px", top: "50%", transform: "translateY(-41%)", cursor: "pointer", }} />
+                          <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} onClick={handleShowPassword} style={{ color: "#636E72", position: "absolute", right: "10px", top: "47%", transform: "translateY(-41%)", cursor: "pointer", }} />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                           {passwordStrong ? (
@@ -1157,7 +1189,7 @@ function ManageAccount() {
                           <TextField required size="small" fullWidth placeholder="Confirm Password" type={showConfirmPassword ? "text" : "password"} id="confirmpassword" onChange={handleConfirmPassword}
                             InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: ".8em", }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }}
                           />
-                          <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} onClick={handleShowConfirmPassword} style={{ color: "#636E72", position: "absolute", right: "17px", top: "50%", transform: "translateY(-41%)", cursor: "pointer", }}
+                          <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} onClick={handleShowConfirmPassword} style={{ color: "#636E72", position: "absolute", right: "10px", top: "47%", transform: "translateY(-41%)", cursor: "pointer", }}
                           />
 
                         </div>
@@ -1185,10 +1217,10 @@ function ManageAccount() {
             <Box sx={{ bgcolor: "#8c383e", height: "2em", width: "100%", display: "flex", justifyContent: "right", }} >
               <Grid container>
                 <Grid item xs={12}>
-                  <Grid container spacing={0.6} sx={{ fontFamily: "Poppins", fontWeight: 500, color: "white", backgroundColor: "transparent", alignItems: "center", }}>
-                    <Grid item sx={{height:'2.2em', ml:'.5em',mt:'.3em' }}>
-                    <FontAwesomeIcon icon={faPenToSquare} sx={{ color: "white", fontSize: "1.5em"}} />
-                  </Grid>
+                  <Grid container spacing={0.6} sx={{ fontFamily: "Poppins", fontWeight: "bold", color: "white", backgroundColor: "transparent", alignItems: "center", }}>
+                    <Grid item sx={{ height: '2.2em', ml: '.5em', mt: '.3em' }}>
+                      <FontAwesomeIcon icon={faPenToSquare} sx={{ color: "white", fontSize: "1.5em" }} />
+                    </Grid>
                     <Grid item >Edit User Details</Grid>
                   </Grid>
                 </Grid>
@@ -1203,7 +1235,7 @@ function ManageAccount() {
                   <>
                     <Grid item xs={4}>
                       <Box style={{ fontFamily: "Poppins" }} height="100%">
-                        <TextField fullWidth size="small" label="First Name" id="fName" name="fName" value={selectedUser.fName} onChange={handleUserDataChange}
+                        <TextField required fullWidth size="small" label="First Name" id="fName" name="fName" value={selectedUser.fName} onChange={handleUserDataChange}
                           InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }}
                         />
                       </Box>
@@ -1216,15 +1248,18 @@ function ManageAccount() {
                     </Grid>
                     <Grid item xs={4}>
                       <Box style={{ fontFamily: "Poppins" }} >
-                        <TextField fullWidth size="small" label="Last Name" id="lName" value={selectedUser.lName} name="lName" onChange={handleUserDataChange}
+                        <TextField required fullWidth size="small" label="Last Name" id="lName" value={selectedUser.lName} name="lName" onChange={handleUserDataChange}
                           InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }} />
                       </Box>
                     </Grid>
                     <Grid item xs={6}>
-                      <Box >
-                        <TextField fullWidth size="small" label="Id Number" id="workId" name="workID" value={selectedUser.workID} onChange={handleUserDataChange}
-                          InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }} />
-                      </Box>
+                      <Tooltip title="ID Numbers should be numbers only" arrow>
+                        <Box >
+                          <TextField fullWidth size="small" label="Id Number" id="workId" name="workID" value={selectedUser.workID} onChange={handleUserDataChange}
+                            InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }} />
+                        </Box>
+                      </Tooltip>
+
                     </Grid>
                     <Grid item xs={6}>
                       <Box >
@@ -1271,13 +1306,28 @@ function ManageAccount() {
                         </Box>
                       </Grid>
                       <Grid item xs={6} sx={{ width: "100%" }}>
+
                         <Box sx={{ height: "100%" }}>
-                          <TextField fullWidth size="small" label="Employee ID" id="workId" name="workID" value={selectedUser.workID} onChange={handleUserDataChange}
-                            InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }} />
-                          {(workIDMsg) && (
-                            <FormHelperText style={{ color: "red", }}>{workIDMsg}</FormHelperText>
-                          )}
+                          <Tooltip title="ID Numbers should be numbers only" placement="left" arrow slotProps={{
+                            popper: {
+                              modifiers: [
+                                {
+                                  name: 'offset',
+                                  options: {
+                                    offset: [0, -14],
+                                  },
+                                },
+                              ],
+                            },
+                          }}
+                          >
+                            <TextField fullWidth size="small" label="ID Number" id="workId" name="workID" value={selectedUser.workID} onChange={handleUserDataChange}
+                              InputLabelProps={{ style: { fontFamily: "Poppins", fontSize: '.8em' }, }} inputProps={{ style: { fontSize: ".8em", fontFamily: "Poppins", }, }} />
+                          </Tooltip>
                         </Box>
+
+
+
                       </Grid>
                       <Grid item xs={6}>
                         <Box>
@@ -1373,31 +1423,30 @@ function ManageAccount() {
 
         {/*dialog - DELETE */}
         <Dialog open={openDeleteDialog} onClose={handleClickCloseBtn}>
-  <Box sx={{ bgcolor: "#8c383e", height: "2em", width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center",}}>
-    <Grid container>
-      <Grid item xs={12}>
-        <Grid container spacing={0.6} sx={{ fontFamily: "Poppins", fontWeight: 500, color: "white", backgroundColor: "transparent", alignItems: "center" }}>
-          <Grid item sx={{ height: '2em', ml: '.3em', mt: '.3em' }}>
-            <FontAwesomeIcon icon={faTrash} sx={{ color: "white", fontSize: "1.5em" }} />
-          </Grid>
-          <Grid item>Delete User Account</Grid>
-        </Grid>
-      </Grid>
-    </Grid>
-    <IconButton onClick={handleClickCloseBtn} sx={{ "&:hover": { color: "#F8C702" } }}>
-      <HighlightOffOutlinedIcon sx={{ fontSize: "1em", color: "white" }} />
-    </IconButton>
-  </Box>
-  <DialogContent>
-    <DialogContentText sx={{ fontFamily: "Poppins", color: "black", display: "flex", justifyContent: "center", mt: "1.3em" }}>
-      Are you sure you want to delete this user account?
-    </DialogContentText>
-  </DialogContent>
-  <DialogActions sx={{ display: "flex", justifyContent: "center", }}>
-    <Button onClick={handleClickCloseBtn} variant="outlined" sx={{ textTransform: "none", width:"20%", borderColor: "#B4B4B4", borderRadius: '5px', fontFamily: "Poppins", height: '2.3em', color: 'black', "&:hover": { bgcolor: "#ECECEE", borderColor: "#ECECEE", color: "black" } }}>No</Button>
-    <Button onClick={() => handleYesDelBtn(selectedUser.userID)} variant="contained" sx={{ textTransform: "none", width:"20%", borderRadius: '5px', fontFamily: "Poppins", bgcolor: "#8C383E", height: '2.3em', color: "white", "&:hover": { bgcolor: "#762F34", color: "white" } }}>Yes</Button>
-  </DialogActions>
-</Dialog>
+          <Box sx={{ bgcolor: "#8c383e", height: "2em", width: "100%", display: "flex", justifyContent: "right", }} >
+            <Grid container>
+              <Grid item xs={12}>
+                <Grid container spacing={0.6} sx={{ fontFamily: "Poppins", fontWeight: "bold", color: "white", backgroundColor: "transparent", alignItems: "center", }}>
+                  <Grid item sx={{ height: '2em', ml: '.3em', mt: '.3em' }}>
+                    <FontAwesomeIcon icon={faTrash} sx={{ color: "white", fontSize: "1.5em" }} />
+                  </Grid>
+                  <Grid item >Delete User Account</Grid>
+                </Grid>
+              </Grid>
+            </Grid>
+            <IconButton onClick={handleClickCloseBtn} sx={{ "&:hover": { color: "#F8C702", }, }}>
+              <HighlightOffOutlinedIcon sx={{ fontSize: "1em", color: "white" }} />
+            </IconButton>
+          </Box>
+          <DialogContent>
+            <DialogContentText sx={{ fontFamily: "Poppins", color: "black", display: "flex", justifyContent: "center", mt: "1.3em", }}>Are you sure you want to delete this user account?</DialogContentText>
+          </DialogContent>
+          <DialogActions sx={{ display: "flex", justifyContent: "center", }}>
+            <Button onClick={() => handleYesDelBtn(selectedUser.userID)} variant="contained" style={{ textTransform: "none", fontFamily: "Poppins", }} sx={{ borderRadius: '20px', fontFamily: "Poppins", bgcolor: "rgba(248, 199, 2, 0.8)", height: '2.3em', color: "black", "&:hover": { bgcolor: "#F8C702", color: "black", }, }}>Yes</Button>
+            <Button onClick={handleClickCloseBtn} style={{ textTransform: "none", fontFamily: "Poppins", }} sx={{ borderRadius: '20px', fontFamily: "Poppins", height: '2.3em', color: 'black', ml: "1em", "&:hover": { bgcolor: "rgba(248, 199, 2, 0.2)", color: "black", }, }} > No
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         <CustomAlert open={successAlert.open} onClose={() => setSuccessAlert({ ...successAlert, open: false })} severity="success" message={successAlert.message} />
         <CustomAlert open={errorAlert.open} onClose={() => setErrorAlert({ ...errorAlert, open: false })} severity="error" message={errorAlert.message} />

@@ -63,13 +63,13 @@ export const SideBarData = [
 	},
   {
     title: "View Profile",
-    path: "/ViewProfileAdmin",
+    path: "/ViewProfileHead",
     role: "HEAD",
     icon: <FontAwesomeIcon icon={faUser} style={{ fontSize: "15px" }} />,
   },
   {
-	title: "Take Evaluation",
-	path: "/takeEvaluation",
+	title: "Employee Evaluation",
+	path: "/EvaluateEmployee",
 	role: "HEAD",
 	icon: <FontAwesomeIcon icon={faFileLines} style={{ fontSize: "15px" }} />,
 	margin: "0 0 0 4px",
@@ -81,4 +81,5 @@ export const SideBarData = [
     role: "HEAD",
     icon: <FontAwesomeIcon icon={faUserTie} style={{ fontSize: "15px" }} />,
   },
+  
 ];
