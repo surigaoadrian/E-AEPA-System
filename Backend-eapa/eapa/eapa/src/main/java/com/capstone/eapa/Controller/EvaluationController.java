@@ -1,5 +1,6 @@
 package com.capstone.eapa.Controller;
 
+import com.capstone.eapa.DTO.EvaluationDTO;
 import com.capstone.eapa.Entity.EvaluationEntity;
 import com.capstone.eapa.Entity.UserEntity;
 import com.capstone.eapa.Service.EvaluationService;
@@ -49,4 +50,8 @@ public class EvaluationController {
         return ResponseEntity.ok(evaluations);
     }
 
+    @GetMapping("/evaluations")
+    public List<EvaluationDTO> getEvaluations() {
+        return evalServ.getAggregatedEvaluations();
+    }
 }
