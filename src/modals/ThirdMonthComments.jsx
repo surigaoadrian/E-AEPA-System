@@ -45,7 +45,7 @@ const ThirdMonthComments = () => {
         height: '40px', 
         display: 'flex',       
         alignItems: 'center',   
-        width: '100%'}} > &nbsp; [TARGET] What should be your STAFF's career goals for the semester (up to December 2022)?  </Typography>
+        width: '100%'}} > &nbsp; [TARGET] What should be your STAFF's career goals for the semester (up to December 2024)?  </Typography>
 
       <div className='flex space-x-4 -mt-2'>
         <TextField
