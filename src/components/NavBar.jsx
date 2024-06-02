@@ -176,7 +176,7 @@ function NavBar() {
 					}}
 				>
 					<img
-						src={profilePictureUrl}
+						src={profilePictureUrl ? profilePictureUrl : profile }
 						alt="nav-profile-picture"
 						style={{ width: "100%", height: "100%", objectFit: "cover" }}
 						className="rounded-full ring-4 ring-black"
