@@ -162,7 +162,7 @@ function EvaluateEmployee() {
                                     </TableHead>
                                     <TableBody>
                                         {rows.map((row) => (
-                                            <TableRow sx={{ bgcolor: 'white', "&:hover": { backgroundColor: "rgba(248, 199, 2, 0.5)", color: "black", }, }} key={row.id}>
+                                            <TableRow sx={{ bgcolor: 'white', "&:hover": { backgroundColor: "rgba(248, 199, 2, 0.5)", color: "black", },height:'3em' }} key={row.id}>
                                                 {columnsEmployees.map((column) => (
                                                     <TableCell sx={{ fontFamily: "Poppins", }} key={`${row.id}-${column.id}`} align={column.align}>
                                                         {column.id === "name" ? row.name : column.id === "actions" ? column.format ? column.format(row[column.id], row) : null : column.format ? column.format(row[column.id]) : row[column.id]}
