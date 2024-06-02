@@ -105,6 +105,10 @@ public class EvaluationService {
         return "COMPLETED".equals(status);
     }
 
+    public List<EvaluationEntity> getEvaluationsByUser(int userID) {
+        return evalRepo.findByUserID(userID);
+    }
+
 
 
 }
