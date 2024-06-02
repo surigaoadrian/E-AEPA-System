@@ -14,4 +14,6 @@ public interface JobBasedResponseRepository extends JpaRepository<JobBasedRespon
     @Query(value = "SELECT * FROM tbljobbasedresponse resp WHERE resp.is_deleted = 0", nativeQuery = true)
     List<JobBasedResponseEntity> findAllResponse();
 
+    List<JobBasedResponseEntity> findByEvaluation_EvalID(int evaluationID);
+
 }

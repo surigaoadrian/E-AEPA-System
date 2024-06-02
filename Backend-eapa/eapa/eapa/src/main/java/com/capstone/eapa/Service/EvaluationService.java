@@ -1,13 +1,15 @@
 package com.capstone.eapa.Service;
 
+import com.capstone.eapa.DTO.EvaluationDTO;
 import com.capstone.eapa.Entity.EvaluationEntity;
+import com.capstone.eapa.Entity.Role;
 import com.capstone.eapa.Entity.UserEntity;
 import com.capstone.eapa.Repository.EvaluationRepository;
 import com.capstone.eapa.Repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import java.util.stream.Collectors;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -108,7 +110,54 @@ public class EvaluationService {
     public List<EvaluationEntity> getEvaluationsByUser(int userID) {
         return evalRepo.findByUserID(userID);
     }
+    
+    public List<EvaluationDTO> getAggregatedEvaluations() {
+        List<EvaluationEntity> evaluations = evalRepo.findAll();
 
+        return evaluations.stream()
+            .collect(Collectors.groupingBy(EvaluationEntity::getUserId))
+            .entrySet().stream()
+            .map(entry -> {
+                int userId = entry.getKey();
+                String position = userRepo.findByUserID(userId).get().getPosition();
+                String workID = userRepo.findByUserID(userId).get().getWorkID();
+                String dept = userRepo.findByUserID(userId).get().getDept();
+                String empStatus = userRepo.findByUserID(userId).get().getEmpStatus();
+                String fName = userRepo.findByUserID(userId).get().getfName();
+                String lName = userRepo.findByUserID(userId).get().getlName();
+                Role role = userRepo.findByUserID(userId).get().getRole();
+
+
+                List<EvaluationEntity> userEvaluations = entry.getValue();
+
+                EvaluationDTO dto = new EvaluationDTO();
+                dto.setUserId(userId);
+                dto.setWorkID(workID);
+                dto.setPosition(position);
+                dto.setDept(dept);
+                dto.setEmpStatus(empStatus);
+                dto.setfName(fName);
+                dto.setlName(lName);
+                dto.setRole(role);
+                
+                for (EvaluationEntity eval : userEvaluations) {
+                    switch (eval.getEvalType() + "-" + eval.getStage()) {
+                        case "SELF-JOB":
+                            dto.setSjbpStatus(eval.getStatus());
+                            break;
+                        case "SELF-VALUES":
+                            dto.setSvbpaStatus(eval.getStatus());
+                            break;
+                        case "PEER-VALUES":
+                            dto.setPvbpaStatus(eval.getStatus());
+                            break;
+                        // Add more cases as needed
+                    }
+                }
+                return dto;
+            })
+            .collect(Collectors.toList());
+    }
 
 
 }

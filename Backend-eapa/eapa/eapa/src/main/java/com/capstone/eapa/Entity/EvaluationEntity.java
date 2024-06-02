@@ -29,6 +29,32 @@ public class EvaluationEntity {
     @OneToMany(mappedBy = "evaluation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ResponseEntity> responses;
 
+    public int getUserId() {
+        return user.getUserID();
+    }
+    public String getWorkID() {
+        return user.getWorkID();
+    }
+
+    public Role getRole() {
+        return user.getRole();
+    }
+    public String getPosition() {
+        return user.getPosition();
+    }
+
+    public String getfName() {
+        return user.getfName();
+    }
+
+    public String getlName() {
+        return user.getlName();
+    }
+    
+    public String getEmpStatus() {
+        return user.getEmpStatus();
+    }
+
     public EvaluationEntity() {
         super();
     }

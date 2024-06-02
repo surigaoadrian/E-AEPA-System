@@ -111,11 +111,12 @@ function EvaluateEmployee() {
                             aria-controls={open ? 'fade-menu' : undefined}
                             aria-haspopup="true"
                             aria-expanded={open ? 'true' : undefined} sx={{
+                                fontFamily:'Poppins',
                                 color: '#8c383e',
                                 fontSize: '.9em', "&:hover": { color: "red", },
                             }}
                             onClick={handleClick}
-                            style={{ textTransform: "none", }} startIcon={<FontAwesomeIcon icon={faFileLines} style={{ fontSize: ".8rem", }} />}>
+                            style={{ textTransform: "none",  }} startIcon={<FontAwesomeIcon icon={faFileLines} style={{ fontSize: ".8rem", }} />}>
                             Evaluate
                         </Button>
                         <Menu

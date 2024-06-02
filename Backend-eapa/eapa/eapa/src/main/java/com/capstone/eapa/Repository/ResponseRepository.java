@@ -15,4 +15,6 @@ public interface ResponseRepository extends JpaRepository<ResponseEntity, Intege
     @Query(value = "SELECT * FROM tblresponse resp WHERE resp.is_deleted = 0", nativeQuery = true)
     List<ResponseEntity> findAllResponse();
 
+    List<ResponseEntity> findByEvaluation_EvalID(int evaluationID);
+
 }
