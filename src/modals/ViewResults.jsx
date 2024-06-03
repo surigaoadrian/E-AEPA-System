@@ -277,22 +277,22 @@ const ViewResults = ({ open, onClose, employee }) => {
             </Typography>
             <Table size="small">
               <TableBody>
-                <TableRow>
-                  <TableCell sx={{width: '40%',border: '1px solid #ccc' ,fontFamily: 'Poppins'}}>Employee ID</TableCell>
-                  <TableCell sx={{border: '1px solid #ccc' ,fontFamily: 'Poppins'}}>{employee.id}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell  sx={{width: '40%',border: '1px solid #ccc' ,fontFamily: 'Poppins'}}>Employee Name</TableCell>
-                  <TableCell  sx={{border: '1px solid #ccc' ,fontFamily: 'Poppins'}}>{employee.name}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell sx={{width: '40%',border: '1px solid #ccc' ,fontFamily: 'Poppins'}}>Employee Position</TableCell>
-                  <TableCell sx={{border: '1px solid #ccc' ,fontFamily: 'Poppins'}}>ETO - Staff</TableCell>
-                </TableRow>
-                <TableRow>
-                      <TableCell sx={{width: '40%',border: '1px solid #ccc' ,fontFamily: 'Poppins'}}>Department</TableCell>
-                      <TableCell sx={{border: '1px solid #ccc' ,fontFamily: 'Poppins'}}>(ETO) Enrolment Technical Office</TableCell>
-                    </TableRow>
+              <TableRow>
+                        <TableCell sx={{ width: '40%', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Employee ID</TableCell>
+                        <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }}>{employee.workID}</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell sx={{ width: '40%', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Employee Name</TableCell>
+                        <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }}>{employee.fName + " " + employee.lName}</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell sx={{ width: '40%', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Employee Position</TableCell>
+                        <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }}>{employee.position}</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell sx={{ width: '40%', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Department</TableCell>
+                        <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }}>{employee.dept}</TableCell>
+                      </TableRow>
               </TableBody>
             </Table>
           </TableContainer>
@@ -478,7 +478,7 @@ const ViewResults = ({ open, onClose, employee }) => {
               Expanded Administrative Performance Assessment (e-AEPA) :
             </Typography>
             <Typography variant="h6" sx={{ textAlign: 'center', fontWeight: 'bold', mt: 1, fontFamily: 'Poppins' }}>
-              3RD MONTH EVALUATION RESULT
+              5TH MONTH EVALUATION RESULT
             </Typography>
             <Divider sx={{ borderBottom: '3px solid', width: '80%', margin: 'auto', my: 2 }} />
             <div className="flex">
@@ -533,12 +533,12 @@ const ViewResults = ({ open, onClose, employee }) => {
                       <TableRow>
                         <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }}>60%</TableCell>
                         <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }}>Values-Based Performance Assessment</TableCell>
-                        <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }} align="right">5.00</TableCell>
+                        <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }} align="right">4.50</TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }}>40%</TableCell>
                         <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }}>Job-Based Performance Assessment</TableCell>
-                        <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }} align="right">4.50</TableCell>
+                        <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }} align="right">5.0</TableCell>
                       </TableRow>
                     </TableBody>
                   </Table>

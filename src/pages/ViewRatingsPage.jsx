@@ -465,7 +465,7 @@ function ViewRatingsPage() {
                           }}
                           align="right"
                         >
-                          5.00
+                          4.5
                         </TableCell>
                       </TableRow>
                       <TableRow>
@@ -492,7 +492,7 @@ function ViewRatingsPage() {
                           }}
                           align="right"
                         >
-                          4.50
+                          5.0
                         </TableCell>
                       </TableRow>
                     </TableBody>
@@ -1324,7 +1324,7 @@ function ViewRatingsPage() {
                           }}
                           align="right"
                         >
-                          4.50
+                          4.5
                         </TableCell>
                       </TableRow>
                       <TableRow>
@@ -1351,7 +1351,7 @@ function ViewRatingsPage() {
                           }}
                           align="right"
                         >
-                          4.50
+                          5.0
                         </TableCell>
                       </TableRow>
                     </TableBody>
