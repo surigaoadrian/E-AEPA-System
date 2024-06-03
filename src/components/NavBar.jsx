@@ -73,6 +73,9 @@ function NavBar() {
 
   //   getImageUrl();
   // }, []);
+	function base64ToDataURL(base64String) {
+		return `data:image/png;base64,${base64String}`;
+	  }
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -82,12 +85,7 @@ function NavBar() {
           `http://localhost:8080/user/getUser/${userID}`
         );
         setLoggedUserData(response.data);
-        if (response.data.role !== "ADMIN" && response.data.role !== "HEAD") {
-          const imageUrl = await getImageUrl(userID);
-          setProfilePictureUrl(imageUrl);
-        } else {
-          setProfilePictureUrl(profile); // Default profile picture for admin
-        }
+
       } catch (error) {
         if (error.response) {
           //not in 200 response range
@@ -199,7 +197,7 @@ function NavBar() {
           }}
         >
           <img
-            src={profilePictureUrl}
+            src={loggedUserData?.profilePic ? base64ToDataURL(loggedUserData.profilePic) : '/user.png'}
             alt="nav-profile-picture"
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
             className="rounded-full ring-4 ring-black"
