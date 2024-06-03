@@ -27,5 +27,5 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
     List<UserEntity> findPeersByDeptRoleNotUserIDNotAndPositionNotSecretary(String dept, String role, int userID);
 
     //Track Employee 
-    List<UserEntity> findByDeptIn(List<String> deptNames);
+//    List<UserEntity> findByDeptIn(List<String> deptNames);
 }

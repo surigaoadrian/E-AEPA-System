@@ -44,6 +44,7 @@ function EvaluationCard({
     bgcolor: "background.paper",
     boxShadow: 24,
     borderTop: "30px solid #8C383E",
+    borderRadius: "10px",
     padding: "20px",
     display: "flex",
     flexDirection: "column",
@@ -297,7 +298,7 @@ function EvaluationCard({
         aria-describedby="modal-description"
       >
         <Box sx={modalStyle}>
-          <Typography id="modal-title" sx={{ fontSize: "18px" }} component="h2">
+          <Typography id="modal-title" sx={{ fontSize: "16px" }} component="h2">
             Are you sure you want to start the assessment now?
           </Typography>
           <div

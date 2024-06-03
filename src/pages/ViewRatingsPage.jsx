@@ -49,6 +49,188 @@ function ViewRatingsPage() {
   const [employee, setEmployee] = useState({});
   const userId = sessionStorage.getItem("userID");
 
+  //adi changes
+  //self values average
+  const [selfValuesAveThirdMonth, setSelfValuesAveThirdMonth] = useState(0.0);
+  //self job average
+  const [selfJobAveThirdMonth, setSelfJobAveThirdMonth] = useState(0.0);
+  //head values average
+  const [headValuesAveThirdMonth, setHeadValuesAveThirdMonth] = useState(0.0);
+  //head job average
+  const [headJobAveThirdMonth, setHeadJobAveThirdMonth] = useState(0.0);
+
+  //self values:
+  const [selfCultAve, setSelfCultAve] = useState(0.0);
+  const [selfIntAve, setSelfIntAve] = useState(0.0);
+  const [selfTeamAve, setSelfTeamAve] = useState(0.0);
+  const [selfUnivAve, setSelfUnivAve] = useState(0.0);
+
+  //head values:
+  const [headCultAve, setHeadCultAve] = useState(0.0);
+  const [headIntAve, setHeadIntAve] = useState(0.0);
+  const [headTeamAve, setHeadTeamAve] = useState(0.0);
+  const [headUnivAve, setHeadUnivAve] = useState(0.0);
+
+  //self job
+  const [selfJobAve, setSelfJobAve] = useState(0.0);
+
+  //Head
+  const [headValuesThirdMonth, setHeadValuesThirdMonth] = useState(0.0);
+
+  //OVERALLS:
+  const [overallSelfVBPA, setOverallSelfVBPA] = useState(0.0); //SELF VALUES
+  const [overallSelfJBPA, setOverallSelfJBPA] = useState(0.0); //SELF JOB
+  const [overallHeadJBPA, setOverallHeadJBPA] = useState(0.0); //HEAD JOB
+  const [overallHeadVBPA, setOverallHeadVBPA] = useState(0.0); //HEAD VALUES
+
+  const handleOverallSelfVBPA = (cultAve, intAve, teamAve, univAve) => {
+    return (cultAve + intAve + teamAve + univAve) / 4;
+  };
+
+  const handleOverallSelfJBPA = (jobAve) => {
+    return jobAve * 0.2;
+  };
+
+  const handleOverallHeadJBPA = (jobAve) => {
+    return jobAve * 0.6;
+  };
+
+  const handleOverallHeadVBPA = (cultAve, intAve, teamAve, univAve) => {
+    return (cultAve + intAve + teamAve + univAve) / 4;
+  };
+
+  //fetch Averages
+  useEffect(() => {
+    //If 3rd month tab is open
+    if (tabIndex === 0) {
+      //SELF VALUES
+      const fetchSelfValuesThirdMonth = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:8080/results/getAverages`,
+            {
+              params: {
+                userId: userId,
+                evalType: "SELF",
+                stage: "VALUES",
+                period: "3rd Month",
+              },
+            }
+          );
+
+          const data = response.data;
+          setSelfCultAve(data.cultureOfExcellenceAverage);
+          setSelfIntAve(data.integrityAverage);
+          setSelfTeamAve(data.teamworkAverage);
+          setSelfUnivAve(data.universalityAverage);
+
+          const overallSelfVBPA = handleOverallSelfVBPA(
+            data.cultureOfExcellenceAverage,
+            data.integrityAverage,
+            data.teamworkAverage,
+            data.universalityAverage
+          );
+
+          setOverallSelfVBPA(overallSelfVBPA);
+
+          console.log("Overall Self Values Based PA:", overallSelfVBPA);
+        } catch (error) {
+          if (error.response) {
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          } else {
+            console.log(`Error: ${error.message}`);
+          }
+        }
+      };
+
+      //SELF JOB
+      const fetchSelfJobThirdMonth = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:8080/results/getAverages`,
+            {
+              params: {
+                userId: userId,
+                evalType: "SELF",
+                stage: "JOB",
+                period: "3rd Month",
+              },
+            }
+          );
+
+          const data = response.data;
+
+          const overallSelfJBPA = handleOverallSelfJBPA(data.jobRespAverage);
+          setOverallSelfJBPA(overallSelfJBPA);
+          console.log("Overall Self Job Based PA:", overallSelfJBPA);
+        } catch (error) {
+          console.error(`Error: ${error.message}`);
+        }
+      };
+
+      //HEAD JOB
+      const fetchHeadJobThirdMonth = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:8080/results/getJobRespAverageByEmpId`,
+            {
+              params: {
+                empId: userId,
+              },
+            }
+          );
+
+          const data = response.data;
+          const overallHeadJBPA = handleOverallHeadJBPA(data);
+          setOverallHeadJBPA(overallHeadJBPA);
+          console.log("Overall Head Job Based PA:", overallHeadJBPA);
+        } catch (error) {
+          console.error(`Error: ${error.message}`);
+        }
+      };
+
+      //HEAD VALUES
+      const fetchHeadValuesThirdMonth = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:8080/results/getValuesAveragesByEmpIdAndEvalType`,
+            {
+              params: {
+                empId: userId,
+              },
+            }
+          );
+
+          const data = response.data;
+
+          const overallHeadVBPA = handleOverallHeadVBPA(
+            data.cultureOfExcellenceAverage,
+            data.integrityAverage,
+            data.teamworkAverage,
+            data.universalityAverage
+          );
+
+          setHeadCultAve(data.cultureOfExcellenceAverage);
+          setHeadIntAve(data.integrityAverage);
+          setHeadTeamAve(data.teamworkAverage);
+          setHeadUnivAve(data.universalityAverage);
+
+          setOverallHeadVBPA(overallHeadVBPA);
+          console.log("Overall Head Values Based PA:", overallHeadVBPA);
+        } catch (error) {
+          console.error(`Error: ${error.message}`);
+        }
+      };
+
+      fetchSelfValuesThirdMonth();
+      fetchSelfJobThirdMonth();
+      fetchHeadValuesThirdMonth();
+      fetchHeadJobThirdMonth();
+    }
+  }, [tabIndex, userId]);
+
   const handleTabChange = (event, newIndex) => {
     setTabIndex(newIndex);
   };
@@ -148,11 +330,11 @@ function ViewRatingsPage() {
   const VBPChartSeries = [
     {
       name: "Head",
-      data: [4.4, 4, 4.4, 4.6],
+      data: [headCultAve, headIntAve, headTeamAve, headUnivAve],
     },
     {
       name: "Self",
-      data: [4.0, 3, 4.3, 4.8],
+      data: [selfCultAve, selfIntAve, selfTeamAve, selfUnivAve],
     },
     {
       name: "Peer",
@@ -219,7 +401,7 @@ function ViewRatingsPage() {
       <div style={evaluationHeaderStyles}>
         <h1
           style={{
-            // backgroundColor: "yellow",
+            //backgroundColor: "yellow",
             flex: 1,
             fontSize: "22px",
             fontWeight: "bold",
@@ -767,7 +949,7 @@ function ViewRatingsPage() {
                             textAlign: "center",
                           }}
                         >
-                          4.50
+                          {(Math.round(overallHeadVBPA * 100) / 100).toFixed(2)}
                         </TableCell>
                         <TableCell
                           sx={{
@@ -776,7 +958,7 @@ function ViewRatingsPage() {
                             textAlign: "center",
                           }}
                         >
-                          4.50
+                          {(Math.round(overallSelfVBPA * 100) / 100).toFixed(2)}
                         </TableCell>
                         <TableCell
                           sx={{
@@ -785,7 +967,7 @@ function ViewRatingsPage() {
                             textAlign: "center",
                           }}
                         >
-                          4.50
+                          0.0
                         </TableCell>
                       </TableRow>
                       <TableRow>
@@ -806,7 +988,7 @@ function ViewRatingsPage() {
                             textAlign: "center",
                           }}
                         >
-                          5.00
+                          {overallHeadJBPA}
                         </TableCell>
                         <TableCell
                           sx={{
@@ -814,7 +996,9 @@ function ViewRatingsPage() {
                             fontFamily: "Poppins",
                             textAlign: "center",
                           }}
-                        ></TableCell>
+                        >
+                          {overallSelfJBPA}
+                        </TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell
@@ -836,18 +1020,13 @@ function ViewRatingsPage() {
                             fontFamily: "Poppins",
                             textAlign: "center",
                           }}
-                        ></TableCell>
-                        <TableCell
-                          sx={{
-                            backgroundColor: "grey",
-                            color: "white",
-                            fontWeight: "bold",
-                            border: "1px solid #ccc",
-                            fontFamily: "Poppins",
-                            textAlign: "center",
-                          }}
                         >
-                          4.70
+                          {(
+                            Math.round(
+                              (overallHeadVBPA * 0.6 + overallHeadJBPA * 0.4) *
+                                100
+                            ) / 100
+                          ).toFixed(2)}
                         </TableCell>
                         <TableCell
                           sx={{
@@ -859,7 +1038,24 @@ function ViewRatingsPage() {
                             textAlign: "center",
                           }}
                         >
-                          4.50
+                          {(
+                            Math.round(
+                              (overallSelfVBPA * 0.6 + overallSelfJBPA * 0.4) *
+                                100
+                            ) / 100
+                          ).toFixed(2)}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            backgroundColor: "grey",
+                            color: "white",
+                            fontWeight: "bold",
+                            border: "1px solid #ccc",
+                            fontFamily: "Poppins",
+                            textAlign: "center",
+                          }}
+                        >
+                          0.0
                         </TableCell>
                       </TableRow>
                     </TableBody>
@@ -942,7 +1138,7 @@ function ViewRatingsPage() {
                             textAlign: "center",
                           }}
                         >
-                          4.50
+                          {headCultAve}
                         </TableCell>
                         <TableCell
                           sx={{
@@ -951,7 +1147,7 @@ function ViewRatingsPage() {
                             textAlign: "center",
                           }}
                         >
-                          4.50
+                          {selfCultAve}
                         </TableCell>
                         <TableCell
                           sx={{
@@ -960,7 +1156,7 @@ function ViewRatingsPage() {
                             textAlign: "center",
                           }}
                         >
-                          4.50
+                          0.0
                         </TableCell>
                       </TableRow>
                       <TableRow>
@@ -974,7 +1170,7 @@ function ViewRatingsPage() {
                             textAlign: "center",
                           }}
                         >
-                          4.50
+                          {headIntAve}
                         </TableCell>
                         <TableCell
                           sx={{
@@ -983,7 +1179,7 @@ function ViewRatingsPage() {
                             textAlign: "center",
                           }}
                         >
-                          4.50
+                          {selfIntAve}
                         </TableCell>
                         <TableCell
                           sx={{
@@ -992,7 +1188,7 @@ function ViewRatingsPage() {
                             textAlign: "center",
                           }}
                         >
-                          4.50
+                          0.0
                         </TableCell>
                       </TableRow>
                       <TableRow>
@@ -1005,15 +1201,8 @@ function ViewRatingsPage() {
                             fontFamily: "Poppins",
                             textAlign: "center",
                           }}
-                        ></TableCell>
-                        <TableCell
-                          sx={{
-                            border: "1px solid #ccc",
-                            fontFamily: "Poppins",
-                            textAlign: "center",
-                          }}
                         >
-                          5.00
+                          {headTeamAve}
                         </TableCell>
                         <TableCell
                           sx={{
@@ -1021,7 +1210,18 @@ function ViewRatingsPage() {
                             fontFamily: "Poppins",
                             textAlign: "center",
                           }}
-                        ></TableCell>
+                        >
+                          {selfTeamAve}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            border: "1px solid #ccc",
+                            fontFamily: "Poppins",
+                            textAlign: "center",
+                          }}
+                        >
+                          0.0
+                        </TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell sx={{ fontFamily: "Poppins" }}>
@@ -1033,15 +1233,8 @@ function ViewRatingsPage() {
                             fontFamily: "Poppins",
                             textAlign: "center",
                           }}
-                        ></TableCell>
-                        <TableCell
-                          sx={{
-                            border: "1px solid #ccc",
-                            fontFamily: "Poppins",
-                            textAlign: "center",
-                          }}
                         >
-                          5.00
+                          {headUnivAve}
                         </TableCell>
                         <TableCell
                           sx={{
@@ -1049,7 +1242,18 @@ function ViewRatingsPage() {
                             fontFamily: "Poppins",
                             textAlign: "center",
                           }}
-                        ></TableCell>
+                        >
+                          {selfUnivAve}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            border: "1px solid #ccc",
+                            fontFamily: "Poppins",
+                            textAlign: "center",
+                          }}
+                        >
+                          0.0
+                        </TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell
@@ -1071,18 +1275,12 @@ function ViewRatingsPage() {
                             fontFamily: "Poppins",
                             textAlign: "center",
                           }}
-                        ></TableCell>
-                        <TableCell
-                          sx={{
-                            backgroundColor: "grey",
-                            color: "white",
-                            fontWeight: "bold",
-                            border: "1px solid #ccc",
-                            fontFamily: "Poppins",
-                            textAlign: "center",
-                          }}
                         >
-                          4.70
+                          {(headCultAve +
+                            headIntAve +
+                            headTeamAve +
+                            headUnivAve) /
+                            4}
                         </TableCell>
                         <TableCell
                           sx={{
@@ -1094,7 +1292,23 @@ function ViewRatingsPage() {
                             textAlign: "center",
                           }}
                         >
-                          4.50
+                          {(selfCultAve +
+                            selfIntAve +
+                            selfTeamAve +
+                            selfUnivAve) /
+                            4}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            backgroundColor: "grey",
+                            color: "white",
+                            fontWeight: "bold",
+                            border: "1px solid #ccc",
+                            fontFamily: "Poppins",
+                            textAlign: "center",
+                          }}
+                        >
+                          0.0
                         </TableCell>
                       </TableRow>
                     </TableBody>

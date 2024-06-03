@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import EvaluationForm from "../components/EvaluationForm";
+
 import EvaluationCard from "../components/EvaluationCard";
 import axios from "axios";
 import zIndex from "@mui/material/styles/zIndex";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGears } from "@fortawesome/free-solid-svg-icons";
+import EvaluationForm from "../components/EvaluationForm";
 
 function TakeEvaluationPage() {
   const [openForm, setOpenForm] = useState(false);
@@ -15,7 +16,7 @@ function TakeEvaluationPage() {
   const [loggedUser, setLoggedUser] = useState({});
   const userID = sessionStorage.getItem("userID");
   const [period, setPeriod] = useState("");
-  const divRef = useRef(null);
+  //const divRef = useRef(null);
 
   //Fetch user details
   useEffect(() => {
@@ -49,7 +50,7 @@ function TakeEvaluationPage() {
   };
 
   const handleConfirm = async () => {
-    setOpenForm(!openForm);
+    setOpenForm(true);
     setStage(selectedStage);
     setOpenModal(false);
 
@@ -152,6 +153,11 @@ function TakeEvaluationPage() {
           setEvalType={setEvalType}
         />
       ) : (
+        // <div
+        //   style={{ backgroundColor: "yellow", height: "500px", width: "100%" }}
+        // >
+        //   Hello
+        // </div>
         <div style={{ position: "relative" }}>
           <EvaluationCard
             period={"3rd Month"}

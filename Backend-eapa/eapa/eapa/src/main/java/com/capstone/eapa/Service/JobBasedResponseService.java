@@ -47,4 +47,11 @@ public class JobBasedResponseService {
         return jbrespRepo.findAllResponse();
     }
 
+    //return only the responsiblity of the user
+    public List<String> getAllResponseByID(int userID){
+        return jbrespRepo.findResponsesByID(userID);
+    }
+
+
+
 }

@@ -12,6 +12,10 @@ public class ResultsEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
+    @ManyToOne
+    @JoinColumn(name = "emp_id", nullable = true)
+    private UserEntity emp;
+
     @Column(name = "cultAve")
     private double cultureOfExcellenceAverage;
     @Column(name = "intAve")
@@ -31,12 +35,13 @@ public class ResultsEntity {
 
     private int isDeleted = 0;
 
-    public ResultsEntity(UserEntity userEntity, double d, double e, double f, double g, double h, String string, String string2, String string3) {
+    public ResultsEntity() {
         super();
     }
 
-    public ResultsEntity(UserEntity user, double cultureOfExcellenceAverage, double integrityAverage, double teamworkAverage, double universalityAverage, double jobRespAverage, String evalType, String period, String stage, int isDeleted) {
+    public ResultsEntity(UserEntity user, UserEntity emp, double cultureOfExcellenceAverage, double integrityAverage, double teamworkAverage, double universalityAverage, double jobRespAverage, String evalType, String period, String stage, int isDeleted) {
         this.user = user;
+        this.emp = emp;
         this.cultureOfExcellenceAverage = cultureOfExcellenceAverage;
         this.integrityAverage = integrityAverage;
         this.teamworkAverage = teamworkAverage;
@@ -59,6 +64,14 @@ public class ResultsEntity {
 
     public void setUser(UserEntity user) {
         this.user = user;
+    }
+
+    public UserEntity getEmp() {
+        return emp;
+    }
+
+    public void setEmp(UserEntity emp) {
+        this.emp = emp;
     }
 
     public double getCultureOfExcellenceAverage() {
@@ -132,4 +145,7 @@ public class ResultsEntity {
     public void setIsDeleted(int isDeleted) {
         this.isDeleted = isDeleted;
     }
+
+
+
 }
