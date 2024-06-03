@@ -1,5 +1,6 @@
 package com.capstone.eapa.Controller;
 
+import com.capstone.eapa.DTO.EvaluationDTO;
 import com.capstone.eapa.Entity.EvaluationEntity;
 import com.capstone.eapa.Entity.UserEntity;
 import com.capstone.eapa.Service.EvaluationService;
@@ -43,4 +44,14 @@ public class EvaluationController {
         return evalServ.isEvaluationCompleted(userID, period, stage, evalType);
     }
 
+    @GetMapping("/getEvaluationsByUser/{userID}")
+    public ResponseEntity<List<EvaluationEntity>> getEvaluationsByUser(@PathVariable int userID) {
+        List<EvaluationEntity> evaluations = evalServ.getEvaluationsByUser(userID);
+        return ResponseEntity.ok(evaluations);
+    }
+
+    @GetMapping("/evaluations")
+    public List<EvaluationDTO> getEvaluations() {
+        return evalServ.getAggregatedEvaluations();
+    }
 }

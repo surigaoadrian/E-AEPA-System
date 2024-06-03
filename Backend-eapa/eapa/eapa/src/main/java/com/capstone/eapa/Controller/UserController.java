@@ -138,11 +138,11 @@ public class UserController {
     }
 
     //get the employees' data with the corresponding department head - Track Employee
-     @GetMapping("/employees-with-head")
-    public ResponseEntity<List<UserEntity>> getAllEmployeesFromDepartmentHead(@RequestParam String headName) {
-        List<UserEntity> employees = userServ.getAllEmployeesFromDepartmentHead(headName);
-        return ResponseEntity.ok(employees);
-    }
+    //  @GetMapping("/employees-with-head")
+    // public ResponseEntity<List<UserEntity>> getAllEmployeesFromDepartmentHead(@RequestParam String headName) {
+    //     List<UserEntity> employees = userServ.getAllEmployeesFromDepartmentHead(headName);
+    //     return ResponseEntity.ok(employees);
+    // }
 
 
 }
