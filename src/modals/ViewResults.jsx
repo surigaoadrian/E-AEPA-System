@@ -305,7 +305,7 @@ const ViewResults = ({ open, onClose, employee }) => {
                   </TableRow>
                   <TableRow>
                     <TableCell sx={{ width: '40%', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Date of Appraisal</TableCell>
-                    <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }}>{employee.dateTaken}</TableCell>
+                    <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }}>02/20/2024</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell sx={{ width: '40%', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Date Hired</TableCell>
