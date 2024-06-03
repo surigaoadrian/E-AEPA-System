@@ -27,7 +27,7 @@ const CustomTooltip = ({ active, payload }) => {
 
 const Matrix = () => {
   const employeeData = [
-    { id: 1, valuesPerformance: 5, jobsPerformance: 4.0 }
+    { id: 1, valuesPerformance: 4.5, jobsPerformance: 5.0 }
   ];
 
   return (
