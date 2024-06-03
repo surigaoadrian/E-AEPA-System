@@ -118,7 +118,7 @@ function TrackEmployee() {
       align: "center",
       format: (value) => {    
         if (value === "OPEN") {
-          return <span style={{color:'red'}}>OPEN</span> ;
+          return <span style={{color:'red', fontWeight:'bold'}}>OPEN</span> ;
         } else if(value === "COMPLETED") {
           return <span style={{color:'green', fontWeight:"bold"}}>COMPLETED</span> ;
         }else{
@@ -134,7 +134,7 @@ function TrackEmployee() {
       align: "center",
       format: (value) => {    
         if (value === "OPEN") {
-          return <span style={{color:'red'}}>OPEN</span> ;
+          return <span style={{color:'red', fontWeight:'bold'}}>OPEN</span> ;
         } else if(value === "COMPLETED") {
           return <span style={{color:'green', fontWeight:"bold"}}>COMPLETED</span> ;
         }else{
@@ -149,7 +149,7 @@ function TrackEmployee() {
       align: "center",
       format: (value) => {    
         if (value === "OPEN") {
-          return <span style={{color:'red'}}>OPEN</span> ;
+          return <span style={{color:'red', fontWeight:'bold'}}>OPEN</span> ;
         } else if(value === "COMPLETED") {
           return <span style={{color:'green', fontWeight:"bold"}}>COMPLETED</span> ;
         }else{
