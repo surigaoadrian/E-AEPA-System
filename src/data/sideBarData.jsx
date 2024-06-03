@@ -68,7 +68,7 @@ export const SideBarData = [
     icon: <FontAwesomeIcon icon={faUser} style={{ fontSize: "15px" }} />,
   },
   {
-	title: "Employee Evaluation",
+	title: "Staff Evaluation",
 	path: "/EvaluateEmployee",
 	role: "HEAD",
 	icon: <FontAwesomeIcon icon={faFileLines} style={{ fontSize: "15px" }} />,

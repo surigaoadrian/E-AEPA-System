@@ -233,6 +233,7 @@ function ViewProfilePage() {
 			const imageUrl = await getImageUrl(); //FETCH THE IMAGE
 			setProfilePictureUrl(imageUrl);
 			setOpenSeePictureDialog(false);
+			window.location.reload(); // Reload the page to reflect the changes
 			setImage(null); //pra mobalik sa chnagepicture na button
 			showSuccessAlert("Image uploaded successfully");
 		} catch (error) {

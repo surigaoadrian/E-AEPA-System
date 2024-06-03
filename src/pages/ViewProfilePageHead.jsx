@@ -1,5 +1,5 @@
 import {Alert as MuiAlert, Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, Grid, IconButton, MenuItem, Paper, Snackbar, TextField, Tooltip, Typography, Select,
-} from "@mui/material";
+ CircularProgress} from "@mui/material";
 import React, { useState, useEffect, useRef } from "react";
 import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
 import SaveAsRoundedIcon from "@mui/icons-material/SaveAsRounded";
@@ -47,6 +47,7 @@ function ViewProfilePage() {
 	const [image, setImage] = useState("");
 	const [profilePictureUrl, setProfilePictureUrl] = useState(null);
 	const [prevProfilePictureUrl, setPrevProfilePictureUrl] = useState(null);
+	const [loading, setLoading] = useState(false);
 
 	const showSuccessAlert = (message) => {
 		setSuccessAlert({ open: true, message });
@@ -208,6 +209,7 @@ function ViewProfilePage() {
 	const handleSavePicture = async () => {
 		//SAVE THE PICTURE
 		if (!image) return;
+		setLoading(true);
 		const formData = new FormData();
 		formData.append("image", image);
 		try {
@@ -223,11 +225,15 @@ function ViewProfilePage() {
 			const imageUrl = await getImageUrl(); //FETCH THE IMAGE
 			setProfilePictureUrl(imageUrl);
 			setOpenSeePictureDialog(false);
+			window.location.reload(); // Reload the page to reflect the changes
 			setImage(null); //pra mobalik sa chnagepicture na button
 			showSuccessAlert("Image uploaded successfully");
 		} catch (error) {
 			console.error("Error uploading image:", error);
-		}
+            showErrorAlert("Failed to update picture. Please try again later.");
+        } finally {
+            setLoading(false); // Stop loading after the fetch request
+        }
 	};
 	const handleCloseDialog = () => {
 		setImage(null);
@@ -1100,6 +1106,13 @@ function ViewProfilePage() {
 				severity="error"
 				message={errorAlert.message}
 			/>
+
+			{loading && (
+				<Box display="flex" justifyContent="center" alignItems="center" position="absolute" top={0} left={0} width="100%" height="100%" bgcolor="rgba(0, 0, 0, 0.5)">
+					<CircularProgress />
+				</Box>
+			)}
+
 		</div>
 	);
 }
