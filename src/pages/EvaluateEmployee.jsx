@@ -64,12 +64,14 @@ function EvaluateEmployee() {
 
   const handleCloseModal = () => {
     setOpenModal(false);
+    setAnchorEl(null);
   };
 
   const handleConfirm = async () => {
     setOpenForm(!openForm);
     setStage(selectedStage);
     setOpenModal(false);
+    setAnchorEl(null);
 
     const today = new Date();
     const month = String(today.getMonth() + 1).padStart(2, "0");
@@ -335,7 +337,8 @@ function EvaluateEmployee() {
                 }
               >
                 Stage 2: H-JBPA{" "}
-              </MenuItem>{" "}
+              </MenuItem>
+              {/* {" "} */}
               {/* so disabled siya if wa pa nahoman ang stage 1, din if mana sd si stage 1 dapat mo disable si 1  */}
             </Menu>
           </div>

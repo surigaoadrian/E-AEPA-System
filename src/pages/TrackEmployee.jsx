@@ -170,6 +170,7 @@ function TrackEmployee() {
               <Button sx={{
                 color: '#8c383e',
                 fontSize: '.9em', "&:hover": { color: "red", },
+                fontFamily:'Poppins'
               }}
                 style={{ textTransform: "none", }} startIcon={<FontAwesomeIcon icon={faEye} style={{ fontSize: ".8rem", }} />}
                 onClick={() => handleViewResultClick(row.userId)}>
