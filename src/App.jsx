@@ -31,7 +31,7 @@ function App() {
           }
         />
 
- <Route
+        <Route
           path="/viewProfile"
           element={
             <PrivateRoute requiredRoles={["EMPLOYEE"]}>
@@ -84,7 +84,6 @@ function App() {
             </PrivateRoute>
           }
         />
-
 
         <Route
           path="/TrackEmployee"

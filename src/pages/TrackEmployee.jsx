@@ -20,7 +20,7 @@ function TrackEmployee() {
   const [rows, setRows] = useState([]);
   const [updateFetch, setUpdateFetch] = useState(true);
   const [showViewRatingsModal, setViewRatingsModal] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState({});
+  const [employee, setEmployee] = useState({});
 
   //fetch the user data
   useEffect(() => {
@@ -33,14 +33,15 @@ function TrackEmployee() {
         }
         const userData = await userResponse.json();
         setUser(userData);
-        console.log("User data:", userData.status);
+        console.log("User data:", userData);
 
         // Fetch all users
-        const allUsersResponse = await fetch("http://localhost:8080/user/getAllUser");
+        const allUsersResponse = await fetch("http://localhost:8080/evaluation/evaluations");
         if (!allUsersResponse.ok) {
           throw new Error("Failed to fetch all users data");
         }
         const allUsersData = await allUsersResponse.json();
+        console.log("All users data:", allUsersData);
         const processedData = allUsersData
           .filter((item) => item.role === "EMPLOYEE" && item.dept === userData.dept)
           .map((item) => ({
@@ -49,6 +50,7 @@ function TrackEmployee() {
             userID: item.userID,
           }));
 
+          console.log("Processed data:", processedData);
         setRows(processedData);
 
       } catch (error) {
@@ -59,23 +61,23 @@ function TrackEmployee() {
     fetchData();
   }, [userID, updateFetch]);
 
-  const handleViewResultClick = async (userID) => {
+  const handleViewResultClick = async (userId) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/user/getUser/${userID}`
+        `http://localhost:8080/user/getUser/${userId}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch user data");
       }
       const userData = await response.json();
       setViewRatingsModal(true);
-      setSelectedEmployee(userData);
-
-      console.log("Selected employee:", selectedEmployee);
+      setEmployee(userData);
+      console.log("Selected employee:", userData);
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
   };
+
 
 
 
@@ -110,33 +112,51 @@ function TrackEmployee() {
       format: (value) => (value ? value.toLocaleString("en-US") : ""),
     },
     {
-      id: "empStatus",
+      id: "sjbpStatus",
       label: "S-JBPA Status",
       minWidth: 150,
       align: "center",
-      format: (value) => (value ? value.toLocaleString("en-US") : ""),
+      format: (value) => {    
+        if (value === "OPEN") {
+          return <span style={{color:'red', fontWeight:'bold'}}>OPEN</span> ;
+        } else if(value === "COMPLETED") {
+          return <span style={{color:'green', fontWeight:"bold"}}>COMPLETED</span> ;
+        }else{
+          return "Not Yet Open"
+        }
+      },
     },
+    
     {
-      id: "empStatus",
+      id: "svbpaStatus",
       label: "S-VBPA Status",
       minWidth: 150,
       align: "center",
-      format: (value) => (value ? value.toLocaleString("en-US") : ""),
+      format: (value) => {    
+        if (value === "OPEN") {
+          return <span style={{color:'red', fontWeight:'bold'}}>OPEN</span> ;
+        } else if(value === "COMPLETED") {
+          return <span style={{color:'green', fontWeight:"bold"}}>COMPLETED</span> ;
+        }else{
+          return "Not Yet Open"
+        }
+      },
     },
     {
-      id: "empStatus",
+      id: "pvbpaStatus",
       label: "P-VBPA Status",
       minWidth: 150,
       align: "center",
-      format: (value) => (value ? value.toLocaleString("en-US") : ""),
+      format: (value) => {    
+        if (value === "OPEN") {
+          return <span style={{color:'red', fontWeight:'bold'}}>OPEN</span> ;
+        } else if(value === "COMPLETED") {
+          return <span style={{color:'green', fontWeight:"bold"}}>COMPLETED</span> ;
+        }else{
+          return "Not Yet Open"
+        }
+      },
     },
-    // {
-    //   id: "status",
-    //   label: "Evaluation Status",
-    //   minWidth: 150,
-    //   align: "center",
-    //   format: (value) => (value ? value.toLocaleString("en-US") : ""),
-    // },
 
     {
       id: "actions",
@@ -146,13 +166,14 @@ function TrackEmployee() {
       format: (value, row) => {
         return (
           <div>
-            {row.empStatus === "Probationary" && (
+            {row.empStatus === "Probationary" && row.sjbpStatus === "COMPLETED" && row.svbpaStatus === "COMPLETED" && row.pvbpaStatus === "COMPLETED" && (
               <Button sx={{
                 color: '#8c383e',
                 fontSize: '.9em', "&:hover": { color: "red", },
+                fontFamily:'Poppins'
               }}
                 style={{ textTransform: "none", }} startIcon={<FontAwesomeIcon icon={faEye} style={{ fontSize: ".8rem", }} />}
-                onClick={() => handleViewResultClick(row.userID)}>
+                onClick={() => handleViewResultClick(row.userId)}>
                 View
               </Button>
             )}
@@ -166,7 +187,7 @@ function TrackEmployee() {
   return (
     <div>
       <Animated>
-        <Typography ml={6.5} mt={3} sx={{ fontFamily: "Poppins", fontWeight: "bold", fontSize: "1.5em" }}>List of Employees </Typography>
+        <Typography ml={6.5} mt={3} sx={{ fontFamily: "Poppins", fontWeight: "bold", fontSize: "1.5em" }}>Track Employees </Typography>
         <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml: 6, mt: 4, width: "93.5%" }, }}>
           <Grid container spacing={1.5} sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", }}>
             <Paper elevation={1} sx={{ borderRadius: "5px", width: "100%", height: "32em", backgroundColor: "transparent", mt: '.2%' }}>
@@ -183,7 +204,7 @@ function TrackEmployee() {
                   </TableHead>
                   <TableBody>
                     {rows.map((row) => (
-                      <TableRow sx={{ bgcolor: 'white', "&:hover": { backgroundColor: "rgba(248, 199, 2, 0.5)", color: "black", }, }} key={row.id}>
+                      <TableRow sx={{ bgcolor: 'white', "&:hover": { backgroundColor: "rgba(248, 199, 2, 0.5)", color: "black", }, height:'3em' }} key={row.id}>
                         {columnsEmployees.map((column) => (
                           <TableCell sx={{ fontFamily: "Poppins", }} key={`${row.id}-${column.id}`} align={column.align}>
                             {column.id === "name" ? row.name : column.id === "actions" ? column.format ? column.format(row[column.id], row) : null : column.format ? column.format(row[column.id]) : row[column.id]}
@@ -199,7 +220,7 @@ function TrackEmployee() {
           <ViewResults
             open={showViewRatingsModal}
             onClose={() => setViewRatingsModal(false)}
-            employee={selectedEmployee}
+            employee={employee}
           />
         </Box>
       </Animated>

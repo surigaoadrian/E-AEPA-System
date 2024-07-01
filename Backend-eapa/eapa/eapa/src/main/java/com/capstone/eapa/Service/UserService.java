@@ -250,21 +250,16 @@ public class UserService implements UserDetailsService {
         return users.get(rand.nextInt(users.size()));
     }
 
-    public List<UserEntity> getAllEmployeesFromDepartmentHead(String headName) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllEmployeesFromDepartmentHead'");
-    }
-
     //Get Employees under Department Head
-    // public List<UserEntity> getAllEmployeesFromDepartmentHead(String headName) {
-
-    //     List<DepartmentEntity> departments = departmentRepository.findByDeptOfficeHead(headName);
-
-    //     List<String> departmentNames = departments.stream()
-    //             .map(DepartmentEntity::getDeptName)
-    //             .collect(Collectors.toList());
-
-
-    //     return userRepo.findByDeptIn(departmentNames);
-    // }
+//    public List<UserEntity> getAllEmployeesFromDepartmentHead(String headName) {
+//
+//        List<DepartmentEntity> departments = departmentRepository.findByDeptOfficeHead(headName);
+//
+//        List<String> departmentNames = departments.stream()
+//                .map(DepartmentEntity::getDeptName)
+//                .collect(Collectors.toList());
+//
+//
+//        return userRepo.findByDeptIn(departmentNames);
+//    }
 }

@@ -13,14 +13,17 @@ function EvaluationForm({
   period,
   setOpenForm,
   setEvalType,
+  selectedEmp,
 }) {
   const [questions, setQuestions] = useState([]);
   const [responses, setResponses] = useState([]);
   const [jobResponses, setJobResponses] = useState([]);
   const [scores, setScores] = useState({});
   const [peer, setPeer] = useState({});
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [evaluationID, setEvaluationID] = useState(0);
+
+  const [selectedEmpJobResp, setSelectedEmpJobResp] = useState([]);
+  const [headScores, setHeadScores] = useState({});
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
@@ -28,6 +31,8 @@ function EvaluationForm({
   const evalPeriod = period;
   const formType = evalType;
   const userId = sessionStorage.getItem("userID");
+
+  const marginTopValueHead = formType === "HEAD" ? "20px" : "10px";
 
   let hasRenderedFillHeading = false;
 
@@ -79,18 +84,36 @@ function EvaluationForm({
   //fetch eval id
   useEffect(() => {
     const fetchEvalID = async () => {
+      let response = null;
       try {
-        const response = await axios.get(
-          "http://localhost:8080/evaluation/getEvalID",
-          {
-            params: {
-              userID: userId,
-              period: evalPeriod,
-              stage: stageType,
-              evalType: formType,
-            },
-          }
-        );
+        if (evalType === "SELF" || evalType === "PEER") {
+          response = await axios.get(
+            "http://localhost:8080/evaluation/getEvalID",
+            {
+              params: {
+                userID: userId,
+                period: evalPeriod,
+                stage: stageType,
+                evalType: formType,
+              },
+            }
+          );
+        } else if (evalType === "HEAD") {
+          response = await axios.get(
+            "http://localhost:8080/evaluation/getEvalIDHead",
+            {
+              params: {
+                userID: userId,
+                empID: selectedEmp.userID,
+                period: evalPeriod,
+                stage: stageType,
+                evalType: formType,
+              },
+            }
+          );
+        }
+
+        console.log(response.data);
         setEvaluationID(response.data);
       } catch (error) {
         if (error.response) {
@@ -107,6 +130,29 @@ function EvaluationForm({
 
     return () => clearInterval(intervalId); // Cleanup on unmount
   }, [userId, evalPeriod, stageType]);
+
+  //fetch selected emp job responses
+  useEffect(() => {
+    if (selectedEmp && selectedEmp.userID) {
+      const fetchJobResp = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:8080/jobbasedresponse/getAllResponsesByID/${selectedEmp.userID}`
+          );
+          const jobResponsesWithScores = response.data.map((resp, index) => ({
+            index,
+            responsibility: resp,
+            score: "", // Initialize score
+          }));
+          setSelectedEmpJobResp(jobResponsesWithScores);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+
+      fetchJobResp();
+    }
+  }, [selectedEmp]);
 
   //Prevent navigation and page refresh and Save progress in local storage
   useEffect(() => {
@@ -289,6 +335,37 @@ function EvaluationForm({
     });
   };
 
+  //job score change for head
+  const handleHeadJobScoreChange = (index, value) => {
+    setHeadScores((prevScores) => ({
+      ...prevScores,
+      [index]: value,
+    }));
+
+    setSelectedEmpJobResp((prevJobResponses) => {
+      const existingJobResponseIndex = prevJobResponses.findIndex(
+        (resp) => resp.index === index
+      );
+      if (existingJobResponseIndex !== -1) {
+        const updatedJobResponses = [...prevJobResponses];
+        updatedJobResponses[existingJobResponseIndex].score = value;
+        return updatedJobResponses;
+      } else {
+        return [
+          ...prevJobResponses,
+          {
+            index,
+            evaluation: { evalID: evaluationID },
+            user: { userID: userId },
+            responsibility: "",
+            score: value,
+            comments: "",
+          },
+        ];
+      }
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     openModal();
@@ -311,6 +388,11 @@ function EvaluationForm({
     try {
       let response = null;
       let updateEval = null;
+      let createResults = null;
+
+      console.log("Stage:", stage);
+      console.log("EvalType:", evalType);
+      console.log("EvaluationID:", evaluationID);
 
       if (stage === "VALUES" && evalType === "PEER") {
         response = await axios.post(
@@ -321,6 +403,39 @@ function EvaluationForm({
         updateEval = await axios.patch(
           `http://localhost:8080/evaluation/updateEvaluation/${evaluationID}`,
           peerEvalPayload,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        createResults = await axios.post(
+          `http://localhost:8080/results/calculateResults?evaluationID=${evaluationID}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      } else if (stage === "VALUES" && evalType === "HEAD") {
+        response = await axios.post(
+          "http://localhost:8080/response/createResponses",
+          responses
+        );
+
+        updateEval = await axios.patch(
+          `http://localhost:8080/evaluation/updateEvaluation/${evaluationID}`,
+          evalPayload,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        createResults = await axios.post(
+          `http://localhost:8080/results/calculateResults?evaluationID=${evaluationID}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -342,15 +457,67 @@ function EvaluationForm({
             },
           }
         );
-      } else if (stage === "JOB") {
+
+        createResults = await axios.post(
+          `http://localhost:8080/results/calculateResults?evaluationID=${evaluationID}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      } else if (stage === "JOB" && evalType === "HEAD") {
+        const responsesToSubmit = selectedEmpJobResp.map((resp, index) => ({
+          ...resp,
+          score: headScores[index] || "",
+          evaluation: { evalID: evaluationID },
+          user: { userID: userId },
+        }));
+
         response = await axios.post(
           "http://localhost:8080/jobbasedresponse/createResponses",
-          jobResponses
+          responsesToSubmit
         );
 
         updateEval = await axios.patch(
           `http://localhost:8080/evaluation/updateEvaluation/${evaluationID}`,
           evalPayload,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        createResults = await axios.post(
+          `http://localhost:8080/results/calculateJobResults?evaluationID=${evaluationID}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      } else if (stage === "JOB") {
+        console.log("Job Responses:", jobResponses);
+
+        response = await axios.post(
+          "http://localhost:8080/jobbasedresponse/createResponses",
+          jobResponses
+        );
+
+        console.log("Eval Payload:", evalPayload);
+        updateEval = await axios.patch(
+          `http://localhost:8080/evaluation/updateEvaluation/${evaluationID}`,
+          evalPayload,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        createResults = await axios.post(
+          `http://localhost:8080/results/calculateJobResults?evaluationID=${evaluationID}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -367,6 +534,7 @@ function EvaluationForm({
         setResponses([]);
         setOpenForm(false);
         setEvalType("");
+        setEvaluationID(0);
       } else {
         console.error("No response data received.");
       }
@@ -383,17 +551,19 @@ function EvaluationForm({
     <div style={formContainer}>
       <div style={formHeader}>
         <h2 style={{ fontSize: "18px", fontWeight: 600 }}>
-          3rd Month Evaluation:{" "}
+          {period} Evaluation:{" "}
           {stageType === "VALUES"
             ? evalType === "PEER"
               ? "Values-Based Performance Assessment (Peer)"
+              : evalType === "HEAD"
+              ? "Values-Based Performance Assessment (Employee)"
               : "Values-Based Performance Assessment"
             : "Job-Based Performance Assessment"}
         </h2>
       </div>
       <div style={formContent}>
         <form onSubmit={handleSubmit}>
-          {stageType === "VALUES" && (
+          {(stageType === "VALUES" || stageType === "JOB") && (
             <>
               <div
                 style={{
@@ -406,11 +576,17 @@ function EvaluationForm({
                   padding: "8px",
                 }}
               >
-                <p>{evalType === "PEER" ? "Peer" : "Self"} Description:</p>
+                <p>
+                  {evalType === "PEER"
+                    ? "Peer"
+                    : evalType === "HEAD"
+                    ? "Employee"
+                    : "Self"}{" "}
+                  Description:
+                </p>
               </div>
               <div
                 style={{
-                  //backgroundColor: "yellow",
                   minHeight: "40px",
                   marginTop: "10px",
                   marginBottom: "25px",
@@ -427,6 +603,8 @@ function EvaluationForm({
                   <p>
                     {evalType === "PEER"
                       ? `${peer.fName} ${peer.lName}`
+                      : evalType === "HEAD"
+                      ? `${selectedEmp.fName} ${selectedEmp.lName}`
                       : `${loggedUser.fName} ${loggedUser.lName}`}
                   </p>
                 </div>
@@ -441,6 +619,8 @@ function EvaluationForm({
                   <p>
                     {evalType === "PEER"
                       ? `${peer.workID}`
+                      : evalType === "HEAD"
+                      ? `${selectedEmp.workID}`
                       : `${loggedUser.workID}`}
                   </p>
                 </div>
@@ -455,6 +635,11 @@ function EvaluationForm({
                   <p>{loggedUser.dept}</p>
                 </div>
               </div>
+            </>
+          )}
+
+          {stageType === "VALUES" && (
+            <>
               {/** Instructions */}
               <div style={{ height: "180px" }}>
                 <p
@@ -510,7 +695,11 @@ function EvaluationForm({
                 {/** Questions */}
                 {filteredQuestions.map((ques, index) => {
                   // Check if the current question is of type "FILL"
-                  if (ques.kind === "FILL" && !hasRenderedFillHeading) {
+                  if (
+                    formType === "SELF" &&
+                    ques.kind === "FILL" &&
+                    !hasRenderedFillHeading
+                  ) {
                     hasRenderedFillHeading = true;
                     return (
                       <React.Fragment key={index}>
@@ -552,7 +741,10 @@ function EvaluationForm({
                   return ques.kind === "RADIO" ? (
                     <div
                       key={index}
-                      style={{ display: "flex", minHeight: "50px" }}
+                      style={{
+                        display: "flex",
+                        minHeight: "50px",
+                      }}
                     >
                       <div
                         style={{
@@ -596,26 +788,30 @@ function EvaluationForm({
                       </div>
                     </div>
                   ) : (
-                    <div key={index}>
-                      <label htmlFor={ques.quesID}>{ques.quesText}</label>
-                      <textarea
-                        id={ques.quesID}
-                        style={{
-                          margin: "8px 0px 15px 0px",
-                          height: "100px",
-                          width: "100%",
-                          border: "1px solid black",
-                          borderRadius: "5px",
-                          padding: "5px",
-                          boxSizing: "border-box",
-                          overflow: "hidden",
-                          resize: "none",
-                        }}
-                        onChange={(e) =>
-                          handleTextareaChange(ques.quesID, e.target.value)
-                        }
-                      ></textarea>
-                    </div>
+                    <>
+                      {formType === "HEAD" ? null : (
+                        <div key={index}>
+                          <label htmlFor={ques.quesID}>{ques.quesText}</label>
+                          <textarea
+                            id={ques.quesID}
+                            style={{
+                              margin: "8px 0px 15px 0px",
+                              height: "100px",
+                              width: "100%",
+                              border: "1px solid black",
+                              borderRadius: "5px",
+                              padding: "5px",
+                              boxSizing: "border-box",
+                              overflow: "hidden",
+                              resize: "none",
+                            }}
+                            onChange={(e) =>
+                              handleTextareaChange(ques.quesID, e.target.value)
+                            }
+                          ></textarea>
+                        </div>
+                      )}
+                    </>
                   );
                 })}
               </div>
@@ -626,7 +822,18 @@ function EvaluationForm({
             <>
               {/** Instructions */}
               <div style={{ height: "180px" }}>
-                <p style={{ marginBottom: "10px" }}>
+                <p
+                  style={{
+                    marginBottom: "10px",
+                    display: "flex",
+                    height: "30px",
+                    alignItems: "center",
+                    backgroundColor: "#1E1E1E",
+                    color: "white",
+                    border: "1px solid black",
+                    padding: "8px",
+                  }}
+                >
                   Instruction: For each performance factor, select the
                   appropriate scale by which such vital function or primary
                   responsibility has been carried out.
@@ -653,54 +860,100 @@ function EvaluationForm({
                   </p>
                 </div>
               </div>
-              {/** Job-based Questions */}
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i}>
-                  <label htmlFor={i}>{i}.</label>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-
-                      marginBottom: "10px",
-                    }}
-                  >
-                    <textarea
-                      id={i}
-                      style={{
-                        margin: "8px 0px 15px 0px",
-                        height: "100px",
-                        width: "100%",
-                        border: "1px solid black",
-                        borderRadius: "5px",
-                        padding: "5px",
-                        boxSizing: "border-box",
-                        overflow: "hidden",
-                        resize: "none",
-                      }}
-                      onChange={(e) =>
-                        handleJobTextareaChange(i, e.target.value)
-                      }
-                    ></textarea>
-                    <FormControl sx={{ marginLeft: "25px", width: "5%" }}>
-                      <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        value={scores[i] || ""}
-                        onChange={(e) =>
-                          handleJobScoreChange(i, e.target.value)
-                        }
+              {evalType === "HEAD"
+                ? /** Job-based Questions for HEAD */
+                  selectedEmpJobResp.map((resp, index) => (
+                    <div key={index}>
+                      <label htmlFor={index}>{index + 1}.</label>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginBottom: "10px",
+                        }}
                       >
-                        <MenuItem value={1}>1</MenuItem>
-                        <MenuItem value={2}>2</MenuItem>
-                        <MenuItem value={3}>3</MenuItem>
-                        <MenuItem value={4}>4</MenuItem>
-                        <MenuItem value={5}>5</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </div>
-                </div>
-              ))}
+                        <textarea
+                          id={index}
+                          readOnly
+                          value={resp.responsibility}
+                          style={{
+                            margin: "8px 0px 15px 0px",
+                            height: "100px",
+                            width: "100%",
+                            border: "1px solid black",
+                            borderRadius: "5px",
+                            padding: "5px",
+                            boxSizing: "border-box",
+                            overflow: "hidden",
+                            resize: "none",
+                          }}
+                        ></textarea>
+                        <FormControl sx={{ marginLeft: "25px", width: "6%" }}>
+                          <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={headScores[index] || ""}
+                            onChange={(e) =>
+                              handleHeadJobScoreChange(index, e.target.value)
+                            }
+                          >
+                            <MenuItem value={1}>1</MenuItem>
+                            <MenuItem value={2}>2</MenuItem>
+                            <MenuItem value={3}>3</MenuItem>
+                            <MenuItem value={4}>4</MenuItem>
+                            <MenuItem value={5}>5</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </div>
+                    </div>
+                  ))
+                : /** Job-based Questions for other evalTypes */
+                  [1, 2, 3, 4, 5].map((i) => (
+                    <div key={i}>
+                      <label htmlFor={i}>{i}.</label>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginBottom: "10px",
+                        }}
+                      >
+                        <textarea
+                          id={i}
+                          style={{
+                            margin: "8px 0px 15px 0px",
+                            height: "100px",
+                            width: "100%",
+                            border: "1px solid black",
+                            borderRadius: "5px",
+                            padding: "5px",
+                            boxSizing: "border-box",
+                            overflow: "hidden",
+                            resize: "none",
+                          }}
+                          onChange={(e) =>
+                            handleJobTextareaChange(i, e.target.value)
+                          }
+                        ></textarea>
+                        <FormControl sx={{ marginLeft: "25px", width: "6%" }}>
+                          <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={scores[i] || ""}
+                            onChange={(e) =>
+                              handleJobScoreChange(i, e.target.value)
+                            }
+                          >
+                            <MenuItem value={1}>1</MenuItem>
+                            <MenuItem value={2}>2</MenuItem>
+                            <MenuItem value={3}>3</MenuItem>
+                            <MenuItem value={4}>4</MenuItem>
+                            <MenuItem value={5}>5</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </div>
+                    </div>
+                  ))}
             </>
           )}
 
@@ -714,6 +967,7 @@ function EvaluationForm({
             <Button
               type="submit"
               sx={{
+                marginTop: marginTopValueHead,
                 width: "8%",
                 backgroundColor: "#8C383E",
                 "&:hover": {

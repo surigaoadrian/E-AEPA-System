@@ -1,5 +1,6 @@
 package com.capstone.eapa.Controller;
 
+import com.capstone.eapa.DTO.EvaluationDTO;
 import com.capstone.eapa.Entity.EvaluationEntity;
 import com.capstone.eapa.Entity.UserEntity;
 import com.capstone.eapa.Service.EvaluationService;
@@ -32,11 +33,18 @@ public class EvaluationController {
         return evalServ.getAllEvaluations();
     }
 
-
+    //Get evaluation ID
     @GetMapping("/getEvalID")
-    public Integer getEvalIDByUserIDAndPeriodAndStageAndEvalType(@RequestParam int userID, @RequestParam String period, @RequestParam String stage, @RequestParam String evalType) {
+    public Integer getEvalIDByUserIdPeriodStage(int userID, String period, String stage, String evalType) {
         return evalServ.getEvalIDByUserIDAndPeriodAndStageAndEvalType(userID, period, stage, evalType);
     }
+
+    //Get evaluation ID for HEAD
+    @GetMapping("/getEvalIDHead")
+    public Integer getEvalIDByUserIdPeriodStageHead(int userID, int empID, String period, String stage, String evalType) {
+        return evalServ.getEvalIDByUserIdPeriodStageHead(userID, empID, period, stage, evalType);
+    }
+
 
     @GetMapping("/isEvaluationCompleted")
     public boolean isEvaluationCompleted(@RequestParam int userID, @RequestParam String period, @RequestParam String stage, @RequestParam String evalType) {
@@ -47,6 +55,15 @@ public class EvaluationController {
     public ResponseEntity<List<EvaluationEntity>> getEvaluationsByUser(@PathVariable int userID) {
         List<EvaluationEntity> evaluations = evalServ.getEvaluationsByUser(userID);
         return ResponseEntity.ok(evaluations);
+    }
+
+    @GetMapping("/evaluations")
+    public List<EvaluationDTO> getEvaluations() {
+        return evalServ.getAggregatedEvaluations();
+    }
+    @GetMapping("/isEvaluationCompletedHead")
+    public boolean isEvaluationCompletedHead(@RequestParam int userID, @RequestParam int empID,@RequestParam String period, @RequestParam String stage, @RequestParam String evalType) {
+        return evalServ.isEvaluationCompletedHead(userID, empID, period, stage, evalType);
     }
 
 }

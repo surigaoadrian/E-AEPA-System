@@ -19,7 +19,7 @@ public class EvaluationEntity {
     @ManyToOne
     @JoinColumn(name = "peer_id", nullable = true)
     private UserEntity peer;
-    private String evalType; //SELF, PEER
+    private String evalType; //SELF, PEER, HEAD
     private String stage; //VALUES, JOB
     private String period; //3rd Month, 5th Month, Annual
     private String status; //OPEN, COMPLETED
@@ -28,6 +28,32 @@ public class EvaluationEntity {
 
     @OneToMany(mappedBy = "evaluation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ResponseEntity> responses;
+
+    public int getUserId() {
+        return user.getUserID();
+    }
+    public String getWorkID() {
+        return user.getWorkID();
+    }
+
+    public Role getRole() {
+        return user.getRole();
+    }
+    public String getPosition() {
+        return user.getPosition();
+    }
+
+    public String getfName() {
+        return user.getfName();
+    }
+
+    public String getlName() {
+        return user.getlName();
+    }
+    
+    public String getEmpStatus() {
+        return user.getEmpStatus();
+    }
 
     public EvaluationEntity() {
         super();
