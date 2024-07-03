@@ -629,7 +629,7 @@ function ManageAccount() {
   const columnsEmployees = [
     {
       id: "workID",
-      label: "ID Number",
+      label: "Employee ID",
       align: "center",
       minWidth: 150,
     },
@@ -792,7 +792,7 @@ function ManageAccount() {
                       {(selectedTab === 0 ? columnsEmployees : columnsAdmins).map(
                         (column) => (
                           <TableCell sx={{
-                            fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: "bold", maxWidth: "2em",
+                            fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: 500, width: "10%"
                           }} key={column.id} align={column.align} style={{ minWidth: column.minWidth }}>{column.label}</TableCell>
                         )
                       )}
@@ -803,7 +803,7 @@ function ManageAccount() {
                       <TableRow sx={{ bgcolor: 'white', "&:hover": { backgroundColor: "rgba(248, 199, 2, 0.5)", color: "black", }, }} key={row.id}>
                         {(selectedTab === 0 ? columnsEmployees : columnsAdmins)
                           .map((column) => (
-                            <TableCell sx={{ fontFamily: "Poppins", }} key={`${row.id}-${column.id}`} align={column.align}>
+                            <TableCell sx={{ fontFamily: "Poppins", fontWeight: 500}} key={`${row.id}-${column.id}`} align={column.align}>
                               {column.id === "name" ? row.name : column.id === "actions" ? column.format ? column.format(row[column.id], row) : null : column.format ? column.format(row[column.id]) : row[column.id]}
                             </TableCell>
                           ))}
@@ -821,8 +821,8 @@ function ManageAccount() {
           <Box sx={{ bgcolor: "#8c383e", height: "2em", width: "100%", display: "flex", justifyContent: "right", }} >
             <Grid container>
               <Grid item xs={12}>
-                <Grid container spacing={0.6} sx={{ fontFamily: "Poppins", fontWeight: "bold", color: "white", backgroundColor: "transparent", alignItems: "center", }}>
-                  <Grid item sx={{ height: "2.6em" }}>
+                <Grid container spacing={0.6} sx={{ fontFamily: "Poppins", fontWeight: 500, color: "white", backgroundColor: "transparent", alignItems: "center", }}>
+                  <Grid item sx={{ height: "2.3em" }}>
                     <PersonRoundedIcon sx={{ color: "white", fontSize: "1.65em", ml: '.2em', mt: '0.1em' }} />
                   </Grid>
                   <Grid item >Register User Account</Grid>
@@ -1230,7 +1230,7 @@ function ManageAccount() {
               </IconButton>
             </Box>
             <DialogContent>
-              <Grid container spacing={1.5} sx={{ display: "flex", justifyContent: "left", width: "100%", fontFamily: "Poppins", }} >
+              <Grid container spacing={1.5} sx={{ display: "flex", justifyContent: "left", width: "100%", fontFamily: "Poppins",}} >
                 {selectedUser?.role === "ADMIN" && (
                   <>
                     <Grid item xs={4}>
@@ -1416,7 +1416,7 @@ function ManageAccount() {
               </Grid>
             </DialogContent>
             <DialogActions sx={{ display: "flex", justifyContent: "center", }}>
-              <Button type="submit" variant="contained" sx={{ bgcolor: "rgba(248, 199, 2, 0.8)", height: '2.3em', borderRadius: '20px', fontFamily: "Poppins", color: "black", "&:hover": { bgcolor: "#F8C702", color: "black", }, }} style={{ textTransform: "none", fontFamily: "Poppins", }}>Save Changes </Button>
+              <Button type="submit" variant="contained" sx={{ bgcolor: "#8C383E", height: '2.5em', borderRadius: '5px', textTransform: "none", width: "35%", mr: ".5em", mb: "1em", fontFamily: "Poppins", color: "white", "&:hover": { bgcolor: "#762F34", color: "white", }, }}>Save Changes </Button>
             </DialogActions>
           </form>
         </Dialog>

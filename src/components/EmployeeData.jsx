@@ -150,6 +150,15 @@ function EmployeeData() {
 		justifyContent: "center",
 	};
 
+	const formatDate = (dateString) => {
+		const date = new Date(dateString);
+		return date.toLocaleDateString("en-US", {
+			year: "numeric",
+			month: "long",
+			day: "numeric",
+		});
+	};
+
 	return (
 		<div>
 			{!isViewed ? (
@@ -266,7 +275,7 @@ function EmployeeData() {
 																{user.position}
 															</TableCell>
 															<TableCell style={cellStyle}>
-																{user.dateHired}
+																{formatDate(user.dateHired)}
 															</TableCell>
 															<TableCell
 																style={{

@@ -18,6 +18,7 @@ import {
 	TextField,
 	InputAdornment,
 	Button,
+	IconButton,
 } from "@mui/material";
 import axios from "axios";
 import Animated from "../components/motion";
@@ -356,7 +357,7 @@ useEffect(() => {
 								<div className="mb-4">
 									<label
 										htmlFor="deptName"
-										style={{fontSize: "14px",  color: "#515151"}}
+										style={{ fontSize: "14px", color: "#515151" }}
 									>
 										Department Name
 									</label>
@@ -375,7 +376,7 @@ useEffect(() => {
 								<div className="mb-4 mt-5">
 									<label
 										htmlFor="deptOfficeHead"
-										style={{fontSize: "14px",  color: "#515151"}}
+										style={{ fontSize: "14px", color: "#515151" }}
 									>
 										Assigned Office Head:
 										<span className="font-medium text-black ml-4">
@@ -520,13 +521,22 @@ useEffect(() => {
 								>
 									<tr>
 										<th></th>
-										<th className="whitespace-nowrap px-4 py-3 text-sm text-gray-50">
+										<th
+											className="whitespace-nowrap px-4 py-3 text-sm text-gray-50"
+											style={{ fontWeight: 500 }}
+										>
 											Department
 										</th>
-										<th className="whitespace-nowrap px-4 py-3 text-sm text-gray-50">
+										<th
+											className="whitespace-nowrap px-4 py-3 text-sm text-gray-50"
+											style={{ fontWeight: 500 }}
+										>
 											Office Head
 										</th>
-										<th className="whitespace-nowrap px-4 py-3 text-sm text-gray-50">
+										<th
+											className="whitespace-nowrap px-4 py-3 text-sm text-gray-50"
+											style={{ fontWeight: 500 }}
+										>
 											Action
 										</th>
 									</tr>
@@ -575,31 +585,33 @@ useEffect(() => {
 												<td className="whitespace-nowrap px-4 py-2 text-gray-700">
 													{dept.deptOfficeHead}
 												</td>
-												<td className="whitespace-nowrap px-4 py-2 text-gray-700">
-													<div className="flex items-center">
-														<FontAwesomeIcon
-															icon={faPenToSquare}
-															className="mr-2"
-															style={{
-																color: "#8C383E",
-																fontSize: "1.3rem",
-																cursor: "pointer",
-															}}
-															onClick={() => handleEditDepartment(dept)}
-														/>
-														<FontAwesomeIcon
-															icon={faTrash}
-															className="mr-2"
-															style={{
-																color: "#8C383E",
-																fontSize: "1.3rem",
-																cursor: "pointer",
-															}}
-															onClick={(e) => {
-																e.stopPropagation(); // Prevent row click from triggering
-																handleDeleteUser(dept.deptID);
-															}}
-														/>
+												<td>
+													<div>
+														<IconButton>
+															<FontAwesomeIcon
+																icon={faPenToSquare}
+																style={{
+																	color: "#8C383E",
+																	fontSize: "1.3rem",
+																	cursor: "pointer",
+																}}
+																onClick={() => handleEditDepartment(dept)}
+															/>
+														</IconButton>
+														<IconButton>
+															<FontAwesomeIcon
+																icon={faTrash}
+																style={{
+																	color: "#8C383E",
+																	fontSize: "1.3rem",
+																	cursor: "pointer",
+																}}
+																onClick={(e) => {
+																	e.stopPropagation(); // Prevent row click from triggering
+																	handleDeleteUser(dept.deptID);
+																}}
+															/>
+														</IconButton>
 													</div>
 												</td>
 											</tr>
@@ -704,43 +716,43 @@ useEffect(() => {
 								</p>
 								<Divider />
 								<div className="mt-4 mb-4 flex justify-end">
-								<Button
-											type="button"
-											variant="outlined"
-											onClick={() => toggleConfirmationDialog()}
-											sx={{
-												marginRight: "8px",
-												borderColor: "#B4B4B4",
+									<Button
+										type="button"
+										variant="outlined"
+										onClick={() => toggleConfirmationDialog()}
+										sx={{
+											marginRight: "8px",
+											borderColor: "#B4B4B4",
+											color: "#1E1E1E",
+											width: "18%",
+											textTransform: "none",
+											fontFamily: "Poppins",
+											"&:hover": {
+												backgroundColor: "#ECECEE",
+												borderColor: "#ECECEE",
 												color: "#1E1E1E",
-												width: "18%",
-												textTransform: "none",
-												fontFamily: "Poppins",
-												"&:hover": {
-													backgroundColor: "#ECECEE",
-													borderColor: "#ECECEE",
-													color: "#1E1E1E",
-												},
-											}}
-										>
-											Cancel
-										</Button>
-										<Button
-											onClick={confirmDeleteDepartment}
-											variant="contained"
-											color="primary"
-											sx={{
-												backgroundColor: "#8C383E",
-												width: "18%",
-												borderRadius: "5px 5px",
-												textTransform: "none",
-												fontFamily: "Poppins",
-												"&:hover": {
-													backgroundColor: "#762F34",
-												},
-											}}
-										>
-											Yes
-										</Button>
+											},
+										}}
+									>
+										Cancel
+									</Button>
+									<Button
+										onClick={confirmDeleteDepartment}
+										variant="contained"
+										color="primary"
+										sx={{
+											backgroundColor: "#8C383E",
+											width: "18%",
+											borderRadius: "5px 5px",
+											textTransform: "none",
+											fontFamily: "Poppins",
+											"&:hover": {
+												backgroundColor: "#762F34",
+											},
+										}}
+									>
+										Yes
+									</Button>
 								</div>
 							</div>
 						</div>
