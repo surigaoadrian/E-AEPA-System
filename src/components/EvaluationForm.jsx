@@ -4,7 +4,12 @@ import axios from "axios";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
+import Modal from "@mui/material/Modal";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import ConfirmationModal from "./ConfirmationModal";
+import ReactRouterPrompt from "react-router-prompt";
+import LeaveConfirmationModal from "../modals/LeaveConfirmationModal";
 
 function EvaluationForm({
   stage,
@@ -57,6 +62,32 @@ function EvaluationForm({
     paddingRight: "10px",
   };
 
+  const overlayStyle = {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Dark background
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1300, // Ensure it sits above other elements
+  };
+
+  const modalStyle = {
+    backgroundColor: "white",
+    padding: "20px",
+    borderRadius: "10px",
+    fontSize: "16px",
+    textAlign: "start",
+    boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)", // Add some shadow for depth
+    zIndex: 1400, // Ensure it sits above the overlay
+    width: "400px",
+    borderTop: "30px solid #8C383E",
+    position: "relative",
+  };
+
   const vbInstructions = [
     "Less than 20% of the time. Exhibits the value rarely.",
     "Less than 40% of the time. Exhibits the value sometimes.",
@@ -72,6 +103,8 @@ function EvaluationForm({
     "Occasionally exceeds expectations.",
     "Consistently exceeds expectations.",
   ];
+
+  const hasUnsavedChanges = responses.length > 0 || jobResponses.length > 0;
 
   const openModal = () => {
     setShowConfirmModal(true);
@@ -154,13 +187,8 @@ function EvaluationForm({
     }
   }, [selectedEmp]);
 
-  //Prevent navigation and page refresh and Save progress in local storage
+  //prevent page refresh
   useEffect(() => {
-    const savedResponses = localStorage.getItem("responses");
-    const savedJobResponses = localStorage.getItem("jobResponses");
-    if (savedResponses) setResponses(JSON.parse(savedResponses));
-    if (savedJobResponses) setJobResponses(JSON.parse(savedJobResponses));
-
     const handleBeforeUnload = (event) => {
       event.preventDefault();
       event.returnValue = "";
@@ -549,6 +577,66 @@ function EvaluationForm({
 
   return (
     <div style={formContainer}>
+      <ReactRouterPrompt when={hasUnsavedChanges}>
+        {({ isActive, onConfirm, onCancel }) => (
+          <LeaveConfirmationModal sx={modalStyle} show={isActive}>
+            <div style={overlayStyle}>
+              <Box sx={modalStyle}>
+                <Typography
+                  id="modal-title"
+                  sx={{ fontSize: "16px" }}
+                  component="h2"
+                >
+                  Are you sure you want to leave this page? Any unsaved changes
+                  will be lost. Please confirm your action.
+                </Typography>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    width: "100%",
+                    marginTop: "20px",
+                  }}
+                >
+                  <Button
+                    sx={{
+                      marginRight: "10px",
+                      width: "20%",
+                      height: "35px",
+                      backgroundColor: "#8C383E",
+                      "&:hover": {
+                        backgroundColor: "#7C2828",
+                      },
+                      fontFamily: "poppins",
+                    }}
+                    variant="contained"
+                    onClick={onConfirm}
+                  >
+                    YES
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    sx={{
+                      width: "20%",
+                      fontWeight: "bold",
+                      border: "none",
+                      color: "#8C383E",
+                      "&:hover": {
+                        backgroundColor: "#a4b0be",
+                        color: "white",
+                        border: "none",
+                      },
+                    }}
+                    onClick={onCancel}
+                  >
+                    NO
+                  </Button>
+                </div>
+              </Box>
+            </div>
+          </LeaveConfirmationModal>
+        )}
+      </ReactRouterPrompt>
       <div style={formHeader}>
         <h2 style={{ fontSize: "18px", fontWeight: 600 }}>
           {period} Evaluation:{" "}
@@ -888,22 +976,52 @@ function EvaluationForm({
                             resize: "none",
                           }}
                         ></textarea>
-                        <FormControl sx={{ marginLeft: "25px", width: "6%" }}>
-                          <Select
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            value={headScores[index] || ""}
-                            onChange={(e) =>
-                              handleHeadJobScoreChange(index, e.target.value)
-                            }
+
+                        <div
+                          style={{
+                            width: "10%",
+                            height: "100px",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <div
+                            style={{
+                              backgroundColor: "#8C383E",
+                              border: "1px solid black",
+                              borderTopRightRadius: "3px",
+                              borderTopLeftRadius: "3px",
+
+                              color: "white",
+                              padding: "5px",
+                              fontSize: "14px",
+                              height: "30px",
+                              width: "75px",
+                              textAlign: "center",
+                            }}
                           >
-                            <MenuItem value={1}>1</MenuItem>
-                            <MenuItem value={2}>2</MenuItem>
-                            <MenuItem value={3}>3</MenuItem>
-                            <MenuItem value={4}>4</MenuItem>
-                            <MenuItem value={5}>5</MenuItem>
-                          </Select>
-                        </FormControl>
+                            Ratings:
+                          </div>
+
+                          <FormControl sx={{ marginLeft: "25px", width: "6%" }}>
+                            <Select
+                              labelId="demo-simple-select-label"
+                              id="demo-simple-select"
+                              value={headScores[index] || ""}
+                              onChange={(e) =>
+                                handleHeadJobScoreChange(index, e.target.value)
+                              }
+                            >
+                              <MenuItem value={1}>1</MenuItem>
+                              <MenuItem value={2}>2</MenuItem>
+                              <MenuItem value={3}>3</MenuItem>
+                              <MenuItem value={4}>4</MenuItem>
+                              <MenuItem value={5}>5</MenuItem>
+                            </Select>
+                          </FormControl>
+                        </div>
                       </div>
                     </div>
                   ))
@@ -935,22 +1053,52 @@ function EvaluationForm({
                             handleJobTextareaChange(i, e.target.value)
                           }
                         ></textarea>
-                        <FormControl sx={{ marginLeft: "25px", width: "6%" }}>
-                          <Select
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            value={scores[i] || ""}
-                            onChange={(e) =>
-                              handleJobScoreChange(i, e.target.value)
-                            }
+
+                        <div
+                          style={{
+                            width: "10%",
+                            height: "100px",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <div
+                            style={{
+                              backgroundColor: "#8C383E",
+                              border: "1px solid black",
+                              borderTopRightRadius: "3px",
+                              borderTopLeftRadius: "3px",
+
+                              color: "white",
+                              padding: "5px",
+                              fontSize: "14px",
+                              height: "30px",
+                              width: "75px",
+                              textAlign: "center",
+                            }}
                           >
-                            <MenuItem value={1}>1</MenuItem>
-                            <MenuItem value={2}>2</MenuItem>
-                            <MenuItem value={3}>3</MenuItem>
-                            <MenuItem value={4}>4</MenuItem>
-                            <MenuItem value={5}>5</MenuItem>
-                          </Select>
-                        </FormControl>
+                            Ratings:
+                          </div>
+
+                          <FormControl sx={{ width: "75px" }}>
+                            <Select
+                              labelId="demo-simple-select-label"
+                              id="demo-simple-select"
+                              value={scores[i] || ""}
+                              onChange={(e) =>
+                                handleJobScoreChange(i, e.target.value)
+                              }
+                            >
+                              <MenuItem value={1}>1</MenuItem>
+                              <MenuItem value={2}>2</MenuItem>
+                              <MenuItem value={3}>3</MenuItem>
+                              <MenuItem value={4}>4</MenuItem>
+                              <MenuItem value={5}>5</MenuItem>
+                            </Select>
+                          </FormControl>
+                        </div>
                       </div>
                     </div>
                   ))}

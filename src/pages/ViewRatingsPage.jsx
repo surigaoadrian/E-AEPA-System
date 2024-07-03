@@ -988,7 +988,7 @@ function ViewRatingsPage() {
                             textAlign: "center",
                           }}
                         >
-                          {overallHeadJBPA}
+                          {(Math.round(overallHeadJBPA * 100) / 100).toFixed(2)}
                         </TableCell>
                         <TableCell
                           sx={{
@@ -997,7 +997,7 @@ function ViewRatingsPage() {
                             textAlign: "center",
                           }}
                         >
-                          {overallSelfJBPA}
+                          {(Math.round(overallSelfJBPA * 100) / 100).toFixed(2)}
                         </TableCell>
                       </TableRow>
                       <TableRow>

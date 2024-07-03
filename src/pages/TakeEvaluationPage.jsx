@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 
 import EvaluationCard from "../components/EvaluationCard";
 import axios from "axios";
-import zIndex from "@mui/material/styles/zIndex";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGears } from "@fortawesome/free-solid-svg-icons";
 import EvaluationForm from "../components/EvaluationForm";
@@ -16,7 +15,7 @@ function TakeEvaluationPage() {
   const [loggedUser, setLoggedUser] = useState({});
   const userID = sessionStorage.getItem("userID");
   const [period, setPeriod] = useState("");
-  //const divRef = useRef(null);
+  const [fetchEvalID, setFetchEvalID] = useState();
 
   //Fetch user details
   useEffect(() => {
@@ -75,19 +74,49 @@ function TakeEvaluationPage() {
 
     console.log("Evaluation object to be sent:", evaluation);
 
+    let existingEvalID = null;
+
     try {
-      const response = await axios.post(
-        "http://localhost:8080/evaluation/createEvaluation",
-        evaluation
+      const response = await axios.get(
+        "http://localhost:8080/evaluation/getEvalID",
+        {
+          params: {
+            userID: userID,
+            period: period,
+            stage: selectedStage,
+            evalType: evalType,
+          },
+        }
       );
+      existingEvalID = response.data;
+      console.log("Existing evaluation ID:", existingEvalID);
+      setFetchEvalID(existingEvalID);
     } catch (error) {
-      console.error("Creating evaluation failed", error);
       if (error.response) {
         console.log(error.response.data);
         console.log(error.response.status);
         console.log(error.response.headers);
       } else {
         console.log(`Error: ${error.message}`);
+      }
+    }
+
+    if (!existingEvalID) {
+      try {
+        const response = await axios.post(
+          "http://localhost:8080/evaluation/createEvaluation",
+          evaluation
+        );
+        console.log("New evaluation created:", response.data);
+      } catch (error) {
+        console.error("Creating evaluation failed", error);
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else {
+          console.log(`Error: ${error.message}`);
+        }
       }
     }
   };
@@ -153,11 +182,6 @@ function TakeEvaluationPage() {
           setEvalType={setEvalType}
         />
       ) : (
-        // <div
-        //   style={{ backgroundColor: "yellow", height: "500px", width: "100%" }}
-        // >
-        //   Hello
-        // </div>
         <div style={{ position: "relative" }}>
           <EvaluationCard
             period={"3rd Month"}
