@@ -315,15 +315,15 @@ function ViewRatingsPage() {
   const JBPChartSeries = [
     {
       name: "Head",
-      data: [4.4, 5],
+      data: [overallHeadVBPA, 5],
     },
     {
       name: "Self",
-      data: [4.0, 3],
+      data: [overallSelfVBPA, 5],
     },
     {
       name: "Peer",
-      data: [4.4, null],
+      data: [4.5, null],
     },
   ];
 
@@ -338,7 +338,7 @@ function ViewRatingsPage() {
     },
     {
       name: "Peer",
-      data: [4.4, 4.6, 3, 4.6],
+      data: [4.4, 4.6, 4.4, 4.6],
     },
   ];
 
@@ -735,7 +735,7 @@ function ViewRatingsPage() {
                     <TableCell
                       sx={{ border: "1px solid #ccc", fontFamily: "Poppins" }}
                     >
-                      02/20/2024
+                      07/03/2024
                     </TableCell>
                   </TableRow>
                   <TableRow>
@@ -767,7 +767,7 @@ function ViewRatingsPage() {
                     <TableCell
                       sx={{ border: "1px solid #ccc", fontFamily: "Poppins" }}
                     >
-                      02/20/2024
+                      07/03/2024
                     </TableCell>
                   </TableRow>
                 </TableBody>
@@ -967,7 +967,7 @@ function ViewRatingsPage() {
                             textAlign: "center",
                           }}
                         >
-                          0.0
+                          4.50
                         </TableCell>
                       </TableRow>
                       <TableRow>
@@ -980,16 +980,7 @@ function ViewRatingsPage() {
                             fontFamily: "Poppins",
                             textAlign: "center",
                           }}
-                        ></TableCell>
-                        <TableCell
-                          sx={{
-                            border: "1px solid #ccc",
-                            fontFamily: "Poppins",
-                            textAlign: "center",
-                          }}
-                        >
-                          {(Math.round(overallHeadJBPA * 100) / 100).toFixed(2)}
-                        </TableCell>
+                        >{overallHeadJBPA}</TableCell>
                         <TableCell
                           sx={{
                             border: "1px solid #ccc",
@@ -999,6 +990,13 @@ function ViewRatingsPage() {
                         >
                           {(Math.round(overallSelfJBPA * 100) / 100).toFixed(2)}
                         </TableCell>
+                        <TableCell
+                          sx={{
+                            border: "1px solid #ccc",
+                            fontFamily: "Poppins",
+                            textAlign: "center",
+                          }}
+                        ></TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell
@@ -1055,7 +1053,7 @@ function ViewRatingsPage() {
                             textAlign: "center",
                           }}
                         >
-                          0.0
+                          4.50
                         </TableCell>
                       </TableRow>
                     </TableBody>
@@ -1156,7 +1154,7 @@ function ViewRatingsPage() {
                             textAlign: "center",
                           }}
                         >
-                          0.0
+                          4.4
                         </TableCell>
                       </TableRow>
                       <TableRow>
@@ -1188,7 +1186,7 @@ function ViewRatingsPage() {
                             textAlign: "center",
                           }}
                         >
-                          0.0
+                          4.6
                         </TableCell>
                       </TableRow>
                       <TableRow>
@@ -1220,7 +1218,7 @@ function ViewRatingsPage() {
                             textAlign: "center",
                           }}
                         >
-                          0.0
+                          4.4
                         </TableCell>
                       </TableRow>
                       <TableRow>
@@ -1252,7 +1250,7 @@ function ViewRatingsPage() {
                             textAlign: "center",
                           }}
                         >
-                          0.0
+                          4.6
                         </TableCell>
                       </TableRow>
                       <TableRow>
@@ -1308,7 +1306,7 @@ function ViewRatingsPage() {
                             textAlign: "center",
                           }}
                         >
-                          0.0
+                          4.50
                         </TableCell>
                       </TableRow>
                     </TableBody>
@@ -1872,7 +1870,7 @@ function ViewRatingsPage() {
                             textAlign: "center",
                           }}
                         >
-                          5.00
+                          5.0
                         </TableCell>
                         <TableCell
                           sx={{
