@@ -19,6 +19,7 @@ import NotAuthorized from "./pages/NotAuthorized";
 import PrivateRoute from "./components/PrivateRoute";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import EvaluateEmployee from "./pages/EvaluateEmployee";
+import ActivityLogs from "./pages/ActivityLogs";
 
 const router = createBrowserRouter([
   {
@@ -28,7 +29,9 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: (
-          <PrivateRoute requiredRoles={["EMPLOYEE", "ADMIN", "HEAD"]}>
+          <PrivateRoute
+            requiredRoles={["EMPLOYEE", "ADMIN", "HEAD", "SUPERUSER"]}
+          >
             <HomeShowcase />
           </PrivateRoute>
         ),
@@ -60,7 +63,7 @@ const router = createBrowserRouter([
       {
         path: "/manageAccount",
         element: (
-          <PrivateRoute requiredRoles={["ADMIN"]}>
+          <PrivateRoute requiredRoles={["ADMIN", "SUPERUSER"]}>
             <ManageAccount />
           </PrivateRoute>
         ),
@@ -68,7 +71,7 @@ const router = createBrowserRouter([
       {
         path: "/manageOffices",
         element: (
-          <PrivateRoute requiredRoles={["ADMIN"]}>
+          <PrivateRoute requiredRoles={["ADMIN", "SUPERUSER"]}>
             <ManageOffices />
           </PrivateRoute>
         ),
@@ -76,8 +79,17 @@ const router = createBrowserRouter([
       {
         path: "/manageEmployee",
         element: (
-          <PrivateRoute requiredRoles={["ADMIN"]}>
+          <PrivateRoute requiredRoles={["ADMIN", "SUPERUSER"]}>
             <ManageEmployee />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/activityLogs",
+        element: (
+          <PrivateRoute requiredRoles={["ADMIN", "SUPERUSER"]}>
+            {/* <ManageEmployee /> */}
+            <ActivityLogs />
           </PrivateRoute>
         ),
       },

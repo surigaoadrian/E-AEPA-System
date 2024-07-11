@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.sql.Blob;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -241,6 +242,8 @@ public class UserService implements UserDetailsService {
 //        Random rand = new Random();
 //        return users.get(rand.nextInt(users.size()));
 //    }
+
+    //peer to evaluate
     public UserEntity getRandomPeer(String dept, int excludedUserID) {
         List<UserEntity> users = userRepo.findPeersByDeptRoleNotUserIDNotAndPositionNotSecretary(dept, Role.HEAD.name(), excludedUserID);
         if (users.isEmpty()) {
@@ -248,6 +251,68 @@ public class UserService implements UserDetailsService {
         }
         Random rand = new Random();
         return users.get(rand.nextInt(users.size()));
+    }
+
+    //peer evaluator assigned
+//    public List<UserEntity> getAssignedEvaluators(String dept, int excludedUserID) {
+//        List<UserEntity> users = userRepo.findPeersByDeptRoleNotUserIDNotAndPositionNotSecretary(dept, Role.HEAD.name(), excludedUserID);
+//
+//        if (users.isEmpty()) {
+//            return Collections.emptyList();
+//        }
+//
+//        // Filter out users with the position 'Secretary'
+//        List<UserEntity> filteredUsers = users.stream()
+//                .filter(user -> !user.getPosition().equalsIgnoreCase("secretary"))
+//                .collect(Collectors.toList());
+//
+//        // Remove the excluded user ID
+//        filteredUsers.removeIf(user -> user.getUserID() == excludedUserID);
+//
+//        int size = filteredUsers.size();
+//        if (size <= 1) {
+//            return Collections.emptyList();
+//        } else if (size == 2) {
+//            return filteredUsers.subList(0, 1);
+//        } else if (size == 3) {
+//            return filteredUsers.subList(0, 2);
+//        } else {
+//            Collections.shuffle(filteredUsers);
+//            return filteredUsers.subList(0, 3);
+//        }
+//    }
+    public List<Integer> getAssignedEvaluators(String dept, int excludedUserID) {
+        List<UserEntity> users = userRepo.findPeersByDeptRoleNotUserIDNotAndPositionNotSecretary(dept, Role.HEAD.name(), excludedUserID);
+
+        if (users.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // Filter out users with the position 'Secretary'
+        List<UserEntity> filteredUsers = users.stream()
+                .filter(user -> !user.getPosition().equalsIgnoreCase("secretary"))
+                .collect(Collectors.toList());
+
+        // Remove the excluded user ID
+        filteredUsers.removeIf(user -> user.getUserID() == excludedUserID);
+
+        int size = filteredUsers.size();
+        if (size <= 1) {
+            return Collections.emptyList();
+        } else if (size == 2) {
+            return filteredUsers.subList(0, 1).stream()
+                    .map(UserEntity::getUserID)
+                    .collect(Collectors.toList());
+        } else if (size == 3) {
+            return filteredUsers.subList(0, 2).stream()
+                    .map(UserEntity::getUserID)
+                    .collect(Collectors.toList());
+        } else {
+            Collections.shuffle(filteredUsers);
+            return filteredUsers.subList(0, 3).stream()
+                    .map(UserEntity::getUserID)
+                    .collect(Collectors.toList());
+        }
     }
 
     //Get Employees under Department Head

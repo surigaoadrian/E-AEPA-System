@@ -12,6 +12,7 @@ import Typography from "@mui/material/Typography";
 import zIndex from "@mui/material/styles/zIndex";
 
 function EvaluationCard({
+  id,
   period,
   loggedUser,
   handleOpenForm,
@@ -22,6 +23,8 @@ function EvaluationCard({
   handleCloseModal,
   handleConfirm,
   setEvalType,
+  activeCard = { activeCard },
+  setActiveCard = { setActiveCard },
 }) {
   const [takeEval, setTakeEval] = useState(false);
   const [shouldDisplay, setShouldDisplay] = useState(true);
@@ -33,6 +36,7 @@ function EvaluationCard({
 
   const handleTakeEvalChange = () => {
     setTakeEval(!takeEval);
+    setActiveCard(id);
   };
 
   const modalStyle = {
@@ -282,13 +286,15 @@ function EvaluationCard({
       )}
 
       {/** Evaluation tab */}
-      <EvaluationTypeTab
-        period={period}
-        evalType={evalType}
-        handleOpenForm={handleOpenForm}
-        handleOpenModal={handleOpenModal}
-        setShouldDisplay={setShouldDisplay}
-      />
+      {activeCard === id && (
+        <EvaluationTypeTab
+          period={period}
+          evalType={evalType}
+          handleOpenForm={handleOpenForm}
+          handleOpenModal={handleOpenModal}
+          setShouldDisplay={setShouldDisplay}
+        />
+      )}
 
       {/**Confirmation Modal */}
       <Modal

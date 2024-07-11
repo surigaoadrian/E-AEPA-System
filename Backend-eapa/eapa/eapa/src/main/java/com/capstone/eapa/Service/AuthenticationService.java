@@ -27,7 +27,6 @@ public class AuthenticationService {
     }
 
     // registration
-    // registration
     public AuthenticationResponse register(UserEntity request) {
         // Check if the username already exists, regardless of deletion status
         Optional<UserEntity> existingUserOptional = userRepo.findByUsername(request.getUsername());
