@@ -44,15 +44,15 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/delete/{userID}")
-    public ResponseEntity<String> deleteUser(@PathVariable int userID) {
-        userServ.deleteUser(userID);
+    @DeleteMapping("/delete/{adminId}/{userID}")
+    public ResponseEntity<String> deleteUser(@PathVariable int adminId,@PathVariable int userID) {
+        userServ.deleteUser(adminId,userID);
         return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
     }
 
-    @PatchMapping("/editUser/{userID}")
-    public ResponseEntity<UserEntity> editUserDetails(@PathVariable int userID, @RequestBody UserEntity newDetails) {
-        UserEntity updatedUser = userServ.editUserDetails(userID, newDetails);
+    @PatchMapping("/editUser/{adminId}/{userID}")
+    public ResponseEntity<UserEntity> editUserDetails(@PathVariable int adminId,@PathVariable int userID, @RequestBody UserEntity newDetails) {
+        UserEntity updatedUser = userServ.editUserDetails(adminId,userID, newDetails);
 
         return ResponseEntity.ok(updatedUser);
     }
@@ -136,13 +136,6 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }
-
-    //get the employees' data with the corresponding department head - Track Employee
-    //  @GetMapping("/employees-with-head")
-    // public ResponseEntity<List<UserEntity>> getAllEmployeesFromDepartmentHead(@RequestParam String headName) {
-    //     List<UserEntity> employees = userServ.getAllEmployeesFromDepartmentHead(headName);
-    //     return ResponseEntity.ok(employees);
-    // }
 
 
 }

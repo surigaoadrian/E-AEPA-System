@@ -7,6 +7,7 @@ import {
 	faUser,
 	faUserTie,
 	faUsers,
+	faUserCheck,
 } from "@fortawesome/free-solid-svg-icons";
 
 export const SideBarData = [
@@ -81,5 +82,13 @@ export const SideBarData = [
     role: "HEAD",
     icon: <FontAwesomeIcon icon={faUserTie} style={{ fontSize: "15px" }} />,
   },
+
+  {
+    title: "Activity Log",
+    path: "/ActivityLog",
+    role: "ADMIN",
+    icon: <FontAwesomeIcon icon={faUserCheck} style={{ fontSize: "15px" }} />,
+  },
   
+
 ];

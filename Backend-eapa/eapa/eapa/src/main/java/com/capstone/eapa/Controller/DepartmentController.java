@@ -28,9 +28,9 @@ public class DepartmentController {
     @Autowired
     DepartmentService departmentServ;
 
-	@PostMapping("/addDept")
-	public DepartmentEntity addDept(@RequestBody DepartmentEntity dept) {
-	    return departmentServ.addDepartment(dept);
+	@PostMapping("/addDept/{adminId}")
+	public DepartmentEntity addDept(@PathVariable int adminId,@RequestBody DepartmentEntity dept) {
+	    return departmentServ.addDepartment(adminId,dept);
     }
 
     @GetMapping("/getAllDepts")
@@ -50,14 +50,14 @@ public class DepartmentController {
 		}
 	}
 
-    @PutMapping("/updateDept")
-	public DepartmentEntity updateDept(@RequestParam int deptID, @RequestBody DepartmentEntity newDept) {
-		return departmentServ.updateDepartment(deptID, newDept);
+    @PutMapping("/updateDept/{adminId}/")
+	public DepartmentEntity updateDept(@PathVariable int adminId,@RequestParam int deptID, @RequestBody DepartmentEntity newDept) {
+		return departmentServ.updateDepartment(adminId,deptID, newDept);
 	}
 	
-	@DeleteMapping("/deleteDept/{id}")
-	public String deleteDept(@PathVariable int id) {
-		return departmentServ.deleteDepartment(id);
+	@DeleteMapping("/deleteDept/{adminId}/{id}")
+	public String deleteDept(@PathVariable int adminId,@PathVariable int id) {
+		return departmentServ.deleteDepartment(adminId,id);
 	}
     
 }

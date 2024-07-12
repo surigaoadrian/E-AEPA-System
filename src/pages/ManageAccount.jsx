@@ -31,6 +31,8 @@ const CustomAlert = ({ open, onClose, severity, message }) => {
 };
 
 function ManageAccount() {
+  const id = sessionStorage.getItem("userID");
+  console.log("ID: ", id);
   const [openRegistrationDialog, setOpenRegistrationDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openDeleteDialog, setopenDeleteDialog] = useState(false);
@@ -445,7 +447,7 @@ function ManageAccount() {
         role: role,
       };
 
-      const response = await fetch("http://localhost:8080/register", {
+      const response = await fetch(`http://localhost:8080/register/${id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -539,7 +541,7 @@ function ManageAccount() {
         dateStarted: selectedUser.dateStarted,
       };
       await axios.patch(
-        `http://localhost:8080/user/editUser/${selectedUser.userID}`,
+        `http://localhost:8080/user/editUser/${id}/${selectedUser.userID}`,
         userPayload,
         {
           headers: {
@@ -568,7 +570,7 @@ function ManageAccount() {
     console.log("delete Yes user:", userID);
     try {
       const response = await fetch(
-        `http://localhost:8080/user/delete/${userID}`,
+        `http://localhost:8080/user/delete/${id}/${userID}`,
         {
           method: "DELETE",
           headers: {

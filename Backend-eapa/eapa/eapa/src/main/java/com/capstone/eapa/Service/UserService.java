@@ -1,8 +1,10 @@
 package com.capstone.eapa.Service;
 
+import com.capstone.eapa.Entity.ActivityLogEntity;
 import com.capstone.eapa.Entity.PasswordResetToken;
 import com.capstone.eapa.Entity.Role;
 import com.capstone.eapa.Entity.UserEntity;
+import com.capstone.eapa.Repository.ActivityLogRepository;
 import com.capstone.eapa.Repository.PasswordResetTokenRepository;
 import com.capstone.eapa.Repository.UserRepository;
 
@@ -13,6 +15,7 @@ import jakarta.transaction.Transactional;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -37,6 +40,8 @@ public class UserService implements UserDetailsService {
     private EmailService emailService;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private ActivityLogRepository activityLogRepo;
 
     public List<UserEntity> getAllUser() {
         return userRepo.findAllByIsDeleted(0);
@@ -126,7 +131,7 @@ public class UserService implements UserDetailsService {
     }
 
     // this method deletes a user account
-    public String deleteUser(int userID) {
+    public String deleteUser(int adminId,int userID) {
         String msg = "";
         Optional<UserEntity> optionalUser = userRepo.findByUserID(userID);
 
@@ -136,6 +141,8 @@ public class UserService implements UserDetailsService {
             userRepo.save(user);
 
             msg = "User " + user.getfName() + " " + user.getlName() + " is deleted.";
+            String admin = userRepo.findById(adminId).get().getfName() + " " + userRepo.findById(adminId).get().getlName();
+            logActivity(adminId,admin,"Deleted User Account", "Deleted User Account  : " + user.getfName() + " " + user.getlName());
         } else {
             msg = "User not found";
         }
@@ -147,7 +154,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public UserEntity editUserDetails(int userID, UserEntity newDetails) {
+    public UserEntity editUserDetails(int adminId,int userID, UserEntity newDetails) {
         UserEntity user = userRepo.findById(userID)
                 .orElseThrow(() -> new NoSuchElementException("User " + userID + " not found."));
         try {
@@ -177,6 +184,9 @@ public class UserService implements UserDetailsService {
                 user.setWorkEmail(newDetails.getWorkEmail());
             if (newDetails.getUsername() != null)
                 user.setUsername(newDetails.getUsername());
+            
+            String admin = userRepo.findById(adminId).get().getfName() + " " + userRepo.findById(adminId).get().getlName();
+            logActivity(adminId,admin,"Edited User Account", "Modified User Account Details : " + user.getfName() + " " + user.getlName());
             return userRepo.save(user);
         } catch (Exception e) {
             throw e; 
@@ -250,6 +260,7 @@ public class UserService implements UserDetailsService {
         return users.get(rand.nextInt(users.size()));
     }
 
+<<<<<<< Updated upstream
     public List<UserEntity> getAllEmployeesFromDepartmentHead(String headName) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getAllEmployeesFromDepartmentHead'");
@@ -267,4 +278,19 @@ public class UserService implements UserDetailsService {
 
     //     return userRepo.findByDeptIn(departmentNames);
     // }
+=======
+    public void logActivity(int adminId, String admin,String activity, String details){
+        UserEntity user = userRepo.findById(adminId)
+                .orElseThrow(() -> new NoSuchElementException("User " + adminId + " not found."));
+
+        ActivityLogEntity activityLog = new ActivityLogEntity();
+        activityLog.setUser(user);
+        activityLog.setAdmin(admin);
+        activityLog.setActivity(activity);
+        activityLog.setActDetails(details);
+        activityLog.setTimestamp(new Date());
+        activityLogRepo.save(activityLog);
+    }
+
+>>>>>>> Stashed changes
 }

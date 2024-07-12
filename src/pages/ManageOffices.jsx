@@ -23,6 +23,7 @@ import axios from "axios";
 import Animated from "../components/motion";
 
 const ManageOffices = () => {
+	const loggedId = sessionStorage.getItem("userID");
 	const [departments, setDepartments] = useState([]);
 	const [filteredDepartments, setFilteredDepartments] = useState([]);
 	const [searchTerm, setSearchTerm] = useState("");
@@ -92,13 +93,13 @@ useEffect(() => {
 				};
 			});
 
-			// Update the departments in the database
-			for (const dept of updatedDepts) {
-				await axios.put(
-					`http://localhost:8080/department/updateDept?deptID=${dept.deptID}`,
-					dept
-				);
-			}
+			// // Update the departments in the database
+			// for (const dept of updatedDepts) {
+			// 	await axios.put(
+			// 		`http://localhost:8080/department/updateDept/${loggedId}/?deptID=${dept.deptID}`,
+			// 		dept
+			// 	);
+			// }
 
 			setDepartments(updatedDepts);
 			setFilteredDepartments(updatedDepts);
@@ -164,7 +165,7 @@ useEffect(() => {
 	const confirmDeleteDepartment = async () => {
 		try {
 			await axios.delete(
-				`http://localhost:8080/department/deleteDept/${departmentToDelete}`
+				`http://localhost:8080/department/deleteDept/${loggedId}/${departmentToDelete}`
 			);
 			const updatedUsers = await axios.get(
 				"http://localhost:8080/department/getAllDepts"
@@ -243,7 +244,7 @@ useEffect(() => {
 		}
 		try {
 			await axios.post(
-				"http://localhost:8080/department/addDept",
+				`http://localhost:8080/department/addDept/${loggedId}`,
 				departmentFormData
 			);
 
@@ -297,7 +298,7 @@ useEffect(() => {
 	const handleUpdateDepartment = async (editedDepartment) => {
 		try {
 			await axios.put(
-				`http://localhost:8080/department/updateDept?deptID=${editedDepartment.deptID}`,
+				`http://localhost:8080/department/updateDept/${loggedId}/?deptID=${editedDepartment.deptID}`,
 				editedDepartment
 			);
 			const updatedUsers = await axios.get(

@@ -6,6 +6,7 @@ import com.capstone.eapa.Repository.UserRepository;
 
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +18,8 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    @Autowired
+    private UserService userService;
 
     public AuthenticationService(UserRepository userRepo, PasswordEncoder passwordEncoder, JwtService jwtService,
             AuthenticationManager authenticationManager) {
@@ -27,8 +30,7 @@ public class AuthenticationService {
     }
 
     // registration
-    // registration
-    public AuthenticationResponse register(UserEntity request) {
+    public AuthenticationResponse register(int adminId,UserEntity request) {
         // Check if the username already exists, regardless of deletion status
         Optional<UserEntity> existingUserOptional = userRepo.findByUsername(request.getUsername());
 
@@ -62,6 +64,8 @@ public class AuthenticationService {
             // Generate JWT token for the updated user
             String token = jwtService.generateToken(existingUser);
 
+            String admin = userRepo.findById(adminId).get().getfName() + " " + userRepo.findById(adminId).get().getlName();
+            userService.logActivity(adminId,admin, "Created User Account", "Created a new user account for " + existingUser.getfName() + " " + existingUser.getlName() + ".");
             return new AuthenticationResponse(token);
         } else {
             // Username does not exist, create a new record
@@ -92,7 +96,8 @@ public class AuthenticationService {
             
             // Generate JWT token for the new user
             String token = jwtService.generateToken(newUser);
-
+            String admin = userRepo.findById(adminId).get().getfName() + " " + userRepo.findById(adminId).get().getlName();
+            userService.logActivity(adminId,admin, "Created User Account", "Add a new User Account : " + newUser.getfName() + " " + newUser.getlName() + ".");
             return new AuthenticationResponse(token);
         }
     }

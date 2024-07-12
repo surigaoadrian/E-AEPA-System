@@ -7,14 +7,20 @@ import java.util.NoSuchElementException;
 
 import com.capstone.eapa.Entity.DepartmentEntity;
 import com.capstone.eapa.Repository.DepartmentRepository;
+import com.capstone.eapa.Repository.UserRepository;
 
 @Service
 public class DepartmentService {
     @Autowired
     DepartmentRepository departmentRepo;
-
+    @Autowired
+    UserService userService;
+    @Autowired
+    UserRepository userRepo;
     //Add Department
-    public DepartmentEntity addDepartment(DepartmentEntity department) {
+    public DepartmentEntity addDepartment(int adminId,DepartmentEntity department) {
+        String admin = userRepo.findById(adminId).get().getfName() + " " + userRepo.findById(adminId).get().getlName();
+        userService.logActivity(adminId,admin,"Created Department", "Added New Department  : " + department.getDeptName() );
         return departmentRepo.save(department);
     }
 
@@ -30,7 +36,7 @@ public class DepartmentService {
 
     //Update a Department
     @SuppressWarnings("finally")
-    public DepartmentEntity updateDepartment(int id, DepartmentEntity newDept){
+    public DepartmentEntity updateDepartment(int adminId,int id, DepartmentEntity newDept){
         DepartmentEntity dept = new DepartmentEntity();
 
         try{
@@ -39,6 +45,8 @@ public class DepartmentService {
             //assigning new data to the user entity
             dept.setDeptName(newDept.getDeptName());
             dept.setDeptOfficeHead(newDept.getDeptOfficeHead());
+            String admin = userRepo.findById(adminId).get().getfName() + " " + userRepo.findById(adminId).get().getlName();
+            userService.logActivity(adminId,admin,"Edited Department", "Edited Department Details : " + newDept.getDeptName() );
         } catch (NoSuchElementException ex){
             throw new NoSuchElementException("Department " + id + " not found.");
         } finally {
@@ -47,10 +55,12 @@ public class DepartmentService {
 
     }
     //Delete a Department
-    public String deleteDepartment(int deptID) {
+    public String deleteDepartment(int adminId,int deptID) {
         DepartmentEntity existingDepartment = departmentRepo.findById(deptID).orElse(null);
         existingDepartment.setIsDeleted(1);
         departmentRepo.save(existingDepartment);
+        String admin = userRepo.findById(adminId).get().getfName() + " " + userRepo.findById(adminId).get().getlName();
+        userService.logActivity(adminId,admin,"Deleted Department", "Deleted Department : " + existingDepartment.getDeptName() );
         return "Department deleted";
     }
 
