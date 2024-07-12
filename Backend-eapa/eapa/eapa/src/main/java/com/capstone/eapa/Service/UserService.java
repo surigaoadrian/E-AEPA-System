@@ -260,25 +260,6 @@ public class UserService implements UserDetailsService {
         return users.get(rand.nextInt(users.size()));
     }
 
-<<<<<<< Updated upstream
-    public List<UserEntity> getAllEmployeesFromDepartmentHead(String headName) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllEmployeesFromDepartmentHead'");
-    }
-
-    //Get Employees under Department Head
-    // public List<UserEntity> getAllEmployeesFromDepartmentHead(String headName) {
-
-    //     List<DepartmentEntity> departments = departmentRepository.findByDeptOfficeHead(headName);
-
-    //     List<String> departmentNames = departments.stream()
-    //             .map(DepartmentEntity::getDeptName)
-    //             .collect(Collectors.toList());
-
-
-    //     return userRepo.findByDeptIn(departmentNames);
-    // }
-=======
     public void logActivity(int adminId, String admin,String activity, String details){
         UserEntity user = userRepo.findById(adminId)
                 .orElseThrow(() -> new NoSuchElementException("User " + adminId + " not found."));
@@ -292,5 +273,4 @@ public class UserService implements UserDetailsService {
         activityLogRepo.save(activityLog);
     }
 
->>>>>>> Stashed changes
 }
