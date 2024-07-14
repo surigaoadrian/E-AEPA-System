@@ -2,7 +2,8 @@ import {Alert as MuiAlert, Avatar, Box, Button, Dialog, DialogActions, DialogCon
 } from "@mui/material";
 import React, { useState, useEffect, useRef } from "react";
 import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
-import SaveAsRoundedIcon from "@mui/icons-material/SaveAsRounded";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
 import axios from "axios";
 import HighlightOffOutlinedIcon from "@mui/icons-material/HighlightOffOutlined";
 import CameraAltOutlinedIcon from "@mui/icons-material/CameraAltOutlined";
@@ -385,7 +386,7 @@ function ViewProfilePage() {
 							</Grid>
 							<Grid item xs={12} sm={6}>
 								<Grid item xs container direction="column" spacing={2}>
-									<Grid item xs sx={{ mt: 7.8 }}>
+									<Grid item xs sx={{ mt: 7.2 }}>
 										<Typography
 											color="text.secondary"
 											sx={{ fontFamily: "Poppins", fontSize: ".9em" }}
@@ -429,7 +430,7 @@ function ViewProfilePage() {
 												>
 													Probationary Date Started:{" "}
 													<span style={{ color: "black", fontWeight: 500 }}>
-														{selectedUser.dateStarted}
+														{formatDate(selectedUser.dateStarted)}
 													</span>
 												</Typography>
 											</>
@@ -674,7 +675,7 @@ function ViewProfilePage() {
 													},
 												}}
 												style={{ textTransform: "none" }}
-												startIcon={<SaveAsRoundedIcon />}
+												startIcon={<FontAwesomeIcon icon={faCircleCheck} style={{fontSize: "15px"}} />}
 												disabled={!saveDisabled}
 											>
 												Save{" "}

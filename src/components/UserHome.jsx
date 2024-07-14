@@ -1,8 +1,17 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Box, Typography, Container } from "@mui/material/";
-import logo from "../assets/logo.png";
+import { Box, Typography, Container, Divider, Grid } from "@mui/material/";
+import { Carousel } from "react-responsive-carousel";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 import Animated from "./motion";
+import logo from "../assets/logo.png";
+import imageSources from "../data/imageSource";
+import efficiencyImg from "../assets/efficient.png";
+import accuracyImg from "../assets/accuracy.png";
+import transparencyImg from "../assets/transparency.png";
+import evaluate from "../assets/evaluate.png";
+import select from "../assets/select.png";
+import done from "../assets/done.png";
 
 function UserHome() {
   const [loggedUserData, setLoggedUserData] = useState(null);
@@ -20,7 +29,6 @@ function UserHome() {
         console.log(response.data);
       } catch (error) {
         if (error.response) {
-          // Not in 200 response range
           console.log(error.response.data);
           console.log(error.response.status);
           console.log(error.response.headers);
@@ -33,7 +41,6 @@ function UserHome() {
     fetchUser();
   }, []);
 
-  // Function to format date as "May 27, 2024"
   const formatDate = (date) => {
     const options = { month: "long", day: "numeric", year: "numeric" };
     return new Date(date).toLocaleDateString("en-US", options);
@@ -46,15 +53,15 @@ function UserHome() {
 
   return (
     <Animated>
-      {/* Main */}
       <Box
         sx={{
           backgroundColor: "white",
           borderRadius: "10px",
           width: "80vw",
-          height: "85vh",
+          height: "86vh",
           margin: "25px 0px 0px 43px",
-          boxShadow: "-1px 4px 5px rgba(0, 0, 0, 0.3)",
+          boxShadow: "-1px 4px 10px rgba(0, 0, 0, 0.3)",
+          overflowY: "auto",
         }}
       >
         <Box
@@ -79,7 +86,7 @@ function UserHome() {
                   sx={{
                     color: "white",
                     fontWeight: 600,
-                    fontSize: "25px",
+                    fontSize: "20px",
                   }}
                 >
                   Hello, {loggedUserData ? loggedUserData.fName : "User"}!
@@ -91,7 +98,7 @@ function UserHome() {
                 src={logo}
                 alt="Logo"
                 sx={{
-                  width: "80px",
+                  width: "50px",
                   height: "auto",
                 }}
               />
@@ -102,6 +109,7 @@ function UserHome() {
                   fontWeight: 500,
                   fontFamily: "Poppins",
                   textAlign: "center",
+                  fontSize: "15px",
                 }}
               >
                 {formatDate(new Date())} - {getWeekday(new Date())}
@@ -114,50 +122,365 @@ function UserHome() {
           variant="body1"
           sx={{
             fontFamily: "Poppins",
-            fontSize: "16.5px",
+            fontSize: "18px",
             mt: 2,
-            textAlign: "justify",
-            pl: "3%",
-            pr: "4%",
+            ml: 2,
+            mr: 2,
+            mb: 5,
+            textAlign: "center",
           }}
         >
-          Welcome to the{" "}
+          <span
+            style={{
+              fontFamily: "Poppins",
+              fontWeight: 800,
+              color: "#1E1E1",
+              fontSize: "50px",
+            }}
+          >
+            WELCOME TO THE{" "}
+          </span>
+          <br />
           <span style={{ fontWeight: 600, color: "#8C383E" }}>
             Expanded Administrative Employee Performance Appraisal (e-AEPA)
             System.
           </span>{" "}
-          <br />
-          <br /> At CIT-U, we are committed to enhancing the way we evaluate our
-          team. The e-AEPA system is designed to modernize and streamline the
-          employee evaluation process, transitioning from traditional manual
-          Excel-based assessments to a comprehensive digital platform.
         </Typography>
 
-        <Typography
+        <Box
           sx={{
-            fontFamily: "Poppins",
-            fontSize: "16.5px",
-            mt: 1,
-            textAlign: "justify",
-            pl: "3%",
-            pr: "4%",
+            margin: "4% auto",
+            width: "90%",
+            maxHeight: "300px",
+            overflow: "hidden",
           }}
         >
-          With a focus on{" "}
-          <span style={{ color: "#F8C720", fontWeight: 600 }}>
-            efficiency, accuracy,
-          </span>{" "}
-          and
-          <span style={{ color: "#F8C720", fontWeight: 600 }}>
-            {" "}
-            transparency,
-          </span>{" "}
-          e-AEPA serves as a vital tool in empowering our HR personnel to make
-          well-informed decisions about employee development and retention.
-          Embrace the future of employee evaluations with us, where technology
-          drives organizational effectiveness and ensures a seamless evaluation
-          workflow for all our probationary and regular employees.
-        </Typography>
+          <Carousel
+            showThumbs={true}
+            autoPlay
+            infiniteLoop
+            interval={3000}
+            stopOnHover
+            swipeable
+            emulateTouch
+            showStatus={false}
+            style={{
+              maxHeight: "300px",
+            }}
+          >
+            {imageSources.map((source, index) => (
+              <div key={index}>
+                <img
+                  src={source.src}
+                  alt={source.alt}
+                  style={{
+                    width: source.width,
+                    height: "100%",
+                    margin: source.margin,
+                    objectFit: source.objectFit,
+                  }}
+                />
+              </div>
+            ))}
+          </Carousel>
+        </Box>
+
+        <Box sx={{ padding: 2, ml: 4, mr: 4 }}>
+          <Typography
+            variant="body1"
+            sx={{
+              fontFamily: "Poppins",
+              fontSize: "19px",
+              lineHeight: "2em",
+              ml: 2,
+              mr: 2,
+              padding: "0 30px 0 30px",
+              textAlign: "justify",
+              color: "#2C2828",
+            }}
+          >
+            At CIT-U, we are committed to enhancing the way we evaluate our
+            team. The e-AEPA system is designed to modernize and streamline the
+            employee evaluation process, transitioning from traditional manual
+            Excel-based assessments to a comprehensive digital platform.
+          </Typography>
+
+          <Divider sx={{ my: 8 }} />
+
+          <Typography
+            variant="h4"
+            sx={{
+              fontFamily: "Poppins",
+              fontWeight: "bold",
+              textAlign: "center",
+              color: "#8C383E",
+              mb: 8,
+            }}
+          >
+            E-AEPA FOCUSES ON THE FOLLOWING
+          </Typography>
+
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6} md={4}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <img
+                  src={efficiencyImg}
+                  alt="Efficiency"
+                  style={{ width: "100%", maxWidth: "170px" }}
+                />
+                <div style={{ textAlign: "center", width: "100%" }}>
+                  <span
+                    style={{
+                      color: "#F8C720",
+                      fontWeight: "bold",
+                      fontFamily: "Poppins",
+                      fontSize: "20px",
+                    }}
+                  >
+                    EFFICIENT
+                  </span>
+                </div>
+                <Typography
+                  sx={{
+                    fontFamily: "Poppins",
+                    fontSize: "16.5px",
+                    textAlign: "justify",
+                    color: "#2C2828",
+                    mr: 3,
+                    ml: 3,
+                    mt: 1,
+                  }}
+                >
+                  e-AEPA enhances efficiency by automating tedious tasks,
+                  allowing more time for critical decision-making.
+                </Typography>
+              </Box>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <img
+                  src={accuracyImg}
+                  alt="Accuracy"
+                  style={{ width: "100%", maxWidth: "210px" }}
+                />
+                <div style={{ textAlign: "center", width: "100%" }}>
+                  <span
+                    style={{
+                      color: "#F8C720",
+                      fontWeight: "bold",
+                      fontFamily: "Poppins",
+                      fontSize: "20px",
+                    }}
+                  >
+                    ACCURACY
+                  </span>
+                </div>
+                <Typography
+                  sx={{
+                    fontFamily: "Poppins",
+                    fontSize: "16.5px",
+                    textAlign: "justify",
+                    color: "#2C2828",
+                    mr: 3,
+                    ml: 3,
+                    mt: 1,
+                  }}
+                >
+                  By reducing human error, our platform ensures accurate and
+                  reliable performance evaluations.
+                </Typography>
+              </Box>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <img
+                  src={transparencyImg}
+                  alt="Transparency"
+                  style={{ width: "100%", maxWidth: "320px" }}
+                />
+                <div style={{ textAlign: "center", width: "100%" }}>
+                  <span
+                    style={{
+                      color: "#F8C720",
+                      fontWeight: "bold",
+                      fontFamily: "Poppins",
+                      fontSize: "20px",
+                    }}
+                  >
+                    TRANSPARENCY
+                  </span>
+                </div>
+                <Typography
+                  sx={{
+                    fontFamily: "Poppins",
+                    fontSize: "16.5px",
+                    textAlign: "justify",
+                    color: "#2C2828",
+                    mr: 3,
+                    ml: 3,
+                    mt: 1,
+                  }}
+                >
+                  Our system promotes transparency, making the evaluation
+                  process clear and understandable for all employees.
+                </Typography>
+              </Box>
+            </Grid>
+          </Grid>
+
+          <Divider sx={{ my: 5 }} />
+
+          <Typography
+            variant="h5"
+            sx={{
+              fontFamily: "Poppins",
+              fontWeight: "bold",
+              textAlign: "center",
+              color: "#8C383E",
+              mb: 8,
+            }}
+          >
+            LEARN E-AEPA EVALUATION WITH 3 EASY STEPS:
+          </Typography>
+
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6} md={4} mb={10}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <img
+                  src={evaluate}
+                  alt="Step 1"
+                  style={{ width: "100%", maxWidth: "165px" }}
+                />
+                <Typography
+                  sx={{
+                    fontFamily: "Poppins",
+                    fontSize: "16px",
+                    textAlign: "justify",
+                    padding: "0 20px 0 20px",
+                    color: "#2C2828",
+                    mt: 2,
+                  }}
+                >
+                  <span
+                    style={{
+                      color: "#8C383E",
+                      fontWeight: "bold",
+                      fontFamily: "Poppins",
+                    }}
+                  >
+                    {" "}
+                    Step 1:
+                  </span>{" "}
+                  Navigate to the Take Evaluation tab.
+                </Typography>
+              </Box>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <img
+                  src={select}
+                  alt="Step 2"
+                  style={{ width: "100%", maxWidth: "140px" }}
+                />
+                <Typography
+                  sx={{
+                    fontFamily: "Poppins",
+                    fontSize: "16px",
+                    textAlign: "justify",
+                    color: "#2C2828",
+                    mt: 2,
+                    padding: "0 20px 0 20px",
+                  }}
+                >
+                  <span
+                    style={{
+                      color: "#8C383E",
+                      fontWeight: "bold",
+                      fontFamily: "Poppins",
+                    }}
+                  >
+                    {" "}
+                    Step 2:
+                  </span>{" "}
+                  Either select Self or Peer Evaluation. You can decide which
+                  response to provide first.
+                </Typography>
+              </Box>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <img
+                  src={done}
+                  alt="Step 3"
+                  style={{ width: "100%", maxWidth: "150px" }}
+                />
+                <Typography
+                  sx={{
+                    fontFamily: "Poppins",
+                    fontSize: "16px",
+                    textAlign: "justify",
+                    color: "#2C2828",
+                    padding: "0 20px 0 20px",
+                    mt: 2,
+                  }}
+                >
+                  <span
+                    style={{
+                      color: "#8C383E",
+                      fontWeight: "bold",
+                      fontFamily: "Poppins",
+                    }}
+                  >
+                    {" "}
+                    Step 3:
+                  </span>{" "}
+                  Make sure that every field is filled out correctly, then send
+                  in your assessment. This concludes your participation.
+                </Typography>
+              </Box>
+            </Grid>
+          </Grid>
+        </Box>
       </Box>
     </Animated>
   );

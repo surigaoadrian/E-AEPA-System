@@ -5,6 +5,7 @@ import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGears } from "@fortawesome/free-solid-svg-icons";
 import EvaluationForm from "../components/EvaluationForm";
+import PeerEvaluationCard from "../components/PeerEvaluationCard";
 
 function TakeEvaluationPage() {
   const [openForm, setOpenForm] = useState(false);
@@ -16,6 +17,9 @@ function TakeEvaluationPage() {
   const userID = sessionStorage.getItem("userID");
   const [period, setPeriod] = useState("");
   const [fetchEvalID, setFetchEvalID] = useState();
+  const [activeCard, setActiveCard] = useState(null);
+
+  //peer eval
 
   //Fetch user details
   useEffect(() => {
@@ -134,6 +138,7 @@ function TakeEvaluationPage() {
     //backgroundColor: "tomato",
     height: "100%",
     padding: "10px 25px 0px 25px",
+    overflow: "auto",
   };
 
   const evaluationHeaderStyles = {
@@ -166,10 +171,10 @@ function TakeEvaluationPage() {
         >
           Evaluation
         </h1>
-        <div style={dateHiredStyles}>
+        {/* <div style={dateHiredStyles}>
           <p>Date Hired:</p>
           <p>{loggedUser.dateHired}</p>
-        </div>
+        </div> */}
       </div>
 
       {openForm ? (
@@ -184,6 +189,7 @@ function TakeEvaluationPage() {
       ) : (
         <div style={{ position: "relative" }}>
           <EvaluationCard
+            id={"3rdMonth"}
             period={"3rd Month"}
             loggedUser={loggedUser}
             evalType={evalType}
@@ -194,9 +200,12 @@ function TakeEvaluationPage() {
             openModal={openModal}
             handleCloseModal={handleCloseModal}
             handleConfirm={handleConfirm}
+            activeCard={activeCard}
+            setActiveCard={setActiveCard}
             style={{ zIndex: 1 }}
           />
           {/* <EvaluationCard
+            id={"5thMonth"}
             period={"5th Month"}
             loggedUser={loggedUser}
             evalType={evalType}
@@ -207,6 +216,8 @@ function TakeEvaluationPage() {
             openModal={openModal}
             handleCloseModal={handleCloseModal}
             handleConfirm={handleConfirm}
+            activeCard={activeCard}
+            setActiveCard={setActiveCard}
           /> */}
           {/* <EvaluationCard
             period={"Annual"}
@@ -220,6 +231,7 @@ function TakeEvaluationPage() {
             handleCloseModal={handleCloseModal}
             handleConfirm={handleConfirm}
           /> */}
+          <PeerEvaluationCard />
 
           <div
             style={{
