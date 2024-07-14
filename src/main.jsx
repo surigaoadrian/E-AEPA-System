@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Navigate  } from "react-router-dom";
 import "./index.css";
 import HomeShowcase from "./pages/HomeShowcase";
 import ViewProfilePage from "./pages/ViewProfilePage";
@@ -19,19 +19,28 @@ import NotAuthorized from "./pages/NotAuthorized";
 import PrivateRoute from "./components/PrivateRoute";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import EvaluateEmployee from "./pages/EvaluateEmployee";
+<<<<<<< Updated upstream
 import ActivityLogs from "./pages/ActivityLogs";
+=======
+import AdminShowcase from "./pages/AdminShowcase";
+>>>>>>> Stashed changes
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
     children: [
+
       {
-        path: "/",
+        path: "/", 
         element: (
+<<<<<<< Updated upstream
           <PrivateRoute
             requiredRoles={["EMPLOYEE", "ADMIN", "HEAD", "SUPERUSER"]}
           >
+=======
+          <PrivateRoute requiredRoles={["EMPLOYEE", "HEAD", "ADMIN"]}>
+>>>>>>> Stashed changes
             <HomeShowcase />
           </PrivateRoute>
         ),
@@ -117,7 +126,26 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
+      {
+        path: "/dashboard",
+        element: (
+          <PrivateRoute requiredRoles={["ADMIN"]}>
+            <AdminShowcase />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/",
+        element: (
+          <PrivateRoute requiredRoles={["ADMIN"]}>
+            <Navigate to="/adminShowcase" replace />
+          </PrivateRoute>
+        ),
+      },
     ],
+  },
+  {
+
   },
   { path: "/login", element: <LoginPage /> },
   { path: "/forgotPassword", element: <ForgotPasswordPage /> },

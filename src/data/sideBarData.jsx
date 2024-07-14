@@ -1,5 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+<<<<<<< Updated upstream
   faBuildingUser,
   faFileLines,
   faHouse,
@@ -8,9 +9,21 @@ import {
   faUserTie,
   faUsers,
   faListUl,
+=======
+	faBuildingUser,
+	faFileLines,
+	faHouse,
+	faStar,
+	faUser,
+	faUserTie,
+	faUsers,
+	faTachometerAlt,
+>>>>>>> Stashed changes
 } from "@fortawesome/free-solid-svg-icons";
+import DashboardIcon from '@mui/icons-material/Dashboard';
 
 export const SideBarData = [
+<<<<<<< Updated upstream
   {
     title: "Home",
     path: "/",
@@ -59,6 +72,64 @@ export const SideBarData = [
     path: "/manageEmployee",
     role: ["ADMIN", "SUPERUSER"],
     icon: <FontAwesomeIcon icon={faUserTie} style={{ fontSize: "15px" }} />,
+=======
+	{
+		title: "Home",
+		path: "/",
+		role: "ALL",
+		icon: <FontAwesomeIcon icon={faHouse} style={{ fontSize: "15px" }} />,
+		margin: "0 0 0 2px",
+	},
+	{
+		title: "Dashboard",
+		path: "/dashboard",
+		role: "ADMIN",
+		icon: <DashboardIcon style={{ fontSize: "15px" }} />,
+		margin: "0 0 0 2px",
+	},
+	{
+		title: "View Profile",
+		path: "/viewProfile",
+		role: "EMPLOYEE",
+		icon: <FontAwesomeIcon icon={faUser} style={{ fontSize: "15px" }} />,
+		margin: "0 0 0 4px",
+	},
+	{
+		title: "Take Evaluation",
+		path: "/takeEvaluation",
+		role: "EMPLOYEE",
+		icon: <FontAwesomeIcon icon={faFileLines} style={{ fontSize: "15px" }} />,
+		margin: "0 0 0 4px",
+	},
+	{
+		title: "View Results",
+		path: "/viewRatings",
+		role: "EMPLOYEE",
+		icon: <FontAwesomeIcon icon={faStar} style={{ fontSize: "15px" }} />,
+		margin: "0 0 0 1px",
+	},
+	{
+		title: "Manage Account",
+		path: "/manageAccount",
+		role: "ADMIN",
+		icon: <FontAwesomeIcon icon={faUsers} style={{ fontSize: "15px" }} />,
+    	margin: "0 0 0 0",
+	},
+	{
+		title: "Manage Offices",
+		path: "/manageOffices",
+		role: "ADMIN",
+		icon: (
+			<FontAwesomeIcon icon={faBuildingUser} style={{ fontSize: "15px" }} />
+		),
+    
+	},
+	{
+		title: "Manage Employee",
+		path: "/manageEmployee",
+		role: "ADMIN",
+		icon: <FontAwesomeIcon icon={faUserTie} style={{ fontSize: "15px" }} />,
+>>>>>>> Stashed changes
     margin: "0 0 0 5px",
   },
   {
