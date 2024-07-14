@@ -2,10 +2,6 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-
-import App from "./App.jsx";
-
 import HomeShowcase from "./pages/HomeShowcase";
 import ViewProfilePage from "./pages/ViewProfilePage";
 import ViewProfilePageHead from "./pages/ViewProfilePageHead";
