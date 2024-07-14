@@ -46,7 +46,7 @@ public class DepartmentService {
             dept.setDeptName(newDept.getDeptName());
             dept.setDeptOfficeHead(newDept.getDeptOfficeHead());
             String admin = userRepo.findById(adminId).get().getfName() + " " + userRepo.findById(adminId).get().getlName();
-            userService.logActivity(adminId,admin,"Edited Department", "Edited Department Details : " + newDept.getDeptName() );
+            userService.logActivity(adminId,admin,"Edited Department", "Modified Department Details : " + newDept.getDeptName() );
         } catch (NoSuchElementException ex){
             throw new NoSuchElementException("Department " + id + " not found.");
         } finally {

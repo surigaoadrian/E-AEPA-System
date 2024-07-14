@@ -15,11 +15,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthenticationService {
     private final UserRepository userRepo;
+    @Autowired
+    UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    @Autowired
-    private UserService userService;
 
     public AuthenticationService(UserRepository userRepo, PasswordEncoder passwordEncoder, JwtService jwtService,
             AuthenticationManager authenticationManager) {
@@ -65,7 +65,7 @@ public class AuthenticationService {
             String token = jwtService.generateToken(existingUser);
 
             String admin = userRepo.findById(adminId).get().getfName() + " " + userRepo.findById(adminId).get().getlName();
-            userService.logActivity(adminId,admin, "Created User Account", "Created a new user account for " + existingUser.getfName() + " " + existingUser.getlName() + ".");
+            userService.logActivity(adminId,admin,"Created User Account", "Added New User  : " + existingUser.getfName() + " " + existingUser.getlName());
             return new AuthenticationResponse(token);
         } else {
             // Username does not exist, create a new record
@@ -96,8 +96,9 @@ public class AuthenticationService {
             
             // Generate JWT token for the new user
             String token = jwtService.generateToken(newUser);
+
             String admin = userRepo.findById(adminId).get().getfName() + " " + userRepo.findById(adminId).get().getlName();
-            userService.logActivity(adminId,admin, "Created User Account", "Add a new User Account : " + newUser.getfName() + " " + newUser.getlName() + ".");
+            userService.logActivity(adminId,admin,"Created User Account", "Added New User : " + newUser.getfName() + " " + newUser.getlName());
             return new AuthenticationResponse(token);
         }
     }

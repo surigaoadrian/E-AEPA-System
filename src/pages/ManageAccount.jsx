@@ -31,8 +31,7 @@ const CustomAlert = ({ open, onClose, severity, message }) => {
 };
 
 function ManageAccount() {
-  const id = sessionStorage.getItem("userID");
-  console.log("ID: ", id);
+  const loggedId = sessionStorage.getItem("userID");
   const [openRegistrationDialog, setOpenRegistrationDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openDeleteDialog, setopenDeleteDialog] = useState(false);
@@ -289,13 +288,15 @@ function ManageAccount() {
           throw new Error("Failed to fetch data");
         }
         const data = await response.json();
-        const filteredData = data.filter((item) => {
-          if (selectedTab === 0) {
-            return item.role !== "ADMIN";
-          } else if (selectedTab === 1) {
-            return item.role === "ADMIN";
-          }
-        }).sort((a, b) => b.userID - a.userID);
+        const filteredData = data
+          .filter((item) => {
+            if (selectedTab === 0) {
+              return item.role !== "ADMIN" && item.role !== "SUPERUSER";
+            } else if (selectedTab === 1) {
+              return item.role === "ADMIN";
+            }
+          })
+          .sort((a, b) => b.userID - a.userID);
         const processedData = filteredData.map((item) => ({
           ...item,
           name: `${item.fName} ${item.lName}`,
@@ -447,7 +448,7 @@ function ManageAccount() {
         role: role,
       };
 
-      const response = await fetch(`http://localhost:8080/register/${id}`, {
+      const response = await fetch(`http://localhost:8080/register/${loggedId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -541,7 +542,7 @@ function ManageAccount() {
         dateStarted: selectedUser.dateStarted,
       };
       await axios.patch(
-        `http://localhost:8080/user/editUser/${id}/${selectedUser.userID}`,
+        `http://localhost:8080/user/editUser/${loggedId}/${selectedUser.userID}`,
         userPayload,
         {
           headers: {
@@ -570,7 +571,7 @@ function ManageAccount() {
     console.log("delete Yes user:", userID);
     try {
       const response = await fetch(
-        `http://localhost:8080/user/delete/${id}/${userID}`,
+        `http://localhost:8080/user/delete/${loggedId}/${userID}`,
         {
           method: "DELETE",
           headers: {

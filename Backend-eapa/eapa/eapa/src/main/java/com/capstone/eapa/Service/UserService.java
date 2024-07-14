@@ -186,7 +186,7 @@ public class UserService implements UserDetailsService {
                 user.setUsername(newDetails.getUsername());
             
             String admin = userRepo.findById(adminId).get().getfName() + " " + userRepo.findById(adminId).get().getlName();
-            logActivity(adminId,admin,"Edited User Account", "Modified User Account Details : " + user.getfName() + " " + user.getlName());
+            logActivity(adminId,admin,"Edited User Account", "Modified User Details : " + user.getfName() + " " + user.getlName());
             return userRepo.save(user);
         } catch (Exception e) {
             throw e; 
