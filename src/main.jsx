@@ -19,7 +19,7 @@ import NotAuthorized from "./pages/NotAuthorized";
 import PrivateRoute from "./components/PrivateRoute";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import EvaluateEmployee from "./pages/EvaluateEmployee";
-import ActivityLog from "./pages/ActivityLog";
+import ActivityLog from "./pages/ActivityLogs";
 
 const router = createBrowserRouter([
   {
