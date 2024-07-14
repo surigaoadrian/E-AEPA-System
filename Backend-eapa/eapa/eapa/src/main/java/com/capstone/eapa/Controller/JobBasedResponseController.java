@@ -25,5 +25,11 @@ public class JobBasedResponseController {
         return jbrespServ.getAllResponse();
     }
 
+    //get responses using userId
+    @GetMapping("getAllResponsesByID/{userID}")
+    public List<String> getAllResponsesByID(@PathVariable int userID) {
+        return jbrespServ.getAllResponseByID(userID);
+    }
+
 
 }

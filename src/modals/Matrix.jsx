@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScatterChart, Scatter, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer, Label } from 'recharts';
+import { ScatterChart, Scatter, XAxis, YAxis, Tooltip, ResponsiveContainer, Label } from 'recharts';
 import { Box } from '@mui/material';
 import matrix from "../assets/matrixx.png";
 import arrow from "../assets/arrow.png";
@@ -27,7 +27,7 @@ const CustomTooltip = ({ active, payload }) => {
 
 const Matrix = () => {
   const employeeData = [
-    { id: 1, valuesPerformance: 3.5, jobsPerformance: 4.0 }
+    { id: 1, valuesPerformance: 4.5, jobsPerformance: 5.0 }
   ];
 
   return (
@@ -64,12 +64,11 @@ const Matrix = () => {
               left: 10,
             }}
           >
-            <defs>
-              <pattern id="backgroundImage" patternUnits="userSpaceOnUse" width="100%" height="100%">
-                <image href={matrix} x="0" y="0" width="100%" height="100%" />
-              </pattern>
-            </defs>
-            <rect x="0" y="0" width="100%" height="100%" fill="url(#backgroundImage)" />
+
+
+            <image xlinkHref={matrix} x="0" y="0" width="100%" height="100%" />
+
+
             
             <XAxis type="number" dataKey="valuesPerformance" name="Values-Based Performance" domain={[1, 5]}>
               <Label value="Values-Based Performance" offset={-20} position="insideBottom" style={{ fontWeight:'bold',textAnchor: 'middle' }} />

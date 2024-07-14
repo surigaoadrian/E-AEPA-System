@@ -12,6 +12,7 @@ import Typography from "@mui/material/Typography";
 import zIndex from "@mui/material/styles/zIndex";
 
 function EvaluationCard({
+  id,
   period,
   loggedUser,
   handleOpenForm,
@@ -22,6 +23,8 @@ function EvaluationCard({
   handleCloseModal,
   handleConfirm,
   setEvalType,
+  activeCard = { activeCard },
+  setActiveCard = { setActiveCard },
 }) {
   const [takeEval, setTakeEval] = useState(false);
   const [shouldDisplay, setShouldDisplay] = useState(true);
@@ -33,6 +36,7 @@ function EvaluationCard({
 
   const handleTakeEvalChange = () => {
     setTakeEval(!takeEval);
+    setActiveCard(id);
   };
 
   const modalStyle = {
@@ -44,6 +48,7 @@ function EvaluationCard({
     bgcolor: "background.paper",
     boxShadow: 24,
     borderTop: "30px solid #8C383E",
+    borderRadius: "10px",
     padding: "20px",
     display: "flex",
     flexDirection: "column",
@@ -281,13 +286,15 @@ function EvaluationCard({
       )}
 
       {/** Evaluation tab */}
-      <EvaluationTypeTab
-        period={period}
-        evalType={evalType}
-        handleOpenForm={handleOpenForm}
-        handleOpenModal={handleOpenModal}
-        setShouldDisplay={setShouldDisplay}
-      />
+      {activeCard === id && (
+        <EvaluationTypeTab
+          period={period}
+          evalType={evalType}
+          handleOpenForm={handleOpenForm}
+          handleOpenModal={handleOpenModal}
+          setShouldDisplay={setShouldDisplay}
+        />
+      )}
 
       {/**Confirmation Modal */}
       <Modal
@@ -297,7 +304,7 @@ function EvaluationCard({
         aria-describedby="modal-description"
       >
         <Box sx={modalStyle}>
-          <Typography id="modal-title" sx={{ fontSize: "18px" }} component="h2">
+          <Typography id="modal-title" sx={{ fontSize: "16px" }} component="h2">
             Are you sure you want to start the assessment now?
           </Typography>
           <div

@@ -101,13 +101,22 @@ public class EvaluationService {
         return evalRepo.findEvalIDByUserIDAndPeriodAndStageAndEvalType(userID, period, stage, evalType);
     }
 
+    //Get evaluation ID for HEAD
+    public Integer getEvalIDByUserIdPeriodStageHead(int userID, int empID, String period, String stage, String evalType) {
+        return evalRepo.findEvalIDByUserIdPeriodStageHead(userID, empID, period, stage, evalType);
+    }
+
     //returns true if evaluation is done
     public boolean isEvaluationCompleted(int userID, String period, String stage, String evalType) {
         String status = evalRepo.findStatusByUserIDPeriodStageAndEvalType(userID, period, stage, evalType);
         return "COMPLETED".equals(status);
     }
 
-    public List<EvaluationEntity> getEvaluationsByUser(int userID) {
+    //returns true if evaluation is done (HEAD)
+    public boolean isEvaluationCompletedHead(int userID, int empID, String period, String stage, String evalType) {
+        String status = evalRepo.findStatusByUserIDEmpIDPeriodStageAndEvalType(userID, empID, period, stage, evalType);
+        return "COMPLETED".equals(status);
+    }    public List<EvaluationEntity> getEvaluationsByUser(int userID) {
         return evalRepo.findByUserID(userID);
     }
     
