@@ -31,6 +31,7 @@ import java.util.*;
 public class UserService implements UserDetailsService {
     @Autowired
     private UserRepository userRepo;
+
     @Autowired
     private PasswordResetTokenRepository passResetTokenRepo;
     @Autowired
@@ -249,6 +250,15 @@ public class UserService implements UserDetailsService {
         Random rand = new Random();
         return users.get(rand.nextInt(users.size()));
     }
+
+    //added is_probationary
+    public long getTotalProbationaryUsers() {
+        return userRepo.countByIsProbationaryTrue();
+    }
+
+    //
+    public long getTotalEmployees(){return userRepo.countTotalEmployees();}
+
 
     //Get Employees under Department Head
 //    public List<UserEntity> getAllEmployeesFromDepartmentHead(String headName) {

@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.stream.Collectors;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -167,6 +169,38 @@ public class EvaluationService {
             })
             .collect(Collectors.toList());
     }
+
+//total employee for recommendation
+    public long countRecommendedEmployees() {
+        return evalRepo.countByPeriodAndStatus();
+    }
+//returns data for 3rd Month Evaluation status BarGraph
+public Map<String, Long> getThirdMonthEvaluationStatus() {
+    long completed = evalRepo.countCompletedForThirdMonth();
+    long open = evalRepo.countOpenForThirdMonth();
+    long notCompleted = open > completed ? open - completed : 0;
+
+    Map<String, Long> statusMap = new HashMap<>();
+    statusMap.put("completed", completed);
+    statusMap.put("notCompleted", notCompleted);
+
+    return statusMap;
+}
+
+    //returns data for 5th Month Evaluation status BarGraph
+    public Map<String, Long> getFifthMonthEvaluationStatus() {
+        long completed = evalRepo.countCompletedForFifthMonth();
+        long open = evalRepo.countOpenForFifthMonth();
+        long notCompleted = open > completed ? open - completed : 0;
+
+        Map<String, Long> statusMap = new HashMap<>();
+        statusMap.put("completed", completed);
+        statusMap.put("notCompleted", notCompleted);
+
+        return statusMap;
+    }
+
+
 
 
 }

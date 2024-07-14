@@ -7,7 +7,7 @@ import com.capstone.eapa.Service.EvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import java.util.Map;
 import java.util.List;
 
 @RestController
@@ -18,7 +18,7 @@ public class EvaluationController {
     EvaluationService evalServ;
 
     @PostMapping("/createEvaluation")
-    public EvaluationEntity createEvaluation(@RequestBody EvaluationEntity evaluation){
+    public EvaluationEntity createEvaluation(@RequestBody EvaluationEntity evaluation) {
         return evalServ.createEvaluation(evaluation);
     }
 
@@ -29,7 +29,7 @@ public class EvaluationController {
     }
 
     @GetMapping("/getAllEvaluation")
-    public List<EvaluationEntity> getAllEvaluation(){
+    public List<EvaluationEntity> getAllEvaluation() {
         return evalServ.getAllEvaluations();
     }
 
@@ -44,7 +44,6 @@ public class EvaluationController {
     public Integer getEvalIDByUserIdPeriodStageHead(int userID, int empID, String period, String stage, String evalType) {
         return evalServ.getEvalIDByUserIdPeriodStageHead(userID, empID, period, stage, evalType);
     }
-
 
     @GetMapping("/isEvaluationCompleted")
     public boolean isEvaluationCompleted(@RequestParam int userID, @RequestParam String period, @RequestParam String stage, @RequestParam String evalType) {
@@ -61,9 +60,30 @@ public class EvaluationController {
     public List<EvaluationDTO> getEvaluations() {
         return evalServ.getAggregatedEvaluations();
     }
+
     @GetMapping("/isEvaluationCompletedHead")
-    public boolean isEvaluationCompletedHead(@RequestParam int userID, @RequestParam int empID,@RequestParam String period, @RequestParam String stage, @RequestParam String evalType) {
+    public boolean isEvaluationCompletedHead(@RequestParam int userID, @RequestParam int empID, @RequestParam String period, @RequestParam String stage, @RequestParam String evalType) {
         return evalServ.isEvaluationCompletedHead(userID, empID, period, stage, evalType);
     }
 
+    //total employees for recommendation
+    @GetMapping("/countRecommendedEmployees")
+    public long countRecommendedEmployees() {
+        return evalServ.countRecommendedEmployees();
+    }
+
+    // for 3rd month evaluation status BarGraph
+    @GetMapping("/thirdMonthStatus")
+    public ResponseEntity<Map<String, Long>> getThirdMonthStatus() {
+        Map<String, Long> statusMap = evalServ.getThirdMonthEvaluationStatus();
+        return ResponseEntity.ok(statusMap);
+    }
+
+    // for 5th month evaluation status BarGraph
+    @GetMapping("/fifthMonthStatus")
+    public ResponseEntity<Map<String, Long>> getFifthMonthStatus() {
+        Map<String, Long> statusMap = evalServ.getFifthMonthEvaluationStatus();
+        return ResponseEntity.ok(statusMap);
+    }
 }
+
