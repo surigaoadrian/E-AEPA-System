@@ -90,7 +90,7 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute requiredRoles={["ADMIN", "SUPERUSER"]}>
             {/* <ManageEmployee /> */}
-            <ActivityLogs />
+            <ActivityLog />
           </PrivateRoute>
         ),
       },
