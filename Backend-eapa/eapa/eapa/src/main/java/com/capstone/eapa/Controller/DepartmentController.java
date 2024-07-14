@@ -23,7 +23,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/department")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "*")
 public class DepartmentController {
     @Autowired
     DepartmentService departmentServ;
