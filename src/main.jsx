@@ -19,11 +19,8 @@ import NotAuthorized from "./pages/NotAuthorized";
 import PrivateRoute from "./components/PrivateRoute";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import EvaluateEmployee from "./pages/EvaluateEmployee";
-<<<<<<< Updated upstream
 import ActivityLogs from "./pages/ActivityLogs";
-=======
 import AdminShowcase from "./pages/AdminShowcase";
->>>>>>> Stashed changes
 
 const router = createBrowserRouter([
   {
@@ -34,13 +31,7 @@ const router = createBrowserRouter([
       {
         path: "/", 
         element: (
-<<<<<<< Updated upstream
-          <PrivateRoute
-            requiredRoles={["EMPLOYEE", "ADMIN", "HEAD", "SUPERUSER"]}
-          >
-=======
           <PrivateRoute requiredRoles={["EMPLOYEE", "HEAD", "ADMIN"]}>
->>>>>>> Stashed changes
             <HomeShowcase />
           </PrivateRoute>
         ),
