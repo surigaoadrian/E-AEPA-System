@@ -276,7 +276,6 @@ public class UserService implements UserDetailsService {
         activityLogRepo.save(activityLog);
     }
 
-=======
     //peer evaluator assigned
 //    public List<UserEntity> getAssignedEvaluators(String dept, int excludedUserID) {
 //        List<UserEntity> users = userRepo.findPeersByDeptRoleNotUserIDNotAndPositionNotSecretary(dept, Role.HEAD.name(), excludedUserID);
