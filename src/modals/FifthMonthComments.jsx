@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, TextField, Grid, Typography } from '@mui/material';
 
 const FifthMonthComments = () => {
+  const role = sessionStorage.getItem("userRole");
   return (
     <div>
     <Box className="mb-2 mt-14" sx={{ 
@@ -29,7 +30,7 @@ const FifthMonthComments = () => {
         width: '100%'}} > &nbsp; [GAP] Describe areas you feel require improvement in terms of your STAFF's professional capabilities. </Typography>
 
       <div className='flex space-x-4 -mt-2'>
-        <TextField
+        <TextField disabled={role==="EMPLOYEE"}
           variant="outlined"
           fullWidth
           multiline
@@ -48,7 +49,7 @@ const FifthMonthComments = () => {
         width: '100%'}} > &nbsp; [TARGET] What should be your STAFF's career goals for the semester (up to December 2024)?  </Typography>
 
       <div className='flex space-x-4 -mt-2'>
-        <TextField
+        <TextField disabled={role==="EMPLOYEE"}
           variant="outlined"
           fullWidth
           multiline
@@ -67,7 +68,7 @@ const FifthMonthComments = () => {
         width: '100%'}} > &nbsp; [ACTION/S] What could your STAFF, you as Immediate Head or CIT management do to best support your STAFF in accomplishing these goals? </Typography>
 
       <div className='flex space-x-4 -mt-2'>
-        <TextField
+        <TextField disabled={role==="EMPLOYEE"}
           variant="outlined"
           fullWidth
           multiline

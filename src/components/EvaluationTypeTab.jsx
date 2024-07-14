@@ -125,7 +125,7 @@ function EvaluationTypeTab({
                     variant="contained"
                     onClick={() => handleOpenModal("VALUES", period)}
                   >
-                    Take Assessment
+                    {response1 === true ? "Completed" : "Take Assessment"}
                   </Button>
                 </div>
               </div>
@@ -170,7 +170,7 @@ function EvaluationTypeTab({
                     variant="contained"
                     onClick={() => handleOpenModal("JOB", period)}
                   >
-                    Take Assessment
+                    {response2 === true ? "Completed" : "Take Assessment"}
                   </Button>
                 </div>
               </div>
@@ -220,7 +220,7 @@ function EvaluationTypeTab({
                     variant="contained"
                     onClick={() => handleOpenModal("VALUES", period)}
                   >
-                    Take Assessment
+                    {response3 === true ? "Completed" : "Take Assessment"}
                   </Button>
                 </div>
               </div>

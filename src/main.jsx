@@ -1,11 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
-<<<<<<< Updated upstream
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import App from "./App.jsx";
-=======
+
 import HomeShowcase from "./pages/HomeShowcase";
 import ViewProfilePage from "./pages/ViewProfilePage";
 import ViewProfilePageHead from "./pages/ViewProfilePageHead";
@@ -33,7 +33,9 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: (
-          <PrivateRoute requiredRoles={["EMPLOYEE", "ADMIN", "HEAD"]}>
+          <PrivateRoute
+            requiredRoles={["EMPLOYEE", "ADMIN", "HEAD", "SUPERUSER"]}
+          >
             <HomeShowcase />
           </PrivateRoute>
         ),
@@ -65,7 +67,7 @@ const router = createBrowserRouter([
       {
         path: "/manageAccount",
         element: (
-          <PrivateRoute requiredRoles={["ADMIN"]}>
+          <PrivateRoute requiredRoles={["ADMIN", "SUPERUSER"]}>
             <ManageAccount />
           </PrivateRoute>
         ),
@@ -73,7 +75,7 @@ const router = createBrowserRouter([
       {
         path: "/manageOffices",
         element: (
-          <PrivateRoute requiredRoles={["ADMIN"]}>
+          <PrivateRoute requiredRoles={["ADMIN", "SUPERUSER"]}>
             <ManageOffices />
           </PrivateRoute>
         ),
@@ -81,8 +83,18 @@ const router = createBrowserRouter([
       {
         path: "/manageEmployee",
         element: (
-          <PrivateRoute requiredRoles={["ADMIN"]}>
+          <PrivateRoute requiredRoles={["ADMIN", "SUPERUSER"]}>
             <ManageEmployee />
+          </PrivateRoute>
+        ),
+      },
+        
+      {
+        path: "/activityLogs",
+        element: (
+          <PrivateRoute requiredRoles={["ADMIN", "SUPERUSER"]}>
+            {/* <ManageEmployee /> */}
+            <ActivityLogs />
           </PrivateRoute>
         ),
       },
@@ -119,6 +131,7 @@ const router = createBrowserRouter([
         ),
       },
 
+
     ],
   },
   { path: "/login", element: <LoginPage /> },
@@ -127,14 +140,10 @@ const router = createBrowserRouter([
   { path: "/notAuthorized", element: <NotAuthorized /> },
   { path: "*", element: <NotFoundPage /> },
 ]);
->>>>>>> Stashed changes
+
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/*" element={<App />} />
-      </Routes>
-    </BrowserRouter>
+    <RouterProvider router={router} />
   </React.StrictMode>
 );

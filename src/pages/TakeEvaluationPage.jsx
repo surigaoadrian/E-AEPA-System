@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import EvaluationForm from "../components/EvaluationForm";
+
 import EvaluationCard from "../components/EvaluationCard";
 import axios from "axios";
-import zIndex from "@mui/material/styles/zIndex";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGears } from "@fortawesome/free-solid-svg-icons";
+import EvaluationForm from "../components/EvaluationForm";
+import PeerEvaluationCard from "../components/PeerEvaluationCard";
 
 function TakeEvaluationPage() {
   const [openForm, setOpenForm] = useState(false);
@@ -15,7 +16,10 @@ function TakeEvaluationPage() {
   const [loggedUser, setLoggedUser] = useState({});
   const userID = sessionStorage.getItem("userID");
   const [period, setPeriod] = useState("");
-  const divRef = useRef(null);
+  const [fetchEvalID, setFetchEvalID] = useState();
+  const [activeCard, setActiveCard] = useState(null);
+
+  //peer eval
 
   //Fetch user details
   useEffect(() => {
@@ -49,7 +53,7 @@ function TakeEvaluationPage() {
   };
 
   const handleConfirm = async () => {
-    setOpenForm(!openForm);
+    setOpenForm(true);
     setStage(selectedStage);
     setOpenModal(false);
 
@@ -74,19 +78,49 @@ function TakeEvaluationPage() {
 
     console.log("Evaluation object to be sent:", evaluation);
 
+    let existingEvalID = null;
+
     try {
-      const response = await axios.post(
-        "http://localhost:8080/evaluation/createEvaluation",
-        evaluation
+      const response = await axios.get(
+        "http://localhost:8080/evaluation/getEvalID",
+        {
+          params: {
+            userID: userID,
+            period: period,
+            stage: selectedStage,
+            evalType: evalType,
+          },
+        }
       );
+      existingEvalID = response.data;
+      console.log("Existing evaluation ID:", existingEvalID);
+      setFetchEvalID(existingEvalID);
     } catch (error) {
-      console.error("Creating evaluation failed", error);
       if (error.response) {
         console.log(error.response.data);
         console.log(error.response.status);
         console.log(error.response.headers);
       } else {
         console.log(`Error: ${error.message}`);
+      }
+    }
+
+    if (!existingEvalID) {
+      try {
+        const response = await axios.post(
+          "http://localhost:8080/evaluation/createEvaluation",
+          evaluation
+        );
+        console.log("New evaluation created:", response.data);
+      } catch (error) {
+        console.error("Creating evaluation failed", error);
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else {
+          console.log(`Error: ${error.message}`);
+        }
       }
     }
   };
@@ -104,6 +138,7 @@ function TakeEvaluationPage() {
     //backgroundColor: "tomato",
     height: "100%",
     padding: "10px 25px 0px 25px",
+    overflow: "auto",
   };
 
   const evaluationHeaderStyles = {
@@ -136,10 +171,10 @@ function TakeEvaluationPage() {
         >
           Evaluation
         </h1>
-        <div style={dateHiredStyles}>
+        {/* <div style={dateHiredStyles}>
           <p>Date Hired:</p>
           <p>{loggedUser.dateHired}</p>
-        </div>
+        </div> */}
       </div>
 
       {openForm ? (
@@ -154,6 +189,7 @@ function TakeEvaluationPage() {
       ) : (
         <div style={{ position: "relative" }}>
           <EvaluationCard
+            id={"3rdMonth"}
             period={"3rd Month"}
             loggedUser={loggedUser}
             evalType={evalType}
@@ -164,9 +200,12 @@ function TakeEvaluationPage() {
             openModal={openModal}
             handleCloseModal={handleCloseModal}
             handleConfirm={handleConfirm}
+            activeCard={activeCard}
+            setActiveCard={setActiveCard}
             style={{ zIndex: 1 }}
           />
           {/* <EvaluationCard
+            id={"5thMonth"}
             period={"5th Month"}
             loggedUser={loggedUser}
             evalType={evalType}
@@ -177,6 +216,8 @@ function TakeEvaluationPage() {
             openModal={openModal}
             handleCloseModal={handleCloseModal}
             handleConfirm={handleConfirm}
+            activeCard={activeCard}
+            setActiveCard={setActiveCard}
           /> */}
           {/* <EvaluationCard
             period={"Annual"}
@@ -190,6 +231,7 @@ function TakeEvaluationPage() {
             handleCloseModal={handleCloseModal}
             handleConfirm={handleConfirm}
           /> */}
+          <PeerEvaluationCard />
 
           <div
             style={{

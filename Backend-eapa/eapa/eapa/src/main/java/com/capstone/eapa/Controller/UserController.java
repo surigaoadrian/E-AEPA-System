@@ -10,13 +10,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "*")
 public class UserController {
     @Autowired
     private UserService userServ;
@@ -136,6 +137,28 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    //random assigned peers
+    @GetMapping("/getAssignedEvaluators")
+    public ResponseEntity<List<Integer>> getAssignedEvaluators(@RequestParam String dept, @RequestParam int excludedUserID) {
+        try {
+            List<Integer> assignedEvaluators = userServ.getAssignedEvaluators(dept, excludedUserID);
+            if (assignedEvaluators.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.ok(assignedEvaluators);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    //get the employees' data with the corresponding department head - Track Employee
+    //  @GetMapping("/employees-with-head")
+    // public ResponseEntity<List<UserEntity>> getAllEmployeesFromDepartmentHead(@RequestParam String headName) {
+    //     List<UserEntity> employees = userServ.getAllEmployeesFromDepartmentHead(headName);
+    //     return ResponseEntity.ok(employees);
+    // }
 
 
 }

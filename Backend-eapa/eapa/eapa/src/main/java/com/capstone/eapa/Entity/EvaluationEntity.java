@@ -19,7 +19,7 @@ public class EvaluationEntity {
     @ManyToOne
     @JoinColumn(name = "peer_id", nullable = true)
     private UserEntity peer;
-    private String evalType; //SELF, PEER
+    private String evalType; //SELF, PEER, HEAD
     private String stage; //VALUES, JOB
     private String period; //3rd Month, 5th Month, Annual
     private String status; //OPEN, COMPLETED

@@ -20,7 +20,7 @@ public class ResponseController {
         return resServ.createResponse(responses);
     }
 
-    @GetMapping("getAllResponses")
+    @GetMapping("/getAllResponses")
     public List<ResponseEntity> getAllResponses(){
         return resServ.getAllResponse();
     }
