@@ -11,6 +11,7 @@ import ConfirmationModal from "./ConfirmationModal";
 import ReactRouterPrompt from "react-router-prompt";
 import LeaveConfirmationModal from "../modals/LeaveConfirmationModal";
 
+
 function EvaluationForm({
   stage,
   evalType,
@@ -77,13 +78,13 @@ function EvaluationForm({
 
   const modalStyle = {
     backgroundColor: "white",
-    padding: "20px",
+    padding: "20px 25px 25px 25px",
     borderRadius: "10px",
     fontSize: "16px",
-    textAlign: "start",
+    textAlign: "start", 
     boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)", // Add some shadow for depth
     zIndex: 1400, // Ensure it sits above the overlay
-    width: "400px",
+    width: "500px",
     borderTop: "30px solid #8C383E",
     position: "relative",
   };
@@ -584,7 +585,7 @@ function EvaluationForm({
               <Box sx={modalStyle}>
                 <Typography
                   id="modal-title"
-                  sx={{ fontSize: "16px" }}
+                  sx={{ fontSize: "15px", fontFamily:"Poppins", pb: 1, }}
                   component="h2"
                 >
                   Are you sure you want to leave this page? Any unsaved changes
@@ -598,11 +599,32 @@ function EvaluationForm({
                     marginTop: "20px",
                   }}
                 >
+
                   <Button
+                    variant="outlined"
                     sx={{
                       marginRight: "10px",
                       width: "20%",
+                      fontWeight: 600,
+                      borderColor: "#E0E0E0",
+                      textTransform: "none",
+                      color: "#1E1E1E",
+                          "&:hover": {
+                        backgroundColor: "#E9E9E9",
+                        color: "#1E1E1E",
+                        borderColor: "#E0E0E0"
+                      },
+                    }}
+                    onClick={onCancel}
+                  >
+                    No
+                  </Button>
+                  <Button
+                    sx={{
+                      width: "20%",
                       height: "35px",
+                      fontWeight: 500,
+                      textTransform: "none",
                       backgroundColor: "#8C383E",
                       "&:hover": {
                         backgroundColor: "#7C2828",
@@ -612,24 +634,7 @@ function EvaluationForm({
                     variant="contained"
                     onClick={onConfirm}
                   >
-                    YES
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    sx={{
-                      width: "20%",
-                      fontWeight: "bold",
-                      border: "none",
-                      color: "#8C383E",
-                      "&:hover": {
-                        backgroundColor: "#a4b0be",
-                        color: "white",
-                        border: "none",
-                      },
-                    }}
-                    onClick={onCancel}
-                  >
-                    NO
+                    Yes
                   </Button>
                 </div>
               </Box>

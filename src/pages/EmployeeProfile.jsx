@@ -1,37 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import {
-	Container,
-	Box,
-	Dialog,
-	DialogTitle,
-	DialogContent,
-	DialogContentText,
-	DialogActions,
-	Button,
-	Grid,
-} from "@mui/material";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import TabContext from "@mui/lab/TabContext";
-import TabList from "@mui/lab/TabList";
-import TabPanel from "@mui/lab/TabPanel";
+import { Container, Box, Grid, Tabs, Tab } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
-import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
 import VerifiedIcon from "@mui/icons-material/Verified";
-import SendIcon from "@mui/icons-material/Send";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { Button } from "@mui/material";
+import Animated from "../components/motion";
+import ViewRatings from "./ViewResults";
 
 const theme = createTheme({
 	palette: {
@@ -39,108 +26,239 @@ const theme = createTheme({
 			main: "#8C383E", // Maroon color
 		},
 	},
+	typography: {
+		fontFamily: "Poppins",
+	},
 });
 
-const tabs = [
-	{ label: "3rd Month", value: "1" },
-	{ label: "5th Month", value: "2" },
-	{ label: "Annual", value: "3" },
-];
-
-const yearEvaluations = [
-	{ value: " ", label: "Select Year" },
-	{ value: "23-24", label: "23-24" },
-	{ value: "22-23", label: "22-23" },
-	// Add more evaluations here
-];
-
 const VerifiedIconWrapper = ({ verified }) => {
-	const iconColor = verified ? "green" : "gray"; // Set the color based on the verified value
-	return <VerifiedIcon htmlColor={iconColor} />;
+	const iconColor = verified ? "green" : "gray";
+	return <VerifiedIcon htmlColor={iconColor} style={{ fontSize: 24 }} />;
 };
+
 function base64ToDataURL(base64String) {
 	return `data:image/png;base64,${base64String}`;
 }
 
 function EmployeeProfile({ user, handleBack }) {
 	const containerStyle = {
-		borderTop: "1px solid transparent", // Invisible border for separation
+		borderTop: "1px solid transparent",
 		marginTop: "30px",
 		padding: 0,
 	};
 
-	const [value, setValue] = useState("1");
-	const [selectedYearEvaluation, setSelectedYearEvaluation] = useState("");
-	const [openDialog, setOpenDialog] = useState(false);
-	const [openSecondDialog, setOpenSecondDialog] = useState(false);
+	const [selectedYearEvaluation, setSelectedYearEvaluation] = useState(" ");
+	const [selectedTab, setSelectedTab] = useState(0);
+	const [userData, setUserData] = useState([]);
+	const [checked, setChecked] = useState([]);
+	const [years, setYears] = useState([]);
+	const [showRatings, setShowRatings] = useState(false);
+	const [selectedEvaluationPeriod, setSelectedEvaluationPeriod] = useState("3rd Month");
 
-	const handleChange = (event, newValue) => {
-		setValue(newValue);
-	};
+	useEffect(() => {
+		const fetchEvaluations = async () => {
+			try {
+				const response = await axios.get(
+					"http://localhost:8080/evaluation/getAllEvaluation"
+				);
+				const data = response.data;
+
+				// Filter the evaluations based on user.userID
+				const filteredEvaluations = data.filter(
+					(evaluation) => evaluation.userId === user.userID
+				);
+
+				// Set the filtered evaluations to the state
+				setUserData(filteredEvaluations);
+				const evaluationYears = filteredEvaluations.map((evaluation) =>
+					new Date(evaluation.dateTaken).getFullYear()
+				);
+				const distinctYears = [...new Set(evaluationYears)];
+				setYears(distinctYears);
+
+				console.log(userData);
+			} catch (error) {
+				console.error("Error fetching evaluations:", error);
+			}
+		};
+
+		fetchEvaluations();
+	}, []);
+	console.log("user Data ", userData);
 
 	const handleYearEvaluationChange = (event) => {
 		setSelectedYearEvaluation(event.target.value);
 	};
 
-	const handleDialogOpen = () => {
-		setOpenDialog(true);
+	const handleTabChange = (event, newValue) => {
+        setSelectedTab(newValue);
+        const period = newValue === 0 ? "3rd Month" : newValue === 1 ? "5th Month" : "Annual";
+        setSelectedEvaluationPeriod(period);
+    };
+
+	const handleViewResultsClick = () => {
+		setShowRatings(true);
 	};
 
-	const handleDialogClose = () => {
-		setOpenDialog(false);
+	const tabStyle = {
+		textTransform: "none",
+		fontFamily: "Poppins",
+		fontSize: "14px",
 	};
 
-	const handleConfirmSendResults = () => {
-		// Handle sending results here
-		console.log("Sending results...");
-		setOpenDialog(false);
-		setOpenSecondDialog(true);
+	const headStyle = {
+		backgroundColor: "#8C383E",
+		textAlign: "center",
+		color: "white",
+		fontFamily: "Poppins",
+		fontSize: "13px",
+		padding: "6px",
+		width: "15%",
 	};
 
-	const handleSecondDialogClose = () => {
-		setOpenSecondDialog(false);
+	const tableStyle = {
+		borderRadius: "5px 5px 5px 5px",
+		marginTop: "5px",
+		boxShadow: "2px 2px 5px rgba(157, 157, 157, 0.5)",
 	};
 
-	const TableComponent = () => {
-		const tableHeaderStyle = {
-			backgroundColor: "#8C383E",
-			color: "white",
-		};
+	const renderEvaluationTable = () => {
+		if (!selectedYearEvaluation || selectedYearEvaluation === " ") {
+			return null;
+		}
 
-		const viewDetailsStyle = {
-			color: "maroon",
-			textDecoration: "underline",
-			cursor: "pointer",
-		};
+		// Filter evaluations for the selected year and user
+		const filteredEvaluations = userData.filter(
+			(evaluation) =>
+				new Date(evaluation.dateTaken).getFullYear() ===
+					parseInt(selectedYearEvaluation) &&
+				evaluation.userId === user.userID &&
+				evaluation.period === selectedEvaluationPeriod
+		);
+		{
+			console.log(userData);
+		}
+		{
+			console.log(filteredEvaluations);
+		}
 
-		const columnStyle = {
-			width: "160px",
-			textAlign: "center",
-			backgroundColor: "#8C383E",
-			color: "white",
-		};
+		// Check completion status for each evaluation stage
+		const hasCompletedValuesSelf = filteredEvaluations.some(
+			(evaluation) =>
+				evaluation.stage === "VALUES" &&
+				evaluation.evalType === "SELF" &&
+				evaluation.status === "COMPLETED"
+		);
 
-		const iconContainerStyle = {
-			display: "flex",
-			justifyContent: "center",
-		};
+		const hasCompletedValuesPeer = filteredEvaluations.some(
+			(evaluation) =>
+				evaluation.stage === "VALUES" &&
+				evaluation.evalType === "PEER" &&
+				evaluation.status === "COMPLETED"
+		);
+
+		const hasCompletedValuesHead = filteredEvaluations.some(
+			(evaluation) =>
+				evaluation.stage === "VALUES" &&
+				evaluation.evalType === "HEAD" &&
+				evaluation.status === "COMPLETED"
+		);
+
+		const hasCompletedJobSelf = filteredEvaluations.some(
+			(evaluation) =>
+				evaluation.stage === "JOB" &&
+				evaluation.evalType === "SELF" &&
+				evaluation.status === "COMPLETED"
+		);
+
+		const hasCompletedJobPeer = filteredEvaluations.some(
+			(evaluation) =>
+				evaluation.stage === "JOB" &&
+				evaluation.evalType === "PEER" &&
+				evaluation.status === "COMPLETED"
+		);
+
+		const hasCompletedJobHead = filteredEvaluations.some(
+			(evaluation) =>
+				evaluation.stage === "VALUES" &&
+				evaluation.evalType === "HEAD" &&
+				evaluation.status === "COMPLETED"
+		);
+
+		// Determine if all stages for the selected year are completed for VALUES and JOB
+		const allValuesStagesCompleted =
+			hasCompletedValuesSelf && hasCompletedValuesPeer && hasCompletedJobSelf;
 
 		return (
-			<TableContainer component={Paper} sx={{ width: "100%" }}>
+			<TableContainer style={tableStyle}>
 				<Table>
-					<TableBody>
+					<TableHead>
 						<TableRow>
-							<TableCell style={tableHeaderStyle}></TableCell>
-							<TableCell style={columnStyle}>
-								<Box sx={iconContainerStyle}>Self</Box>
+							<TableCell align="center" style={{ backgroundColor: "#8C383E" }}>
+								{" "}
 							</TableCell>
-							<TableCell style={columnStyle}>
-								<Box sx={iconContainerStyle}>Office Head</Box>
+							<TableCell align="center" style={headStyle}>
+								Self
 							</TableCell>
-							<TableCell style={columnStyle}>
-								<Box sx={iconContainerStyle}>Peer</Box>
+							<TableCell align="center" style={headStyle}>
+								Head
 							</TableCell>
-							<TableCell style={tableHeaderStyle}></TableCell>
+							<TableCell align="center" style={headStyle}>
+								Peer
+							</TableCell>
+							<TableCell align="center" style={{ backgroundColor: "#8C383E" }}>
+								{" "}
+							</TableCell>
+						</TableRow>
+					</TableHead>
+					<TableBody>
+						{/* Render VALUES based evaluations */}
+						<TableRow>
+							<TableCell align="center" style={{ width: "20%" }}>
+								Values Based
+							</TableCell>
+							<TableCell align="center">
+								<VerifiedIconWrapper verified={hasCompletedValuesSelf} />
+							</TableCell>
+							<TableCell align="center">
+								<VerifiedIconWrapper verified={hasCompletedValuesHead} />
+							</TableCell>
+							<TableCell align="center">
+								<VerifiedIconWrapper verified={hasCompletedValuesPeer} />
+							</TableCell>
+							<TableCell align="center" style={{ width: "20%" }}>
+								<Button
+									sx={{
+										color: "#8C383E",
+										textTransform: "none",
+										fontSize: "13px",
+										"&:hover": {
+											textDecoration: "underline",
+											borderStyle: "none",
+											backgroundColor: "transparent",
+										},
+									}}
+									onClick={handleViewResultsClick}
+									disabled={!allValuesStagesCompleted}
+								>
+									View Results
+								</Button>
+							</TableCell>
+						</TableRow>
+
+						{/* Render JOB based evaluations */}
+						<TableRow>
+							<TableCell align="center" style={{ width: "20%" }}>
+								Job Based
+							</TableCell>
+							<TableCell align="center">
+								<VerifiedIconWrapper verified={hasCompletedJobSelf} />
+							</TableCell>
+							<TableCell align="center">
+								<VerifiedIconWrapper verified={hasCompletedJobHead} />
+							</TableCell>
+							<TableCell align="center"></TableCell>
+							<TableCell align="center" style={{ width: "20%" }}></TableCell>
 						</TableRow>
 					</TableBody>
 				</Table>
@@ -148,6 +266,7 @@ function EmployeeProfile({ user, handleBack }) {
 		);
 	};
 
+	
 	return (
 		<ThemeProvider theme={theme}>
 			<Container
@@ -203,342 +322,234 @@ function EmployeeProfile({ user, handleBack }) {
 							borderBottom: "2px solid #e0e0e0",
 						}}
 					>
-						<Box sx={{ ml: 8, mb: 2 }}>
-							<Avatar
-								alt="Employee"
-								src={
-									user.profilePic
-										? base64ToDataURL(user.profilePic)
-										: "/user.png"
-								}
-								sx={{ width: "120px", height: "120px" }}
-							/>
-						</Box>
-						<Box sx={{ ml: 5 }}>
-							<Grid container spacing={2}>
-								<Grid item xs={12} sm={6}>
-									<Typography
-										variant="body2"
-										fontFamily="Poppins"
-										fontSize="14px"
-										color="#9D9D9D"
-										mb={1}
-									>
-										Employee ID:
-									</Typography>
-									<Typography
-										variant="body2"
-										fontFamily="Poppins"
-										mb={2}
-										fontWeight={500}
-										fontSize="16px"
-									>
-										{user.workID}
-									</Typography>
-								</Grid>
-								<Grid item xs={12} sm={6}>
-									<Typography
-										variant="body2"
-										fontFamily="Poppins"
-										fontSize="14px"
-										color="#9D9D9D"
-										mb={1}
-									>
-										Name:
-									</Typography>
-									<Typography
-										variant="body2"
-										fontFamily="Poppins"
-										mb={2}
-										fontWeight={500}
-										fontSize="16px"
-									>
-										{`${user.fName} ${user.lName}`}
-									</Typography>
-								</Grid>
-								<Grid item xs={12} sm={6}>
-									<Typography
-										variant="body2"
-										fontFamily="Poppins"
-										mb={1}
-										fontSize="14px"
-										color="#9D9D9D"
-									>
-										Position:
-									</Typography>
-									<Typography
-										variant="body2"
-										fontFamily="Poppins"
-										mb={2}
-										fontWeight={500}
-										fontSize="16px"
-									>
-										{user.position}
-									</Typography>
-								</Grid>
-								<Grid item xs={12} sm={6}>
-									<Typography
-										variant="body2"
-										fontFamily="Poppins"
-										fontSize="14px"
-										mb={1}
-										color="#9D9D9D"
-									>
-										Department:
-									</Typography>
-									<Typography
-										variant="body2"
-										fontFamily="Poppins"
-										mb={2}
-										fontWeight={500}
-										fontSize="16px"
-									>
-										{user.dept}
-									</Typography>
-								</Grid>
-							</Grid>
-						</Box>
-					</Box>
-					<Box sx={{ display: "flex", alignItems: "center" }}>
-						<Box sx={{ mr: 1 }}>
-							<Typography
-								variant="body2"
-								fontFamily="Poppins"
-								color="#9D9D9D"
-								mb={0.2}
-								ml={3}
-							>
-								Set Year Evaluation:{" "}
-							</Typography>
-						</Box>
-						<Box sx={{ display: "flex", alignItems: "center" }}>
-							<FormControl
-								sx={{ m: 1, mr: 94, minWidth: 100, minHeight: 10 }}
-								size="small"
-							>
-								<Select
-									id="year-evaluation"
-									value={selectedYearEvaluation}
-									onChange={handleYearEvaluationChange}
-									style={{ padding: 1, fontSize: 12, textAlign: "left" }} // Apply custom styling here
-								>
-									{yearEvaluations.map((evaluation) => (
-										<MenuItem value={evaluation.value} key={evaluation.value}>
-											{evaluation.label}
-										</MenuItem>
-									))}
-								</Select>
-							</FormControl>
-
-							<Button
-								variant="contained"
-								color="secondary"
-								sx={{
-									textTransform: "none",
-									fontSize: "12px",
-									fontFamily: "Poppins",
-									width: "140px",
-								}}
-							>
-								View Evaluation
-							</Button>
-						</Box>
-					</Box>
-					<Box sx={{ width: "100%", typography: "body1" }}>
-						<TabContext value={value}>
-							<TabList
-								onChange={handleChange}
-								aria-label="lab API tabs example"
-								indicatorColor="secondary"
-								sx={{
-									borderBottom: "none",
-									marginLeft: "35px",
-								}}
-							>
-								{tabs.map((tab) => (
-									<Tab
-										label={tab.label}
-										value={tab.value}
-										key={tab.value}
-										sx={{
-											textTransform: "none",
-											fontFamily: "poppins",
-											fontWeight: 500,
-										}}
-									/>
-								))}
-							</TabList>
-							<TabPanel value="1">
-								<TableComponent />
-							</TabPanel>
-							<TabPanel value="2">
-								<TableComponent />
-							</TabPanel>
-							<TabPanel value="3">
-								<TableComponent />
-							</TabPanel>
-						</TabContext>
-						<Button
-							variant="contained"
-							color="secondary"
-							startIcon={<SendIcon sx={{ fontSize: "20px" }} />}
+						<Box
 							sx={{
-								textTransform: "none",
-								fontFamily: "Poppins",
-								fontSize: "12px",
-								width: "145px",
-								ml: 129,
+								display: "flex",
+								alignItems: "center",
+								margin: "10px 10px 10px 14px",
+								width: "97%",
+								backgroundColor: "white",
 							}}
-							onClick={handleDialogOpen}
 						>
-							Send Results
-						</Button>
+							<Box sx={{ ml: 8, mb: 2 }}>
+								<Avatar
+									alt="Employee"
+									src={
+										user.profilePic
+											? base64ToDataURL(user.profilePic)
+											: "/user.png"
+									}
+									sx={{ width: "120px", height: "120px" }}
+								/>
+							</Box>
+							<Box sx={{ ml: 5 }}>
+								<Grid container spacing={2}>
+									<Grid item xs={12} sm={6}>
+										<Typography
+											variant="body2"
+											fontFamily="Poppins"
+											fontSize="14px"
+											color="#9D9D9D"
+											mb={1}
+										>
+											Employee ID:
+										</Typography>
+										<Typography
+											variant="body2"
+											fontFamily="Poppins"
+											mb={2}
+											fontWeight={500}
+											fontSize="16px"
+										>
+											{user.workID}
+										</Typography>
+									</Grid>
+									<Grid item xs={12} sm={6}>
+										<Typography
+											variant="body2"
+											fontFamily="Poppins"
+											fontSize="14px"
+											color="#9D9D9D"
+											mb={1}
+										>
+											Name:
+										</Typography>
+										<Typography
+											variant="body2"
+											fontFamily="Poppins"
+											mb={2}
+											fontWeight={500}
+											fontSize="16px"
+										>
+											{user.fName} {user.lName}
+										</Typography>
+									</Grid>
+									<Grid item xs={12} sm={6}>
+										<Typography
+											variant="body2"
+											fontFamily="Poppins"
+											mb={1}
+											fontSize="14px"
+											color="#9D9D9D"
+										>
+											Position:
+										</Typography>
+										<Typography
+											variant="body2"
+											fontFamily="Poppins"
+											mb={2}
+											fontWeight={500}
+											fontSize="16px"
+										>
+											{user.position}
+										</Typography>
+									</Grid>
+									<Grid item xs={12} sm={6}>
+										<Typography
+											variant="body2"
+											fontFamily="Poppins"
+											fontSize="14px"
+											mb={1}
+											color="#9D9D9D"
+										>
+											Department:
+										</Typography>
+										<Typography
+											variant="body2"
+											fontFamily="Poppins"
+											mb={2}
+											fontWeight={500}
+											fontSize="16px"
+										>
+											{user.dept}
+										</Typography>
+									</Grid>
+								</Grid>
+							</Box>
+						</Box>
 					</Box>
+					<Box
+						sx={{
+							display: "flex",
+							alignItems: "center",
+							ml: 1.8,
+							mr: 2.5,
+							mt: 2,
+						}}
+					>
+						<Typography
+							variant="body2"
+							fontFamily="Poppins"
+							color="#9D9D9D"
+							mr={1}
+						>
+							Set Year Evaluation:
+						</Typography>
+						<FormControl sx={{ minWidth: 90 }} size="small">
+							<Select
+								id="year-evaluation"
+								value={selectedYearEvaluation}
+								onChange={handleYearEvaluationChange}
+								style={{
+									fontSize: 13,
+									fontFamily: "Poppins",
+									color: "#1a1a1a",
+								}}
+							>
+								<MenuItem value=" ">Select Year</MenuItem>
+								{years.map((year) => (
+									<MenuItem value={year} key={year}>
+										{year}
+									</MenuItem>
+								))}
+							</Select>
+						</FormControl>
+					</Box>
+					{console.log("si selected", selectedYearEvaluation)}
+					{/* Display tabs and corresponding content only if a year evaluation is selected */}
+					{selectedYearEvaluation != " " && (
+						<Box sx={{ mt: 2, ml: 1.8, width: "97.1%" }}>
+							<Tabs
+								value={selectedTab}
+								onChange={handleTabChange}
+								indicatorColor="secondary"
+								textColor="secondary"
+							>
+								<Tab label="3rd Month" style={tabStyle} />
+								<Tab label="5th Month" style={tabStyle} />
+								<Tab label="Annual" style={tabStyle} />
+							</Tabs>
+							{selectedTab === 0 && (
+								<Animated>
+									<Box>
+										<Typography
+											variant="h6"
+											sx={{
+												fontSize: "20px",
+												display: "flex",
+												justifyContent: "center",
+												padding: 1,
+												color: "#1a1a1a",
+												fontWeight: "bold",
+											}}
+										>
+											3RD MONTH EVALUATION
+										</Typography>
+										{renderEvaluationTable()}
+										{showRatings && (
+											<ViewRatings
+												userId={user.userID}
+												year={selectedYearEvaluation}
+												period={selectedEvaluationPeriod}
+											/>
+										)}
+									</Box>
+								</Animated>
+							)}
+							{selectedTab === 1 && (
+								<Animated>
+									<Box>
+										<Typography
+											variant="h6"
+											sx={{
+												fontSize: "20px",
+												display: "flex",
+												justifyContent: "center",
+												padding: 1,
+												color: "#1a1a1a",
+												fontWeight: "bold",
+											}}
+										>
+											5TH MONTH EVALUATION
+										</Typography>
+										{renderEvaluationTable()}
+									</Box>
+								</Animated>
+							)}
+							{selectedTab === 2 && (
+								<Animated>
+									<Box>
+										<Typography
+											variant="h6"
+											sx={{
+												fontSize: "20px",
+												display: "flex",
+												justifyContent: "center",
+												padding: 1,
+												color: "#1a1a1a",
+												fontWeight: "bold",
+											}}
+										>
+											ANNUAL EVALUATION
+										</Typography>
+										{renderEvaluationTable()}
+									</Box>
+								</Animated>
+							)}
+						</Box>
+					)}
 				</Box>
 			</Container>
-
-			{/* Dialog Component */}
-			<Dialog
-				open={openDialog}
-				onClose={handleDialogClose}
-				aria-labelledby="alert-dialog-title"
-				aria-describedby="alert-dialog-description"
-				maxWidth="xs"
-				fullWidth
-				style={{ margin: "24px 0", paddingBottom: "36px" }}
-			>
-				<DialogTitle
-					id="alert-dialog-title"
-					style={{
-						textAlign: "center",
-						backgroundColor: "#8b2500",
-						padding: "40px 16px 0px 16px",
-						borderBottom: "1px solid #e0e0e0",
-						color: "white",
-					}}
-				></DialogTitle>
-				<DialogContent style={{ textAlign: "center", padding: "24px" }}>
-					<b
-						style={{
-							fontSize: "24px",
-							color: "black",
-							display: "block",
-							margin: "16px 0",
-						}}
-					>
-						Confirm Sending Results
-					</b>
-					<DialogContentText
-						id="alert-dialog-description"
-						style={{ color: "grey", textAlign: "center", fontSize: "1rem" }}
-					>
-						Would you like to forward the results to the head?
-					</DialogContentText>
-				</DialogContent>
-				<DialogActions
-					style={{ justifyContent: "center", padding: "10px 10px 16px 10px" }}
-				>
-					<Button
-						variant="contained"
-						onClick={handleDialogClose}
-						sx={{
-							textTransform: "capitalize",
-							fontSize: "1rem",
-							width: "129px",
-							height: "37px",
-							backgroundColor: "white",
-							color: "black",
-							border: "none",
-							fontWeight: "600",
-							"&:hover": { backgroundColor: "#f5f5f5" },
-						}}
-					>
-						Cancel
-					</Button>
-					<Button
-						variant="contained"
-						color="secondary"
-						onClick={handleConfirmSendResults}
-						autoFocus
-						sx={{
-							textTransform: "capitalize",
-							fontSize: "1rem",
-							width: "129px",
-							height: "37px",
-							border: "none",
-							fontWeight: "600",
-						}}
-					>
-						Send
-					</Button>
-				</DialogActions>
-			</Dialog>
-
-			{/* Second Dialog Component - Added after clicking send in the first dialog */}
-			<Dialog
-				open={openSecondDialog}
-				onClose={handleSecondDialogClose}
-				aria-labelledby="alert-dialog-title"
-				aria-describedby="alert-dialog-description"
-				maxWidth="xs"
-				fullWidth
-				style={{ margin: "24px 0", paddingBottom: "36px" }}
-			>
-				<DialogTitle
-					id="alert-dialog-title"
-					style={{
-						textAlign: "center",
-						backgroundColor: "#8b2500",
-						padding: "40px 16px 0px 16px",
-						borderBottom: "1px solid #e0e0e0",
-						color: "white",
-					}}
-				></DialogTitle>
-				<DialogContent style={{ textAlign: "center", padding: "24px" }}>
-					<VerifiedIcon htmlColor="green" sx={{ fontSize: "3rem", mr: 1 }} />
-					<b
-						style={{
-							fontSize: "1.5rem",
-							color: "green",
-							display: "block",
-							marginBottom: "16px",
-						}}
-					>
-						SUCCESS
-					</b>
-					<DialogContentText
-						id="alert-dialog-description"
-						style={{ color: "grey", textAlign: "center", fontSize: "1rem" }}
-					>
-						Summary evaluation results successfully sent.
-					</DialogContentText>
-				</DialogContent>
-				<DialogActions
-					style={{ justifyContent: "center", padding: "10px 10px 16px 10px" }}
-				>
-					<Button
-						variant="contained"
-						onClick={handleSecondDialogClose}
-						autoFocus
-						sx={{
-							textTransform: "capitalize",
-							fontSize: "1rem",
-							width: "129px",
-							height: "37px",
-							border: "none",
-							fontWeight: "600",
-							backgroundColor: "white",
-							color: "black",
-							"&:hover": {
-								backgroundColor: "#800000", // Maroon color
-								color: "white",
-							},
-						}}
-					>
-						OK
-					</Button>
-				</DialogActions>
-			</Dialog>
 		</ThemeProvider>
 	);
 }

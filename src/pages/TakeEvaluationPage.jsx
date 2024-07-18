@@ -121,6 +121,11 @@ function TakeEvaluationPage() {
     }
   };
 
+  const formatDate = (date) => {
+    const options = { month: 'long', day: 'numeric', year: 'numeric' };
+    return new Date(date).toLocaleDateString('en-US', options);
+  };
+
   const handleOpenForm = (stage) => {
     setOpenForm(!openForm);
     setStage(stage);
@@ -147,8 +152,8 @@ function TakeEvaluationPage() {
   const dateHiredStyles = {
     // backgroundColor: "lightgreen",
     display: "flex",
-    justifyContent: "space-between",
-    width: "20%",
+    justifyContent: "space-evenly",
+    width: "17%",
     fontSize: "15px",
     fontWeight: "500",
   };
@@ -162,13 +167,14 @@ function TakeEvaluationPage() {
             flex: 1,
             fontSize: "22px",
             fontWeight: "bold",
+            marginLeft: "10px",
           }}
         >
           Evaluation
         </h1>
         <div style={dateHiredStyles}>
           <p>Date Hired:</p>
-          <p>{loggedUser.dateHired}</p>
+          <p>{loggedUser ? formatDate(loggedUser.dateHired): ''}</p>
         </div>
       </div>
 

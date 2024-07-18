@@ -5,7 +5,7 @@ import notAuthorized from "../assets/not-authorized.png";
 function NotAuthorized() {
 	const container = {
 		height: "100vh",
-		width: "80%",
+		width: "85%",
 		margin: "auto",
 		display: "flex",
 		justifyContent: "center",
@@ -46,7 +46,7 @@ function NotAuthorized() {
 			</div>
 			<div>
 				<img
-					style={{ height: "500px" }}
+					style={{marginBottom: "7em",}}
 					src={notAuthorized}
 					alt="search-logo"
 				/>

@@ -45,10 +45,10 @@ const evaluationHeaderStyles = {
   paddingLeft: "45px",
 };
 
-function ViewRatingsPage() {
+function ViewRatingsPage({userId}) {
   const [tabIndex, setTabIndex] = useState(0);
   const [employee, setEmployee] = useState({});
-  const userId = sessionStorage.getItem("userID");
+
 
   //adi changes
   //self values average

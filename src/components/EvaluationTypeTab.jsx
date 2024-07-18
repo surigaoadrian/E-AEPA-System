@@ -116,6 +116,7 @@ function EvaluationTypeTab({
                     sx={{
                       width: "14%",
                       height: "35px",
+                      textTransform: "none",
                       backgroundColor: "#8C383E",
                       "&:hover": {
                         backgroundColor: "#7C2828",
@@ -162,6 +163,7 @@ function EvaluationTypeTab({
                       width: "14%",
                       height: "35px",
                       backgroundColor: "#8C383E",
+                      textTransform: "none",
                       "&:hover": {
                         backgroundColor: "#7C2828",
                       },
@@ -211,6 +213,7 @@ function EvaluationTypeTab({
                     sx={{
                       width: "14%",
                       height: "35px",
+                      textTransform:"none",
                       backgroundColor: "#8C383E",
                       "&:hover": {
                         backgroundColor: "#7C2828",

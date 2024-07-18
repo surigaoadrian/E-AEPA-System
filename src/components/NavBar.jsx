@@ -14,11 +14,9 @@ import MenuItem from "@mui/material/MenuItem";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ListItemIcon } from "@mui/material";
-import profile from "../assets/logo.png";
 
 function NavBar() {
   const [loggedUserData, setLoggedUserData] = useState({});
-  const [profilePictureUrl, setProfilePictureUrl] = useState(null);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
@@ -51,31 +49,19 @@ function NavBar() {
     }
   };
 
-  // useEffect(() => {
-  //   const getImageUrl = async (userID) => {
-  //     try {
-  //       const response = await axios.get(
-  //         `http://localhost:8080/user/image/${userID}`,
-  //         {
-  //           responseType: "arraybuffer",
-  //         }
-  //       );
-  //       const imageBlob = new Blob([response.data], {
-  //         type: response.headers["content-type"],
-  //       });
-  //       const imageUrl = URL.createObjectURL(imageBlob);
-  //       return imageUrl;
-  //     } catch (error) {
-  //       console.error("Error fetching profile picture:", error);
-  //       return null;
-  //     }
-  //   };
-
-  //   getImageUrl();
-  // }, []);
 	function base64ToDataURL(base64String) {
 		return `data:image/png;base64,${base64String}`;
 	  }
+
+  const abbreviateDept = (dept) => {
+    if (!dept) return ""; 
+    const ignoreWords = ["of", "and"];
+    const words = dept.split(" ").filter((word) => !ignoreWords.includes(word.toLowerCase()));
+    if (words.length <= 2) {
+      return dept;
+    }
+    return words.map((word) => word[0].toUpperCase()).join("");
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -181,7 +167,7 @@ function NavBar() {
           >
             {loggedUserData.role === "ADMIN"
               ? "Admin"
-              : `${loggedUserData.dept} - ${loggedUserData.position}`}
+              : `${abbreviateDept(loggedUserData.dept)} - ${loggedUserData.position}`}
           </Typography>
         </div>
       </div>

@@ -14,6 +14,7 @@ import {
 	Button,
 	InputAdornment,
 	TextField,
+	Box,
 	backdropClasses,
 } from "@mui/material";
 import Paper from "@mui/material/Paper";
@@ -21,6 +22,8 @@ import Paper from "@mui/material/Paper";
 import { faCheckCircle, faSearch } from "@fortawesome/free-solid-svg-icons";
 import EmployeeProfile from "../pages/EmployeeProfile";
 import Animated from "../components/motion";
+
+
 
 function EmployeeData() {
 	const [tab, setTab] = useState(0);
@@ -92,7 +95,7 @@ function EmployeeData() {
 	};
 
 	const tabStyle = {
-		marginLeft: "25px",
+		//marginLeft: "25px",
 		textTransform: "none",
 		color: "#9D9D9D",
 		fontFamily: "Poppins",
@@ -169,7 +172,7 @@ function EmployeeData() {
 							value={tab}
 							onChange={changeTab}
 							aria-label="Tabs"
-							sx={tabStyle}
+							sx={{ml: 5.5, width: "93%", ...tabStyle}}
 						>
 							<Tab
 								label={`All Employees (${filteredUsers.length})`}
@@ -189,9 +192,9 @@ function EmployeeData() {
 								>
 									<TableContainer
 										component={Paper}
-										sx={{ maxHeight: 550, overflowY: "auto", ...tableStyle }}
+										sx={{ maxHeight: 550, ...tableStyle }}
 									>
-										<Table>
+										<Table >
 											<TableHead>
 												<TableRow>
 													<TableCell sx={{ borderBottom: "0 solid #8C383E" }}>
@@ -315,7 +318,7 @@ function EmployeeData() {
 													))
 												)}
 											</TableBody>
-										</Table>
+										</Table>	
 									</TableContainer>
 								</div>
 							)}
