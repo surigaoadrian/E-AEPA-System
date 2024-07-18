@@ -1,8 +1,62 @@
-import React from 'react';
-import { Box, TextField, Grid, Typography } from '@mui/material';
+import React, { useEffect, useState } from "react";
+import { Box, TextField, Typography } from '@mui/material';
+import axios from "axios";
 
 const FifthMonthComments = () => {
   const role = sessionStorage.getItem("userRole");
+  console.log("Role:", role);
+  const userId = sessionStorage.getItem("userID");
+  const [department, setDepartment] = useState("");
+  const [fullname, setFullname] = useState("");
+  const [position, setPosition] = useState("");
+  const [headFullname, setHeadFullname] = useState("");
+  const [headPosition, setHeadPosition] = useState("");
+
+    // Fetch user data
+    useEffect(() => {
+      const fetchUserData = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:8080/user/getUser/${userId}`
+          );
+          setDepartment(response.data.dept);
+          setFullname(response.data.fName + " " + response.data.lName);
+          setPosition(response.data.position);
+        } catch (error) {
+          console.error("Error checking evaluation status:", error);
+        }
+      };
+  
+      fetchUserData();
+    }, []);
+  
+  
+    // Fetch head of department data
+    useEffect(() => {
+      const fetchHeadData = async () => {
+        try {
+          const response = await axios.get(`http://localhost:8080/user/getAllUser`);
+          const users = response.data;
+  
+          const head = users.find(
+            (user) =>
+              user.dept === department &&
+              user.position === "Department Head"
+          );
+  
+          if (head) {
+            setHeadFullname(`${head.fName} ${head.lName}`);
+            setHeadPosition(head.position);
+          }
+        } catch (error) {
+          console.error("Error fetching department head data:", error);
+        }
+      };
+  
+      if (department) {
+        fetchHeadData();
+      }
+    }, [department]);
   return (
     <div>
     <Box className="mb-2 mt-14" sx={{ 
@@ -88,6 +142,7 @@ const FifthMonthComments = () => {
 
       <div className='flex space-x-4 -mt-2'>
         <TextField
+          disabled = {role === "EMPLOYEE"}
           variant="outlined"
           fullWidth
           multiline
@@ -96,35 +151,107 @@ const FifthMonthComments = () => {
         />
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '20px' }}>
-      <div style={{ width: '50%' }}>
-        <h2 className='mb-8 italic'>Certified by Immediate Head:</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '10px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
-            Name of Head:
-            <span style={{ marginLeft: '10px', width: '400px', border: '2px solid gray', padding: '2px', display: 'inline-block' }}>BOND, JAMES</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            Position / Title:
-            <span style={{ marginLeft: '15px', width: '400px', border: '2px solid gray', padding: '2px', display: 'inline-block' }}>ETO - Head</span>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          padding: "20px",
+        }}
+      >
+        <div style={{ width: "50%" }}>
+          <h2 className="mb-8 italic">Certified by Immediate Head:</h2>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              marginBottom: "10px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "5px",
+              }}
+            >
+              Name of Head:
+              <span
+                style={{
+                  marginLeft: "10px",
+                  width: "400px",
+                  border: "2px solid gray",
+                  padding: "2px",
+                  display: "inline-block",
+                }}
+              >
+                 {headFullname}
+              </span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              Position / Title:
+              <span
+                style={{
+                  marginLeft: "15px",
+                  width: "400px",
+                  border: "2px solid gray",
+                  padding: "2px",
+                  display: "inline-block",
+                }}
+              >
+                {headPosition}
+              </span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div style={{ width: '50%' }}>
-        <h2 className='mb-8 italic'>I acknowledge the receipt of this evaluation:</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '10px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
-            Name of Staff:
-            <span style={{ marginLeft: '12px', width: '400px', border: '2px solid gray', padding: '2px', display: 'inline-block' }}>DOW, JOHN</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            Position / Title:
-            <span style={{ marginLeft: '10px', width: '400px', border: '2px solid gray', padding: '2px', display: 'inline-block' }}>ETO-Staff</span>
+        <div style={{ width: "50%" }}>
+          <h2 className="mb-8 italic">
+            I acknowledge the receipt of this evaluation:
+          </h2>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              marginBottom: "10px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "5px",
+              }}
+            >
+              Name of Staff:
+              <span
+                style={{
+                  marginLeft: "12px",
+                  width: "400px",
+                  border: "2px solid gray",
+                  padding: "2px",
+                  display: "inline-block",
+                }}
+              >
+                {fullname}
+              </span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              Position / Title:
+              <span
+                style={{
+                  marginLeft: "10px",
+                  width: "400px",
+                  border: "2px solid gray",
+                  padding: "2px",
+                  display: "inline-block",
+                }}
+              >
+                {position}
+              </span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </div>
   );
 }

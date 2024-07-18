@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, TextField, Container, Typography } from "@mui/material";
+import { Box, TextField, Typography } from "@mui/material";
 import axios from "axios";
 
 const ThirdMonthComments = () => {
@@ -9,7 +9,10 @@ const ThirdMonthComments = () => {
   const [department, setDepartment] = useState("");
   const [fullname, setFullname] = useState("");
   const [position, setPosition] = useState("");
+  const [headFullname, setHeadFullname] = useState("");
+  const [headPosition, setHeadPosition] = useState("");
 
+  // Fetch user data
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -26,6 +29,34 @@ const ThirdMonthComments = () => {
 
     fetchUserData();
   }, []);
+
+
+  // Fetch head of department data
+  useEffect(() => {
+    const fetchHeadData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8080/user/getAllUser`);
+        const users = response.data;
+
+        const head = users.find(
+          (user) =>
+            user.dept === department &&
+            user.position === "Department Head"
+        );
+
+        if (head) {
+          setHeadFullname(`${head.fName} ${head.lName}`);
+          setHeadPosition(head.position);
+        }
+      } catch (error) {
+        console.error("Error fetching department head data:", error);
+      }
+    };
+
+    if (department) {
+      fetchHeadData();
+    }
+  }, [department]);
 
   return (
     <div>
@@ -190,7 +221,7 @@ const ThirdMonthComments = () => {
                   display: "inline-block",
                 }}
               >
-                BOND, JAMES
+                 {headFullname}
               </span>
             </div>
             <div style={{ display: "flex", alignItems: "center" }}>
@@ -204,7 +235,7 @@ const ThirdMonthComments = () => {
                   display: "inline-block",
                 }}
               >
-                ETO - Head
+                {headPosition}
               </span>
             </div>
           </div>
