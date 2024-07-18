@@ -21,6 +21,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import EvaluateEmployee from "./pages/EvaluateEmployee";
 import ActivityLogs from "./pages/ActivityLogs";
 import AdminShowcase from "./pages/AdminShowcase";
+import ActivityLog from "./pages/ActivityLogs";
 
 const router = createBrowserRouter([
   {
@@ -84,12 +85,13 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
+        
       {
         path: "/activityLogs",
         element: (
           <PrivateRoute requiredRoles={["ADMIN", "SUPERUSER"]}>
             {/* <ManageEmployee /> */}
-            <ActivityLogs />
+            <ActivityLog />
           </PrivateRoute>
         ),
       },
@@ -133,6 +135,16 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
+      {
+        path: "/ActivityLog",
+        element: (
+          <PrivateRoute requiredRoles={["ADMIN"]}>
+            <ActivityLog />
+          </PrivateRoute>
+        ),
+      },
+
+
     ],
   },
   {
@@ -144,6 +156,7 @@ const router = createBrowserRouter([
   { path: "/notAuthorized", element: <NotAuthorized /> },
   { path: "*", element: <NotFoundPage /> },
 ]);
+
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

@@ -1,12 +1,13 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faBuildingUser,
-  faFileLines,
-  faHouse,
-  faStar,
-  faUser,
-  faUserTie,
-  faUsers,
+	faBuildingUser,
+	faFileLines,
+	faHouse,
+	faStar,
+	faUser,
+	faUserTie,
+	faUsers,
+	faUserCheck,
   faListUl,
 } from "@fortawesome/free-solid-svg-icons";
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -96,4 +97,6 @@ export const SideBarData = [
     role: ["HEAD"],
     icon: <FontAwesomeIcon icon={faUserTie} style={{ fontSize: "15px" }} />,
   },
+  
+
 ];

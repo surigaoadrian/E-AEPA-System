@@ -69,6 +69,7 @@ const CustomAlert = ({ open, onClose, severity, message }) => {
 };
 
 function ManageAccount() {
+  const loggedId = sessionStorage.getItem("userID");
   const [openRegistrationDialog, setOpenRegistrationDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openDeleteDialog, setopenDeleteDialog] = useState(false);
@@ -348,7 +349,7 @@ function ManageAccount() {
         const filteredData = data
           .filter((item) => {
             if (selectedTab === 0) {
-              return item.role !== "ADMIN";
+              return item.role !== "ADMIN" && item.role !== "SUPERUSER";
             } else if (selectedTab === 1) {
               return item.role === "ADMIN";
             }
@@ -519,7 +520,7 @@ function ManageAccount() {
         role: role,
       };
 
-      const response = await fetch("http://localhost:8080/register", {
+      const response = await fetch(`http://localhost:8080/register/${loggedId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -612,7 +613,7 @@ function ManageAccount() {
         dateStarted: selectedUser.dateStarted,
       };
       await axios.patch(
-        `http://localhost:8080/user/editUser/${selectedUser.userID}`,
+        `http://localhost:8080/user/editUser/${loggedId}/${selectedUser.userID}`,
         userPayload,
         {
           headers: {
@@ -641,7 +642,7 @@ function ManageAccount() {
     console.log("delete Yes user:", userID);
     try {
       const response = await fetch(
-        `http://localhost:8080/user/delete/${userID}`,
+        `http://localhost:8080/user/delete/${loggedId}/${userID}`,
         {
           method: "DELETE",
           headers: {
