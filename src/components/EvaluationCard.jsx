@@ -13,16 +13,19 @@ import zIndex from "@mui/material/styles/zIndex";
 import Animated from "./motion";
 
 function EvaluationCard({
-	period,
-	loggedUser,
-	handleOpenForm,
-	handleEvalTypeChange,
-	evalType,
-	handleOpenModal,
-	openModal,
-	handleCloseModal,
-	handleConfirm,
-	setEvalType,
+  id,
+  period,
+  loggedUser,
+  handleOpenForm,
+  handleEvalTypeChange,
+  evalType,
+  handleOpenModal,
+  openModal,
+  handleCloseModal,
+  handleConfirm,
+  setEvalType,
+  activeCard = { activeCard },
+  setActiveCard = { setActiveCard },
 }) {
 	const [takeEval, setTakeEval] = useState(false);
 	const [shouldDisplay, setShouldDisplay] = useState(true);
@@ -32,9 +35,10 @@ function EvaluationCard({
 		setEvalType("");
 	};
 
-	const handleTakeEvalChange = () => {
-		setTakeEval(!takeEval);
-	};
+  const handleTakeEvalChange = () => {
+    setTakeEval(!takeEval);
+    setActiveCard(id);
+  };
 
 	const modalStyle = {
 		position: "absolute",
@@ -288,14 +292,16 @@ function EvaluationCard({
 				</>
 			)}
 
-			{/** Evaluation tab */}
-			<EvaluationTypeTab
-				period={period}
-				evalType={evalType}
-				handleOpenForm={handleOpenForm}
-				handleOpenModal={handleOpenModal}
-				setShouldDisplay={setShouldDisplay}
-			/>
+      {/** Evaluation tab */}
+      {activeCard === id && (
+        <EvaluationTypeTab
+          period={period}
+          evalType={evalType}
+          handleOpenForm={handleOpenForm}
+          handleOpenModal={handleOpenModal}
+          setShouldDisplay={setShouldDisplay}
+        />
+      )}
 
 			{/**Confirmation Modal */}
 			<Modal

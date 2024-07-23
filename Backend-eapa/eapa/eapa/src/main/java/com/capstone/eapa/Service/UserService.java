@@ -1,8 +1,10 @@
 package com.capstone.eapa.Service;
 
+import com.capstone.eapa.Entity.ActivityLogEntity;
 import com.capstone.eapa.Entity.PasswordResetToken;
 import com.capstone.eapa.Entity.Role;
 import com.capstone.eapa.Entity.UserEntity;
+import com.capstone.eapa.Repository.ActivityLogRepository;
 import com.capstone.eapa.Repository.PasswordResetTokenRepository;
 import com.capstone.eapa.Repository.UserRepository;
 
@@ -13,6 +15,7 @@ import jakarta.transaction.Transactional;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -26,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.sql.Blob;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -37,6 +41,8 @@ public class UserService implements UserDetailsService {
     private EmailService emailService;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private ActivityLogRepository activityLogRepo;
 
     public List<UserEntity> getAllUser() {
         return userRepo.findAllByIsDeleted(0);
@@ -126,7 +132,7 @@ public class UserService implements UserDetailsService {
     }
 
     // this method deletes a user account
-    public String deleteUser(int userID) {
+    public String deleteUser(int adminId,int userID) {
         String msg = "";
         Optional<UserEntity> optionalUser = userRepo.findByUserID(userID);
 
@@ -136,6 +142,8 @@ public class UserService implements UserDetailsService {
             userRepo.save(user);
 
             msg = "User " + user.getfName() + " " + user.getlName() + " is deleted.";
+            String admin = userRepo.findById(adminId).get().getfName() + " " + userRepo.findById(adminId).get().getlName();
+            logActivity(adminId,admin,"Deleted User Account", "Deleted User Account  : " + user.getfName() + " " + user.getlName());
         } else {
             msg = "User not found";
         }
@@ -147,7 +155,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public UserEntity editUserDetails(int userID, UserEntity newDetails) {
+    public UserEntity editUserDetails(int adminId,int userID, UserEntity newDetails) {
         UserEntity user = userRepo.findById(userID)
                 .orElseThrow(() -> new NoSuchElementException("User " + userID + " not found."));
         try {
@@ -177,6 +185,9 @@ public class UserService implements UserDetailsService {
                 user.setWorkEmail(newDetails.getWorkEmail());
             if (newDetails.getUsername() != null)
                 user.setUsername(newDetails.getUsername());
+            
+            String admin = userRepo.findById(adminId).get().getfName() + " " + userRepo.findById(adminId).get().getlName();
+            logActivity(adminId,admin,"Edited User Account", "Modified User Details : " + user.getfName() + " " + user.getlName());
             return userRepo.save(user);
         } catch (Exception e) {
             throw e; 
@@ -241,6 +252,8 @@ public class UserService implements UserDetailsService {
 //        Random rand = new Random();
 //        return users.get(rand.nextInt(users.size()));
 //    }
+
+    //peer to evaluate
     public UserEntity getRandomPeer(String dept, int excludedUserID) {
         List<UserEntity> users = userRepo.findPeersByDeptRoleNotUserIDNotAndPositionNotSecretary(dept, Role.HEAD.name(), excludedUserID);
         if (users.isEmpty()) {
@@ -248,6 +261,81 @@ public class UserService implements UserDetailsService {
         }
         Random rand = new Random();
         return users.get(rand.nextInt(users.size()));
+    }
+
+    public void logActivity(int adminId, String admin,String activity, String details){
+        UserEntity user = userRepo.findById(adminId)
+                .orElseThrow(() -> new NoSuchElementException("User " + adminId + " not found."));
+
+        ActivityLogEntity activityLog = new ActivityLogEntity();
+        activityLog.setUser(user);
+        activityLog.setAdmin(admin);
+        activityLog.setActivity(activity);
+        activityLog.setActDetails(details);
+        activityLog.setTimestamp(new Date());
+        activityLogRepo.save(activityLog);
+    }
+
+    //peer evaluator assigned
+//    public List<UserEntity> getAssignedEvaluators(String dept, int excludedUserID) {
+//        List<UserEntity> users = userRepo.findPeersByDeptRoleNotUserIDNotAndPositionNotSecretary(dept, Role.HEAD.name(), excludedUserID);
+//
+//        if (users.isEmpty()) {
+//            return Collections.emptyList();
+//        }
+//
+//        // Filter out users with the position 'Secretary'
+//        List<UserEntity> filteredUsers = users.stream()
+//                .filter(user -> !user.getPosition().equalsIgnoreCase("secretary"))
+//                .collect(Collectors.toList());
+//
+//        // Remove the excluded user ID
+//        filteredUsers.removeIf(user -> user.getUserID() == excludedUserID);
+//
+//        int size = filteredUsers.size();
+//        if (size <= 1) {
+//            return Collections.emptyList();
+//        } else if (size == 2) {
+//            return filteredUsers.subList(0, 1);
+//        } else if (size == 3) {
+//            return filteredUsers.subList(0, 2);
+//        } else {
+//            Collections.shuffle(filteredUsers);
+//            return filteredUsers.subList(0, 3);
+//        }
+//    }
+    public List<Integer> getAssignedEvaluators(String dept, int excludedUserID) {
+        List<UserEntity> users = userRepo.findPeersByDeptRoleNotUserIDNotAndPositionNotSecretary(dept, Role.HEAD.name(), excludedUserID);
+
+        if (users.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // Filter out users with the position 'Secretary'
+        List<UserEntity> filteredUsers = users.stream()
+                .filter(user -> !user.getPosition().equalsIgnoreCase("secretary"))
+                .collect(Collectors.toList());
+
+        // Remove the excluded user ID
+        filteredUsers.removeIf(user -> user.getUserID() == excludedUserID);
+
+        int size = filteredUsers.size();
+        if (size <= 1) {
+            return Collections.emptyList();
+        } else if (size == 2) {
+            return filteredUsers.subList(0, 1).stream()
+                    .map(UserEntity::getUserID)
+                    .collect(Collectors.toList());
+        } else if (size == 3) {
+            return filteredUsers.subList(0, 2).stream()
+                    .map(UserEntity::getUserID)
+                    .collect(Collectors.toList());
+        } else {
+            Collections.shuffle(filteredUsers);
+            return filteredUsers.subList(0, 3).stream()
+                    .map(UserEntity::getUserID)
+                    .collect(Collectors.toList());
+        }
     }
 
     //Get Employees under Department Head
@@ -262,4 +350,5 @@ public class UserService implements UserDetailsService {
 //
 //        return userRepo.findByDeptIn(departmentNames);
 //    }
+
 }

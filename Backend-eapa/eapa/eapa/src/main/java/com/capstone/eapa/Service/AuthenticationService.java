@@ -6,6 +6,7 @@ import com.capstone.eapa.Repository.UserRepository;
 
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthenticationService {
     private final UserRepository userRepo;
+    @Autowired
+    UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -27,8 +30,8 @@ public class AuthenticationService {
     }
 
     // registration
-    // registration
-    public AuthenticationResponse register(UserEntity request) {
+    public AuthenticationResponse register(int adminId,UserEntity request) {
+
         // Check if the username already exists, regardless of deletion status
         Optional<UserEntity> existingUserOptional = userRepo.findByUsername(request.getUsername());
 
@@ -62,6 +65,8 @@ public class AuthenticationService {
             // Generate JWT token for the updated user
             String token = jwtService.generateToken(existingUser);
 
+            String admin = userRepo.findById(adminId).get().getfName() + " " + userRepo.findById(adminId).get().getlName();
+            userService.logActivity(adminId,admin,"Created User Account", "Added New User  : " + existingUser.getfName() + " " + existingUser.getlName());
             return new AuthenticationResponse(token);
         } else {
             // Username does not exist, create a new record
@@ -93,6 +98,8 @@ public class AuthenticationService {
             // Generate JWT token for the new user
             String token = jwtService.generateToken(newUser);
 
+            String admin = userRepo.findById(adminId).get().getfName() + " " + userRepo.findById(adminId).get().getlName();
+            userService.logActivity(adminId,admin,"Created User Account", "Added New User : " + newUser.getfName() + " " + newUser.getlName());
             return new AuthenticationResponse(token);
         }
     }

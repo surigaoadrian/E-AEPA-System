@@ -71,7 +71,6 @@ function NavBar() {
           `http://localhost:8080/user/getUser/${userID}`
         );
         setLoggedUserData(response.data);
-
       } catch (error) {
         if (error.response) {
           //not in 200 response range
@@ -167,7 +166,9 @@ function NavBar() {
           >
             {loggedUserData.role === "ADMIN"
               ? "Admin"
-              : `${abbreviateDept(loggedUserData.dept)} - ${loggedUserData.position}`}
+              : loggedUserData.role === "SUPERUSER"
+              ? "Superuser"
+              : `${loggedUserData.dept} - ${loggedUserData.position}`}
           </Typography>
         </div>
       </div>
@@ -183,7 +184,11 @@ function NavBar() {
           }}
         >
           <img
-            src={loggedUserData?.profilePic ? base64ToDataURL(loggedUserData.profilePic) : '/user.png'}
+            src={
+              loggedUserData?.profilePic
+                ? base64ToDataURL(loggedUserData.profilePic)
+                : "/user.png"
+            }
             alt="nav-profile-picture"
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
             className="rounded-full ring-4 ring-black"

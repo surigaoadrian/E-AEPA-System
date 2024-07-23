@@ -8,6 +8,7 @@ function Showcase() {
     backgroundColor: "#f5f4f6",
     borderTop: "3px solid #8C383E",
   };
+  
 
   return (
     <div style={showcaseStyles}>

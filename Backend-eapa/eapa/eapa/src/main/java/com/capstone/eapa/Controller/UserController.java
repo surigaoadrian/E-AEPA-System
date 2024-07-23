@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -44,15 +45,15 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/delete/{userID}")
-    public ResponseEntity<String> deleteUser(@PathVariable int userID) {
-        userServ.deleteUser(userID);
+    @DeleteMapping("/delete/{adminId}/{userID}")
+    public ResponseEntity<String> deleteUser(@PathVariable int adminId,@PathVariable int userID) {
+        userServ.deleteUser(adminId,userID);
         return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
     }
 
-    @PatchMapping("/editUser/{userID}")
-    public ResponseEntity<UserEntity> editUserDetails(@PathVariable int userID, @RequestBody UserEntity newDetails) {
-        UserEntity updatedUser = userServ.editUserDetails(userID, newDetails);
+    @PatchMapping("/editUser/{adminId}/{userID}")
+    public ResponseEntity<UserEntity> editUserDetails(@PathVariable int adminId,@PathVariable int userID, @RequestBody UserEntity newDetails) {
+        UserEntity updatedUser = userServ.editUserDetails(adminId,userID, newDetails);
 
         return ResponseEntity.ok(updatedUser);
     }
@@ -134,6 +135,21 @@ public class UserController {
             return ResponseEntity.ok(randomPeer);
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    //random assigned peers
+    @GetMapping("/getAssignedEvaluators")
+    public ResponseEntity<List<Integer>> getAssignedEvaluators(@RequestParam String dept, @RequestParam int excludedUserID) {
+        try {
+            List<Integer> assignedEvaluators = userServ.getAssignedEvaluators(dept, excludedUserID);
+            if (assignedEvaluators.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.ok(assignedEvaluators);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
         }
     }
 

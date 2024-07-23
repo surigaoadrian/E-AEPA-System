@@ -306,14 +306,14 @@ const ViewResults = ({ open, onClose, employee }) => {
                         <TableRow>
                           <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Weight</TableCell>
                           <TableCell sx={{ backgroundColor: '#151515', textAlign: 'center', color: 'white', fontWeight: 'bold', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Overall AEPA</TableCell>
-                          <TableCell sx={{ backgroundColor: 'grey', color: 'white', border: '1px solid #ccc', fontWeight: 'bold', fontSize: "1em" }}>3.80</TableCell>
+                          <TableCell sx={{ backgroundColor: 'grey', color: 'white', border: '1px solid #ccc', fontWeight: 'bold', fontSize: "1em" }}>4.70</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
                         <TableRow>
                           <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }}>60%</TableCell>
                           <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }}>Values-Based Performance Assessment</TableCell>
-                          <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }} align="right">3.00</TableCell>
+                          <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }} align="right">4.50</TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell sx={{ border: '1px solid #ccc', fontFamily: 'Poppins' }}>40%</TableCell>
@@ -526,7 +526,7 @@ const ViewResults = ({ open, onClose, employee }) => {
                       <TableRow>
                         <TableCell sx={{ backgroundColor: 'grey', color: 'white', fontWeight: 'bold', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Weight</TableCell>
                         <TableCell sx={{ backgroundColor: '#151515', textAlign: 'center', color: 'white', fontWeight: 'bold', border: '1px solid #ccc', fontFamily: 'Poppins' }}>Overall AEPA</TableCell>
-                        <TableCell sx={{ backgroundColor: 'grey', color: 'white', border: '1px solid #ccc', fontWeight: 'bold', fontSize: "1em" }}>3.80</TableCell>
+                        <TableCell sx={{ backgroundColor: 'grey', color: 'white', border: '1px solid #ccc', fontWeight: 'bold', fontSize: "1em" }}>3.8</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
