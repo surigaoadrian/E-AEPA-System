@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Navigate  } from "react-router-dom";
 import "./index.css";
 import HomeShowcase from "./pages/HomeShowcase";
 import ViewProfilePage from "./pages/ViewProfilePage";
@@ -19,16 +19,20 @@ import NotAuthorized from "./pages/NotAuthorized";
 import PrivateRoute from "./components/PrivateRoute";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import EvaluateEmployee from "./pages/EvaluateEmployee";
+import ActivityLogs from "./pages/ActivityLogs";
+import AdminShowcase from "./pages/AdminShowcase";
+import ActivityLog from "./pages/ActivityLogs";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
     children: [
+
       {
-        path: "/",
+        path: "/", 
         element: (
-          <PrivateRoute requiredRoles={["EMPLOYEE", "ADMIN", "HEAD"]}>
+          <PrivateRoute requiredRoles={["EMPLOYEE", "HEAD", "ADMIN", "SUPERUSER"]}>
             <HomeShowcase />
           </PrivateRoute>
         ),
@@ -60,7 +64,7 @@ const router = createBrowserRouter([
       {
         path: "/manageAccount",
         element: (
-          <PrivateRoute requiredRoles={["ADMIN"]}>
+          <PrivateRoute requiredRoles={["ADMIN", "SUPERUSER"]}>
             <ManageAccount />
           </PrivateRoute>
         ),
@@ -68,7 +72,7 @@ const router = createBrowserRouter([
       {
         path: "/manageOffices",
         element: (
-          <PrivateRoute requiredRoles={["ADMIN"]}>
+          <PrivateRoute requiredRoles={["ADMIN", "SUPERUSER"]}>
             <ManageOffices />
           </PrivateRoute>
         ),
@@ -76,8 +80,18 @@ const router = createBrowserRouter([
       {
         path: "/manageEmployee",
         element: (
-          <PrivateRoute requiredRoles={["ADMIN"]}>
+          <PrivateRoute requiredRoles={["ADMIN", "SUPERUSER"]}>
             <ManageEmployee />
+          </PrivateRoute>
+        ),
+      },
+        
+      {
+        path: "/activityLogs",
+        element: (
+          <PrivateRoute requiredRoles={["ADMIN", "SUPERUSER"]}>
+            {/* <ManageEmployee /> */}
+            <ActivityLog />
           </PrivateRoute>
         ),
       },
@@ -105,7 +119,36 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
+      {
+        path: "/dashboard",
+        element: (
+          <PrivateRoute requiredRoles={["ADMIN"]}>
+            <AdminShowcase />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/",
+        element: (
+          <PrivateRoute requiredRoles={["ADMIN"]}>
+            <Navigate to="/adminShowcase" replace />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/ActivityLog",
+        element: (
+          <PrivateRoute requiredRoles={["ADMIN"]}>
+            <ActivityLog />
+          </PrivateRoute>
+        ),
+      },
+
+
     ],
+  },
+  {
+
   },
   { path: "/login", element: <LoginPage /> },
   { path: "/forgotPassword", element: <ForgotPasswordPage /> },
@@ -113,6 +156,7 @@ const router = createBrowserRouter([
   { path: "/notAuthorized", element: <NotAuthorized /> },
   { path: "*", element: <NotFoundPage /> },
 ]);
+
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

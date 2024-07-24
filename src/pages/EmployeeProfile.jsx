@@ -15,10 +15,10 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@mui/material";
 import Animated from "../components/motion";
-import ViewRatings from "./ViewResults";
+import View3rd from "../modals/ThirdMonthEval";
 
 const theme = createTheme({
 	palette: {
@@ -50,10 +50,33 @@ function EmployeeProfile({ user, handleBack }) {
 	const [selectedYearEvaluation, setSelectedYearEvaluation] = useState(" ");
 	const [selectedTab, setSelectedTab] = useState(0);
 	const [userData, setUserData] = useState([]);
-	const [checked, setChecked] = useState([]);
 	const [years, setYears] = useState([]);
-	const [showRatings, setShowRatings] = useState(false);
-	const [selectedEvaluationPeriod, setSelectedEvaluationPeriod] = useState("3rd Month");
+	const [show3rd, setShow3rd] = useState(false);
+	const [selectedEvaluationPeriod, setSelectedEvaluationPeriod] =
+		useState("3rd Month");
+	const [evaluationsData, setEvaluationsData] = useState([]);
+
+
+	useEffect(() => {
+		axios
+			.get("http://localhost:8080/evaluation/getAllEvaluation")
+			.then((response) => {
+				console.log("Fetched Evaluations:", response.data);
+
+				const filteredEvaluations = response.data.filter(
+					(evalItem) =>
+						evalItem.evalType === "HEAD" &&
+						evalItem.peer?.userID === user.userID
+				);
+
+				console.log("Filtered Evaluations:", filteredEvaluations); 
+				setEvaluationsData(filteredEvaluations);
+			})
+			.catch((error) => {
+				console.error("There was an error fetching the evaluations!", error);
+			});
+	}, [user.userID]); 
+	
 
 	useEffect(() => {
 		const fetchEvaluations = async () => {
@@ -70,6 +93,7 @@ function EmployeeProfile({ user, handleBack }) {
 
 				// Set the filtered evaluations to the state
 				setUserData(filteredEvaluations);
+
 				const evaluationYears = filteredEvaluations.map((evaluation) =>
 					new Date(evaluation.dateTaken).getFullYear()
 				);
@@ -86,18 +110,32 @@ function EmployeeProfile({ user, handleBack }) {
 	}, []);
 	console.log("user Data ", userData);
 
+	const getUserDetails = (userId) => {
+		return userData.find((user) => user.userId === userId) || {};
+	};
+
+	const userDetails = getUserDetails(user.userID);
+
+	const fName = userDetails.fName;
+	const lName = userDetails.lName;
+
 	const handleYearEvaluationChange = (event) => {
 		setSelectedYearEvaluation(event.target.value);
 	};
 
 	const handleTabChange = (event, newValue) => {
-        setSelectedTab(newValue);
-        const period = newValue === 0 ? "3rd Month" : newValue === 1 ? "5th Month" : "Annual";
-        setSelectedEvaluationPeriod(period);
-    };
+		setSelectedTab(newValue);
+		const period =
+			newValue === 0 ? "3rd Month" : newValue === 1 ? "5th Month" : "Annual";
+		setSelectedEvaluationPeriod(period);
+	};
 
 	const handleViewResultsClick = () => {
-		setShowRatings(true);
+		setShow3rd(true);
+	};
+
+	const handleCloseModal = () => {
+		setShow3rd(false); // Close the modal
 	};
 
 	const tabStyle = {
@@ -127,7 +165,7 @@ function EmployeeProfile({ user, handleBack }) {
 			return null;
 		}
 
-		// Filter evaluations for the selected year and user
+		// Filter evaluations
 		const filteredEvaluations = userData.filter(
 			(evaluation) =>
 				new Date(evaluation.dateTaken).getFullYear() ===
@@ -135,12 +173,14 @@ function EmployeeProfile({ user, handleBack }) {
 				evaluation.userId === user.userID &&
 				evaluation.period === selectedEvaluationPeriod
 		);
-		{
-			console.log(userData);
-		}
-		{
-			console.log(filteredEvaluations);
-		}
+
+		const headEval = evaluationsData.filter(
+			(evaluation) =>
+				new Date(evaluation.dateTaken).getFullYear() ===
+					parseInt(selectedYearEvaluation) &&
+				evaluation.peer.userID === user.userID &&
+				evaluation.period === selectedEvaluationPeriod
+		);
 
 		// Check completion status for each evaluation stage
 		const hasCompletedValuesSelf = filteredEvaluations.some(
@@ -157,31 +197,20 @@ function EmployeeProfile({ user, handleBack }) {
 				evaluation.status === "COMPLETED"
 		);
 
-		const hasCompletedValuesHead = filteredEvaluations.some(
+		const hasCompletedHeadValues = headEval.some(
 			(evaluation) =>
-				evaluation.stage === "VALUES" &&
-				evaluation.evalType === "HEAD" &&
-				evaluation.status === "COMPLETED"
+				evaluation.stage === "VALUES" && evaluation.status === "COMPLETED"
+		);
+
+		const hasCompletedHeadJob = headEval.some(
+			(evaluation) =>
+				evaluation.stage === "JOB" && evaluation.status === "COMPLETED"
 		);
 
 		const hasCompletedJobSelf = filteredEvaluations.some(
 			(evaluation) =>
 				evaluation.stage === "JOB" &&
 				evaluation.evalType === "SELF" &&
-				evaluation.status === "COMPLETED"
-		);
-
-		const hasCompletedJobPeer = filteredEvaluations.some(
-			(evaluation) =>
-				evaluation.stage === "JOB" &&
-				evaluation.evalType === "PEER" &&
-				evaluation.status === "COMPLETED"
-		);
-
-		const hasCompletedJobHead = filteredEvaluations.some(
-			(evaluation) =>
-				evaluation.stage === "VALUES" &&
-				evaluation.evalType === "HEAD" &&
 				evaluation.status === "COMPLETED"
 		);
 
@@ -221,7 +250,7 @@ function EmployeeProfile({ user, handleBack }) {
 								<VerifiedIconWrapper verified={hasCompletedValuesSelf} />
 							</TableCell>
 							<TableCell align="center">
-								<VerifiedIconWrapper verified={hasCompletedValuesHead} />
+								<VerifiedIconWrapper verified={hasCompletedHeadValues} />
 							</TableCell>
 							<TableCell align="center">
 								<VerifiedIconWrapper verified={hasCompletedValuesPeer} />
@@ -255,7 +284,7 @@ function EmployeeProfile({ user, handleBack }) {
 								<VerifiedIconWrapper verified={hasCompletedJobSelf} />
 							</TableCell>
 							<TableCell align="center">
-								<VerifiedIconWrapper verified={hasCompletedJobHead} />
+								<VerifiedIconWrapper verified={hasCompletedHeadJob} />
 							</TableCell>
 							<TableCell align="center"></TableCell>
 							<TableCell align="center" style={{ width: "20%" }}></TableCell>
@@ -266,7 +295,6 @@ function EmployeeProfile({ user, handleBack }) {
 		);
 	};
 
-	
 	return (
 		<ThemeProvider theme={theme}>
 			<Container
@@ -342,7 +370,7 @@ function EmployeeProfile({ user, handleBack }) {
 									sx={{ width: "120px", height: "120px" }}
 								/>
 							</Box>
-							<Box sx={{ ml: 5 }}>
+							<Box sx={{ ml: 8 }}>
 								<Grid container spacing={2}>
 									<Grid item xs={12} sm={6}>
 										<Typography
@@ -435,38 +463,65 @@ function EmployeeProfile({ user, handleBack }) {
 							ml: 1.8,
 							mr: 2.5,
 							mt: 2,
+							justifyContent: "space-between",
 						}}
 					>
-						<Typography
-							variant="body2"
-							fontFamily="Poppins"
-							color="#9D9D9D"
-							mr={1}
-						>
-							Set Year Evaluation:
-						</Typography>
-						<FormControl sx={{ minWidth: 90 }} size="small">
-							<Select
-								id="year-evaluation"
-								value={selectedYearEvaluation}
-								onChange={handleYearEvaluationChange}
-								style={{
-									fontSize: 13,
-									fontFamily: "Poppins",
-									color: "#1a1a1a",
-								}}
+						<Box sx={{ display: "flex", alignItems: "center" }}>
+							<Typography
+								variant="body2"
+								fontFamily="Poppins"
+								color="#9D9D9D"
+								mr={1}
 							>
-								<MenuItem value=" ">Select Year</MenuItem>
-								{years.map((year) => (
-									<MenuItem value={year} key={year}>
-										{year}
-									</MenuItem>
-								))}
-							</Select>
-						</FormControl>
+								Set Year Evaluation:
+							</Typography>
+							<FormControl sx={{ minWidth: 90 }} size="small">
+								<Select
+									id="year-evaluation"
+									value={selectedYearEvaluation}
+									onChange={handleYearEvaluationChange}
+									style={{
+										fontSize: 13,
+										fontFamily: "Poppins",
+										color: "#1a1a1a",
+									}}
+								>
+									<MenuItem value=" ">Select Year</MenuItem>
+									{years.map((year) => (
+										<MenuItem value={year} key={year}>
+											{year}
+										</MenuItem>
+									))}
+								</Select>
+							</FormControl>
+						</Box>
+
+						{selectedYearEvaluation !== " " && (
+							<Button
+								variant="contained"
+								sx={{
+									height: "2.5em",
+									width: "11em",
+									fontFamily: "Poppins",
+									backgroundColor: "#8c383e",
+									padding: "1px 1px 0 0 ",
+									"&:hover": { backgroundColor: "#762F34", color: "white" },
+								}}
+								style={{ textTransform: "none" }}
+								startIcon={
+									<FontAwesomeIcon
+										icon={faUsers}
+										style={{ fontSize: "15px" }}
+									/>
+								}
+							>
+								Manage Peer
+							</Button>
+						)}
 					</Box>
+
 					{console.log("si selected", selectedYearEvaluation)}
-					{/* Display tabs and corresponding content only if a year evaluation is selected */}
+					{/* Display tabs and kung unsa year selected */}
 					{selectedYearEvaluation != " " && (
 						<Box sx={{ mt: 2, ml: 1.8, width: "97.1%" }}>
 							<Tabs
@@ -496,11 +551,14 @@ function EmployeeProfile({ user, handleBack }) {
 											3RD MONTH EVALUATION
 										</Typography>
 										{renderEvaluationTable()}
-										{showRatings && (
-											<ViewRatings
+										{show3rd && (
+											<View3rd
 												userId={user.userID}
-												year={selectedYearEvaluation}
-												period={selectedEvaluationPeriod}
+												fName={fName}
+												lName={lName}
+												pos={user.position}
+												open={show3rd}
+												onClose={handleCloseModal}
 											/>
 										)}
 									</Box>

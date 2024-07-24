@@ -1,31 +1,69 @@
 import React, { useEffect, useState } from "react";
-import { Box, TextField, Container, Typography } from "@mui/material";
+import { Box, TextField, Typography } from "@mui/material";
 import axios from "axios";
 
-const ThirdMonthComments = () => {
+const ThirdMonthComments = ({ userId, fName, lName, pos}) => {
   const role = sessionStorage.getItem("userRole");
   console.log("Role:", role);
-  const userId = sessionStorage.getItem("userID");
+  
   const [department, setDepartment] = useState("");
-  const [fullname, setFullname] = useState("");
-  const [position, setPosition] = useState("");
+  const [headFullname, setHeadFullname] = useState("");
+  const [headPosition, setHeadPosition] = useState("");
+
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchUserDepartment = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8080/user/getUser/${userId}`
-        );
-        setDepartment(response.data.dept);
-        setFullname(response.data.fName + " " + response.data.lName);
-        setPosition(response.data.position);
+        const response = await axios.get(`http://localhost:8080/user/getUser/${userId}`);
+        const user = response.data;
+        console.log("User data:", user);
+        setDepartment(user.dept); // Ensure this matches your data structure
       } catch (error) {
-        console.error("Error checking evaluation status:", error);
+        console.error("Error fetching user department:", error);
       }
     };
 
-    fetchUserData();
-  }, []);
+    fetchUserDepartment();
+  }, [userId]);
+
+  // Fetch head of department data
+  useEffect(() => {
+    const fetchHeadData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8080/user/getAllUser`);
+        const users = response.data;
+  
+        // Log fetched users
+        console.log("Fetched users:", users);
+  
+        const head = users.find(
+          (user) =>
+            user.dept === department &&
+            user.position === "Department Head"
+        );
+  
+        // Log the found head of department
+        console.log("Found department head:", head);
+  
+        if (head) {
+          setHeadFullname(`${head.fName} ${head.lName}`);
+          setHeadPosition(head.position);
+        } else {
+          console.log("No department head found for department:", department);
+        }
+      } catch (error) {
+        console.error("Error fetching department head data:", error);
+      }
+    };
+  
+    if (department) {
+      fetchHeadData();
+    } else {
+      console.log("Department not set");
+    }
+  }, [department]);
+
+
 
   return (
     <div>
@@ -190,7 +228,7 @@ const ThirdMonthComments = () => {
                   display: "inline-block",
                 }}
               >
-                BOND, JAMES
+                 {headFullname}
               </span>
             </div>
             <div style={{ display: "flex", alignItems: "center" }}>
@@ -204,7 +242,7 @@ const ThirdMonthComments = () => {
                   display: "inline-block",
                 }}
               >
-                ETO - Head
+                {headPosition}
               </span>
             </div>
           </div>
@@ -238,7 +276,7 @@ const ThirdMonthComments = () => {
                   display: "inline-block",
                 }}
               >
-                {fullname}
+                {fName} {lName}
               </span>
             </div>
             <div style={{ display: "flex", alignItems: "center" }}>
@@ -252,7 +290,7 @@ const ThirdMonthComments = () => {
                   display: "inline-block",
                 }}
               >
-                {position}
+                {pos}
               </span>
             </div>
           </div>

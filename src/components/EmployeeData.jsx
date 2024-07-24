@@ -15,6 +15,10 @@ import {
 	InputAdornment,
 	TextField,
 	Box,
+	FormControl,
+	InputLabel,
+	Select,
+	MenuItem,
 	backdropClasses,
 } from "@mui/material";
 import Paper from "@mui/material/Paper";
@@ -23,8 +27,6 @@ import { faCheckCircle, faSearch } from "@fortawesome/free-solid-svg-icons";
 import EmployeeProfile from "../pages/EmployeeProfile";
 import Animated from "../components/motion";
 
-
-
 function EmployeeData() {
 	const [tab, setTab] = useState(0);
 	const [isViewed, setViewed] = useState(false);
@@ -32,6 +34,7 @@ function EmployeeData() {
 	const [users, setUsers] = useState([]);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedUser, setSelectedUser] = useState(null);
+	const [statusFilter, setStatusFilter] = useState("");
 
 	useEffect(() => {
 		const fetchUsers = async () => {
@@ -76,23 +79,20 @@ function EmployeeData() {
 		setSearchQuery(e.target.value);
 	};
 
+	const handleStatusFilterChange = (e) => {
+		setStatusFilter(e.target.value);
+	};
+
 	const filteredUsers = users.filter((user) => {
 		const fullName = `${user.fName} ${user.lName}`.toLowerCase();
-		return (
+		const searchUser =
 			user.workID.toString().includes(searchQuery) ||
-			fullName.includes(searchQuery.toLowerCase())
-		);
+			fullName.includes(searchQuery.toLowerCase());
+		const userStatus = statusFilter
+			? user.empStatus === statusFilter
+			: true;
+		return searchUser && userStatus;
 	});
-
-	const approvedCellStyle = {
-		display: "flex",
-		justifyContent: "center",
-		textAlign: "center",
-		fontFamily: "Poppins",
-		fontSize: "12px",
-		padding: "2px",
-		color: "green",
-	};
 
 	const tabStyle = {
 		//marginLeft: "25px",
@@ -172,7 +172,7 @@ function EmployeeData() {
 							value={tab}
 							onChange={changeTab}
 							aria-label="Tabs"
-							sx={{ml: 5.5, width: "93%", ...tabStyle}}
+							sx={{ ml: 5.5, width: "93%", ...tabStyle }}
 						>
 							<Tab
 								label={`All Employees (${filteredUsers.length})`}
@@ -194,7 +194,7 @@ function EmployeeData() {
 										component={Paper}
 										sx={{ maxHeight: 550, ...tableStyle }}
 									>
-										<Table >
+										<Table>
 											<TableHead>
 												<TableRow>
 													<TableCell sx={{ borderBottom: "0 solid #8C383E" }}>
@@ -236,6 +236,51 @@ function EmployeeData() {
 																),
 															}}
 														/>
+													</TableCell>
+													<TableCell sx={{ borderBottom: "0 solid #8C383E" }}>
+														<FormControl
+															variant="outlined"
+															size="small"
+															sx={{
+																marginLeft: 2,
+																minWidth: 120,
+																"& .MuiInputLabel-root": {
+																	fontFamily: "Poppins",
+																	colot:"#e0e0e0",
+																	fontSize: "12px",
+																	margin: "2px 0 0 0",
+																},
+																"& .MuiSelect-root": {
+																	fontFamily: "Poppins",
+																	fontSize: "13px",
+																},
+																"& .MuiOutlinedInput-notchedOutline": {
+																	borderColor: "#e0e0e0",
+																},
+																"&:hover .MuiOutlinedInput-notchedOutline": {
+																	borderColor: "#8C383E",
+																},
+															}}
+														>
+															<InputLabel>Filter Status</InputLabel>
+															<Select
+																value={statusFilter}
+																onChange={handleStatusFilterChange}
+																label="Status"
+																sx={{
+																	"& .MuiSelect-select": {
+																		fontFamily: "Poppins",
+																		fontSize: "13px",
+																	},
+																}}
+															>
+																<MenuItem value="">All Employee</MenuItem>
+																<MenuItem value="Probationary">
+																	Probationary
+																</MenuItem>
+																<MenuItem value="Regular">Regular</MenuItem>
+															</Select>
+														</FormControl>
 													</TableCell>
 												</TableRow>
 												<TableRow>
@@ -318,7 +363,7 @@ function EmployeeData() {
 													))
 												)}
 											</TableBody>
-										</Table>	
+										</Table>
 									</TableContainer>
 								</div>
 							)}
