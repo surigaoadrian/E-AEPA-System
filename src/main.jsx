@@ -89,7 +89,6 @@ const router = createBrowserRouter([
         path: "/activityLogs",
         element: (
           <PrivateRoute requiredRoles={["ADMIN", "SUPERUSER"]}>
-            {/* <ManageEmployee /> */}
             <ActivityLog />
           </PrivateRoute>
         ),
@@ -118,14 +117,7 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-      {
-        path: "/ActivityLog",
-        element: (
-          <PrivateRoute requiredRoles={["ADMIN"]}>
-            <ActivityLog />
-          </PrivateRoute>
-        ),
-      },
+
 
 
     ],
