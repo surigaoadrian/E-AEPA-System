@@ -4,5 +4,5 @@ public enum Role {
     EMPLOYEE,
     HEAD,
     ADMIN,
-    SUPERUSER
+    SUPERUSER,
 }

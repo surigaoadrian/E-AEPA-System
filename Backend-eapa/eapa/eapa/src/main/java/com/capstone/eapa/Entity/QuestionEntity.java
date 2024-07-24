@@ -15,7 +15,7 @@ public class QuestionEntity {
     private String category; // For VALUES (CULTURE OF EXCELLENCE, INTEGRITY, TEAMWORK, UNIVERSALITY)
     private String kind; //RADIO, FILL
 
-    private String evalType; //SELF PEER
+    private String evalType; //SELF PEER HEAD
     private int isDeleted = 0;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)

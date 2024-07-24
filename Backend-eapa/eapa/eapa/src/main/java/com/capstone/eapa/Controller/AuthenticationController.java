@@ -20,6 +20,12 @@ public class AuthenticationController {
         this.authService = authService;
     }
 
+    @PostMapping("/register")
+    public ResponseEntity<AuthenticationResponse> registerr(@RequestBody UserEntity request){
+        return ResponseEntity.ok(authService.registerr(request));
+    }
+
+
     @PostMapping("/register/{adminId}")
     public ResponseEntity<AuthenticationResponse> register(@PathVariable int adminId,@RequestBody UserEntity request){
         return ResponseEntity.ok(authService.register(adminId,request));

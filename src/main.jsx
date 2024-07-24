@@ -19,7 +19,6 @@ import NotAuthorized from "./pages/NotAuthorized";
 import PrivateRoute from "./components/PrivateRoute";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import EvaluateEmployee from "./pages/EvaluateEmployee";
-import ActivityLogs from "./pages/ActivityLogs";
 import AdminShowcase from "./pages/AdminShowcase";
 import ActivityLog from "./pages/ActivityLogs";
 
@@ -32,7 +31,7 @@ const router = createBrowserRouter([
       {
         path: "/", 
         element: (
-          <PrivateRoute requiredRoles={["EMPLOYEE", "HEAD", "ADMIN"]}>
+          <PrivateRoute requiredRoles={["EMPLOYEE", "HEAD", "ADMIN", "SUPERUSER"]}>
             <HomeShowcase />
           </PrivateRoute>
         ),
