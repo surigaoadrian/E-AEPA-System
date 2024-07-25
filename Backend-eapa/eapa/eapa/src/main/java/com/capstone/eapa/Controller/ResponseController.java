@@ -1,4 +1,3 @@
-
 package com.capstone.eapa.Controller;
 
 import com.capstone.eapa.Entity.ResponseEntity;
@@ -16,13 +15,34 @@ public class ResponseController {
     ResponseService resServ;
 
     @PostMapping("/createResponses")
-    public List<ResponseEntity> createResponses (@RequestBody List<ResponseEntity> responses) {
+    public List<ResponseEntity> createResponses(@RequestBody List<ResponseEntity> responses) {
         return resServ.createResponse(responses);
     }
 
     @GetMapping("/getAllResponses")
-    public List<ResponseEntity> getAllResponses(){
+    public List<ResponseEntity> getAllResponses() {
         return resServ.getAllResponse();
     }
+
+    @PostMapping("/createHeadComment")
+    public ResponseEntity createHeadComment(@RequestBody ResponseEntity newComment) {
+        return resServ.createHeadComment(newComment);
+    }
+
+    @PutMapping("/updateHeadComment/{responseID}")
+    public ResponseEntity updateHeadComment(@PathVariable int responseID, @RequestBody ResponseEntity updatedComment) {
+        return resServ.updateHeadComment(responseID, updatedComment);
+    }
+
+    @GetMapping("/getHeadComments/{userID}")
+    public List<ResponseEntity> getHeadComments(@PathVariable int userID) {
+        return resServ.getHeadComments(userID);
+    }
+
+    @DeleteMapping("/deleteHeadComment/{responseID}")
+    public void deleteHeadComment(@PathVariable int responseID) {
+        resServ.deleteHeadComment(responseID);
+    }
+
 
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Box, Menu, MenuItem, IconButton, Tabs, Tab } from '@mui/material';
 import { jsPDF } from 'jspdf';
-import domtoimage from 'dom-to-image';
+import html2canvas from 'html2canvas';
 import PrintIcon from '@mui/icons-material/Print';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ThirdMonthEval from "../modals/ThirdMonthEval";
@@ -114,21 +114,18 @@ const ViewResults = ({ open, onClose, employee }) => {
       return;
     }
 
-    domtoimage.toPng(input)
-      .then(function (dataUrl) {
-        const img = new Image();
-        img.src = dataUrl;
-        
+    html2canvas(input)
+      .then((canvas) => {
+        const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF({
           orientation: 'portrait',
           unit: 'px',
           format: [input.clientWidth, input.clientHeight]
         });
-
-        pdf.addImage(dataUrl, 'PNG', 0, 0, input.clientWidth, input.clientHeight);
+        pdf.addImage(imgData, 'PNG', 0, 0, input.clientWidth, input.clientHeight);
         pdf.save('download.pdf');
       })
-      .catch(function (error) {
+      .catch((error) => {
         console.error('Error capturing the PDF:', error);
       });
   };

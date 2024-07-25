@@ -9,7 +9,7 @@ public class ResponseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int responseID;
     @ManyToOne
-    @JoinColumn(name = "evaluation_id", nullable = false)
+    @JoinColumn(name = "evaluation_id", nullable = true)
     private EvaluationEntity evaluation;
 
     @ManyToOne
