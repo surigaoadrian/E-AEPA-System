@@ -9,6 +9,7 @@ import {
 	faUsers,
 	faUserCheck,
   faListUl,
+  faBarChart
 } from "@fortawesome/free-solid-svg-icons";
 import DashboardIcon from '@mui/icons-material/Dashboard';
 
@@ -20,13 +21,12 @@ export const SideBarData = [
 		icon: <FontAwesomeIcon icon={faHouse} style={{ fontSize: "15px" }} />,
 		margin: "0 0 0 2px",
 	},
-	{
-		title: "Dashboard",
-		path: "/dashboard",
-		role: "ADMIN",
-		icon: <DashboardIcon style={{ fontSize: "15px" }} />,
-		margin: "0 0 0 2px",
-	},
+  {
+    title: "Admin Dashboard",
+    path: "/AdminDashboard",
+    role: ["ADMIN"],
+    icon: <DashboardIcon style={{ fontSize: "15px" }} />,
+  },
 	{
 		title: "View Profile",
 		path: "/viewProfile",
@@ -97,6 +97,5 @@ export const SideBarData = [
     role: ["HEAD"],
     icon: <FontAwesomeIcon icon={faUserTie} style={{ fontSize: "15px" }} />,
   },
-  
 
 ];

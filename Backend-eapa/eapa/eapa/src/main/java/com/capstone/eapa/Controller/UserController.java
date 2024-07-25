@@ -10,14 +10,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173")
 public class UserController {
     @Autowired
     private UserService userServ;
@@ -138,21 +137,25 @@ public class UserController {
         }
     }
 
-    //random assigned peers
-    @GetMapping("/getAssignedEvaluators")
-    public ResponseEntity<List<Integer>> getAssignedEvaluators(@RequestParam String dept, @RequestParam int excludedUserID) {
-        try {
-            List<Integer> assignedEvaluators = userServ.getAssignedEvaluators(dept, excludedUserID);
-            if (assignedEvaluators.isEmpty()) {
-                return ResponseEntity.noContent().build();
-            } else {
-                return ResponseEntity.ok(assignedEvaluators);
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(500).build();
-        }
+        //total probationary employees
+    @GetMapping("/countProbationaryUsers")
+    public ResponseEntity<Long> countProbationaryUsers() {
+        long count = userServ.getTotalProbationaryUsers();
+        return ResponseEntity.ok(count);
+    }
+    //for total Employees
+    @GetMapping("/countTotalEmployees")
+    public ResponseEntity<Long> countTotalEmployees() {
+        long count = userServ.getTotalEmployees();
+        return ResponseEntity.ok(count);
     }
 
+    @GetMapping("/getRegularEmployees")
+    public ResponseEntity<Long> getRegularEmployees(){
+        long count = userServ.getRegularEmployee();
+        return ResponseEntity.ok(count);
+    }
+}
     //get the employees' data with the corresponding department head - Track Employee
     //  @GetMapping("/employees-with-head")
     // public ResponseEntity<List<UserEntity>> getAllEmployeesFromDepartmentHead(@RequestParam String headName) {
