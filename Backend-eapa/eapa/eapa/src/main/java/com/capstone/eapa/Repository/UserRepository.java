@@ -26,9 +26,16 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
     @Query(value = "SELECT * FROM tbluser WHERE department = :dept AND role <> :role AND userID <> :userID AND LOWER(position) <> 'secretary' AND is_deleted = 0", nativeQuery = true)
     List<UserEntity> findPeersByDeptRoleNotUserIDNotAndPositionNotSecretary(String dept, String role, int userID);
 
-    //get random assigned peers
-
-
     //Track Employee 
 //    List<UserEntity> findByDeptIn(List<String> deptNames);
+    @Query("SELECT COUNT(u) FROM UserEntity u WHERE u.empStatus = 'Probationary' OR u.isProbationary = true")
+    long countByIsProbationaryTrue();
+
+    //get all employees  | This can be removed only used for visualization.
+    @Query("SELECT COUNT(u) FROM UserEntity u WHERE u.isDeleted = 0")
+    long countTotalEmployees();
+
+    //count Regular Employees
+    @Query("SELECT COUNT(u) FROM UserEntity u WHERE u.empStatus = 'Regular'")
+    long countRegularEmployees();
 }

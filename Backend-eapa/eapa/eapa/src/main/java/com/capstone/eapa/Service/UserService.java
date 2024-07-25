@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 public class UserService implements UserDetailsService {
     @Autowired
     private UserRepository userRepo;
+
     @Autowired
     private PasswordResetTokenRepository passResetTokenRepo;
     @Autowired
@@ -252,8 +253,6 @@ public class UserService implements UserDetailsService {
 //        Random rand = new Random();
 //        return users.get(rand.nextInt(users.size()));
 //    }
-
-    //peer to evaluate
     public UserEntity getRandomPeer(String dept, int excludedUserID) {
         List<UserEntity> users = userRepo.findPeersByDeptRoleNotUserIDNotAndPositionNotSecretary(dept, Role.HEAD.name(), excludedUserID);
         if (users.isEmpty()) {
@@ -350,5 +349,22 @@ public class UserService implements UserDetailsService {
 //
 //        return userRepo.findByDeptIn(departmentNames);
 //    }
+    //added is_probationary
+    public long getTotalProbationaryUsers() {
+        return userRepo.countByIsProbationaryTrue();
+    }
 
+    //
+    public long getTotalEmployees(){return userRepo.countTotalEmployees();}
+
+     //count regular Employees
+    public long getRegularEmployee(){return userRepo.countRegularEmployees();}
+
+public boolean verifyPassword(int userID, String rawPassword) {
+    UserEntity user = userRepo.findByUserID(userID).orElse(null);
+    if (user == null) {
+        return false;
+    }
+    return passwordEncoder.matches(rawPassword, user.getPassword());
+}
 }

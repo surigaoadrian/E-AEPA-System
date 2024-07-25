@@ -1,5 +1,6 @@
 package com.capstone.eapa.Controller;
 
+import com.capstone.eapa.DTO.PasswordRequest;
 import com.capstone.eapa.DTO.SwapAccountRequest;
 import com.capstone.eapa.Entity.AuthenticationResponse;
 import com.capstone.eapa.Entity.UserEntity;
@@ -56,6 +57,19 @@ public class AuthenticationController {
         String adminUsername = "adm_" + username;
         boolean exists = userRepo.existsByUsernameAndIsDeleted(adminUsername,0);
         return ResponseEntity.ok(exists);
+    }
+
+    @GetMapping("/checkEmpAccount/{username}")
+    public ResponseEntity<Boolean> checkEmpUsername(@PathVariable String username) {
+        String empUsername = username.replace("adm_", "");
+        boolean exists = userRepo.existsByUsernameAndIsDeleted(empUsername,0);
+        return ResponseEntity.ok(exists);
+    }
+
+    @PostMapping("/verifyPassword")
+    public ResponseEntity<Boolean> verifyPassword(@RequestBody PasswordRequest request) {
+        boolean isValid = authService.verifyPassword(request.getUsername(), request.getPassword());
+        return ResponseEntity.ok(isValid);
     }
     
 }

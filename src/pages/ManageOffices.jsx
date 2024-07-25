@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
 	faCirclePlus,
@@ -38,6 +38,7 @@ const ManageOffices = () => {
 	const [departmentToDelete, setDepartmentToDelete] = useState(null);
 	const [currentPage, setCurrentPage] = useState(1);
 	const itemsPerPage = 10;
+	const pagesPerGroup = 5;
 	const [snackbar, setSnackbar] = useState({
 		open: false,
 		message: "",
@@ -61,7 +62,6 @@ const ManageOffices = () => {
 		secretary: "",
 		staff: [],
 	});
-
 // fetch all users
 useEffect(() => {
 	const fetchData = async () => {
@@ -279,6 +279,10 @@ useEffect(() => {
 	const handleSearchChange = (e) => {
 		setSearchTerm(e.target.value);
 	};
+
+	const startPageGroup = Math.floor((currentPage - 1) / pagesPerGroup) * pagesPerGroup + 1;
+    const endPageGroup = Math.min(startPageGroup + pagesPerGroup - 1, totalPages);
+
 	const handlePageChange = (newPage) => {
 		setCurrentPage(newPage);
 	};
@@ -290,6 +294,8 @@ useEffect(() => {
 	const handleNextPage = () => {
 		setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
 	};
+
+	const hasData = departments.length > 0;
 
 	const handleEditDepartment = (user) => {
 		setEditingDepartment(user);
@@ -512,7 +518,7 @@ useEffect(() => {
 					</div>
 					<div
 						className="mr-10 ml-4 rounded-lg border border-gray-200"
-						style={{ position: "relative", height: "423px" }}
+						style={{ position: "relative", height: "26.25em", borderRadius: "5px 5px 0 0" }}
 					>
 						<div className="overflow-x-auto rounded-t-lg">
 							<table className="w-full divide-y-2 divide-gray-200 bg-white text-sm">
@@ -655,18 +661,18 @@ useEffect(() => {
 								</a>
 							</li>
 
-							{Array.from({ length: totalPages }, (_, index) => (
-								<li key={index + 1}>
+							{Array.from({ length: endPageGroup - startPageGroup + 1 }, (_, index) => (
+								<li key={startPageGroup + index}>
 									<a
 										href="#"
 										className={`block h-8 w-8 rounded border ${
-											currentPage === index + 1
+											currentPage === startPageGroup + index
 												? "border-pink-900 bg-pink-900 text-white"
 												: "border-gray-100 bg-white text-gray-900"
 										} text-center leading-8`}
-										onClick={() => handlePageChange(index + 1)}
+										onClick={() => handlePageChange(startPageGroup + index)}
 									>
-										{index + 1}
+										{startPageGroup + index}
 									</a>
 								</li>
 							))}

@@ -19,8 +19,8 @@ import NotAuthorized from "./pages/NotAuthorized";
 import PrivateRoute from "./components/PrivateRoute";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import EvaluateEmployee from "./pages/EvaluateEmployee";
-import AdminShowcase from "./pages/AdminShowcase";
 import ActivityLog from "./pages/ActivityLogs";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const router = createBrowserRouter([
   {
@@ -39,7 +39,7 @@ const router = createBrowserRouter([
       {
         path: "/viewProfile",
         element: (
-          <PrivateRoute requiredRoles={["EMPLOYEE"]}>
+          <PrivateRoute requiredRoles={["EMPLOYEE", "HEAD"]}>
             <ViewProfilePage />
           </PrivateRoute>
         ),
@@ -101,14 +101,14 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-      {
-        path: "/ViewProfileHead",
-        element: (
-          <PrivateRoute requiredRoles={["HEAD"]}>
-            <ViewProfilePageHead />
-          </PrivateRoute>
-        ),
-      },
+      // {
+      //   path: "/ViewProfileHead",
+      //   element: (
+      //     <PrivateRoute requiredRoles={["HEAD"]}>
+      //       <ViewProfilePageHead />
+      //     </PrivateRoute>
+      //   ),
+      // },
       {
         path: "/EvaluateEmployee",
         element: (
@@ -117,33 +117,14 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-      // {
-      //   path: "/dashboard",
-      //   element: (
-      //     <PrivateRoute requiredRoles={["ADMIN"]}>
-      //       <AdminShowcase />
-      //     </PrivateRoute>
-      //   ),
-      // },
-      // {
-      //   path: "/",
-      //   element: (
-      //     <PrivateRoute requiredRoles={["ADMIN"]}>
-      //       <Navigate to="/adminShowcase" replace />
-      //     </PrivateRoute>
-      //   ),
-      // },
-      // {
-      //   path: "/ActivityLog",
-      //   element: (
-      //     <PrivateRoute requiredRoles={["ADMIN"]}>
-      //       <ActivityLog />
-      //     </PrivateRoute>
-      //   ),
-      // },
-
-
-
+       {
+        path: "/AdminDashboard",
+        element: (
+         <PrivateRoute requiredRoles={["ADMIN"]}>
+            <AdminDashboard />
+          </PrivateRoute>
+        ),
+      },
     ],
   },
   {
@@ -154,6 +135,7 @@ const router = createBrowserRouter([
   { path: "/resetPassword/:token", element: <ResetPasswordPage /> },
   { path: "/notAuthorized", element: <NotAuthorized /> },
   { path: "*", element: <NotFoundPage /> },
+  // { path: "/loading", element:<Loading/>},
 ]);
 
 

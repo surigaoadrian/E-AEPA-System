@@ -48,7 +48,10 @@ public class UserEntity implements UserDetails {
     private String imageFormat;
     @Lob
     private Blob signature;
+    //changes made: Added mapping
+    @Column(name = "is_probationary")
     private boolean isProbationary;
+//    private boolean isProbationary;
     @Column(name = "Probationary Status")
     private String probeStatus;
     

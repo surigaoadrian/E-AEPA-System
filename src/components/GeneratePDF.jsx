@@ -13,11 +13,11 @@ const GeneratePDF = async (htmlContent) => {
   container.style.width = '100%';
   container.style.height = 'auto';
   container.style.visibility = 'hidden';
-  container.style.overflow = 'hidden'; // Ensure no overflow issues
+  container.style.overflow = 'auto'; // Adjust overflow property
   document.body.appendChild(container);
 
   // Wait for the content to render and measure its dimensions
-  await new Promise(resolve => setTimeout(resolve, 500)); // Increased timeout
+  await new Promise(resolve => setTimeout(resolve, 1000)); // Increased timeout to 1 second
 
   const { scrollWidth, scrollHeight } = container;
 
