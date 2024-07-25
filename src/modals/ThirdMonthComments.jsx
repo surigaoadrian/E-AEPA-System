@@ -353,6 +353,7 @@ useEffect(() => {
               {role !== "EMPLOYEE" && (
                 <IconButton
                 onClick={() => handleEditComment(quesID)}
+
                 sx={{
                   color: 'white',
                   '&:hover': {
@@ -361,7 +362,7 @@ useEffect(() => {
                   },
                 }}
               >
-                <EditIcon />
+                <EditIcon/>
               </IconButton>
               )}
             </Typography>

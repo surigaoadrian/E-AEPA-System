@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Box, Menu, MenuItem, IconButton, Tabs, Tab } from '@mui/material';
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
 import PrintIcon from '@mui/icons-material/Print';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ThirdMonthEval from "../modals/ThirdMonthEval";
 import FifthMonthEval from "../modals/FifthMonthEval";
 import axios from 'axios';
+import GeneratePDF from '../components/GeneratePDF';  // Import the GeneratePDF function
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -105,7 +104,7 @@ const ViewResults = ({ open, onClose, employee }) => {
     },
   };
 
-  const handlePrint = () => {
+  const handlePrint = async () => {
     const printAreaId = `tabPanel-${tabIndex}`;
     const input = document.getElementById(printAreaId);
 
@@ -114,21 +113,11 @@ const ViewResults = ({ open, onClose, employee }) => {
       return;
     }
 
-    html2canvas(input)
-      .then((canvas) => {
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF({
-          orientation: 'portrait',
-          unit: 'px',
-          format: [input.clientWidth, input.clientHeight]
-        });
-        pdf.addImage(imgData, 'PNG', 0, 0, input.clientWidth, input.clientHeight);
-        pdf.save('download.pdf');
-      })
-      .catch((error) => {
-        console.error('Error capturing the PDF:', error);
-      });
+    const htmlContent = input.outerHTML;
+    await GeneratePDF(htmlContent);  // Use the GeneratePDF function
   };
+
+  
 
   return (
     <Modal
