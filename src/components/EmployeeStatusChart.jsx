@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import axios from 'axios';
 
-const COLORS = ['#CD1A30', '#7A0C31'];
+const COLORS = ['#FFBA00', '#597001'];
 
 const EmployeeStatusChart = () => {
   const [data, setData] = useState([]);
@@ -47,8 +47,8 @@ const EmployeeStatusChart = () => {
             data={data}
             cx="50%"
             cy="50%"
-            innerRadius="50%"
-            outerRadius="90%"
+            innerRadius="40%"
+            outerRadius="80%"
             fill="#8884d8"
             paddingAngle={1}
             dataKey="value"
