@@ -20,6 +20,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import EvaluateEmployee from "./pages/EvaluateEmployee";
 import ActivityLogs from "./pages/ActivityLogs";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const router = createBrowserRouter([
   {
@@ -114,6 +115,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute requiredRoles={["HEAD"]}>
             <EvaluateEmployee />
+          </PrivateRoute>
+        ),
+      },
+       {
+        path: "/AdminDashboard",
+        element: (
+         <PrivateRoute requiredRoles={["ADMIN"]}>
+            <AdminDashboard />
           </PrivateRoute>
         ),
       },
