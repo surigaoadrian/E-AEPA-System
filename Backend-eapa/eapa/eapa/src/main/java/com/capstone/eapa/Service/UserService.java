@@ -259,17 +259,7 @@ public class UserService implements UserDetailsService {
     //
     public long getTotalEmployees(){return userRepo.countTotalEmployees();}
 
+     //count regular Employees
+    public long getRegularEmployee(){return userRepo.countRegularEmployees();}
 
-    //Get Employees under Department Head
-//    public List<UserEntity> getAllEmployeesFromDepartmentHead(String headName) {
-//
-//        List<DepartmentEntity> departments = departmentRepository.findByDeptOfficeHead(headName);
-//
-//        List<String> departmentNames = departments.stream()
-//                .map(DepartmentEntity::getDeptName)
-//                .collect(Collectors.toList());
-//
-//
-//        return userRepo.findByDeptIn(departmentNames);
-//    }
 }
