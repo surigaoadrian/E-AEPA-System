@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Paper from "@mui/material/Paper";
 import {
   Box,
@@ -23,6 +23,10 @@ import {
   ListItemIcon,
   Chip,
   Tooltip,
+  Skeleton,
+  CircularProgress,
+  Card,
+  InputAdornment,
 } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import HighlightOffOutlinedIcon from "@mui/icons-material/HighlightOffOutlined";
@@ -42,6 +46,7 @@ import {
   faEyeSlash,
   faTrash,
   faPenToSquare,
+  faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"; //password
 import axios from "axios";
@@ -121,6 +126,38 @@ function ManageAccount() {
   const [passwordLength, setPasswordLength] = useState(false);
 
   const loggedUserRole = sessionStorage.getItem("userRole");
+  const [countAdmin, setCountAdmin] = useState(0);
+  const [countEmployee, setCountEmployee] = useState(0);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10; // Adjust this based on your needs
+  const pagesPerGroup = 5;
+
+  const totalPages = Math.ceil(rows.length / itemsPerPage);
+
+  const startPageGroup = Math.floor((currentPage - 1) / pagesPerGroup) * pagesPerGroup + 1;
+  const endPageGroup = Math.min(startPageGroup + pagesPerGroup - 1, totalPages);
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const handlePrevPage = () => {
+    setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
+  };
+
+  const paginatedRows = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return rows.slice(startIndex, endIndex);
+  }, [currentPage, rows]);
+
+  const hasData = rows.length > 0;
 
   const modifyFirstLetter = (str, capitalize = true) => {
     if (capitalize) {
@@ -335,7 +372,22 @@ function ManageAccount() {
   };
 
   const handleTabChange = (event, newValue) => {
+    setCurrentPage(1);
     setSelectedTab(newValue);
+    setUpdateFetch((prev) => !prev);
+  };
+
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [selectedTab]);
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
   };
 
   useEffect(() => {
@@ -360,14 +412,33 @@ function ManageAccount() {
           name: `${item.fName} ${item.lName}`,
           userID: item.userID,
         }));
-        setRows(processedData);
+
+        // Apply search filter
+        const searchFilteredData = processedData.filter((item) =>
+          Object.values(item).some(
+            (value) =>
+              value &&
+              value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+          )
+        );
+
+        setRows(searchFilteredData);
+        const filterAdmin = processedData.filter(
+          (row) => row.role === "ADMIN"
+        ).length;
+        const filterEmp = processedData.filter(
+          (row) => row.role === "EMPLOYEE"
+        ).length;
+        setCountAdmin(filterAdmin);
+        setCountEmployee(filterEmp);
+        // setHasData(searchFilteredData.length > 0);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
     fetchData();
-  }, [updateFetch, selectedTab]);
+  }, [updateFetch, selectedTab, searchTerm]);
 
   useEffect(() => {
     const fetchDeptAndUsers = async () => {
@@ -708,26 +779,26 @@ function ManageAccount() {
       id: "workID",
       label: "Employee ID",
       align: "center",
-      minWidth: 150,
+      minWidth: 90,
     },
     {
       id: "name",
       label: "Name",
-      minWidth: 170,
+      minWidth: 200,
       align: "center",
       format: (value) => formatName(value),
     },
     {
       id: "workEmail",
       label: "Email",
-      minWidth: 150,
+      minWidth: 100,
       align: "center",
       format: (value) => (value ? value.toLocaleString("en-US") : ""),
     },
     {
       id: "dept",
       label: "Department",
-      minWidth: 150,
+      minWidth: 250,
       align: "center",
       format: (value) => (value ? value.toLocaleString("en-US") : ""),
     },
@@ -741,28 +812,28 @@ function ManageAccount() {
     {
       id: "actions",
       label: "Actions",
-      minWidth: 150,
+      minWidth: 60,
       align: "center",
       format: (value, row) => {
         return (
           <div>
-            <IconButton sx={{ width: "1.5em" }}>
+            <IconButton sx={{ width: "1.2em" }}>
               <FontAwesomeIcon
                 icon={faPenToSquare}
                 style={{
                   color: "#8C383E",
-                  fontSize: "1.3rem",
+                  fontSize: "1.1rem",
                   cursor: "pointer",
                 }}
                 onClick={() => handleClickEditBtn(row.userID)}
               />
             </IconButton>
-            <IconButton sx={{ width: "1.5em" }}>
+            <IconButton sx={{ width: "1.2em" }}>
               <FontAwesomeIcon
                 icon={faTrash}
                 style={{
                   color: "#8C383E",
-                  fontSize: "1.3rem",
+                  fontSize: "1.1rem",
                   cursor: "pointer",
                 }}
                 onClick={() => {
@@ -805,23 +876,23 @@ function ManageAccount() {
       align: "center",
       format: (value, row) => (
         <div>
-          <IconButton sx={{ width: "1.5em" }}>
+          <IconButton sx={{ width: "1.2em" }}>
             <FontAwesomeIcon
               icon={faPenToSquare}
               style={{
                 color: "#8C383E",
-                fontSize: "1.3rem",
+                fontSize: "1.1rem",
                 cursor: "pointer",
               }}
               onClick={() => handleClickEditBtn(row.userID)}
             />
           </IconButton>
-          <IconButton sx={{ width: "1.5em" }}>
+          <IconButton sx={{ width: "1.2em" }}>
             <FontAwesomeIcon
               icon={faTrash}
               style={{
                 color: "#8C383E",
-                fontSize: "1.3rem",
+                fontSize: "1.1rem",
                 cursor: "pointer",
               }}
               onClick={() => {
@@ -844,38 +915,64 @@ function ManageAccount() {
         >
           User Accounts
         </Typography>
-        <Box
-          sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            "& > :not(style)": { ml: 6, mt: 0.1, width: "93.5%" },
-          }}
-        >
-          <Grid
-            container
-            spacing={1.5}
-            sx={{
-              display: "flex",
-              justifyContent: "flex-end",
-              alignItems: "center",
-            }}
-          >
-            <Grid
-              item
-              xs={2}
-              sx={{
-                display: "flex",
-                justifyContent: "flex-end",
-                alignItems: "center",
-                borderRadius: "4px 4px 0 0",
-                height: 15,
-                mt: 1,
-                width: "100%",
-              }}
-            >
+        {loggedUserRole === "ADMIN" && (
+          <label className="ml-12 text-sm text-gray-700">
+            All Employees ({rows.length})
+          </label>
+        )}
+
+        <div className="ml-8 mt-2">
+          <div className="mr-10 mb-4 flex items-center justify-between">
+            <div className="ml-4 flex items-center justify-start">
+              <TextField
+                placeholder="Search ..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+                sx={{
+
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "#ffffff", // Set the background color for the entire input area
+                  },
+                  "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
+                    borderWidth: "1px",
+                    borderColor: "#e0e0e0",
+                  },
+                  "&:hover .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
+                  {
+                    borderColor: "#e0e0e0",
+                  },
+                  "&:focus-within": {
+                    "& fieldset": {
+                      borderColor: "#8C383E !important",
+                      borderWidth: "1px !important",
+                    },
+                  },
+                  "& .MuiInputBase-input": {
+                    padding: "10px 10px",
+                    fontSize: "13px",
+                    fontFamily: "Poppins",
+                  },
+                  minWidth: "110%",
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment>
+                      <FontAwesomeIcon
+                        icon={faSearch}
+                        style={{ fontSize: "13px", padding: "0" }}
+                      />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </div>
+
+
+            <div className="flex items-center">
               <Button
                 variant="contained"
                 sx={{
+                  display: 'flex-end',
                   height: "2.5em",
                   width: "9em",
                   fontFamily: "Poppins",
@@ -889,99 +986,233 @@ function ManageAccount() {
               >
                 Add User
               </Button>
-            </Grid>
-            <Grid
-              item
-              xs={12}
-              sx={{ height: "4em", display: "flex", mt: "-1em" }}
-            >
-              <Tabs
-                value={selectedTab}
-                onChange={handleTabChange}
-                sx={tabStyle}
+            </div>
+          </div>
+        </div>
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            "& > :not(style)": { ml: 6, mt: 0.1, width: "93.5%" },
+          }}
+        >
+
+
+
+          <Grid
+            container
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center",
+            }}
+          >
+            {loggedUserRole === "SUPERUSER" && (
+              <Grid
+                item
+                xs={12}
+                sx={{ height: "3em", display: "flex", mt: "-1em" }}
               >
-                <Tab label="All Employees" sx={tabStyle} />
-                <Tab label="All Admins" sx={tabStyle} />
-              </Tabs>
-            </Grid>
-            <Paper
-              elevation={1}
+                <Tabs
+                  value={selectedTab}
+                  onChange={handleTabChange}
+                  sx={tabStyle}
+                >
+                  <Tab label={`All Employees (${countEmployee})`} sx={tabStyle} />
+                  <Tab label={`All Admins (${countAdmin})`} sx={tabStyle} />
+                </Tabs>
+              </Grid>
+
+            )}
+
+
+            <Card
+              variant="outlined"
               sx={{
-                borderRadius: "5px",
+                borderRadius: '5px 0 0',
+                variant: "outlined",
                 width: "100%",
-                height: "32em",
+                height: "31.9em",
                 backgroundColor: "transparent",
                 mt: ".2%",
+                position: 'relative',
               }}
             >
-              <TableContainer
-                sx={{ borderRadius: "5px 5px 0 0 ", maxHeight: "100%" }}
-              >
-                <Table stickyHeader aria-label="sticky table" size="small">
-                  <TableHead sx={{ height: "2em" }}>
-                    <TableRow>
-                      {(selectedTab === 0
-                        ? columnsEmployees
-                        : columnsAdmins
-                      ).map((column) => (
-                        <TableCell
-                          sx={{
-                            fontFamily: "Poppins",
-                            bgcolor: "#8c383e",
-                            color: "white",
-                            fontWeight: 500,
-                            width: "10%",
-                          }}
-                          key={column.id}
-                          align={column.align}
-                          style={{ minWidth: column.minWidth }}
-                        >
-                          {column.label}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows.map((row) => (
-                      <TableRow
-                        sx={{
-                          bgcolor: "white",
-                          "&:hover": {
-                            backgroundColor: "rgba(248, 199, 2, 0.5)",
-                            color: "black",
-                          },
-                        }}
-                        key={row.id}
-                      >
+
+              {loggedUserRole === "SUPERUSER" && loading ? (
+                <div style={{
+                  height: '32em',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  fontWeight: 500,
+                }}>Loading... </div>
+              ) : (
+                <TableContainer
+                  sx={{ borderRadius: "5px 5px 0 0 ", maxHeight: "100%" }}
+                >
+                  <Table stickyHeader aria-label="sticky table" size="small">
+                    <TableHead sx={{ height: "3em" }}>
+                      <TableRow>
                         {(selectedTab === 0
                           ? columnsEmployees
                           : columnsAdmins
                         ).map((column) => (
                           <TableCell
-                            sx={{ fontFamily: "Poppins", fontWeight: 500 }}
-                            key={`${row.id}-${column.id}`}
+                            sx={{
+                              fontFamily: "Poppins",
+                              bgcolor: "#8c383e",
+                              color: "white",
+                              fontWeight: 500,
+                              width: "10%",
+                            }}
+                            key={column.id}
                             align={column.align}
+                            style={{ minWidth: column.minWidth }}
                           >
-                            {column.id === "name"
-                              ? row.name
-                              : column.id === "actions"
-                                ? column.format
-                                  ? column.format(row[column.id], row)
-                                  : null
-                                : column.format
-                                  ? column.format(row[column.id])
-                                  : row[column.id]}
+                            {column.label}
                           </TableCell>
                         ))}
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Paper>
+                    </TableHead>
+                    {hasData ? (
+                      <TableBody>
+
+                        {paginatedRows.map((row) => (
+                          <TableRow
+                            sx={{
+                              bgcolor: "white",
+                              "&:hover": {
+                                backgroundColor: "rgba(248, 199, 2, 0.5)",
+                                color: "black",
+                              },
+                            }}
+                            key={row.id}
+                          >
+                            {(selectedTab === 0
+                              ? columnsEmployees
+                              : columnsAdmins
+                            ).map((column) => (
+                              <TableCell
+                                sx={{ fontFamily: "Poppins", fontWeight: 500 }}
+                                key={`${row.id}-${column.id}`}
+                                align={column.align}
+                              >
+                                {column.id === "name"
+                                  ? row.name
+                                  : column.id === "actions"
+                                    ? column.format
+                                      ? column.format(row[column.id], row)
+                                      : null
+                                    : column.format
+                                      ? column.format(row[column.id])
+                                      : row[column.id]}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    ) : (
+                      <TableBody>
+                        <TableRow>
+                          <TableCell sx={{ bgcolor: 'white', height: '5em', }} colSpan={columnsEmployees.length || columnsAdmins.length} align="center">
+                            <Typography
+                              sx={{
+                                textAlign: "center",
+                                fontFamily: "Poppins",
+                                fontSize: "17px",
+                                color: "#1e1e1e",
+                                fontWeight: 500,
+                                padding: "25px",
+                              }}
+                            >
+                              No user are currently registered
+                            </Typography>
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    )}
+                  </Table>
+                </TableContainer>
+              )}
+            </Card>
           </Grid>
         </Box>
+        {/* Pagination */}
+        <div
+          className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-9"
+          style={{
+            position: "relative", // Change to relative to keep it in place
+            // bottom: 90,
+            // left: '19%',
+            // transform: "translateX(-50%",
+            display: "flex",
+            alignItems: "center",
 
+            ml: '4em'
+          }}
+        >
+          <ol className="flex justify-end gap-1 text-xs font-medium">
+            <li>
+              <a
+                href="#"
+                className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180"
+                onClick={handlePrevPage}
+              >
+                <span className="sr-only">Prev Page</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-3 w-3"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </a>
+            </li>
+
+            {Array.from({ length: endPageGroup - startPageGroup + 1 }, (_, index) => (
+              <li key={startPageGroup + index}>
+                <a
+                  href="#"
+                  className={`block h-8 w-8 rounded border ${currentPage === startPageGroup + index
+                    ? "border-pink-900 bg-pink-900 text-white"
+                    : "border-gray-100 bg-white text-gray-900"
+                    } text-center leading-8`}
+                  onClick={() => handlePageChange(startPageGroup + index)}
+                >
+                  {startPageGroup + index}
+                </a>
+              </li>
+            ))}
+
+            <li>
+              <a
+                href="#"
+                className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180"
+                onClick={handleNextPage}
+              >
+                <span className="sr-only">Next Page</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-3 w-3"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </a>
+            </li>
+          </ol>
+        </div>
         {/* dialog - REGISTRATION */}
         <Dialog
           maxWidth="xs"
@@ -2186,6 +2417,7 @@ function ManageAccount() {
                       <Box style={{ fontFamily: "Poppins" }} height="100%">
                         <TextField
                           required
+                          disabled
                           fullWidth
                           size="small"
                           label="First Name"
@@ -2225,6 +2457,7 @@ function ManageAccount() {
                       <Box style={{ fontFamily: "Poppins" }}>
                         <TextField
                           required
+                          disabled
                           fullWidth
                           size="small"
                           label="Last Name"
@@ -2299,31 +2532,6 @@ function ManageAccount() {
                         )}
                       </Box>
                     </Grid>
-                    <Grid item xs={12}>
-                      <Box>
-                        <TextField
-                          disabled
-                          fullWidth
-                          size="small"
-                          label="Institutional Email"
-                          id="email"
-                          name="workEmail"
-                          value={selectedUser.workEmail}
-                          onChange={handleUserDataChange}
-                          InputLabelProps={{
-                            style: { fontFamily: "Poppins", fontSize: ".8em" },
-                          }}
-                          inputProps={{
-                            style: { fontSize: ".8em", fontFamily: "Poppins" },
-                          }}
-                        />
-                        {!emailIsAvailable && (
-                          <FormHelperText style={{ color: "red" }}>
-                            {emailMsgInfo}
-                          </FormHelperText>
-                        )}
-                      </Box>
-                    </Grid>
                   </>
                 )}
                 {(selectedUser?.role === "EMPLOYEE" ||
@@ -2332,6 +2540,7 @@ function ManageAccount() {
                       <Grid item xs={4}>
                         <Box style={{ fontFamily: "Poppins" }} height="100%">
                           <TextField
+                            disabled
                             fullWidth
                             size="small"
                             label="First Name"
@@ -2371,6 +2580,7 @@ function ManageAccount() {
                         <Box style={{ fontFamily: "Poppins" }}>
                           <TextField
                             fullWidth
+                            disabled
                             size="small"
                             label="Last Name"
                             id="lName"
@@ -2826,5 +3036,5 @@ function ManageAccount() {
       </Animated>
     </div>
   );
-}
+};
 export default ManageAccount;

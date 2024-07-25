@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -134,4 +135,20 @@ public class AuthenticationService {
         String adminUsername = "adm_"+username;
         return userRepo.existsByUsernameAndIsDeleted(adminUsername,0);
     }
+
+    public boolean EmpAccountExist(String username){
+        String empUsername = username.replace("adm_", "");
+        return userRepo.existsByUsernameAndIsDeleted(empUsername,0);
+    }
+
+    public boolean verifyPassword(String username, String password) {
+        try {
+            // This will throw an exception if authentication fails
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            return true;
+        } catch (AuthenticationException e) {
+            return false;
+        }
+    }
+    
 }

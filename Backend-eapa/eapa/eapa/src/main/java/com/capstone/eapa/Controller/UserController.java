@@ -1,5 +1,6 @@
 package com.capstone.eapa.Controller;
 
+import com.capstone.eapa.DTO.PasswordRequest;
 import com.capstone.eapa.Entity.UserEntity;
 import com.capstone.eapa.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import java.util.Optional;
 public class UserController {
     @Autowired
     private UserService userServ;
+
 
 
     @GetMapping("/getUser/{userID}")
@@ -159,6 +161,5 @@ public class UserController {
     //     List<UserEntity> employees = userServ.getAllEmployeesFromDepartmentHead(headName);
     //     return ResponseEntity.ok(employees);
     // }
-
 
 }

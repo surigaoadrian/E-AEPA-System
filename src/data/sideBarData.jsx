@@ -22,7 +22,7 @@ export const SideBarData = [
   {
     title: "View Profile",
     path: "/viewProfile",
-    role: ["EMPLOYEE"],
+    role: ["EMPLOYEE","HEAD"],
     icon: <FontAwesomeIcon icon={faUser} style={{ fontSize: "15px" }} />,
     margin: "0 0 0 4px",
   },
@@ -69,12 +69,12 @@ export const SideBarData = [
     icon: <FontAwesomeIcon icon={faListUl} style={{ fontSize: "15px" }} />,
     margin: "0 0 0 5px",
   },
-  {
-    title: "View Profile",
-    path: "/ViewProfileHead",
-    role: ["HEAD"],
-    icon: <FontAwesomeIcon icon={faUser} style={{ fontSize: "15px" }} />,
-  },
+  // {
+  //   title: "View Profile",
+  //   path: "/ViewProfileHead",
+  //   role: ["HEAD"],
+  //   icon: <FontAwesomeIcon icon={faUser} style={{ fontSize: "15px" }} />,
+  // },
   {
     title: "Staff Evaluation",
     path: "/EvaluateEmployee",
@@ -84,7 +84,7 @@ export const SideBarData = [
   },
 
   {
-    title: "Track Employee",
+    title: "Evaluation Tracking",
     path: "/TrackEmployee",
     role: ["HEAD"],
     icon: <FontAwesomeIcon icon={faUserTie} style={{ fontSize: "15px" }} />,
