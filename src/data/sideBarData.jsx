@@ -27,27 +27,27 @@ export const SideBarData = [
     role: ["ADMIN"],
     icon: <DashboardIcon style={{ fontSize: "15px" }} />,
   },
-	{
-		title: "View Profile",
-		path: "/viewProfile",
-		role: "EMPLOYEE",
-		icon: <FontAwesomeIcon icon={faUser} style={{ fontSize: "15px" }} />,
-		margin: "0 0 0 4px",
-	},
-	{
-		title: "Take Evaluation",
-		path: "/takeEvaluation",
-		role: "EMPLOYEE",
-		icon: <FontAwesomeIcon icon={faFileLines} style={{ fontSize: "15px" }} />,
-		margin: "0 0 0 4px",
-	},
-	{
-		title: "View Results",
-		path: "/viewRatings",
-		role: "EMPLOYEE",
-		icon: <FontAwesomeIcon icon={faStar} style={{ fontSize: "15px" }} />,
-		margin: "0 0 0 1px",
-	},
+ {
+    title: "View Profile",
+    path: "/viewProfile",
+    role: ["EMPLOYEE","HEAD"],
+    icon: <FontAwesomeIcon icon={faUser} style={{ fontSize: "15px" }} />,
+    margin: "0 0 0 4px",
+  },
+  {
+    title: "Take Evaluation",
+    path: "/takeEvaluation",
+    role: ["EMPLOYEE"],
+    icon: <FontAwesomeIcon icon={faFileLines} style={{ fontSize: "15px" }} />,
+    margin: "0 0 0 4px",
+  },
+  {
+    title: "View Results",
+    path: "/viewRatings",
+    role: ["EMPLOYEE"],
+    icon: <FontAwesomeIcon icon={faStar} style={{ fontSize: "15px" }} />,
+    margin: "0 0 0 1px",
+  },
   {
     title: "Manage Account",
     path: "/manageAccount",
@@ -77,12 +77,7 @@ export const SideBarData = [
     icon: <FontAwesomeIcon icon={faListUl} style={{ fontSize: "15px" }} />,
     margin: "0 0 0 5px",
   },
-  {
-    title: "View Profile",
-    path: "/ViewProfileHead",
-    role: ["HEAD"],
-    icon: <FontAwesomeIcon icon={faUser} style={{ fontSize: "15px" }} />,
-  },
+
   {
     title: "Staff Evaluation",
     path: "/EvaluateEmployee",
@@ -92,7 +87,7 @@ export const SideBarData = [
   },
 
   {
-    title: "Track Employee",
+    title: "Evaluation Tracking",
     path: "/TrackEmployee",
     role: ["HEAD"],
     icon: <FontAwesomeIcon icon={faUserTie} style={{ fontSize: "15px" }} />,

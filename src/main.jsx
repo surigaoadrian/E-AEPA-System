@@ -39,7 +39,7 @@ const router = createBrowserRouter([
       {
         path: "/viewProfile",
         element: (
-          <PrivateRoute requiredRoles={["EMPLOYEE"]}>
+          <PrivateRoute requiredRoles={["EMPLOYEE", "HEAD"]}>
             <ViewProfilePage />
           </PrivateRoute>
         ),
@@ -101,14 +101,14 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-      {
-        path: "/ViewProfileHead",
-        element: (
-          <PrivateRoute requiredRoles={["HEAD"]}>
-            <ViewProfilePageHead />
-          </PrivateRoute>
-        ),
-      },
+      // {
+      //   path: "/ViewProfileHead",
+      //   element: (
+      //     <PrivateRoute requiredRoles={["HEAD"]}>
+      //       <ViewProfilePageHead />
+      //     </PrivateRoute>
+      //   ),
+      // },
       {
         path: "/EvaluateEmployee",
         element: (
@@ -135,6 +135,7 @@ const router = createBrowserRouter([
   { path: "/resetPassword/:token", element: <ResetPasswordPage /> },
   { path: "/notAuthorized", element: <NotAuthorized /> },
   { path: "*", element: <NotFoundPage /> },
+  // { path: "/loading", element:<Loading/>},
 ]);
 
 

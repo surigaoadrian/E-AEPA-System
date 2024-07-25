@@ -33,7 +33,8 @@ function NavBar() {
   const [message, setMessage] = useState("");
   const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
   const [hasAdminAccount, setHasAdminAccount] = useState(false);
-
+  const [hasEmpAccount, setHasEmpAccount] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const role = sessionStorage.getItem("userRole");
 
@@ -105,6 +106,10 @@ function NavBar() {
         //  const adminUsername = `adm_${response.data.username}`;
          const checkAdminResponse = await axios.get(`http://localhost:8080/checkAdminAccount/${response.data.username}`);
          setHasAdminAccount(checkAdminResponse.data);
+
+         const checkEmpResponse = await axios.get(`http://localhost:8080/checkEmpAccount/${response.data.username}`);
+          setHasEmpAccount(checkEmpResponse.data);
+          console.log("Has Employee account:", checkEmpResponse.data);
       } catch (error) {
         if (error.response) {
           //not in 200 response range
@@ -357,7 +362,7 @@ function NavBar() {
               </Typography>
             </MenuItem>
           )}
-          {loggedUserData.role === "ADMIN" && (
+          {loggedUserData.role === "ADMIN" && hasEmpAccount && (
             <MenuItem
               onClick={() => handleSwitchAccount("EMPLOYEE")}
               sx={{
