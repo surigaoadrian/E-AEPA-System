@@ -78,17 +78,17 @@ const EvaluationStatusChart = () => {
             layout="horizontal"
             valueScale={{ type: 'linear' }}
             indexScale={{ type: 'band', round: true }}
-            colors={({ id }) => (id === 'completed' ? '#A73328' : '#562D33')}
+            colors={({ id }) => (id === 'completed' ? '#74A587' : '#E05D5D')}
             borderColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
             axisTop={null}
             axisRight={null}
             axisBottom={{
                 tickSize: 5,
-                tickPadding: 5,
+                tickPadding: 1,
                 tickRotation: 0,
                 legend: 'Percentage',
                 legendPosition: 'middle',
-                legendOffset: 32,
+                legendOffset: 22,
                 tickValues: [0, 20, 40, 60, 80, 100], // Ensure tick values from 0 to 100
                 format: (value) => `${value}%`,
             }}
@@ -99,12 +99,30 @@ const EvaluationStatusChart = () => {
                 legend: 'Evaluation',
                 legendPosition: 'middle',
                 legendOffset: -100,
-                tickValues: data.map(d => d.evaluation) // Ensure tick values are based on evaluation categories
+                tickValues: data.map(d => d.evaluation), // Ensure tick values are based on evaluation categories
+                renderTick: ({ opacity, textAnchor, textBaseline, value, x, y, onMouseEnter, onMouseMove, onMouseLeave }) => (
+                    <g
+                        transform={`translate(${x},${y})`}
+                        style={{ opacity }}
+                        onMouseEnter={onMouseEnter}
+                        onMouseMove={onMouseMove}
+                        onMouseLeave={onMouseLeave}
+                    >
+                        <text
+                            alignmentBaseline={textBaseline}
+                            textAnchor={textAnchor}
+                            style={{ fontSize: 14, fontWeight: 'bold' ,fontSize:'12px'}} // Increase font size and make bold
+                        >
+                            {value}
+                        </text>
+                    </g>
+                )
             }}
-            label={(d) => `${d.value}%`}
+            label={(d) => (
+                <tspan style={{ fill: '#ffffff', fontWeight: 'bold' }}>{`${d.value}%`}</tspan>
+            )}
             labelSkipWidth={12}
             labelSkipHeight={12}
-            labelTextColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
             legends={[
                 {
                     dataFrom: 'keys',
@@ -136,4 +154,3 @@ const EvaluationStatusChart = () => {
 };
 
 export default EvaluationStatusChart;
-
