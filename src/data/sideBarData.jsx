@@ -8,6 +8,7 @@ import {
   faUserTie,
   faUsers,
   faListUl,
+  faBarChart
 } from "@fortawesome/free-solid-svg-icons";
 
 export const SideBarData = [
@@ -87,5 +88,11 @@ export const SideBarData = [
     path: "/TrackEmployee",
     role: ["HEAD"],
     icon: <FontAwesomeIcon icon={faUserTie} style={{ fontSize: "15px" }} />,
+  },
+   {
+    title: "Admin Dashboard",
+    path: "/AdminDashboard",
+    role: ["ADMIN"],
+    icon: <FontAwesomeIcon icon={faBarChart} style={{ fontSize: "15px" }} />,
   },
 ];
