@@ -129,7 +129,7 @@ function TrackEmployee() {
       id: "workID",
       label: "ID No.",
       align: "center",
-      minWidth: 100,
+      minWidth: 90,
     },
     {
       id: "name",
@@ -143,7 +143,7 @@ function TrackEmployee() {
     {
       id: "position",
       label: "Position",
-      minWidth: 150,
+      minWidth: 100,
       align: "center",
       format: (value) => (value ? value.toLocaleString("en-US") : ""),
     },
@@ -204,7 +204,7 @@ function TrackEmployee() {
     {
       id: "actions",
       label: "Result",
-      minWidth: 150,
+      minWidth: 100,
       align: "center",
       format: (value, row) => {
         return (
@@ -300,19 +300,20 @@ function TrackEmployee() {
         )}
 
 
-        <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml: 6, mt: 4, width: "93.5%" } }}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml: 6, mt: 1, width: "93%" } }}>
           <Grid container spacing={1.5} sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
-            <Card variant="outlined" sx={{ borderRadius: "5px", width: "100%", height: "27.1em", backgroundColor: "transparent"}}>
+            {/* <Card variant="outlined" sx={{ borderRadius: "5px", width: "100%", height: "27.1em", backgroundColor: "transparent",position:'relative'}}> */}
               {showPasswordModal ? (
-                <Skeleton variant="rectangular" width="100%" height="100%"></Skeleton>
+                <Skeleton variant="rectangular" width="100%" height="27.1em" sx={{bgcolor:'lightgray'}}></Skeleton>
               ) : (
-                <TableContainer sx={{ borderRadius: "5px 5px 0 0", maxHeight: "100%" }}>
-                  <Table stickyHeader aria-label="sticky table" size="small">
+                <TableContainer sx={{ borderRadius: "5px 5px 0 0", maxHeight: "100%",border:'1px solid lightgray' }}>
+                  <Table stickyHeader aria-label="a dense table" size="small">
                     <TableHead sx={{ height: "2em" }}>
                       <TableRow>
                         {columnsEmployees.map((column) => (
                           <TableCell
-                            sx={{ fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: "bold", maxWidth: "2em" }}
+                           component="th" scope="row"
+                            sx={{ fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: "bold", fontSize: ".8em" }}
                             key={column.id}
                             align={column.align}
                             style={{ minWidth: column.minWidth }}
@@ -326,11 +327,11 @@ function TrackEmployee() {
                       <TableBody>
                         {paginatedRows.map((row) => (
                           <TableRow
-                            sx={{ bgcolor: 'white', "&:hover": { backgroundColor: "rgba(248, 199, 2, 0.5)", color: "black" }, height: '3em' }}
+                            sx={{ bgcolor: 'white', "&:hover": { backgroundColor: "rgba(248, 199, 2, 0.5)", color: "black" } }}
                             key={row.id}
                           >
                             {columnsEmployees.map((column) => (
-                              <TableCell sx={{ fontFamily: "Poppins" }} key={`${row.id}-${column.id}`} align={column.align}>
+                              <TableCell  component="th" scope="row" sx={{ fontFamily: "Poppins" ,fontSize:'.8em'}} key={`${row.id}-${column.id}`} align={column.align}>
                                 {column.id === "name" ? row.name : column.id === "actions" ? column.format ? column.format(row[column.id], row) : null : column.format ? column.format(row[column.id]) : row[column.id]}
                               </TableCell>
                             ))}
@@ -360,7 +361,7 @@ function TrackEmployee() {
                   </Table>
                 </TableContainer>
               )}
-            </Card>
+            {/* </Card> */}
           </Grid>
           <ViewResults
             open={showViewRatingsModal}
@@ -375,10 +376,10 @@ function TrackEmployee() {
           < div
             className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-9"
             style={{
-              position: "relative", // Change to relative to keep it in place
-              // bottom: 200,
-              // left: '20%',
-              // transform: "translateX(-50%)",
+              position: "absolute", // Change to relative to keep it in place
+              bottom: 170,
+              left: '21%',
+              transform: "translateX(-50%)",
               display: "flex",
               alignItems: "center",
               ml: '4em'
