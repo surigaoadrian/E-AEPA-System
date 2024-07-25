@@ -137,6 +137,25 @@ public class UserController {
         }
     }
 
+        //total probationary employees
+    @GetMapping("/countProbationaryUsers")
+    public ResponseEntity<Long> countProbationaryUsers() {
+        long count = userServ.getTotalProbationaryUsers();
+        return ResponseEntity.ok(count);
+    }
+    //for total Employees
+    @GetMapping("/countTotalEmployees")
+    public ResponseEntity<Long> countTotalEmployees() {
+        long count = userServ.getTotalEmployees();
+        return ResponseEntity.ok(count);
+    }
+
+    @GetMapping("/getRegularEmployees")
+    public ResponseEntity<Long> getRegularEmployees(){
+        long count = userServ.getRegularEmployee();
+        return ResponseEntity.ok(count);
+    }
+}
     //get the employees' data with the corresponding department head - Track Employee
     //  @GetMapping("/employees-with-head")
     // public ResponseEntity<List<UserEntity>> getAllEmployeesFromDepartmentHead(@RequestParam String headName) {
