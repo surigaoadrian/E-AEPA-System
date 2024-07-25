@@ -43,7 +43,7 @@ const selectedMenuItemStyles = {
   color: "#fff",
   "&:hover": {
     backgroundColor: "#8C383E",
-    color: "#fff",
+    color: "#ffffff",
   },
 };
 
