@@ -393,9 +393,8 @@ function ManageAccount() {
           return {
             ...dept,
             deptOfficeHead: officeHead
-              ? `${officeHead.fName} ${
-                  officeHead.mName ? officeHead.mName.charAt(0) + "." : ""
-                } ${officeHead.lName}`
+              ? `${officeHead.fName} ${officeHead.mName ? officeHead.mName.charAt(0) + "." : ""
+              } ${officeHead.lName}`
               : "",
           };
         });
@@ -480,11 +479,11 @@ function ManageAccount() {
 
     // Check if username and email are available before proceeding
     if (!isAvailable) {
-      setMsgInfo("Username already exist");
+      setMsgInfo("Username already exists");
       return;
     }
 
-    if (!emailIsAvailable) {
+    if (role !== 'ADMIN' && !emailIsAvailable) {
       setEmailMsgInfo("Email already exists");
       return;
     }
@@ -512,13 +511,16 @@ function ManageAccount() {
         fName: firstname,
         mName: middlename,
         lName: lastname,
-        workEmail: emailChange,
         gender: gender,
         password: password,
         position: position,
         dept: dept,
         role: role,
       };
+
+      if (role !== 'ADMIN') {
+        userData.workEmail = emailChange;
+      }
 
       const response = await fetch(`http://localhost:8080/register/${loggedId}`, {
         method: "POST",
@@ -555,6 +557,7 @@ function ManageAccount() {
       console.error("Network error", error);
     }
   };
+
 
   const availableDepartments =
     role === "HEAD"
@@ -794,12 +797,7 @@ function ManageAccount() {
       align: "center",
       format: (value) => (value ? value.toLocaleString("en-US") : ""),
     },
-    {
-      id: "workEmail",
-      label: "Email",
-      minWidth: 170,
-      align: "center",
-    },
+
     {
       id: "actions",
       label: "Actions",
@@ -967,12 +965,12 @@ function ManageAccount() {
                             {column.id === "name"
                               ? row.name
                               : column.id === "actions"
-                              ? column.format
-                                ? column.format(row[column.id], row)
-                                : null
-                              : column.format
-                              ? column.format(row[column.id])
-                              : row[column.id]}
+                                ? column.format
+                                  ? column.format(row[column.id], row)
+                                  : null
+                                : column.format
+                                  ? column.format(row[column.id])
+                                  : row[column.id]}
                           </TableCell>
                         ))}
                       </TableRow>
@@ -1247,30 +1245,6 @@ function ManageAccount() {
                         {isTaken && (
                           <FormHelperText style={{ color: "red" }}>
                             {msgInfo}{" "}
-                          </FormHelperText>
-                        )}
-                      </Box>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Box>
-                        <TextField
-                          size="small"
-                          required
-                          fullWidth
-                          label="Admin Email Address"
-                          id="email"
-                          value={emailChange}
-                          onChange={handleEmailChange}
-                          InputLabelProps={{
-                            style: { fontFamily: "Poppins", fontSize: ".8em" },
-                          }}
-                          inputProps={{
-                            style: { fontFamily: "Poppins", fontSize: ".8em" },
-                          }}
-                        />
-                        {emailIsTaken && (
-                          <FormHelperText style={{ color: "red" }}>
-                            {emailMsgInfo}
                           </FormHelperText>
                         )}
                       </Box>
@@ -2354,371 +2328,371 @@ function ManageAccount() {
                 )}
                 {(selectedUser?.role === "EMPLOYEE" ||
                   selectedUser?.role === "HEAD") && (
-                  <>
-                    <Grid item xs={4}>
-                      <Box style={{ fontFamily: "Poppins" }} height="100%">
-                        <TextField
-                          fullWidth
-                          size="small"
-                          label="First Name"
-                          id="fName"
-                          name="fName"
-                          value={selectedUser.fName}
-                          onChange={handleUserDataChange}
-                          InputLabelProps={{
-                            style: { fontFamily: "Poppins", fontSize: ".8em" },
-                          }}
-                          inputProps={{
-                            style: { fontSize: ".8em", fontFamily: "Poppins" },
-                          }}
-                        />
-                      </Box>
-                    </Grid>
-                    <Grid item xs={4}>
-                      <Box style={{ fontFamily: "Poppins" }}>
-                        <TextField
-                          fullWidth
-                          size="small"
-                          label="Middle Name"
-                          id="mName"
-                          name="mName"
-                          value={selectedUser.mName}
-                          onChange={handleUserDataChange}
-                          InputLabelProps={{
-                            style: { fontFamily: "Poppins", fontSize: ".8em" },
-                          }}
-                          inputProps={{
-                            style: { fontSize: ".8em", fontFamily: "Poppins" },
-                          }}
-                        />
-                      </Box>
-                    </Grid>
-                    <Grid item xs={4}>
-                      <Box style={{ fontFamily: "Poppins" }}>
-                        <TextField
-                          fullWidth
-                          size="small"
-                          label="Last Name"
-                          id="lName"
-                          value={selectedUser.lName}
-                          name="lName"
-                          onChange={handleUserDataChange}
-                          InputLabelProps={{
-                            style: { fontFamily: "Poppins", fontSize: ".8em" },
-                          }}
-                          inputProps={{
-                            style: { fontSize: ".8em", fontFamily: "Poppins" },
-                          }}
-                        />
-                      </Box>
-                    </Grid>
-                    <Grid item xs={6} sx={{ width: "100%" }}>
-                      <Box sx={{ height: "100%" }}>
-                        <Tooltip
-                          title="ID Numbers should be numbers only"
-                          placement="left"
-                          arrow
-                          slotProps={{
-                            popper: {
-                              modifiers: [
-                                {
-                                  name: "offset",
-                                  options: {
-                                    offset: [0, -14],
-                                  },
-                                },
-                              ],
-                            },
-                          }}
-                        >
+                    <>
+                      <Grid item xs={4}>
+                        <Box style={{ fontFamily: "Poppins" }} height="100%">
                           <TextField
                             fullWidth
                             size="small"
-                            label="ID Number"
-                            id="workId"
-                            name="workID"
-                            value={selectedUser.workID}
+                            label="First Name"
+                            id="fName"
+                            name="fName"
+                            value={selectedUser.fName}
                             onChange={handleUserDataChange}
                             InputLabelProps={{
-                              style: {
-                                fontFamily: "Poppins",
-                                fontSize: ".8em",
-                              },
+                              style: { fontFamily: "Poppins", fontSize: ".8em" },
                             }}
                             inputProps={{
-                              style: {
-                                fontSize: ".8em",
-                                fontFamily: "Poppins",
-                              },
+                              style: { fontSize: ".8em", fontFamily: "Poppins" },
                             }}
                           />
-                        </Tooltip>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Box>
-                        <FormControl fullWidth size="small" disabled>
-                          <InputLabel
-                            id="GenderLabel"
-                            value={gender}
-                            sx={{ fontSize: ".8em", fontFamily: "Poppins" }}
-                          >
-                            Gender
-                          </InputLabel>
-                          <Select
-                            labelId="GenderLabel"
-                            id="GenderLabel"
-                            value={selectedUser.gender}
-                            label="gender"
-                            name="gender"
-                            sx={{ fontFamily: "Poppins", fontSize: ".8em" }}
-                          >
-                            <MenuItem value={"Female"}>Female</MenuItem>
-                            <MenuItem value={"Male"}>Male</MenuItem>
-                            <MenuItem value={"Other"}>Other</MenuItem>
-                          </Select>
-                        </FormControl>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={6} sx={{ width: "100%" }}>
-                      <Box>
-                        <FormControl
-                          size="small"
-                          fullWidth
-                          disabled={selectedUser?.role === "HEAD"}
-                        >
-                          <InputLabel
-                            id="employementStatusLabel"
-                            sx={{ fontSize: ".8em", fontFamily: "Poppins" }}
-                          >
-                            Employment Status
-                          </InputLabel>
-                          <Select
-                            labelId="employementStatusLabel"
-                            id="employementStatus"
-                            name="empStatus"
-                            value={selectedUser.empStatus}
-                            label="employment status"
+                        </Box>
+                      </Grid>
+                      <Grid item xs={4}>
+                        <Box style={{ fontFamily: "Poppins" }}>
+                          <TextField
+                            fullWidth
+                            size="small"
+                            label="Middle Name"
+                            id="mName"
+                            name="mName"
+                            value={selectedUser.mName}
                             onChange={handleUserDataChange}
-                            sx={{ fontFamily: "Poppins", fontSize: ".8em" }}
-                          >
-                            <MenuItem
-                              style={{ fontFamily: "Poppins" }}
-                              value="Probationary"
-                            >
-                              Probationary
-                            </MenuItem>
-                            <MenuItem
-                              style={{ fontFamily: "Poppins" }}
-                              value="Regular"
-                            >
-                              {" "}
-                              Regular
-                            </MenuItem>
-                          </Select>
-                        </FormControl>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Box>
-                        <TextField
-                          fullWidth
-                          size="small"
-                          label="Date Hired "
-                          id="datehired"
-                          type="date"
-                          name="dateHired"
-                          value={selectedUser.dateHired}
-                          onChange={handleUserDataChange}
-                          InputLabelProps={{
-                            shrink: true,
-                            style: { fontFamily: "Poppins", fontSize: ".8em" },
-                          }}
-                          inputProps={{
-                            style: { fontSize: ".8em", fontFamily: "Poppins" },
-                            pattern:
-                              "(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/[0-9]{2}",
-                          }}
-                        />
-                      </Box>
-                    </Grid>
-                    <Grid item xs={6} sx={{ width: "100%" }}>
-                      <Box>
-                        <FormControl
-                          size="small"
-                          fullWidth
-                          disabled={
-                            selectedUser?.empStatus === "Regular" ||
-                            selectedUser?.role === "HEAD"
-                          }
-                        >
-                          <InputLabel
-                            id="probationaryStatus"
-                            sx={{ fontSize: ".8em", fontFamily: "Poppins" }}
-                          >
-                            Probationary Status
-                          </InputLabel>
-                          <Select
-                            labelId="probationaryStatusLabel"
-                            id="probeStat"
-                            name="probeStatus"
-                            value={selectedUser.probeStatus}
-                            label="probationary status"
+                            InputLabelProps={{
+                              style: { fontFamily: "Poppins", fontSize: ".8em" },
+                            }}
+                            inputProps={{
+                              style: { fontSize: ".8em", fontFamily: "Poppins" },
+                            }}
+                          />
+                        </Box>
+                      </Grid>
+                      <Grid item xs={4}>
+                        <Box style={{ fontFamily: "Poppins" }}>
+                          <TextField
+                            fullWidth
+                            size="small"
+                            label="Last Name"
+                            id="lName"
+                            value={selectedUser.lName}
+                            name="lName"
                             onChange={handleUserDataChange}
-                            sx={{ fontFamily: "Poppins", fontSize: ".8em" }}
+                            InputLabelProps={{
+                              style: { fontFamily: "Poppins", fontSize: ".8em" },
+                            }}
+                            inputProps={{
+                              style: { fontSize: ".8em", fontFamily: "Poppins" },
+                            }}
+                          />
+                        </Box>
+                      </Grid>
+                      <Grid item xs={6} sx={{ width: "100%" }}>
+                        <Box sx={{ height: "100%" }}>
+                          <Tooltip
+                            title="ID Numbers should be numbers only"
+                            placement="left"
+                            arrow
+                            slotProps={{
+                              popper: {
+                                modifiers: [
+                                  {
+                                    name: "offset",
+                                    options: {
+                                      offset: [0, -14],
+                                    },
+                                  },
+                                ],
+                              },
+                            }}
                           >
-                            <MenuItem
-                              style={{ fontFamily: "Poppins" }}
-                              value={"3rd Probationary"}
+                            <TextField
+                              fullWidth
+                              size="small"
+                              label="ID Number"
+                              id="workId"
+                              name="workID"
+                              value={selectedUser.workID}
+                              onChange={handleUserDataChange}
+                              InputLabelProps={{
+                                style: {
+                                  fontFamily: "Poppins",
+                                  fontSize: ".8em",
+                                },
+                              }}
+                              inputProps={{
+                                style: {
+                                  fontSize: ".8em",
+                                  fontFamily: "Poppins",
+                                },
+                              }}
+                            />
+                          </Tooltip>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Box>
+                          <FormControl fullWidth size="small" disabled>
+                            <InputLabel
+                              id="GenderLabel"
+                              value={gender}
+                              sx={{ fontSize: ".8em", fontFamily: "Poppins" }}
                             >
-                              3rd Probationary
-                            </MenuItem>
-                            <MenuItem
-                              style={{ fontFamily: "Poppins" }}
-                              value={"5th Probationary"}
+                              Gender
+                            </InputLabel>
+                            <Select
+                              labelId="GenderLabel"
+                              id="GenderLabel"
+                              value={selectedUser.gender}
+                              label="gender"
+                              name="gender"
+                              sx={{ fontFamily: "Poppins", fontSize: ".8em" }}
                             >
-                              5th Probationary
-                            </MenuItem>
-                          </Select>
-                        </FormControl>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={6} sx={{ width: "100%" }}>
-                      <Box>
-                        <TextField
-                          fullWidth
-                          disabled={
-                            selectedUser?.empStatus === "Regular" ||
-                            selectedUser?.role === "HEAD"
-                          }
-                          size="small"
-                          label="Date Started "
-                          id="dateStarted"
-                          type="date"
-                          name="dateStarted"
-                          value={selectedUser.dateStarted}
-                          onChange={handleUserDataChange}
-                          InputLabelProps={{
-                            shrink: true,
-                            style: { fontFamily: "Poppins", fontSize: ".8em" },
-                          }}
-                          inputProps={{
-                            style: { fontSize: ".8em", fontFamily: "Poppins" },
-                            pattern:
-                              "(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/[0-9]{2}",
-                          }}
-                        />
-                      </Box>
-                    </Grid>
-                    <Grid item xs={4.8}>
-                      <Box>
-                        <TextField
-                          fullWidth
-                          size="small"
-                          label="Position"
-                          id="position"
-                          name="position"
-                          value={selectedUser.position}
-                          onChange={handleUserDataChange}
-                          InputLabelProps={{
-                            style: { fontFamily: "Poppins", fontSize: ".8em" },
-                          }}
-                          inputProps={{
-                            style: { fontSize: ".8em", fontFamily: "Poppins" },
-                          }}
-                        />
-                      </Box>
-                    </Grid>
-                    <Grid item xs={7.2}>
-                      <Box>
-                        <FormControl fullWidth size="small">
-                          <InputLabel
-                            id="deptLabel"
-                            sx={{ fontSize: ".8em", fontFamily: "Poppins" }}
+                              <MenuItem value={"Female"}>Female</MenuItem>
+                              <MenuItem value={"Male"}>Male</MenuItem>
+                              <MenuItem value={"Other"}>Other</MenuItem>
+                            </Select>
+                          </FormControl>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={6} sx={{ width: "100%" }}>
+                        <Box>
+                          <FormControl
+                            size="small"
+                            fullWidth
+                            disabled={selectedUser?.role === "HEAD"}
                           >
-                            Department
-                          </InputLabel>
-                          <Select
-                            labelId="deptLabel"
-                            name="dept"
-                            id="dept"
-                            value={selectedUser.dept}
-                            label="dept"
+                            <InputLabel
+                              id="employementStatusLabel"
+                              sx={{ fontSize: ".8em", fontFamily: "Poppins" }}
+                            >
+                              Employment Status
+                            </InputLabel>
+                            <Select
+                              labelId="employementStatusLabel"
+                              id="employementStatus"
+                              name="empStatus"
+                              value={selectedUser.empStatus}
+                              label="employment status"
+                              onChange={handleUserDataChange}
+                              sx={{ fontFamily: "Poppins", fontSize: ".8em" }}
+                            >
+                              <MenuItem
+                                style={{ fontFamily: "Poppins" }}
+                                value="Probationary"
+                              >
+                                Probationary
+                              </MenuItem>
+                              <MenuItem
+                                style={{ fontFamily: "Poppins" }}
+                                value="Regular"
+                              >
+                                {" "}
+                                Regular
+                              </MenuItem>
+                            </Select>
+                          </FormControl>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Box>
+                          <TextField
+                            fullWidth
+                            size="small"
+                            label="Date Hired "
+                            id="datehired"
+                            type="date"
+                            name="dateHired"
+                            value={selectedUser.dateHired}
                             onChange={handleUserDataChange}
-                            sx={{ fontFamily: "Poppins", fontSize: ".8em" }}
+                            InputLabelProps={{
+                              shrink: true,
+                              style: { fontFamily: "Poppins", fontSize: ".8em" },
+                            }}
+                            inputProps={{
+                              style: { fontSize: ".8em", fontFamily: "Poppins" },
+                              pattern:
+                                "(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/[0-9]{2}",
+                            }}
+                          />
+                        </Box>
+                      </Grid>
+                      <Grid item xs={6} sx={{ width: "100%" }}>
+                        <Box>
+                          <FormControl
+                            size="small"
+                            fullWidth
+                            disabled={
+                              selectedUser?.empStatus === "Regular" ||
+                              selectedUser?.role === "HEAD"
+                            }
                           >
-                            {departments.map((dept, index) => {
-                              return (
-                                <MenuItem
-                                  key={index}
-                                  style={{
-                                    fontFamily: "Poppins",
-                                    fontSize: ".8em",
-                                  }}
-                                  value={dept.deptName}
-                                  sx={{
-                                    fontFamily: "Poppins",
-                                    whiteSpace: "nowrap",
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis",
-                                    maxWidth: "300px",
-                                  }}
-                                >
-                                  {dept.deptName}
-                                </MenuItem>
-                              );
-                            })}
-                          </Select>
-                        </FormControl>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={6.5}>
-                      <Box>
-                        <TextField
-                          disabled
-                          fullWidth
-                          size="small"
-                          label="Institutional Email"
-                          id="email"
-                          name="workEmail"
-                          value={selectedUser.workEmail}
-                          onChange={handleUserDataChange}
-                          InputLabelProps={{
-                            style: { fontFamily: "Poppins", fontSize: ".8em" },
-                          }}
-                          inputProps={{
-                            style: { fontSize: ".8em", fontFamily: "Poppins" },
-                          }}
-                        />
-                        {!emailIsAvailable && (
-                          <FormHelperText style={{ color: "red" }}>
-                            {emailMsgInfo}
-                          </FormHelperText>
-                        )}
-                      </Box>
-                    </Grid>
-                    <Grid item xs={5.5}>
-                      <Box>
-                        <TextField
-                          disabled
-                          fullWidth
-                          size="small"
-                          label="Username"
-                          id="username"
-                          name="username"
-                          value={selectedUser.username}
-                          onChange={handleUserDataChange}
-                          InputLabelProps={{
-                            style: { fontFamily: "Poppins", fontSize: ".8em" },
-                          }}
-                          inputProps={{
-                            style: { fontSize: ".8em", fontFamily: "Poppins" },
-                          }}
-                        />
-                      </Box>
-                    </Grid>
-                  </>
-                )}
+                            <InputLabel
+                              id="probationaryStatus"
+                              sx={{ fontSize: ".8em", fontFamily: "Poppins" }}
+                            >
+                              Probationary Status
+                            </InputLabel>
+                            <Select
+                              labelId="probationaryStatusLabel"
+                              id="probeStat"
+                              name="probeStatus"
+                              value={selectedUser.probeStatus}
+                              label="probationary status"
+                              onChange={handleUserDataChange}
+                              sx={{ fontFamily: "Poppins", fontSize: ".8em" }}
+                            >
+                              <MenuItem
+                                style={{ fontFamily: "Poppins" }}
+                                value={"3rd Probationary"}
+                              >
+                                3rd Probationary
+                              </MenuItem>
+                              <MenuItem
+                                style={{ fontFamily: "Poppins" }}
+                                value={"5th Probationary"}
+                              >
+                                5th Probationary
+                              </MenuItem>
+                            </Select>
+                          </FormControl>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={6} sx={{ width: "100%" }}>
+                        <Box>
+                          <TextField
+                            fullWidth
+                            disabled={
+                              selectedUser?.empStatus === "Regular" ||
+                              selectedUser?.role === "HEAD"
+                            }
+                            size="small"
+                            label="Date Started "
+                            id="dateStarted"
+                            type="date"
+                            name="dateStarted"
+                            value={selectedUser.dateStarted}
+                            onChange={handleUserDataChange}
+                            InputLabelProps={{
+                              shrink: true,
+                              style: { fontFamily: "Poppins", fontSize: ".8em" },
+                            }}
+                            inputProps={{
+                              style: { fontSize: ".8em", fontFamily: "Poppins" },
+                              pattern:
+                                "(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/[0-9]{2}",
+                            }}
+                          />
+                        </Box>
+                      </Grid>
+                      <Grid item xs={4.8}>
+                        <Box>
+                          <TextField
+                            fullWidth
+                            size="small"
+                            label="Position"
+                            id="position"
+                            name="position"
+                            value={selectedUser.position}
+                            onChange={handleUserDataChange}
+                            InputLabelProps={{
+                              style: { fontFamily: "Poppins", fontSize: ".8em" },
+                            }}
+                            inputProps={{
+                              style: { fontSize: ".8em", fontFamily: "Poppins" },
+                            }}
+                          />
+                        </Box>
+                      </Grid>
+                      <Grid item xs={7.2}>
+                        <Box>
+                          <FormControl fullWidth size="small">
+                            <InputLabel
+                              id="deptLabel"
+                              sx={{ fontSize: ".8em", fontFamily: "Poppins" }}
+                            >
+                              Department
+                            </InputLabel>
+                            <Select
+                              labelId="deptLabel"
+                              name="dept"
+                              id="dept"
+                              value={selectedUser.dept}
+                              label="dept"
+                              onChange={handleUserDataChange}
+                              sx={{ fontFamily: "Poppins", fontSize: ".8em" }}
+                            >
+                              {departments.map((dept, index) => {
+                                return (
+                                  <MenuItem
+                                    key={index}
+                                    style={{
+                                      fontFamily: "Poppins",
+                                      fontSize: ".8em",
+                                    }}
+                                    value={dept.deptName}
+                                    sx={{
+                                      fontFamily: "Poppins",
+                                      whiteSpace: "nowrap",
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                      maxWidth: "300px",
+                                    }}
+                                  >
+                                    {dept.deptName}
+                                  </MenuItem>
+                                );
+                              })}
+                            </Select>
+                          </FormControl>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={6.5}>
+                        <Box>
+                          <TextField
+                            disabled
+                            fullWidth
+                            size="small"
+                            label="Institutional Email"
+                            id="email"
+                            name="workEmail"
+                            value={selectedUser.workEmail}
+                            onChange={handleUserDataChange}
+                            InputLabelProps={{
+                              style: { fontFamily: "Poppins", fontSize: ".8em" },
+                            }}
+                            inputProps={{
+                              style: { fontSize: ".8em", fontFamily: "Poppins" },
+                            }}
+                          />
+                          {!emailIsAvailable && (
+                            <FormHelperText style={{ color: "red" }}>
+                              {emailMsgInfo}
+                            </FormHelperText>
+                          )}
+                        </Box>
+                      </Grid>
+                      <Grid item xs={5.5}>
+                        <Box>
+                          <TextField
+                            disabled
+                            fullWidth
+                            size="small"
+                            label="Username"
+                            id="username"
+                            name="username"
+                            value={selectedUser.username}
+                            onChange={handleUserDataChange}
+                            InputLabelProps={{
+                              style: { fontFamily: "Poppins", fontSize: ".8em" },
+                            }}
+                            inputProps={{
+                              style: { fontSize: ".8em", fontFamily: "Poppins" },
+                            }}
+                          />
+                        </Box>
+                      </Grid>
+                    </>
+                  )}
               </Grid>
             </DialogContent>
             <DialogActions sx={{ display: "flex", justifyContent: "center" }}>

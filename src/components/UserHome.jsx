@@ -164,7 +164,7 @@ function UserHome() {
 
             <Box
               sx={{
-                margin: "4% auto",
+                margin: "5% auto",
                 width: "90%",
                 maxHeight: "300px",
                 overflow: "hidden",

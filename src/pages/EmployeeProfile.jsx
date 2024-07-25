@@ -56,7 +56,6 @@ function EmployeeProfile({ user, handleBack }) {
 		useState("3rd Month");
 	const [evaluationsData, setEvaluationsData] = useState([]);
 
-
 	useEffect(() => {
 		axios
 			.get("http://localhost:8080/evaluation/getAllEvaluation")
@@ -69,14 +68,13 @@ function EmployeeProfile({ user, handleBack }) {
 						evalItem.peer?.userID === user.userID
 				);
 
-				console.log("Filtered Evaluations:", filteredEvaluations); 
+				console.log("Filtered Evaluations:", filteredEvaluations);
 				setEvaluationsData(filteredEvaluations);
 			})
 			.catch((error) => {
 				console.error("There was an error fetching the evaluations!", error);
 			});
-	}, [user.userID]); 
-	
+	}, [user.userID]);
 
 	useEffect(() => {
 		const fetchEvaluations = async () => {
@@ -216,7 +214,10 @@ function EmployeeProfile({ user, handleBack }) {
 
 		// Determine if all stages for the selected year are completed for VALUES and JOB
 		const allValuesStagesCompleted =
-			hasCompletedValuesSelf && hasCompletedValuesPeer && hasCompletedJobSelf;
+			hasCompletedValuesSelf &&
+			hasCompletedValuesPeer &&
+			hasCompletedJobSelf &&
+			hasCompletedHeadValues;
 
 		return (
 			<TableContainer style={tableStyle}>

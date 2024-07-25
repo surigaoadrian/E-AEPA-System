@@ -28,8 +28,9 @@ public class AuthenticationService {
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
     }
+   
 
-    // registration
+    // registration (angela)
     public AuthenticationResponse register(int adminId,UserEntity request) {
 
         // Check if the username already exists, regardless of deletion status
@@ -67,7 +68,7 @@ public class AuthenticationService {
 
             String admin = userRepo.findById(adminId).get().getfName() + " " + userRepo.findById(adminId).get().getlName();
             userService.logActivity(adminId,admin,"Created User Account", "Added New User  : " + existingUser.getfName() + " " + existingUser.getlName());
-            return new AuthenticationResponse(token);
+            return new AuthenticationResponse(token,existingUser.getUserID());
         } else {
             // Username does not exist, create a new record
             UserEntity newUser = new UserEntity();
@@ -100,7 +101,7 @@ public class AuthenticationService {
 
             String admin = userRepo.findById(adminId).get().getfName() + " " + userRepo.findById(adminId).get().getlName();
             userService.logActivity(adminId,admin,"Created User Account", "Added New User : " + newUser.getfName() + " " + newUser.getlName());
-            return new AuthenticationResponse(token);
+            return new AuthenticationResponse(token,newUser.getUserID());
         }
     }
 
@@ -114,6 +115,24 @@ public class AuthenticationService {
         UserEntity user = userRepo.findByUsernameAndIsDeleted(request.getUsername(), 0).orElseThrow();
         String token = jwtService.generateToken(user);
 
-        return new AuthenticationResponse(token);
+        return new AuthenticationResponse(token,user.getUserID());
+    }
+
+    public AuthenticationResponse swapAccount(String username, String password) {
+        UserEntity user = userRepo.findByUsernameAndIsDeleted(username, 0)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        username,
+                        password));
+
+        String token = jwtService.generateToken(user);
+        return new AuthenticationResponse(token,user.getUserID());
+    }
+
+    public boolean adminAccountExist(String username){
+        String adminUsername = "adm_"+username;
+        return userRepo.existsByUsernameAndIsDeleted(adminUsername,0);
     }
 }

@@ -19,7 +19,6 @@ import NotAuthorized from "./pages/NotAuthorized";
 import PrivateRoute from "./components/PrivateRoute";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import EvaluateEmployee from "./pages/EvaluateEmployee";
-import ActivityLogs from "./pages/ActivityLogs";
 import AdminShowcase from "./pages/AdminShowcase";
 import ActivityLog from "./pages/ActivityLogs";
 
@@ -90,7 +89,6 @@ const router = createBrowserRouter([
         path: "/activityLogs",
         element: (
           <PrivateRoute requiredRoles={["ADMIN", "SUPERUSER"]}>
-            {/* <ManageEmployee /> */}
             <ActivityLog />
           </PrivateRoute>
         ),
@@ -119,30 +117,31 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-      {
-        path: "/dashboard",
-        element: (
-          <PrivateRoute requiredRoles={["ADMIN"]}>
-            <AdminShowcase />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: "/",
-        element: (
-          <PrivateRoute requiredRoles={["ADMIN"]}>
-            <Navigate to="/adminShowcase" replace />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: "/ActivityLog",
-        element: (
-          <PrivateRoute requiredRoles={["ADMIN"]}>
-            <ActivityLog />
-          </PrivateRoute>
-        ),
-      },
+      // {
+      //   path: "/dashboard",
+      //   element: (
+      //     <PrivateRoute requiredRoles={["ADMIN"]}>
+      //       <AdminShowcase />
+      //     </PrivateRoute>
+      //   ),
+      // },
+      // {
+      //   path: "/",
+      //   element: (
+      //     <PrivateRoute requiredRoles={["ADMIN"]}>
+      //       <Navigate to="/adminShowcase" replace />
+      //     </PrivateRoute>
+      //   ),
+      // },
+      // {
+      //   path: "/ActivityLog",
+      //   element: (
+      //     <PrivateRoute requiredRoles={["ADMIN"]}>
+      //       <ActivityLog />
+      //     </PrivateRoute>
+      //   ),
+      // },
+
 
 
     ],

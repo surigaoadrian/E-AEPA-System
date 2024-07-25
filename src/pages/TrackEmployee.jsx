@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
 import Animated from "../components/motion";
 import ViewResults from "../modals/ViewResults";
+import ViewRatingsPage from "./ViewRatingsPage"; 
 import Fade from '@mui/material/Fade';
 
 function TrackEmployee() {
@@ -63,21 +64,23 @@ function TrackEmployee() {
 
   const handleViewResultClick = async (userId) => {
     try {
-      const response = await fetch(
-        `http://localhost:8080/user/getUser/${userId}`
-      );
+      const response = await fetch(`http://localhost:8080/user/getUser/${userId}`);
       if (!response.ok) {
         throw new Error("Failed to fetch user data");
       }
       const userData = await response.json();
       setViewRatingsModal(true);
-      setEmployee(userData);
-      console.log("Selected employee:", userData);
+      setEmployee(userData); // Make sure to pass the entire employee object
+      console.log("Selected employee for view:", userData);
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
   };
   
+
+
+
+
   const columnsEmployees = [
     {
       id: "workID",

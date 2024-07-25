@@ -26,6 +26,7 @@ function SideBar() {
     backgroundColor: "#FFFFFF",
     paddingTop: "10px",
     borderTop: "3px solid #F8C702",
+    overflowY: "auto", 
   };
 
   return (
