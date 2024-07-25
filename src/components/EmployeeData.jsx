@@ -14,6 +14,11 @@ import {
 	Button,
 	InputAdornment,
 	TextField,
+	Box,
+	FormControl,
+	InputLabel,
+	Select,
+	MenuItem,
 	backdropClasses,
 } from "@mui/material";
 import Paper from "@mui/material/Paper";
@@ -29,6 +34,7 @@ function EmployeeData() {
 	const [users, setUsers] = useState([]);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedUser, setSelectedUser] = useState(null);
+	const [statusFilter, setStatusFilter] = useState("");
 
 	useEffect(() => {
 		const fetchUsers = async () => {
@@ -73,26 +79,23 @@ function EmployeeData() {
 		setSearchQuery(e.target.value);
 	};
 
-	const filteredUsers = users.filter((user) => {
-		const fullName = `${user.fName} ${user.lName}`.toLowerCase();
-		return (
-			user.workID.toString().includes(searchQuery) ||
-			fullName.includes(searchQuery.toLowerCase())
-		);
-	});
-
-	const approvedCellStyle = {
-		display: "flex",
-		justifyContent: "center",
-		textAlign: "center",
-		fontFamily: "Poppins",
-		fontSize: "12px",
-		padding: "2px",
-		color: "green",
+	const handleStatusFilterChange = (e) => {
+		setStatusFilter(e.target.value);
 	};
 
+	const filteredUsers = users.filter((user) => {
+		const fullName = `${user.fName} ${user.lName}`.toLowerCase();
+		const searchUser =
+			user.workID.toString().includes(searchQuery) ||
+			fullName.includes(searchQuery.toLowerCase());
+		const userStatus = statusFilter
+			? user.empStatus === statusFilter
+			: true;
+		return searchUser && userStatus;
+	});
+
 	const tabStyle = {
-		marginLeft: "25px",
+		//marginLeft: "25px",
 		textTransform: "none",
 		color: "#9D9D9D",
 		fontFamily: "Poppins",
@@ -169,7 +172,7 @@ function EmployeeData() {
 							value={tab}
 							onChange={changeTab}
 							aria-label="Tabs"
-							sx={tabStyle}
+							sx={{ ml: 5.5, width: "93%", ...tabStyle }}
 						>
 							<Tab
 								label={`All Employees (${filteredUsers.length})`}
@@ -189,7 +192,7 @@ function EmployeeData() {
 								>
 									<TableContainer
 										component={Paper}
-										sx={{ maxHeight: 550, overflowY: "auto", ...tableStyle }}
+										sx={{ maxHeight: 550, ...tableStyle }}
 									>
 										<Table>
 											<TableHead>
@@ -233,6 +236,51 @@ function EmployeeData() {
 																),
 															}}
 														/>
+													</TableCell>
+													<TableCell sx={{ borderBottom: "0 solid #8C383E" }}>
+														<FormControl
+															variant="outlined"
+															size="small"
+															sx={{
+																marginLeft: 2,
+																minWidth: 120,
+																"& .MuiInputLabel-root": {
+																	fontFamily: "Poppins",
+																	colot:"#e0e0e0",
+																	fontSize: "12px",
+																	margin: "2px 0 0 0",
+																},
+																"& .MuiSelect-root": {
+																	fontFamily: "Poppins",
+																	fontSize: "13px",
+																},
+																"& .MuiOutlinedInput-notchedOutline": {
+																	borderColor: "#e0e0e0",
+																},
+																"&:hover .MuiOutlinedInput-notchedOutline": {
+																	borderColor: "#8C383E",
+																},
+															}}
+														>
+															<InputLabel>Filter Status</InputLabel>
+															<Select
+																value={statusFilter}
+																onChange={handleStatusFilterChange}
+																label="Status"
+																sx={{
+																	"& .MuiSelect-select": {
+																		fontFamily: "Poppins",
+																		fontSize: "13px",
+																	},
+																}}
+															>
+																<MenuItem value="">All Employee</MenuItem>
+																<MenuItem value="Probationary">
+																	Probationary
+																</MenuItem>
+																<MenuItem value="Regular">Regular</MenuItem>
+															</Select>
+														</FormControl>
 													</TableCell>
 												</TableRow>
 												<TableRow>
