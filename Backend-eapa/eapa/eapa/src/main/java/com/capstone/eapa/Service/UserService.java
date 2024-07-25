@@ -349,6 +349,7 @@ public class UserService implements UserDetailsService {
 //
 //        return userRepo.findByDeptIn(departmentNames);
 //    }
+
     //added is_probationary
     public long getTotalProbationaryUsers() {
         return userRepo.countByIsProbationaryTrue();
@@ -360,11 +361,16 @@ public class UserService implements UserDetailsService {
      //count regular Employees
     public long getRegularEmployee(){return userRepo.countRegularEmployees();}
 
-public boolean verifyPassword(int userID, String rawPassword) {
-    UserEntity user = userRepo.findByUserID(userID).orElse(null);
-    if (user == null) {
-        return false;
+    public boolean verifyPassword(int userID, String rawPassword) {
+        UserEntity user = userRepo.findByUserID(userID).orElse(null);
+        if (user == null) {
+            return false;
+        }
+        return passwordEncoder.matches(rawPassword, user.getPassword());
     }
-    return passwordEncoder.matches(rawPassword, user.getPassword());
-}
+
+    public Integer getHeadUserIdByDept(String dept) {
+        return userRepo.findHeadUserIdByDept(dept);
+    }
+
 }

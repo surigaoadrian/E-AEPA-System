@@ -1,10 +1,20 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
+import axios from "axios";
 
-function PeerEvaluationCard() {
+function PeerEvaluationCard({
+  id,
+  setEvalType,
+  handleOpenModal,
+  openModal,
+  handleCloseModal,
+  handleConfirm,
+  evalDeets,
+  setSelectedAssignedPeerId,
+}) {
   const modalStyle = {
     position: "absolute",
     top: "50%",
@@ -31,6 +41,39 @@ function PeerEvaluationCard() {
     zIndex: 3,
     position: "relative",
   };
+
+  //format date
+  const formatDate = (dateString) => {
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", options);
+  };
+
+  const [evaluatee, setEvaluatee] = useState({});
+
+  //fetch evaluatee details
+  useEffect(() => {
+    const fetchEvaluatee = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8080/user/getUser/${evalDeets.evaluateeId}`
+        );
+        setEvaluatee(response.data);
+      } catch (error) {
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else {
+          console.log(`Error: ${error.message}`);
+        }
+      }
+    };
+
+    fetchEvaluatee();
+  }, []);
+
+  //fetch tbl assigned peers data
 
   return (
     <div style={cardContainer}>
@@ -72,9 +115,12 @@ function PeerEvaluationCard() {
         {/**Evaluation description */}
         <div style={{ width: "82%" }}>
           <p>
-            As of February 11, 2024, John Doe has completed his 3-month
-            probationary period. During this e-AEPA, he will be evaluated by
-            you, his Peer Evaluator.
+            As of {formatDate(evalDeets.dateAssigned)},{" "}
+            <b style={{ fontWeight: "600", color: "#EE5253" }}>
+              {evaluatee.fName}
+            </b>{" "}
+            has completed his 3-month probationary period. During this e-AEPA,
+            he will be evaluated by you, his Peer Evaluator.
           </p>
         </div>
         {/**Evaluation footer */}
@@ -123,6 +169,11 @@ function PeerEvaluationCard() {
             }}
             variant="contained"
             //onClick={handleTakeEvalChange}
+            onClick={() => {
+              setEvalType("PEER-A");
+              setSelectedAssignedPeerId(evalDeets.evaluateeId);
+              handleOpenModal("VALUES", "3rd Month");
+            }}
           >
             Take Evaluation
           </Button>
@@ -131,14 +182,14 @@ function PeerEvaluationCard() {
 
       {/**Confirmation Modal */}
       <Modal
-        //open={openModal}
-        //onClose={handleCloseModal}
+        open={openModal}
+        onClose={handleCloseModal}
         aria-labelledby="modal-title"
         aria-describedby="modal-description"
       >
         <Box sx={modalStyle}>
           <Typography id="modal-title" sx={{ fontSize: "16px" }} component="h2">
-            Are you sure you want to start the assessment now?
+            Are you sure you want to start the Peer Evaluation now?
           </Typography>
           <div
             style={{
@@ -160,7 +211,7 @@ function PeerEvaluationCard() {
                 fontFamily: "poppins",
               }}
               variant="contained"
-              //onClick={handleConfirm}
+              onClick={handleConfirm}
             >
               YES
             </Button>
@@ -177,7 +228,7 @@ function PeerEvaluationCard() {
                   border: "none",
                 },
               }}
-              //onClick={handleCloseModal}
+              onClick={handleCloseModal}
             >
               NO
             </Button>

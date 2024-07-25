@@ -195,24 +195,7 @@ function NavBar() {
       <div className="nav-logo" style={{ flex: "1", marginLeft: "20px" }}>
         <img style={{ width: "130px" }} src={logo} alt="e-aepa-logo" />
       </div>
-      <div className="nav-notif" style={{ marginRight: "20px" }}>
-        <button
-          style={{
-            height: "30px",
-            width: "30px",
-            borderRadius: "100%",
-            padding: "5px",
-            border: "none",
-            backgroundColor: "#8C383E",
-            cursor: "pointer",
-          }}
-        >
-          <FontAwesomeIcon
-            icon={faBell}
-            style={{ fontSize: "15px", color: "#FFFFFF" }}
-          />
-        </button>
-      </div>
+
       <div
         className="nav-profile"
         style={{

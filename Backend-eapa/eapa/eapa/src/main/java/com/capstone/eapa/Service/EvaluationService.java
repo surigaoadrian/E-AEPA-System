@@ -1,12 +1,15 @@
 package com.capstone.eapa.Service;
 
+import com.capstone.eapa.DTO.AveragesDTO;
 import com.capstone.eapa.DTO.EvaluationDTO;
 import com.capstone.eapa.DTO.DepartmentEvaluationCountDTO;
 import com.capstone.eapa.DTO.EvaluationStatusDTO;
 import com.capstone.eapa.Entity.EvaluationEntity;
+import com.capstone.eapa.Entity.ResponseEntity;
 import com.capstone.eapa.Entity.Role;
 import com.capstone.eapa.Entity.UserEntity;
 import com.capstone.eapa.Repository.EvaluationRepository;
+import com.capstone.eapa.Repository.ResponseRepository;
 import com.capstone.eapa.Repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,9 @@ public class EvaluationService {
 
     @Autowired
     UserRepository userRepo;
+
+    @Autowired
+    ResponseRepository resRepo;
 
     //create evaluation
     public EvaluationEntity createEvaluation(EvaluationEntity evaluation){
@@ -82,6 +88,12 @@ public class EvaluationService {
             if (updatedEvaluation.getStatus() != null) {
                 existingEval.setStatus(updatedEvaluation.getStatus());
             }
+            if (updatedEvaluation.getSchoolYear() != null) {
+                existingEval.setSchoolYear(updatedEvaluation.getSchoolYear());
+            }
+            if (updatedEvaluation.getSemester() != null) {
+                existingEval.setSemester(updatedEvaluation.getSemester());
+            }
             if (updatedEvaluation.getDateTaken() != null) {
                 existingEval.setDateTaken(updatedEvaluation.getDateTaken());
             }
@@ -105,9 +117,19 @@ public class EvaluationService {
         return evalRepo.findEvalIDByUserIDAndPeriodAndStageAndEvalType(userID, period, stage, evalType);
     }
 
+    //Get evaluation ID for assigned peer
+    public Integer getEvalIDByUserIDPeriodStageEvalTypePeerID(int userID, String period, String stage, String evalType, int peerID) {
+        return evalRepo.findEvalIDByUserIDAndPeriodAndStageAndEvalTypeAndPeerID(userID, period, stage, evalType, peerID);
+    }
+
     //Get evaluation ID for HEAD
     public Integer getEvalIDByUserIdPeriodStageHead(int userID, int empID, String period, String stage, String evalType) {
         return evalRepo.findEvalIDByUserIdPeriodStageHead(userID, empID, period, stage, evalType);
+    }
+
+    // Get evaluation entity HEAD
+    public EvaluationEntity getEvaluationByUserIdPeriodStageHead(int userID, int empID, String period, String stage, String evalType) {
+        return evalRepo.findEvalByUserIdPeriodStageHead(userID, empID, period, stage, evalType);
     }
 
     //returns true if evaluation is done
@@ -171,6 +193,7 @@ public class EvaluationService {
             })
             .collect(Collectors.toList());
     }
+
 
 //total employee for recommendation
     public long countRecommendedEmployees() {
@@ -259,6 +282,60 @@ public class EvaluationService {
         return results.stream()
                 .map(result -> new DepartmentEvaluationCountDTO((String) result[0], (Long) result[1]))
                 .collect(Collectors.toList());
+    }
+
+
+
+    public AveragesDTO getPeerEvaluationAverages(int peerID, int userID, String period, String evalType) {
+        List<EvaluationEntity> evaluations = evalRepo.findByUserIDAndPeerIDAndPeriodAndEvalType(userID, peerID, period, evalType);
+
+        if (evaluations.isEmpty()) {
+            throw new RuntimeException("No evaluations found matching the criteria");
+        }
+
+        // Collect all responses for the found evaluations
+        List<ResponseEntity> responses = evaluations.stream()
+                .flatMap(evaluation -> resRepo.findByEvaluation_EvalID(evaluation.getEvalID()).stream())
+                .collect(Collectors.toList());
+
+        // Calculate averages by category
+        AveragesDTO averages = new AveragesDTO();
+
+        double totalCOE = 0, totalINT = 0, totalTEA = 0, totalUNI = 0;
+        int countCOE = 0, countINT = 0, countTEA = 0, countUNI = 0;
+
+        for (ResponseEntity response : responses) {
+            String category = response.getQuestion().getCategory();
+            if (category == null) continue; // Skip if category is null
+
+            double score = response.getScore();
+
+            switch (category) {
+                case "CULTURE OF EXCELLENCE":
+                    totalCOE += score;
+                    countCOE++;
+                    break;
+                case "INTEGRITY":
+                    totalINT += score;
+                    countINT++;
+                    break;
+                case "TEAMWORK":
+                    totalTEA += score;
+                    countTEA++;
+                    break;
+                case "UNIVERSALITY":
+                    totalUNI += score;
+                    countUNI++;
+                    break;
+            }
+        }
+
+        averages.setCOE(countCOE > 0 ? totalCOE / countCOE : 0);
+        averages.setINT(countINT > 0 ? totalINT / countINT : 0);
+        averages.setTEA(countTEA > 0 ? totalTEA / countTEA : 0);
+        averages.setUNI(countUNI > 0 ? totalUNI / countUNI : 0);
+
+        return averages;
     }
 
 

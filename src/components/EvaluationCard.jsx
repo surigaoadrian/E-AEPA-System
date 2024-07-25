@@ -9,7 +9,6 @@ import EvaluationTypeTab from "./EvaluationTypeTab";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import zIndex from "@mui/material/styles/zIndex";
 
 function EvaluationCard({
   id,
@@ -295,6 +294,14 @@ function EvaluationCard({
           setShouldDisplay={setShouldDisplay}
         />
       )}
+
+      {/* <EvaluationTypeTab
+        period={period}
+        evalType={evalType}
+        handleOpenForm={handleOpenForm}
+        handleOpenModal={handleOpenModal}
+        setShouldDisplay={setShouldDisplay}
+      /> */}
 
       {/**Confirmation Modal */}
       <Modal

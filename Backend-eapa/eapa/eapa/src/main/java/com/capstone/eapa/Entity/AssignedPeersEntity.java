@@ -12,29 +12,26 @@ public class AssignedPeersEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "evaluatee_id", nullable = false)
     private UserEntity evaluatee;
 
-    @ManyToMany
-    @JoinTable(
-            name = "assigned_peers_evaluators",
-            joinColumns = @JoinColumn(name = "assigned_peers_id"),
-            inverseJoinColumns = @JoinColumn(name = "evaluator_id")
-    )
-    private List<UserEntity> peers;
+    @OneToMany(mappedBy = "assignedPeers", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<AssignedPeerEvaluators> evaluators;
+
     private String period; //3rd Month, 5th Month, Annual
-    private LocalDate dateAssigned; //YYYY-MM-DD
+    private String dateAssigned; //YYYY-MM-DD
 
     public AssignedPeersEntity() {
         super();
     }
 
-    public AssignedPeersEntity(UserEntity evaluatee, List<UserEntity> peers, String period, LocalDate dateAssigned) {
+    public AssignedPeersEntity(UserEntity evaluatee, String period, String dateAssigned, List<AssignedPeerEvaluators> evaluators) {
         this.evaluatee = evaluatee;
-        this.peers = peers;
         this.period = period;
         this.dateAssigned = dateAssigned;
+        this.evaluators = evaluators;
     }
 
     public int getId() {
@@ -49,12 +46,12 @@ public class AssignedPeersEntity {
         this.evaluatee = evaluatee;
     }
 
-    public List<UserEntity> getPeers() {
-        return peers;
+    public List<AssignedPeerEvaluators> getEvaluators() {
+        return evaluators;
     }
 
-    public void setPeers(List<UserEntity> peers) {
-        this.peers = peers;
+    public void setEvaluators(List<AssignedPeerEvaluators> evaluators) {
+        this.evaluators = evaluators;
     }
 
     public String getPeriod() {
@@ -65,11 +62,11 @@ public class AssignedPeersEntity {
         this.period = period;
     }
 
-    public LocalDate getDateAssigned() {
+    public String getDateAssigned() {
         return dateAssigned;
     }
 
-    public void setDateAssigned(LocalDate dateAssigned) {
+    public void setDateAssigned(String dateAssigned) {
         this.dateAssigned = dateAssigned;
     }
 }

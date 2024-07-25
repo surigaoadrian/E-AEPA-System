@@ -157,7 +157,7 @@ public class UserController {
         long count = userServ.getRegularEmployee();
         return ResponseEntity.ok(count);
     }
-}
+
     //get the employees' data with the corresponding department head - Track Employee
     //  @GetMapping("/employees-with-head")
     // public ResponseEntity<List<UserEntity>> getAllEmployeesFromDepartmentHead(@RequestParam String headName) {
@@ -166,4 +166,13 @@ public class UserController {
     // }
 
 
+
+
+
+    @GetMapping("/getHeadUserIdByDept")
+    public ResponseEntity<Integer> getHeadUserIdByDept(@RequestParam String dept) {
+        Integer userId = userServ.getHeadUserIdByDept(dept);
+        return ResponseEntity.ok(userId);
+    }
+}
 

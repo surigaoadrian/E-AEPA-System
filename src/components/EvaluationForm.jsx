@@ -19,12 +19,15 @@ function EvaluationForm({
   setOpenForm,
   setEvalType,
   selectedEmp,
+  selectedAssignedPeerId,
+  randomPeerId,
 }) {
   const [questions, setQuestions] = useState([]);
   const [responses, setResponses] = useState([]);
   const [jobResponses, setJobResponses] = useState([]);
   const [scores, setScores] = useState({});
   const [peer, setPeer] = useState({});
+  const [assignedPeer, setAssignedPeer] = useState({});
   const [evaluationID, setEvaluationID] = useState(0);
 
   const [selectedEmpJobResp, setSelectedEmpJobResp] = useState([]);
@@ -114,12 +117,112 @@ function EvaluationForm({
     setShowConfirmModal(false);
   };
 
+  //empty the peer when evaluation is open
+  useEffect(() => {
+    if (setOpenForm) {
+      setPeer({});
+    }
+  }, [setOpenForm]);
+
+  //fetch id from random
+
+  //fetch id from assigned peer table
+  const [assignPeerID, setAssignPeerID] = useState(null);
+  const [assignEvaluatorID, setAssignEvaluatorID] = useState(null);
+
+  useEffect(() => {
+    if (evalType === "PEER-A") {
+      const fetchAssignPeerID = async () => {
+        try {
+          const response = await axios.get(
+            "http://localhost:8080/assignedPeers/getAssignedPeersId",
+            {
+              params: {
+                period: evalPeriod,
+                evaluateeId: selectedAssignedPeerId,
+              },
+            }
+          );
+
+          setAssignPeerID(response.data);
+        } catch (error) {
+          if (error.response) {
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          } else {
+            console.log(`Error: ${error.message}`);
+          }
+        }
+      };
+
+      fetchAssignPeerID();
+    }
+  }, [evalType, evalPeriod, selectedAssignedPeerId]);
+
+  //fetch id from assigned evaluators table
+  useEffect(() => {
+    if (evalType === "PEER-A" && assignPeerID) {
+      const fetchAssignEvalutaorsID = async () => {
+        try {
+          const response = await axios.get(
+            "http://localhost:8080/assignedPeers/getAssignedEvaluatorId",
+            {
+              params: {
+                evaluatorId: userId,
+                assignedPeersId: assignPeerID,
+              },
+            }
+          );
+
+          setAssignEvaluatorID(response.data);
+        } catch (error) {
+          if (error.response) {
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          } else {
+            console.log(`Error: ${error.message}`);
+          }
+        }
+      };
+
+      fetchAssignEvalutaorsID();
+    }
+  }, [evalType, assignPeerID, userId]);
+
   //fetch eval id
   useEffect(() => {
     const fetchEvalID = async () => {
       let response = null;
       try {
-        if (evalType === "SELF" || evalType === "PEER") {
+        if (evalType === "PEER") {
+          response = await axios.get(
+            "http://localhost:8080/evaluation/getEvalIDAssignedPeer",
+            {
+              params: {
+                userID: userId,
+                period: evalPeriod,
+                stage: stageType,
+                evalType: formType,
+                peerID: randomPeerId,
+              },
+            }
+          );
+        } else if (evalType === "PEER-A") {
+          response = await axios.get(
+            "http://localhost:8080/evaluation/getEvalIDAssignedPeer",
+            {
+              params: {
+                userID: userId,
+                period: evalPeriod,
+                stage: stageType,
+                evalType: formType,
+                peerID: selectedAssignedPeerId,
+              },
+            }
+          );
+        } else if (evalType === "SELF") {
           response = await axios.get(
             "http://localhost:8080/evaluation/getEvalID",
             {
@@ -207,34 +310,54 @@ function EvaluationForm({
     localStorage.setItem("jobResponses", JSON.stringify(jobResponses));
   }, [responses, jobResponses]);
 
+  //fetched assigned peer details
+  useEffect(() => {
+    if (evalType === "PEER-A") {
+      const fetchAssignedPeer = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:8080/user/getUser/${selectedAssignedPeerId}`
+          );
+          setAssignedPeer(response.data);
+        } catch (error) {
+          if (error.response) {
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          } else {
+            console.log(`Error: ${error.message}`);
+          }
+        }
+      };
+
+      fetchAssignedPeer();
+    }
+  }, [selectedAssignedPeerId, evalType === "PEER-A"]);
+
   //fetch peer details if peer is selected
   useEffect(() => {
-    const fetchRandomPeer = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:8080/user/randomPeer",
-          {
-            params: {
-              dept: loggedUser.dept,
-              excludedUserID: loggedUser.userID,
-            },
+    if (evalType === "PEER") {
+      const fetchRandomPeer = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:8080/user/getUser/${randomPeerId}`
+          );
+
+          setPeer(response.data);
+        } catch (error) {
+          if (error.response) {
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          } else {
+            console.log(`Error: ${error.message}`);
           }
-        );
-
-        setPeer(response.data);
-      } catch (error) {
-        if (error.response) {
-          console.log(error.response.data);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-        } else {
-          console.log(`Error: ${error.message}`);
         }
-      }
-    };
+      };
 
-    fetchRandomPeer();
-  }, [evalType === "PEER"]);
+      fetchRandomPeer();
+    }
+  }, [evalType]);
 
   //fetch all questions
   useEffect(() => {
@@ -408,21 +531,56 @@ function EvaluationForm({
 
     const peerEvalPayload = {
       status: "COMPLETED",
-      peer: {
-        userID: peer.userID,
-      },
+    };
+
+    const peerAEvalPayload = {
+      status: "COMPLETED",
+    };
+
+    const assignPeerEvalPayload = {
+      status: "COMPLETED",
     };
 
     try {
       let response = null;
       let updateEval = null;
+      let updateEvaluatorStatus = null;
       let createResults = null;
 
       console.log("Stage:", stage);
       console.log("EvalType:", evalType);
       console.log("EvaluationID:", evaluationID);
 
-      if (stage === "VALUES" && evalType === "PEER") {
+      if (stage === "VALUES" && evalType === "PEER-A") {
+        response = await axios.post(
+          "http://localhost:8080/response/createResponses",
+          responses
+        );
+
+        updateEval = await axios.patch(
+          `http://localhost:8080/evaluation/updateEvaluation/${evaluationID}`,
+          peerAEvalPayload,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (assignEvaluatorID) {
+          updateEvaluatorStatus = await axios.patch(
+            `http://localhost:8080/assignedPeers/updateEvaluatorStatus/${assignEvaluatorID}`,
+            assignPeerEvalPayload,
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+        } else {
+          console.error("assignEvaluatorID is null");
+        }
+      } else if (stage === "VALUES" && evalType === "PEER") {
         response = await axios.post(
           "http://localhost:8080/response/createResponses",
           responses
@@ -641,7 +799,7 @@ function EvaluationForm({
         <h2 style={{ fontSize: "18px", fontWeight: 600 }}>
           {period} Evaluation:{" "}
           {stageType === "VALUES"
-            ? evalType === "PEER"
+            ? evalType === "PEER" || evalType === "PEER-A"
               ? "Values-Based Performance Assessment (Peer)"
               : evalType === "HEAD"
               ? "Values-Based Performance Assessment (Employee)"
@@ -665,7 +823,7 @@ function EvaluationForm({
                 }}
               >
                 <p>
-                  {evalType === "PEER"
+                  {evalType === "PEER" || evalType === "PEER-A"
                     ? "Peer"
                     : evalType === "HEAD"
                     ? "Employee"
@@ -689,7 +847,9 @@ function EvaluationForm({
                 >
                   <p style={{ width: "20%" }}>Employee:</p>
                   <p>
-                    {evalType === "PEER"
+                    {evalType === "PEER-A"
+                      ? `${assignedPeer.fName} ${assignedPeer.lName}`
+                      : evalType === "PEER"
                       ? `${peer.fName} ${peer.lName}`
                       : evalType === "HEAD"
                       ? `${selectedEmp.fName} ${selectedEmp.lName}`
@@ -705,7 +865,9 @@ function EvaluationForm({
                 >
                   <p style={{ width: "20%" }}>Employee ID:</p>
                   <p>
-                    {evalType === "PEER"
+                    {evalType === "PEER-A"
+                      ? `${assignedPeer.workID}`
+                      : evalType === "PEER"
                       ? `${peer.workID}`
                       : evalType === "HEAD"
                       ? `${selectedEmp.workID}`
@@ -1005,7 +1167,7 @@ function EvaluationForm({
                             Ratings:
                           </div>
 
-                          <FormControl sx={{ marginLeft: "25px", width: "6%" }}>
+                          <FormControl sx={{ width: "75px" }}>
                             <Select
                               labelId="demo-simple-select-label"
                               id="demo-simple-select"

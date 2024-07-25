@@ -12,9 +12,20 @@ import transparencyImg from "../assets/transparency.png";
 import evaluate from "../assets/evaluate.png";
 import select from "../assets/select.png";
 import done from "../assets/done.png";
+import Button from "@mui/material/Button";
+import SchoolYearModal from "../modals/SchoolYearModal";
 
 function UserHome() {
   const [loggedUserData, setLoggedUserData] = useState(null);
+  const [openModal, setOpenModal] = useState(false);
+
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -481,7 +492,26 @@ function UserHome() {
             </Grid>
           </Grid>
         </Box>
+        <Button
+          sx={{
+            width: "130px",
+            height: "35px",
+            backgroundColor: "#8C383E",
+            "&:hover": {
+              backgroundColor: "#7C2828",
+            },
+            fontFamily: "poppins",
+          }}
+          variant="contained"
+          onClick={handleOpenModal}
+        >
+          Manage S.Y.
+        </Button>
       </Box>
+      <SchoolYearModal
+        openModal={openModal}
+        handleCloseModal={handleCloseModal}
+      />
     </Animated>
   );
 }

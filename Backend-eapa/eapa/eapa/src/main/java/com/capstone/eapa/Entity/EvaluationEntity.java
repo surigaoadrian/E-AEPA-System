@@ -24,6 +24,9 @@ public class EvaluationEntity {
     private String period; //3rd Month, 5th Month, Annual
     private String status; //OPEN, COMPLETED
     private LocalDate dateTaken; //YYYY-MM-DD
+
+    private String schoolYear; //2024-2025
+    private String semester;
     private int isDeleted = 0;
 
     @OneToMany(mappedBy = "evaluation", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -59,7 +62,8 @@ public class EvaluationEntity {
         super();
     }
 
-    public EvaluationEntity(UserEntity user, UserEntity peer, String evalType, String stage, String period, String status, LocalDate dateTaken, int isDeleted) {
+
+    public EvaluationEntity(UserEntity user, UserEntity peer, String evalType, String stage, String period, String status, LocalDate dateTaken, String schoolYear, String semester, int isDeleted, List<ResponseEntity> responses) {
         this.user = user;
         this.peer = peer;
         this.evalType = evalType;
@@ -67,7 +71,10 @@ public class EvaluationEntity {
         this.period = period;
         this.status = status;
         this.dateTaken = dateTaken;
+        this.schoolYear = schoolYear;
+        this.semester = semester;
         this.isDeleted = isDeleted;
+        this.responses = responses;
     }
 
     public int getEvalID() {
@@ -139,4 +146,19 @@ public class EvaluationEntity {
         this.isDeleted = isDeleted;
     }
 
+    public String getSchoolYear() {
+        return schoolYear;
+    }
+
+    public void setSchoolYear(String schoolYear) {
+        this.schoolYear = schoolYear;
+    }
+
+    public String getSemester() {
+        return semester;
+    }
+
+    public void setSemester(String semester) {
+        this.semester = semester;
+    }
 }

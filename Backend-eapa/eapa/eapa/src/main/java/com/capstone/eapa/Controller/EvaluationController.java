@@ -1,5 +1,6 @@
 package com.capstone.eapa.Controller;
 
+import com.capstone.eapa.DTO.AveragesDTO;
 import com.capstone.eapa.DTO.EvaluationDTO;
 import com.capstone.eapa.DTO.DepartmentEvaluationCountDTO;
 import com.capstone.eapa.DTO.EvaluationStatusDTO;
@@ -42,6 +43,12 @@ public class EvaluationController {
         return evalServ.getEvalIDByUserIDAndPeriodAndStageAndEvalType(userID, period, stage, evalType);
     }
 
+    //Get evaluation ID for assigned peer
+    @GetMapping("/getEvalIDAssignedPeer")
+    public Integer getEvalIDAssignedPeer(int userID, String period, String stage, String evalType, int peerID){
+        return evalServ.getEvalIDByUserIDPeriodStageEvalTypePeerID(userID, period, stage, evalType, peerID);
+    }
+
     //Get evaluation ID for HEAD
     @GetMapping("/getEvalIDHead")
     public Integer getEvalIDByUserIdPeriodStageHead(int userID, int empID, String period, String stage, String evalType) {
@@ -69,6 +76,7 @@ public class EvaluationController {
         return evalServ.isEvaluationCompletedHead(userID, empID, period, stage, evalType);
     }
 
+
       //total employees for recommendation
     @GetMapping("/countRecommendedEmployees")
     public long countRecommendedEmployees() {
@@ -84,6 +92,21 @@ public ResponseEntity<Map<String, Long>> getThirdMonthStatus() {
     statusMap.put("notCompleted", statusDTO.getNotCompleted());
     return ResponseEntity.ok(statusMap);
 }
+    // New endpoint to get evaluation entity
+    @GetMapping("/getEvaluationHead")
+    public ResponseEntity<EvaluationEntity> getEvaluationByUserIdPeriodStageHead(@RequestParam int userID, @RequestParam int empID, @RequestParam String period, @RequestParam String stage, @RequestParam String evalType) {
+        EvaluationEntity evaluation = evalServ.getEvaluationByUserIdPeriodStageHead(userID, empID, period, stage, evalType);
+        return ResponseEntity.ok(evaluation);
+    }
+
+    @GetMapping("/getPeerEvaluationAverages")
+    public ResponseEntity<AveragesDTO> getPeerEvaluationAverages(@RequestParam int peerID, @RequestParam int userID, @RequestParam String period, @RequestParam String evalType) {
+        AveragesDTO averages = evalServ.getPeerEvaluationAverages(peerID, userID, period, evalType);
+        return ResponseEntity.ok(averages);
+    }
+
+
+
 
     // Endpoint for 5th Month evaluation status
     @GetMapping("/fifthMonthStatus")

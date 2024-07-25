@@ -7,6 +7,7 @@ import com.capstone.eapa.Entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -28,6 +29,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 
     //Track Employee 
 //    List<UserEntity> findByDeptIn(List<String> deptNames);
+
     @Query("SELECT COUNT(u) FROM UserEntity u WHERE u.empStatus = 'Probationary' OR u.isProbationary = true")
     long countByIsProbationaryTrue();
 
@@ -38,4 +40,9 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
     //count Regular Employees
     @Query("SELECT COUNT(u) FROM UserEntity u WHERE u.empStatus = 'Regular'")
     long countRegularEmployees();
+
+
+    @Query("SELECT u.userID FROM UserEntity u WHERE u.role = 'HEAD' AND u.dept = :dept AND u.isDeleted = 0")
+    Integer findHeadUserIdByDept(@Param("dept") String dept);
+
 }
