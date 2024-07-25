@@ -28,4 +28,14 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 
     //Track Employee 
 //    List<UserEntity> findByDeptIn(List<String> deptNames);
+    @Query("SELECT COUNT(u) FROM UserEntity u WHERE u.empStatus = 'Probationary' OR u.isProbationary = true")
+    long countByIsProbationaryTrue();
+
+    //get all employees  | This can be removed only used for visualization.
+    @Query("SELECT COUNT(u) FROM UserEntity u WHERE u.isDeleted = 0")
+    long countTotalEmployees();
+
+    //count Regular Employees
+    @Query("SELECT COUNT(u) FROM UserEntity u WHERE u.empStatus = 'Regular'")
+    long countRegularEmployees();
 }
