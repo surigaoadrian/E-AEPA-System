@@ -1,6 +1,8 @@
 package com.capstone.eapa.Service;
 
 import com.capstone.eapa.DTO.EvaluationDTO;
+import com.capstone.eapa.DTO.DepartmentEvaluationCountDTO;
+import com.capstone.eapa.DTO.EvaluationStatusDTO;
 import com.capstone.eapa.Entity.EvaluationEntity;
 import com.capstone.eapa.Entity.Role;
 import com.capstone.eapa.Entity.UserEntity;
@@ -174,32 +176,90 @@ public class EvaluationService {
     public long countRecommendedEmployees() {
         return evalRepo.countByPeriodAndStatus();
     }
-//returns data for 3rd Month Evaluation status BarGraph
-public Map<String, Long> getThirdMonthEvaluationStatus() {
-    long completed = evalRepo.countCompletedForThirdMonth();
-    long open = evalRepo.countOpenForThirdMonth();
-    long notCompleted = open > completed ? open - completed : 0;
 
-    Map<String, Long> statusMap = new HashMap<>();
-    statusMap.put("completed", completed);
-    statusMap.put("notCompleted", notCompleted);
 
-    return statusMap;
-}
 
-    //returns data for 5th Month Evaluation status BarGraph
-    public Map<String, Long> getFifthMonthEvaluationStatus() {
-        long completed = evalRepo.countCompletedForFifthMonth();
-        long open = evalRepo.countOpenForFifthMonth();
-        long notCompleted = open > completed ? open - completed : 0;
+    // Method to get 3rd Month evaluation status
+    public EvaluationStatusDTO getThirdMonthEvaluationStatus() {
+        List<Long> completedThirdMonthUsers = evalRepo.getCompleted3rdMonthEvaluation();
+        List<Long> completedFifthMonthUsers = evalRepo.getCompleted5thMonthEvaluation();
 
-        Map<String, Long> statusMap = new HashMap<>();
-        statusMap.put("completed", completed);
-        statusMap.put("notCompleted", notCompleted);
+        // Filter out users who have completed the 5th month from the 3rd month completed list
+        long adjustedCompleted = completedThirdMonthUsers.stream()
+                .filter(userId -> !completedFifthMonthUsers.contains(userId))
+                .count();
 
-        return statusMap;
+        long open = evalRepo.countOpenForThirdMonth();
+
+        return new EvaluationStatusDTO(adjustedCompleted, open);
     }
 
+
+    // Method to get 5th Month evaluation status
+    public EvaluationStatusDTO getFifthMonthEvaluationStatus() {
+        List<Long> completedFifthMonthUsers = evalRepo.getCompleted5thMonthEvaluation();
+        List<Long> completedAnnualUsers = evalRepo.getCompletedAnnualEvaluation();
+
+        // Filter out users who have completed both 5th Month and Annual evaluations
+        long adjustedCompleted = completedFifthMonthUsers.stream()
+                .filter(userId -> !completedAnnualUsers.contains(userId))
+                .count();
+
+        // Count of users who have not completed the 5th Month evaluation
+        long open = evalRepo.countOpenForFifthMonth();
+
+        return new EvaluationStatusDTO(adjustedCompleted, open);
+    }
+
+
+    public EvaluationStatusDTO getAnnualEvaluationStatus() {
+        List<Long> completedAnnualUsers = evalRepo.getCompletedAnnualEvaluation();
+        List<Long> completedFifthMonthUsers = evalRepo.getCompleted5thMonthEvaluation();
+
+        // Count users who have completed the Annual evaluation
+        long adjustedCompleted = completedAnnualUsers.size();
+
+        // Add users from the 5th Month evaluation who have also completed the Annual evaluation
+        long additionalCompleted = completedFifthMonthUsers.stream()
+                .filter(completedAnnualUsers::contains)
+                .count();
+
+        adjustedCompleted += additionalCompleted;
+
+        // Count of users who have not yet completed
+        long open = evalRepo.countOpenForAnnual();
+
+        return new EvaluationStatusDTO(adjustedCompleted, open);
+
+    }
+
+
+    public Long getTotalUniqueUserIds() {
+        return evalRepo.countUniqueUserIds();
+    }
+
+    //Evaluation Count per Department : 3rd Month
+    public List<DepartmentEvaluationCountDTO> getCompletedEvaluationsForThirdMonth() {
+        List<Object[]> results = evalRepo.countCompletedForThirdMonthPerDept();
+        return results.stream()
+                .map(result -> new DepartmentEvaluationCountDTO((String) result[0], (Long) result[1]))
+                .collect(Collectors.toList());
+    }
+
+    //Evaluation Count per Department : Annual
+    public List<DepartmentEvaluationCountDTO> getCompletedEvaluationsForAnnual() {
+        List<Object[]> results = evalRepo.countCompletedForAnnualPerDept();
+        return results.stream()
+                .map(result -> new DepartmentEvaluationCountDTO((String) result[0], (Long) result[1]))
+                .collect(Collectors.toList());
+    }
+    //Evaluation Count per Department : 5th Month
+    public List<DepartmentEvaluationCountDTO> getCompletedEvaluationsForFifthMonth() {
+        List<Object[]> results = evalRepo.countCompletedForFifthMonthPerDept();
+        return results.stream()
+                .map(result -> new DepartmentEvaluationCountDTO((String) result[0], (Long) result[1]))
+                .collect(Collectors.toList());
+    }
 
 
 
