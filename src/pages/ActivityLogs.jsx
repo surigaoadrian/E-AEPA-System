@@ -186,8 +186,7 @@ function ActivityLogs() {
           }}
         >
           <Grid container spacing={1.5} sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
-            <Card variant="outlined" sx={{ borderRadius: "5px 5px 0 0", width: "100%", height:"27.5em", backgroundColor: "transparent", mt: ".2%" }}>
-              <TableContainer sx={{ borderRadius: "5px 5px 0 0 ", maxHeight: "100%" }}>
+              <TableContainer  sx={{ borderRadius: "5px 5px 0 0 ", maxHeight: "100%",position:'relative', border:'1px solid lightgray'}}>
                 <Table stickyHeader aria-label="sticky table" size="small">
                   <TableHead sx={{ height: "3em" }}>
                     <TableRow>
@@ -215,6 +214,7 @@ function ActivityLogs() {
                         >
                           {columnsHeader.map((column) => (
                             <TableCell
+                            component="th" scope="row"
                               sx={{
                                 fontFamily: "Poppins",
                                  fontWeight: 500,
@@ -258,17 +258,16 @@ function ActivityLogs() {
                   )}
                 </Table>
               </TableContainer>
-            </Card>
           </Grid>
         </Box>
         { /* Pagination */}
         <div
           className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-9"
           style={{
-            position: "relative", // Change to relative to keep it in place
-            // bottom: 200,
-            // left: '21.3%',
-            // transform: "translateX(-50%)",
+            position: "absolute", // Change to relative to keep it in place
+            bottom: 100,
+            left: '24%',
+            transform: "translateX(-50%)",
             display: "flex",
             alignItems: "center",
             ml: '4em'

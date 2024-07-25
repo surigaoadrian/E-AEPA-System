@@ -4,7 +4,6 @@ import { createBrowserRouter, RouterProvider, Navigate  } from "react-router-dom
 import "./index.css";
 import HomeShowcase from "./pages/HomeShowcase";
 import ViewProfilePage from "./pages/ViewProfilePage";
-import ViewProfilePageHead from "./pages/ViewProfilePageHead";
 import TakeEvaluationPage from "./pages/TakeEvaluationPage";
 import ViewRatingsPage from "./pages/ViewRatingsPage";
 import ManageAccount from "./pages/ManageAccount";
