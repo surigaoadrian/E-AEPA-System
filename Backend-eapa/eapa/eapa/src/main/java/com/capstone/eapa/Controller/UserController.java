@@ -139,22 +139,6 @@ public class UserController {
         }
     }
 
-    
-    //random assigned peers
-    @GetMapping("/getAssignedEvaluators")
-    public ResponseEntity<List<Integer>> getAssignedEvaluators(@RequestParam String dept, @RequestParam int excludedUserID) {
-        try {
-            List<Integer> assignedEvaluators = userServ.getAssignedEvaluators(dept, excludedUserID);
-            if (assignedEvaluators.isEmpty()) {
-                return ResponseEntity.noContent().build();
-            } else {
-                return ResponseEntity.ok(assignedEvaluators);
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(500).build();
-        }
-    }
-
         //total probationary employees
     @GetMapping("/countProbationaryUsers")
     public ResponseEntity<Long> countProbationaryUsers() {
