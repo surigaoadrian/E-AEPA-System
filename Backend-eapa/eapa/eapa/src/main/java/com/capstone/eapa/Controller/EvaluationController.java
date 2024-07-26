@@ -5,7 +5,6 @@ import com.capstone.eapa.DTO.EvaluationDTO;
 import com.capstone.eapa.DTO.DepartmentEvaluationCountDTO;
 import com.capstone.eapa.DTO.EvaluationStatusDTO;
 import com.capstone.eapa.Entity.EvaluationEntity;
-import com.capstone.eapa.Entity.UserEntity;
 import com.capstone.eapa.Service.EvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

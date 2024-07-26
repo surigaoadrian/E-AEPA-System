@@ -216,6 +216,7 @@ public interface EvaluationRepository extends JpaRepository<EvaluationEntity, In
     @Query(value = "SELECT * FROM tblevaluation WHERE TRIM(user_id) = :userID AND TRIM(peer_id) = :empID AND TRIM(period) = :period AND TRIM(stage) = :stage AND TRIM(eval_type) = :evalType AND TRIM(is_deleted) = 0", nativeQuery = true)
     EvaluationEntity findEvalByUserIdPeriodStageHead(@Param("userID") int userID, @Param("empID") int empID, @Param("period") String period, @Param("stage") String stage, @Param("evalType") String evalType);
 
-    List<EvaluationEntity> findByUserIDAndPeerIDAndPeriodAndEvalType(@Param("userID") int userID, @Param("peerID") int peerID, @Param("period") String period, @Param("evalType") String evalType);
+    @Query("SELECT e FROM EvaluationEntity e WHERE e.user.userID = :userID AND e.peer.userID = :peerID AND e.period = :period AND e.evalType = :evalType AND e.isDeleted = 0")
+    List<EvaluationEntity> findByUserIDAndPeerIDAndPeriodAndEvalType(int userID, int peerID, String period, String evalType);
 
 }
