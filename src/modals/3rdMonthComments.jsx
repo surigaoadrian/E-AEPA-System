@@ -10,9 +10,9 @@ const selfQuestionLabels = {
   24: "[ACTION/S] What could you, your Immediate Head, or CIT management do to best support you in accomplishing these goals?"
 };
 
-const ThirdMonthComments = ({ userId, filter }) => {
-  const role = sessionStorage.getItem("userRole");
-  console.log("Si role:", role);
+const ThirdComments = ({ userId, filter, role }) => {
+//   const role = sessionStorage.getItem("userRole");
+   console.log("Si role:", role);
   const [selfComments, setSelfComments] = useState([]);
   const [commentsData, setCommentsData] = useState({
     27: '', // GAP comment
@@ -351,7 +351,7 @@ useEffect(() => {
                 }}
               >
               {label}
-              {role !== "EMPLOYEE" && (
+              {role !== "EMPLOYEE" && role !== "ADMIN" &&   (
                 <IconButton
                 onClick={() => handleEditComment(quesID)}
 
@@ -438,4 +438,4 @@ useEffect(() => {
 };
 
 
-export default ThirdMonthComments;
+export default ThirdComments;

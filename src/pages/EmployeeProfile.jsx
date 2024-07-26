@@ -18,7 +18,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@mui/material";
 import Animated from "../components/motion";
-import View3rd from "../modals/ThirdMonthEval";
+import AdminViewResult from "../modals/AdminViewResults";
 
 const theme = createTheme({
 	palette: {
@@ -55,6 +55,8 @@ function EmployeeProfile({ user, handleBack }) {
 	const [selectedEvaluationPeriod, setSelectedEvaluationPeriod] =
 		useState("3rd Month");
 	const [evaluationsData, setEvaluationsData] = useState([]);
+	const role = sessionStorage.getItem("userRole");
+	console.log(role);
 
 	useEffect(() => {
 		axios
@@ -553,13 +555,12 @@ function EmployeeProfile({ user, handleBack }) {
 										</Typography>
 										{renderEvaluationTable()}
 										{show3rd && (
-											<View3rd
+											<AdminViewResult
 												userId={user.userID}
-												fName={fName}
-												lName={lName}
-												pos={user.position}
 												open={show3rd}
 												onClose={handleCloseModal}
+												employee={user}
+												role={role}
 											/>
 										)}
 									</Box>

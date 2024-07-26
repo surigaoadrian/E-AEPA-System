@@ -80,8 +80,8 @@ public class EvaluationController {
 public ResponseEntity<Map<String, Long>> getThirdMonthStatus() {
     EvaluationStatusDTO statusDTO = evalServ.getThirdMonthEvaluationStatus();
     Map<String, Long> statusMap = new HashMap<>();
-    statusMap.put("completed", statusDTO.getCompleted());
-    statusMap.put("notCompleted", statusDTO.getNotCompleted());
+    statusMap.put("COMPLETED", statusDTO.getCompleted());
+    statusMap.put("OPEN", statusDTO.getNotCompleted());
     return ResponseEntity.ok(statusMap);
 }
 
@@ -100,7 +100,7 @@ public ResponseEntity<Map<String, Long>> getThirdMonthStatus() {
     public ResponseEntity<Map<String, Long>> getAnnualStatus() {
         EvaluationStatusDTO statusDTO = evalServ.getAnnualEvaluationStatus();
         Map<String, Long> statusMap = new HashMap<>();
-        statusMap.put("completed", statusDTO.getCompleted());
+        statusMap.put("COMPLETED", statusDTO.getCompleted());
         return ResponseEntity.ok(statusMap);
     }
 
