@@ -67,12 +67,12 @@ public interface EvaluationRepository extends JpaRepository<EvaluationEntity, In
     @Query("SELECT e.user.dept, COUNT(DISTINCT e.user.id) " +
             "FROM EvaluationEntity e " +
             "WHERE e.period = '3rd Month' " +
-            "AND e.status = 'COMPLETED' " +
+            "AND e.status = 'COMPLETE' " +
             "AND e.user.id IN (" +
             "    SELECT ee.user.id " +
             "    FROM EvaluationEntity ee " +
             "    WHERE ee.period = '3rd Month' " +
-            "    AND ee.status = 'COMPLETED' " +
+            "    AND ee.status = 'COMPLETE' " +
             "    GROUP BY ee.user.id " +
             "    HAVING " +
             "        SUM(CASE WHEN ee.stage = 'VALUES' AND ee.evalType = 'SELF' THEN 1 ELSE 0 END) > 0 " +
