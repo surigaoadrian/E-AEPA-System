@@ -179,8 +179,15 @@ function NavBar() {
     }
   };
 
-
-
+  const abbreviateDept = (dept) => {
+    if (!dept) return ""; 
+    const ignoreWords = ["of", "and"];
+    const words = dept.split(" ").filter((word) => !ignoreWords.includes(word.toLowerCase()));
+    if (words.length <= 2) {
+      return dept;
+    }
+    return words.map((word) => word[0].toUpperCase()).join("");
+  };
 
   const navBarStyle = {
     height: "8vh",
@@ -257,7 +264,7 @@ function NavBar() {
               ? "Admin"
               : loggedUserData.role === "SUPERUSER"
                 ? "Superuser"
-                : `${loggedUserData.dept} - ${loggedUserData.position}`}
+                : `${abbreviateDept(loggedUserData.dept)} - ${loggedUserData.position}`}
           </Typography>
         </div>
       </div>

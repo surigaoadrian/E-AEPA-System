@@ -1115,18 +1115,19 @@ function ManageAccount() {
                     ) : (
                       <TableBody>
                         <TableRow>
-                          <TableCell sx={{ bgcolor: 'white', height: '5em', }} colSpan={columnsEmployees.length || columnsAdmins.length} align="center">
+                          <TableCell sx={{ bgcolor: 'white', }} colSpan={columnsEmployees.length || columnsAdmins.length} align="center">
                             <Typography
                               sx={{
                                 textAlign: "center",
                                 fontFamily: "Poppins",
-                                fontSize: "17px",
+                                fontSize: "15px",
                                 color: "#1e1e1e",
                                 fontWeight: 500,
-                                padding: "25px",
+                                padding: "20px",
                               }}
                             >
-                              No user are currently registered
+                              Oops! We couldn't find any results matching your
+															search.
                             </Typography>
                           </TableCell>
                         </TableRow>

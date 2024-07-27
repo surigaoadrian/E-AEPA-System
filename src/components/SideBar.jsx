@@ -21,7 +21,7 @@ function SideBar() {
   console.log(filteredSideBarData);
 
   const sidebarStyles = {
-    height: "92vh",
+    height: "100vh",
     width: "229px",
     backgroundColor: "#FFFFFF",
     paddingTop: "10px",
