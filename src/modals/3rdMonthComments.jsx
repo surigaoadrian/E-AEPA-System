@@ -173,7 +173,6 @@ useEffect(() => {
                   backgroundColor: "black",
                   color: "white",
                   fontSize: "1rem",
-                  fontWeight: "bold",
                   height: "40px",
                   display: "flex",
                   alignItems: "center",
@@ -217,93 +216,87 @@ useEffect(() => {
       {filter === "peer" && (
         <>
         <Box
-        className="mb-2 "
-        sx={{
-          backgroundColor: "#E81B1B",
-          color: "white",
-          p: 2,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: "1rem",
-          fontWeight: "bold",
-          height: "30px",
-          borderBottom: "3px solid #F8C702",
-        }}
+          className="mb-2 mt-2"
+          sx={{
+            backgroundColor: "#E81B1B",
+            color: "white",
+            p: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "1rem",
+            fontWeight: "bold",
+            height: "30px",
+            borderBottom: "3px solid #F8C702",
+          }}
       >
         SUGGESTIONS / INSIGHTS FOR THE CO-WORKER
       </Box>
           <Typography
-            sx={{
-              backgroundColor: "black",
-              color: "white",
-              fontSize: "1rem",
-              fontWeight: "bold",
-              height: "40px",
-              display: "flex",
-              alignItems: "center",
-              width: "100%",
-            }}
+                sx={{
+                  backgroundColor: "black",
+                  color: "white",
+                  fontSize: "1rem",
+                  height: "40px",
+                  display: "flex",
+                  alignItems: "center",
+                  width: "100%",
+                  paddingLeft: "8px",
+                  fontFamily: "poppins",
+                }}
           >
             {" "}
             &nbsp; What suggestions do you have for your CO-WORKER to maintain or improve team relationships?{" "}
           </Typography>
-          <textarea
-            disabled
-            variant="outlined"
-            fullWidth
-            multiline
-            rows={5}
-            margin="normal"
-            style={{
-              width: '100%',
-              padding: '8px',
-              fontSize: '1rem',
-              color: 'black',
-              backgroundColor: 'white',
-              border: '1px solid black',
-              borderRadius: '4px',
-              boxSizing: 'border-box',
-              marginTop: '8px',
-              marginBottom: '8px',
-              resize: 'none',  
-            }}
+          <TextareaAutosize
+              disabled
+              minRows={5}
+              style={{
+                width: '100%',
+                padding: '8px',
+                fontSize: '1rem',
+                color: 'black',
+                backgroundColor: 'white',
+                border: '1px solid black',
+                borderRadius: '4px',
+                boxSizing: 'border-box',
+                marginTop: '8px',
+                resize: 'none',  
+               
+              }}
           />
                     <Typography
-            sx={{
-              backgroundColor: "black",
-              color: "white",
-              fontSize: "1rem",
-              fontWeight: "bold",
-              height: "55px",
-              display: "flex",
-              alignItems: "center",
-              width: "100%",
-              padding: "10px",
-            }}
+                sx={{
+                  backgroundColor: "black",
+                  color: "white",
+                  fontSize: "1rem",
+                  height: "40px",
+                  display: "flex",
+                  alignItems: "center",
+                  width: "100%",
+                  paddingLeft: "8px",
+                  fontFamily: "poppins",
+                  height: "50px",
+                  marginTop: '8px',
+                }}
           >
             {" "}
-            &nbsp; What else would you like CIT management or your Immediate Head to know about your CO-WORKER? Your CO-WORKER'S job? Other comments/remarks/suggestions?{" "}
+            &nbsp; What else would you like CIT management or your Immediate Head to know about your CO-WORKER? Your CO-WORKER'S job? <br/> Other comments/remarks/suggestions?{" "}
           </Typography>
-          <textarea
-            disabled
-            variant="outlined"
-            fullWidth
-            multiline
-            rows={5}
-            margin="normal"
-            style={{
-              width: '100%',
-              padding: '8px',
-              fontSize: '1rem',
-              color: 'black',
-              backgroundColor: 'white',
-              border: '1px solid black',
-              borderRadius: '4px',
-              boxSizing: 'border-box',
-              marginTop: '8px',
-              marginBottom: '8px',
-              resize: 'none',  
+          <TextareaAutosize
+              disabled
+              minRows={5}
+              style={{
+                width: '100%',
+                padding: '8px',
+                fontSize: '1rem',
+                color: 'black',
+                backgroundColor: 'white',
+                border: '1px solid black',
+                borderRadius: '4px',
+                boxSizing: 'border-box',
+                marginTop: '8px',
+                resize: 'none',  
             }}
           />
         </>
@@ -341,7 +334,6 @@ useEffect(() => {
                   backgroundColor: "black",
                   color: "white",
                   fontSize: "1rem",
-                  fontWeight: "bold",
                   height: "40px",
                   display: "flex",
                   alignItems: "center",
