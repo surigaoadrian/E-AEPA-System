@@ -42,7 +42,7 @@ public class UserEntity implements UserDetails {
     private String dateHired;
     @Column(name = "Date Started")
     private String dateStarted;
-    @JsonIgnore
+    //@JsonIgnore
     @Lob
     @Column(name = "Profile Picture", columnDefinition = "LONGBLOB")
     private byte[] profilePic;
