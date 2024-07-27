@@ -692,6 +692,7 @@ function ManageAccount() {
         dept: selectedUser.dept,
         empStatus: selectedUser.empStatus,
         probeStatus: selectedUser.probeStatus,
+        dateHired: selectedUser.dateHired,
         dateStarted: selectedUser.dateStarted,
       };
       await axios.patch(
