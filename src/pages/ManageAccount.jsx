@@ -694,6 +694,7 @@ function ManageAccount() {
         dept: selectedUser.dept,
         empStatus: selectedUser.empStatus,
         probeStatus: selectedUser.probeStatus,
+        dateHired: selectedUser.dateHired,
         dateStarted: selectedUser.dateStarted,
         dateHired: selectedUser.dateHired,
       };
@@ -1013,7 +1014,7 @@ function ManageAccount() {
               <Grid
                 item
                 xs={12}
-                sx={{ height: "3em", display: "flex", mt: "-1em", mb: '.2em' }}
+                sx={{ height: "2em", display: "flex", mt: "-1em", mb: '.2em' }}
               >
                 <Tabs
                   value={selectedTab}
@@ -1043,7 +1044,7 @@ function ManageAccount() {
 
             <TableContainer
 
-              sx={{ borderRadius: "5px 5px 0 0 ", maxHeight: "100%", position: 'relative', border: '1px solid lightgray' }}
+              sx={{height:'29.55em', borderRadius: "5px 5px 0 0 ", maxHeight: "100%",maxWidth:'100%', position: 'relative', border: '1px solid lightgray' }}
             >
               {loggedUserRole === "SUPERUSER" && loading ? (
                 <div style={{
@@ -1148,14 +1149,14 @@ function ManageAccount() {
         <div
           className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-9"
           style={{
-            position: "absolute", // Change to relative to keep it in place
-            bottom: 30,
-            left: '21.5%',
-            transform: "translateX(-50%",
+            position: "relative", // Change to relative to keep it in place
+            // bottom: 30,
+            // left: '21.5%',
+            // transform: "translateX(-50%",
             display: "flex",
             alignItems: "center",
 
-            ml: '4em'
+            // ml: '4em'
           }}
         >
           <ol className="flex justify-end gap-1 text-xs font-medium">
