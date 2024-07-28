@@ -69,7 +69,7 @@ public class EvaluationController {
         return evalServ.isEvaluationCompletedHead(userID, empID, period, stage, evalType);
     }
 
-      //total employees for recommendation
+       //total employees for recommendation
     @GetMapping("/countRecommendedEmployees")
     public long countRecommendedEmployees() {
         return evalServ.countRecommendedEmployees();
@@ -101,9 +101,36 @@ public ResponseEntity<Map<String, Long>> getThirdMonthStatus() {
         EvaluationStatusDTO statusDTO = evalServ.getAnnualEvaluationStatus();
         Map<String, Long> statusMap = new HashMap<>();
         statusMap.put("completed", statusDTO.getCompleted());
+        statusMap.put("notCompleted", statusDTO.getNotCompleted());
         return ResponseEntity.ok(statusMap);
     }
 
+    // Endpoint for 3rd Month completed evaluations only
+    @GetMapping("/thirdMonthCompleted")
+    public ResponseEntity<Map<String, Long>> getThirdMonthCompleted() {
+        long completed = evalServ.getCompleted3rdMonthEvaluationCount();
+        Map<String, Long> statusMap = new HashMap<>();
+        statusMap.put("completed", completed);
+        return ResponseEntity.ok(statusMap);
+    }
+
+    // Endpoint for 5th Month completed evaluations only
+    @GetMapping("/fifthMonthCompleted")
+    public ResponseEntity<Map<String, Long>> getFifthMonthCompleted() {
+        long completed = evalServ.getCompleted5thMonthEvaluationCount();
+        Map<String, Long> statusMap = new HashMap<>();
+        statusMap.put("completed", completed);
+        return ResponseEntity.ok(statusMap);
+    }
+
+    // Endpoint for Annual completed evaluations only
+    @GetMapping("/annualCompleted")
+    public ResponseEntity<Map<String, Long>> getAnnualCompleted() {
+        long completed = evalServ.getCompletedAnnualEvaluationCount();
+        Map<String, Long> statusMap = new HashMap<>();
+        statusMap.put("completed", completed);
+        return ResponseEntity.ok(statusMap);
+    }
 
     //get the number of evaluators
     @GetMapping("/unique-user-count")
@@ -117,7 +144,6 @@ public ResponseEntity<Map<String, Long>> getThirdMonthStatus() {
         List<DepartmentEvaluationCountDTO> counts = evalServ.getCompletedEvaluationsForThirdMonth();
         return ResponseEntity.ok(counts);
     }
-
     //Annual Completed Evaluation Per Department
     @GetMapping("/annualPerDept")
     public ResponseEntity<List<DepartmentEvaluationCountDTO>> getCompletedEvaluationsForAnnual() {
