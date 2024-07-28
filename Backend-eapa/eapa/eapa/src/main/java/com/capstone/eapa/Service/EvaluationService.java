@@ -172,6 +172,7 @@ public class EvaluationService {
             .collect(Collectors.toList());
     }
 
+
 //total employee for recommendation
     public long countRecommendedEmployees() {
         return evalRepo.countByPeriodAndStatus();
@@ -182,55 +183,37 @@ public class EvaluationService {
     // Method to get 3rd Month evaluation status
     public EvaluationStatusDTO getThirdMonthEvaluationStatus() {
         List<Long> completedThirdMonthUsers = evalRepo.getCompleted3rdMonthEvaluation();
-        List<Long> completedFifthMonthUsers = evalRepo.getCompleted5thMonthEvaluation();
-
-        // Filter out users who have completed the 5th month from the 3rd month completed list
-        long adjustedCompleted = completedThirdMonthUsers.stream()
-                .filter(userId -> !completedFifthMonthUsers.contains(userId))
-                .count();
-
-        long open = evalRepo.countOpenForThirdMonth();
-
-        return new EvaluationStatusDTO(adjustedCompleted, open);
+            long completed = completedThirdMonthUsers.size();
+            long notCompleted = evalRepo.countOpenForThirdMonth();
+        return new EvaluationStatusDTO(completed, notCompleted);
     }
-
 
     // Method to get 5th Month evaluation status
     public EvaluationStatusDTO getFifthMonthEvaluationStatus() {
         List<Long> completedFifthMonthUsers = evalRepo.getCompleted5thMonthEvaluation();
-        List<Long> completedAnnualUsers = evalRepo.getCompletedAnnualEvaluation();
-
-        // Filter out users who have completed both 5th Month and Annual evaluations
-        long adjustedCompleted = completedFifthMonthUsers.stream()
-                .filter(userId -> !completedAnnualUsers.contains(userId))
-                .count();
-
-        // Count of users who have not completed the 5th Month evaluation
-        long open = evalRepo.countOpenForFifthMonth();
-
-        return new EvaluationStatusDTO(adjustedCompleted, open);
+        long completed = completedFifthMonthUsers.size();
+        long notCompleted = evalRepo.countOpenForFifthMonth();
+        return new EvaluationStatusDTO(completed,notCompleted);
     }
-
 
     public EvaluationStatusDTO getAnnualEvaluationStatus() {
         List<Long> completedAnnualUsers = evalRepo.getCompletedAnnualEvaluation();
-        List<Long> completedFifthMonthUsers = evalRepo.getCompleted5thMonthEvaluation();
+        long completed = completedAnnualUsers.size();
+        long notCompleted = evalRepo.countOpenForFifthMonth();
+        return new EvaluationStatusDTO(completed, notCompleted);
+    }
 
-        // Count users who have completed the Annual evaluation
-        long adjustedCompleted = completedAnnualUsers.size();
+    // New methods for only completed counts
+    public long getCompleted3rdMonthEvaluationCount() {
+        return evalRepo.getCompleted3rdMonthEvaluation().size();
+    }
 
-        // Add users from the 5th Month evaluation who have also completed the Annual evaluation
-        long additionalCompleted = completedFifthMonthUsers.stream()
-                .filter(completedAnnualUsers::contains)
-                .count();
+    public long getCompleted5thMonthEvaluationCount() {
+        return evalRepo.getCompleted5thMonthEvaluation().size();
+    }
 
-        adjustedCompleted += additionalCompleted;
-
-        // Count of users who have not yet completed
-        long open = evalRepo.countOpenForAnnual();
-
-        return new EvaluationStatusDTO(adjustedCompleted, open);
-
+    public long getCompletedAnnualEvaluationCount() {
+        return evalRepo.getCompletedAnnualEvaluation().size();
     }
 
 
@@ -260,6 +243,7 @@ public class EvaluationService {
                 .map(result -> new DepartmentEvaluationCountDTO((String) result[0], (Long) result[1]))
                 .collect(Collectors.toList());
     }
+
 
 
 
