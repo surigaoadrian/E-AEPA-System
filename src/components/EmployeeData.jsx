@@ -22,6 +22,7 @@ import {
 	backdropClasses,
 } from "@mui/material";
 import Paper from "@mui/material/Paper";
+import { apiUrl } from '../config/config';
 
 import { faCheckCircle, faSearch } from "@fortawesome/free-solid-svg-icons";
 import EmployeeProfile from "../pages/EmployeeProfile";
@@ -40,7 +41,7 @@ function EmployeeData() {
 		const fetchUsers = async () => {
 			try {
 				const response = await axios.get(
-					"http://localhost:8080/user/getAllUser"
+					`${apiUrl}user/getAllUser`
 				);
 				const sortedUsers = response.data
 					.filter((user) => user.role === "EMPLOYEE")

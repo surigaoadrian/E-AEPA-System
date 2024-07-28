@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Box,Button, IconButton, Typography,TextareaAutosize  } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import axios from "axios";
+import { apiUrl } from '../config/config';
 
 const selfQuestionLabels = {
   21: "For this period that you are evaluating yourself, what is/are 1 or 2 of your accomplish/s or contribution/s that you are most proud of?",
@@ -28,11 +29,11 @@ const ThirdComments = ({ userId, filter, role }) => {
  const fetchCommentsAndResponseIDs = async () => {
   try {
     // Fetch comments
-    const commentsResponse = await axios.get(`http://localhost:8080/response/getHeadComments/${userId}`);
+    const commentsResponse = await axios.get(`${apiUrl}response/getHeadComments/${userId}`);
     const comments = commentsResponse.data;
 
     // Fetch response IDs
-    const responsesResponse = await axios.get('http://localhost:8080/response/getAllResponses');
+    const responsesResponse = await axios.get(`${apiUrl}response/getAllResponses`);;
     const responses = responsesResponse.data;
 
     // Update comments and response IDs state
@@ -81,11 +82,11 @@ useEffect(() => {
     try {
       if (responseID) {
         // Update existing comment
-        await axios.put(`http://localhost:8080/response/updateHeadComment/${responseID}`, dataToSend);
+        await axios.put(`${apiUrl}response/updateHeadComment/${responseID}`, dataToSend);
         console.log('Comment updated');
       } else {
         // Create new comment
-        await axios.post('http://localhost:8080/response/createHeadComment', dataToSend);
+        await axios.post(`${apiUrl}response/createHeadComment`, dataToSend);
         console.log('Comment added');
       }
 
@@ -105,7 +106,7 @@ useEffect(() => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/user/getUser/${userId}`);
+        const response = await axios.get(`${apiUrl}user/getUser/${userId}`);
         setDepartment(response.data.dept);
         setFullname(response.data.fName + " " + response.data.lName);
         setPosition(response.data.position);
@@ -120,7 +121,7 @@ useEffect(() => {
   useEffect(() => {
   const fetchSelfComments = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/response/getAllResponses');
+      const response = await axios.get(`${apiUrl}response/getAllResponses`);
       const allResponses = response.data;
       console.log('All responses:', allResponses);
 

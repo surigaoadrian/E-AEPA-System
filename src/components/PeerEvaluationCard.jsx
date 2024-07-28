@@ -4,7 +4,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import axios from "axios";
-
+import { apiUrl } from '../config/config';
 function PeerEvaluationCard({
   id,
   setEvalType,
@@ -56,7 +56,7 @@ function PeerEvaluationCard({
     const fetchEvaluatee = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/user/getUser/${evalDeets.evaluateeId}`
+          `${apiUrl}user/getUser/${evalDeets.evaluateeId}`
         );
         setEvaluatee(response.data);
       } catch (error) {

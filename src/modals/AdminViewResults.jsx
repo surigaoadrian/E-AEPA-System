@@ -5,7 +5,7 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import Third from "../modals/3rdMonthEval";
 import axios from "axios";
 import GeneratePDF from "../components/GeneratePDF"; // Import the GeneratePDF function
-
+import { apiUrl } from '../config/config';
 
 
 const menuItemStyles = {
@@ -50,7 +50,7 @@ const AdminViewResults = ({ userId, open, onClose, employee, role }) => {
 		const fetchUser = async () => {
 			try {
 				const response = await axios.get(
-					`http://localhost:8080/user/getUser/${userId}`
+					`${apiUrl}user/getUser/${userId}`
 				);
 				setSelectedStaff(response.data);
 			} catch (error) {

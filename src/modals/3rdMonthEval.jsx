@@ -9,7 +9,7 @@ import Chart from "react-apexcharts";
 import ThirdMonthComments from "../modals/3rdMonthComments";
 import CircularProgress from '@mui/material/CircularProgress';
 import axios from "axios";
-
+import { apiUrl } from '../config/config';
 
 const ThirdMonthEval = ({ userId, role, filter}) => {
   const [employee, setEmployee] = useState({});

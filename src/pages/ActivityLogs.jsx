@@ -12,6 +12,7 @@ import { faUser, faUserPen, faUserMinus, faBuildingCircleCheck, faBuildingCircle
 import { format, parseISO } from 'date-fns';
 import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
 import SwapVertRoundedIcon from '@mui/icons-material/SwapVertRounded';
+import { apiUrl } from '../config/config';
 
 function ActivityLogs() {
   const id = sessionStorage.getItem("userID");
@@ -51,9 +52,9 @@ function ActivityLogs() {
     try {
       let response;
       if (role === "SUPERUSER") {
-        response = await fetch(`http://localhost:8080/activityLog/ActivityLog`);
+        response = await fetch(`${apiUrl}activityLog/ActivityLog`);
       } else {
-        response = await fetch(`http://localhost:8080/activityLog/ActivityLogByAdmin/${id}`);
+        response = await fetch(`${apiUrl}activityLog/ActivityLogByAdmin/${id}`);
       }
 
       if (!response.ok) {

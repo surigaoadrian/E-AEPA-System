@@ -17,6 +17,7 @@ import Fade from "@mui/material/Fade";
 import EvaluationForm from "../components/EvaluationForm";
 import CheckIcon from '@mui/icons-material/Check';
 import { set } from "date-fns";
+import { apiUrl } from '../config/config';
 
 function EvaluateEmployee() {
   const userID = sessionStorage.getItem("userID");
@@ -108,7 +109,7 @@ function EvaluateEmployee() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/evaluation/createEvaluation",
+        `${apiUrl}evaluation/createEvaluation`,
         evaluation
       );
 
@@ -185,7 +186,7 @@ function EvaluateEmployee() {
   ) => {
     try {
       const response = await axios.get(
-        "http://localhost:8080/evaluation/isEvaluationCompletedHead",
+        `${apiUrl}evaluation/isEvaluationCompletedHead`,
         {
           params: {
             userID: userID,
@@ -212,7 +213,7 @@ function EvaluateEmployee() {
       try {
         // Fetch specific user data based on userID
         const userResponse = await fetch(
-          `http://localhost:8080/user/getUser/${userID}`
+          `${apiUrl}user/getUser/${userID}`
         );
         if (!userResponse.ok) {
           throw new Error("Failed to fetch user data");
@@ -222,7 +223,7 @@ function EvaluateEmployee() {
 
         // Fetch all users
         const allUsersResponse = await fetch(
-          "http://localhost:8080/user/getAllUser"
+          `${apiUrl}user/getAllUser`
         );
         if (!allUsersResponse.ok) {
           throw new Error("Failed to fetch all users data");

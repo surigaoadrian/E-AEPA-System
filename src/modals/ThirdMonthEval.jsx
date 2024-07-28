@@ -8,6 +8,7 @@ import bottomArrow from "../assets/bottomarrow.png";
 import Chart from "react-apexcharts";
 import ThirdMonthComments from "../modals/ThirdMonthComments";
 import axios from "axios";
+import { apiUrl } from '../config/config';
 
 
 const ThirdMonthEval = ({ userId, filter}) => {
@@ -15,6 +16,7 @@ const ThirdMonthEval = ({ userId, filter}) => {
   const [department, setDepartment] = useState("");
   const [headFullname, setHeadFullname] = useState("");
   const [headPosition, setHeadPosition] = useState("");
+  const [currentDate, setCurrentDate] = useState('');
 
   //self values:
   const [selfCultAve, setSelfCultAve] = useState(0.0);
@@ -70,7 +72,7 @@ const ThirdMonthEval = ({ userId, filter}) => {
     self: {
       overallEAPAAverage: (((overallSelfVBPA * 0.6) + (overallSelfJBPA * 0.4))).toFixed(2),
       overallVBPAAverage: overallSelfVBPA.toFixed(2),
-      overallJBPAverage: overallSelfJBPA.toFixed(2),
+      overallJBPAverage: overallSelfJBPA,
     },
     peer: {
       overallEAPAAverage: null,
@@ -89,7 +91,7 @@ const ThirdMonthEval = ({ userId, filter}) => {
   useEffect(() => {
     const fetchHeadData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/user/getAllUser`);
+        const response = await axios.get(`${apiUrl}user/getAllUser`);
         const users = response.data;
 
         const head = users.find(
@@ -138,11 +140,11 @@ const ThirdMonthEval = ({ userId, filter}) => {
   useEffect(() => {
     const fetchData =  async () => {
       //setLoading(true); 
-      //SELF VALUES
+      // SELF VALUES
       const fetchSelfValuesThirdMonth = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:8080/results/getAverages`,
+            `${apiUrl}results/getAverages`,
             {
               params: {
                 userId: userId,
@@ -154,21 +156,29 @@ const ThirdMonthEval = ({ userId, filter}) => {
           );
 
           const data = response.data;
-          setSelfCultAve(data.cultureOfExcellenceAverage);
-          setSelfIntAve(data.integrityAverage);
-          setSelfTeamAve(data.teamworkAverage);
-          setSelfUnivAve(data.universalityAverage);
+
+          // Rounding each value to two decimal places
+          const roundedCultureOfExcellenceAverage = parseFloat(data.cultureOfExcellenceAverage.toFixed(2));
+          const roundedIntegrityAverage = parseFloat(data.integrityAverage.toFixed(2));
+          const roundedTeamworkAverage = parseFloat(data.teamworkAverage.toFixed(2));
+          const roundedUniversalityAverage = parseFloat(data.universalityAverage.toFixed(2));
+
+          setSelfCultAve(roundedCultureOfExcellenceAverage);
+          setSelfIntAve(roundedIntegrityAverage);
+          setSelfTeamAve(roundedTeamworkAverage);
+          setSelfUnivAve(roundedUniversalityAverage);
 
           const overallSelfVBPA = handleOverallSelfVBPA(
-            data.cultureOfExcellenceAverage,
-            data.integrityAverage,
-            data.teamworkAverage,
-            data.universalityAverage
+            roundedCultureOfExcellenceAverage,
+            roundedIntegrityAverage,
+            roundedTeamworkAverage,
+            roundedUniversalityAverage
           );
 
-          setOverallSelfVBPA(overallSelfVBPA);
+          setOverallSelfVBPA(parseFloat(overallSelfVBPA.toFixed(2))); // Rounding overallSelfVBPA
 
-          console.log("Overall Self Values Based PA:", overallSelfVBPA);
+          console.log("Overall Self Values Based PA:", parseFloat(overallSelfVBPA.toFixed(2)));
+
         } catch (error) {
           if (error.response) {
             console.log(error.response.data);
@@ -180,37 +190,40 @@ const ThirdMonthEval = ({ userId, filter}) => {
         }
       };
 
-      //SELF JOB
-      const fetchSelfJobThirdMonth = async () => {
-        try {
-          const response = await axios.get(
-            `http://localhost:8080/results/getAverages`,
-            {
-              params: {
-                userId: userId,
-                evalType: "SELF",
-                stage: "JOB",
-                period: "3rd Month",
-              },
-            }
-          );
-      
-          const data = response.data;
-      
-          const overallSelfJBPA = handleOverallSelfJBPA(data.jobRespAverage);
-          setOverallSelfJBPA(overallSelfJBPA);
-          console.log("Overall Self Job Based PA:", overallSelfJBPA);
-        } catch (error) {
-          console.error(`Error: ${error.message}`);
-        }
-      };
+
+    // SELF JOB
+    const fetchSelfJobThirdMonth = async () => {
+      try {
+        const response = await axios.get(
+          `${apiUrl}results/getAverages`,
+          {
+            params: {
+              userId: userId,
+              evalType: "SELF",
+              stage: "JOB",
+              period: "3rd Month",
+            },
+          }
+        );
+
+        const data = response.data;
+
+        const overallSelfJBPA = handleOverallSelfJBPA(data.jobRespAverage);
+        const roundedOverallSelfJBPA = parseFloat(overallSelfJBPA.toFixed(2));
+        setOverallSelfJBPA(roundedOverallSelfJBPA);
+        console.log("Overall Self Job Based PA:", roundedOverallSelfJBPA);
+      } catch (error) {
+        console.error(`Error: ${error.message}`);
+      }
+    };
+
       
 //PEER VALUES
 const fetchPeerThirdMonth = async () => {
   try {
     // Fetch assigned peer ID
     const assignedPeerIdResponse = await axios.get(
-      'http://localhost:8080/assignedPeers/getAssignedPeersId',
+      `${apiUrl}assignedPeers/getAssignedPeersId`,
       {
         params: {
           period: "3rd Month",
@@ -222,7 +235,7 @@ const fetchPeerThirdMonth = async () => {
     console.log('Assigned Peers ID:', assignedPeersId);
     // Fetch evaluator IDs
     const evaluatorIdsResponse = await axios.get(
-      'http://localhost:8080/assignedPeers/getEvaluatorIds',
+      `${apiUrl}assignedPeers/getEvaluatorIds`,
       {
         params: {
           assignedPeersId: assignedPeersId,
@@ -232,10 +245,21 @@ const fetchPeerThirdMonth = async () => {
     const evaluatorIds = evaluatorIdsResponse.data;
     console.log('Evaluator IDs:', evaluatorIds);
 
+        // Initialize peer evaluation averages with default values
+        const defaultAverages = {
+          coe: '-',
+          int: '-',
+          tea: '-',
+          uni: '-',
+        };
+        const initialPeerEvaluationAverages = evaluatorIds.map(() => defaultAverages);
+    
+        setPeerEvaluationAverages(initialPeerEvaluationAverages);
+
     // Fetch peer evaluation averages for each evaluator
     const evaluationAveragesPromises = evaluatorIds.map((evaluatorId) =>
       axios.get(
-        'http://localhost:8080/evaluation/getPeerEvaluationAverages',
+        `${apiUrl}evaluation/getPeerEvaluationAverages`,
         {
           params: {
             userID: evaluatorId,
@@ -244,16 +268,23 @@ const fetchPeerThirdMonth = async () => {
             evalType: 'PEER-A',
           },
         }
-      )
+      ).catch(error => {
+        console.error(`Error fetching data for evaluator ${evaluatorId}:`, error);
+        return { data: defaultAverages }; // Return default averages in case of an error
+      })
     );
     
     const evaluationAveragesResponses = await Promise.all(evaluationAveragesPromises);
     const peerEvaluationAverages = evaluationAveragesResponses.map(response => response.data);
 
     // Combine the results into a single state
-    setPeerEvaluationAverages(peerEvaluationAverages);
+    const combinedPeerEvaluationAverages = evaluatorIds.map((_, index) => {
+      return peerEvaluationAverages[index] || defaultAverages;
+    });
 
-    console.log('Peer Evaluation Averages:', peerEvaluationAverages);
+    setPeerEvaluationAverages(combinedPeerEvaluationAverages);
+
+    console.log('Peer Evaluation Averages:', combinedPeerEvaluationAverages);
   } catch (error) {
     console.error('Error fetching peer evaluation data:', error);
   }
@@ -263,55 +294,66 @@ const fetchPeerThirdMonth = async () => {
       const fetchHeadJobThirdMonth = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:8080/results/getJobRespAverageByEmpId`,
+            `${apiUrl}results/getJobRespAverageByEmpId`,
             {
               params: {
                 empId: userId,
               },
             }
           );
-
+      
           const data = response.data;
           const overallHeadJBPA = handleOverallHeadJBPA(data);
-          setOverallHeadJBPA(overallHeadJBPA);
-          console.log("Overall Head Job Based PA:", overallHeadJBPA);
+          const roundedOverallHeadJBPA = parseFloat(overallHeadJBPA.toFixed(2));
+          setOverallHeadJBPA(roundedOverallHeadJBPA);
+          console.log("Overall Head Job Based PA:", roundedOverallHeadJBPA);
         } catch (error) {
           console.error(`Error: ${error.message}`);
         }
       };
+      
 
       //HEAD VALUES
       const fetchHeadValuesThirdMonth = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:8080/results/getValuesAveragesByEmpIdAndEvalType`,
+            `${apiUrl}results/getValuesAveragesByEmpIdAndEvalType`,
             {
               params: {
                 empId: userId,
               },
             }
           );
-
+      
           const data = response.data;
-
+      
+          // Rounding each value to two decimal places
+          const roundedCultureOfExcellenceAverage = parseFloat(data.cultureOfExcellenceAverage.toFixed(2));
+          const roundedIntegrityAverage = parseFloat(data.integrityAverage.toFixed(2));
+          const roundedTeamworkAverage = parseFloat(data.teamworkAverage.toFixed(2));
+          const roundedUniversalityAverage = parseFloat(data.universalityAverage.toFixed(2));
+      
           const overallHeadVBPA = handleOverallHeadVBPA(
-            data.cultureOfExcellenceAverage,
-            data.integrityAverage,
-            data.teamworkAverage,
-            data.universalityAverage
+            roundedCultureOfExcellenceAverage,
+            roundedIntegrityAverage,
+            roundedTeamworkAverage,
+            roundedUniversalityAverage
           );
-
-          setHeadCultAve(data.cultureOfExcellenceAverage);
-          setHeadIntAve(data.integrityAverage);
-          setHeadTeamAve(data.teamworkAverage);
-          setHeadUnivAve(data.universalityAverage);
-
-          setOverallHeadVBPA(overallHeadVBPA);
-          console.log("Overall Head Values Based PA:", overallHeadVBPA);
+      
+          setHeadCultAve(roundedCultureOfExcellenceAverage);
+          setHeadIntAve(roundedIntegrityAverage);
+          setHeadTeamAve(roundedTeamworkAverage);
+          setHeadUnivAve(roundedUniversalityAverage);
+      
+          setOverallHeadVBPA(parseFloat(overallHeadVBPA.toFixed(2))); // Rounding overallHeadVBPA
+      
+          console.log("Overall Head Values Based PA:", parseFloat(overallHeadVBPA.toFixed(2)));
+      
         } catch (error) {
           console.error(`Error: ${error.message}`);
         }
       };
+      
 
       fetchSelfValuesThirdMonth();
       fetchSelfJobThirdMonth();
@@ -380,7 +422,7 @@ const fetchPeerThirdMonth = async () => {
     const fetchUser = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/user/getUser/${userId}`
+          `${apiUrl}user/getUser/${userId}`
         );
         setEmployee(response.data);
         setDepartment(response.data.dept);
@@ -517,6 +559,19 @@ const fetchPeerThirdMonth = async () => {
   const employeeData = [
     {valuesPerformance: filteredScores.overallVBPAAverage, jobsPerformance: filteredScores.overallJBPAverage }
   ];
+
+  useEffect(() => {
+    const today = new Date();
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const formattedDate = today.toLocaleDateString(undefined, options);
+    setCurrentDate(formattedDate);
+  }, []);
+
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const date = new Date(dateString);
+    return date.toLocaleDateString(undefined, options);
+  };
 
 
   return (
@@ -831,7 +886,7 @@ const fetchPeerThirdMonth = async () => {
                     <TableCell
                       sx={{ border: "1px solid #ccc", fontFamily: "Poppins" }}
                     >
-                      07/03/2024
+                      {currentDate}
                     </TableCell>
                   </TableRow>
                   <TableRow>
@@ -847,7 +902,7 @@ const fetchPeerThirdMonth = async () => {
                     <TableCell
                       sx={{ border: "1px solid #ccc", fontFamily: "Poppins" }}
                     >
-                      {employee.dateHired}
+                      {formatDate(employee.dateHired)}
                     </TableCell>
                   </TableRow>
                   <TableRow>
@@ -863,7 +918,7 @@ const fetchPeerThirdMonth = async () => {
                     <TableCell
                       sx={{ border: "1px solid #ccc", fontFamily: "Poppins" }}
                     >
-                      07/03/2024
+                     {currentDate}
                     </TableCell>
                   </TableRow>
                 </TableBody>

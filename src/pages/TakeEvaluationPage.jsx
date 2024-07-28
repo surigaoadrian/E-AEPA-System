@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGears } from "@fortawesome/free-solid-svg-icons";
 import EvaluationForm from "../components/EvaluationForm";
 import PeerEvaluationCard from "../components/PeerEvaluationCard";
+import { apiUrl } from '../config/config';
 
 function TakeEvaluationPage() {
   const [openForm, setOpenForm] = useState(false);
@@ -32,7 +33,7 @@ function TakeEvaluationPage() {
     const fetchSchoolYear = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/schoolYear/currentyear`
+          `${apiUrl}schoolYear/currentyear`
         );
         setSchoolYear(response.data);
       } catch (error) {
@@ -54,7 +55,7 @@ function TakeEvaluationPage() {
     const fetchUser = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/user/getUser/${userID}`
+          `${apiUrl}user/getUser/${userID}`
         );
         setLoggedUser(response.data);
         setDateHired(response.data.dateHired);
@@ -99,7 +100,7 @@ function TakeEvaluationPage() {
       try {
         if (today >= evaluationStartDate) {
           const response = await axios.get(
-            "http://localhost:8080/user/getAssignedEvaluators",
+            `${apiUrl}user/getAssignedEvaluators`,
             {
               params: {
                 dept: loggedUser.dept,
@@ -127,7 +128,7 @@ function TakeEvaluationPage() {
       try {
         if (today >= evaluationStartDate) {
           const response = await axios.get(
-            `http://localhost:8080/assignedPeers/isAssignedPeersIdPresent`,
+            `${apiUrl}assignedPeers/isAssignedPeersIdPresent`,
             {
               params: {
                 period: periodResult,
@@ -146,7 +147,7 @@ function TakeEvaluationPage() {
             }));
 
             await axios.post(
-              `http://localhost:8080/assignedPeers/createAssignedPeers`,
+              `${apiUrl}assignedPeers/createAssignedPeers`,
               {
                 evaluatee: { userID: loggedUser.userID },
                 evaluators: evaluatorsArray,
@@ -178,7 +179,7 @@ function TakeEvaluationPage() {
       try {
         if (today >= evaluationStartDate5th) {
           const response = await axios.get(
-            "http://localhost:8080/user/getAssignedEvaluators",
+            `${apiUrl}user/getAssignedEvaluators`,
             {
               params: {
                 dept: loggedUser.dept,
@@ -205,7 +206,7 @@ function TakeEvaluationPage() {
       try {
         if (today >= evaluationStartDate5th) {
           const response = await axios.get(
-            `http://localhost:8080/assignedPeers/isAssignedPeersIdPresent`,
+            `${apiUrl}assignedPeers/isAssignedPeersIdPresent`,
             {
               params: {
                 period: periodResult,
@@ -224,7 +225,7 @@ function TakeEvaluationPage() {
             }));
 
             await axios.post(
-              `http://localhost:8080/assignedPeers/createAssignedPeers`,
+              `${apiUrl}assignedPeers/createAssignedPeers`,
               {
                 evaluatee: { userID: loggedUser.userID },
                 evaluators: evaluatorsArray,
@@ -255,7 +256,7 @@ function TakeEvaluationPage() {
     const checkIfAssignedEvaluator = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/assignedPeers/checkEvaluator`,
+          `${apiUrl}assignedPeers/checkEvaluator`,
           {
             params: {
               evaluatorId: userID,
@@ -296,7 +297,7 @@ function TakeEvaluationPage() {
       const fetchRandomPeer = async () => {
         try {
           const response = await axios.get(
-            "http://localhost:8080/user/randomPeer",
+            `${apiUrl}/user/randomPeer`,
             {
               params: {
                 dept: loggedUser.dept,
@@ -352,7 +353,7 @@ function TakeEvaluationPage() {
 
     try {
       const response = await axios.get(
-        `http://localhost:8080/schoolYear/semester/${monthNames[monthNum]}`
+        `${apiUrl}schoolYear/semester/${monthNames[monthNum]}`
       );
 
       setSemester(response.data);
@@ -434,7 +435,7 @@ function TakeEvaluationPage() {
     if (evalType === "PEER") {
       try {
         const response = await axios.get(
-          "http://localhost:8080/evaluation/getEvalIDAssignedPeer",
+          `${apiUrl}evaluation/getEvalIDAssignedPeer`,
           {
             params: {
               userID: userID,
@@ -459,7 +460,7 @@ function TakeEvaluationPage() {
     } else if (evalType === "PEER-A") {
       try {
         const response = await axios.get(
-          "http://localhost:8080/evaluation/getEvalIDAssignedPeer",
+          `${apiUrl}evaluation/getEvalIDAssignedPeer`,
           {
             params: {
               userID: userID,
@@ -484,7 +485,7 @@ function TakeEvaluationPage() {
     } else {
       try {
         const response = await axios.get(
-          "http://localhost:8080/evaluation/getEvalID",
+          `${apiUrl}evaluation/getEvalID`,
           {
             params: {
               userID: userID,
@@ -510,7 +511,7 @@ function TakeEvaluationPage() {
     if (!existingEvalID) {
       try {
         const response = await axios.post(
-          "http://localhost:8080/evaluation/createEvaluation",
+          `${apiUrl}evaluation/createEvaluation`,
           evalType === "PEER"
             ? randomPeerEvaluation
             : evalType === "PEER-A"

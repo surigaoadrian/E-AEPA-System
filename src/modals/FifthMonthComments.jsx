@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, TextField, Typography } from '@mui/material';
 import axios from "axios";
+import { apiUrl } from '../config/config';
 
 const FifthMonthComments = () => {
   const role = sessionStorage.getItem("userRole");
@@ -17,7 +18,7 @@ const FifthMonthComments = () => {
       const fetchUserData = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:8080/user/getUser/${userId}`
+            `${apiUrl}user/getUser/${userId}`
           );
           setDepartment(response.data.dept);
           setFullname(response.data.fName + " " + response.data.lName);
@@ -35,7 +36,7 @@ const FifthMonthComments = () => {
     useEffect(() => {
       const fetchHeadData = async () => {
         try {
-          const response = await axios.get(`http://localhost:8080/user/getAllUser`);
+          const response = await axios.get(`${apiUrl}user/getAllUser`);
           const users = response.data;
   
           const head = users.find(
