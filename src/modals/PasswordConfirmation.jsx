@@ -3,6 +3,7 @@ import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, T
 import axios from 'axios';
 import HighlightOffOutlinedIcon from "@mui/icons-material/HighlightOffOutlined";
 import { useNavigate } from 'react-router-dom';
+import { apiUrl } from '../config/config';
 
 const PasswordConfirmationModal = ({ open, onClose, onConfirm, loggedUserData }) => {
 //   const [loggedUserData, setLoggedUserData] = useState({});
@@ -27,7 +28,7 @@ const PasswordConfirmationModal = ({ open, onClose, onConfirm, loggedUserData })
     const username = loggedUserData?.username;
     console.log("Username:", username);
     try {
-      const response = await axios.post("http://localhost:8080/verifyPassword", {
+      const response = await axios.post(`${apiUrl}verifyPassword`, {
         username,
         password,
       });

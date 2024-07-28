@@ -8,6 +8,7 @@ import axios from "axios";
 import HighlightOffOutlinedIcon from "@mui/icons-material/HighlightOffOutlined";
 import CameraAltOutlinedIcon from "@mui/icons-material/CameraAltOutlined";
 import Animated from "../components/motion";
+import { apiUrl } from '../config/config';
 
 const CustomAlert = ({ open, onClose, severity, message }) => {
 	return (
@@ -125,7 +126,7 @@ function ViewProfilePage() {
 				contactNum: selectedUser.contactNum,
 			};
 			await axios.patch(
-				`http://localhost:8080/user/editPersonalDetails/${selectedUser.userID}`,
+				`${apiUrl}user/editPersonalDetails/${selectedUser.userID}`,
 				userPayload,
 				{
 					headers: {
@@ -148,7 +149,7 @@ function ViewProfilePage() {
 		const fetchData = async () => {
 			try {
 				const response = await fetch(
-					`http://localhost:8080/user/getUser/${userID}`
+					`${apiUrl}user/getUser/${userID}`
 				);
 				if (!response.ok) {
 					throw new Error("Failed to fetch user data");
@@ -167,7 +168,7 @@ function ViewProfilePage() {
 	const getImageUrl = async () => {
 		try {
 			const response = await axios.get(
-				`http://localhost:8080/user/image/${userID}`,
+				`${apiUrl}user/image/${userID}`,
 				{
 					responseType: "arraybuffer", // Ensure response is treated as binary data
 				}
@@ -223,7 +224,7 @@ function ViewProfilePage() {
 		formData.append("image", image);
 		try {
 			await axios.post(
-				`http://localhost:8080/user/uploadImage/${userID}`,
+				`${apiUrl}user/uploadImage/${userID}`,
 				formData,
 				{
 					headers: {

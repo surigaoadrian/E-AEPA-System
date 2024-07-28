@@ -9,6 +9,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { styled } from "@mui/system";
 import { motion } from "framer-motion";
+import { apiUrl } from '../config/config';
 
 function LoginPage() {
 	const [username, setUsername] = useState("");
@@ -45,7 +46,7 @@ function LoginPage() {
 		}
 	
 		try {
-			const response = await axios.post("http://localhost:8080/login", {
+			const response = await axios.post(`${apiUrl}login`, {
 				username: username,
 				password: password,
 			});

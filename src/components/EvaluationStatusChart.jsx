@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ResponsiveBar } from '@nivo/bar';
+import { apiUrl } from '../config/config';
 
 const EvaluationStatusChart = () => {
     const [data, setData] = useState([]);
@@ -9,21 +10,21 @@ const EvaluationStatusChart = () => {
         const fetchData = async () => {
             try {
                 // Fetch the 3rd month evaluation status
-                const thirdMonthResponse = await fetch('http://localhost:8080/evaluation/thirdMonthStatus');
+                const thirdMonthResponse = await fetch(`${apiUrl}evaluation/thirdMonthStatus`);
                 if (!thirdMonthResponse.ok) {
                     throw new Error(`HTTP error! status: ${thirdMonthResponse.status}`);
                 }
                 const thirdMonthData = await thirdMonthResponse.json();
 
                 // Fetch the 5th month evaluation status
-                const fifthMonthResponse = await fetch('http://localhost:8080/evaluation/fifthMonthStatus');
+                const fifthMonthResponse = await fetch(`${apiUrl}evaluation/fifthMonthStatus`);
                 if (!fifthMonthResponse.ok) {
                     throw new Error(`HTTP error! status: ${fifthMonthResponse.status}`);
                 }
                 const fifthMonthData = await fifthMonthResponse.json();
 
                 // Fetch the total number of probationary employees
-                const totalEmployeesResponse = await fetch('http://localhost:8080/user/countProbationaryUsers');
+                const totalEmployeesResponse = await fetch(`${apiUrl}user/countProbationaryUsers`);
                 if (!totalEmployeesResponse.ok) {
                     throw new Error(`HTTP error! status: ${totalEmployeesResponse.status}`);
                 }

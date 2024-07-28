@@ -11,8 +11,8 @@ const EmployeeStatusChart = () => {
     const fetchData = async () => {
       try {
         const [probationaryRes, regularRes] = await Promise.all([
-          axios.get('http://localhost:8080/user/countProbationaryUsers'),
-          axios.get('http://localhost:8080/user/getRegularEmployees')
+          axios.get(`user/countProbationaryUsers`),
+          axios.get(`user/getRegularEmployees`)
         ]);
 
         const probationaryCount = probationaryRes.data;

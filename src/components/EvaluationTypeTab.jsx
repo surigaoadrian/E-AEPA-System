@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Button from "@mui/material/Button";
 import axios from "axios";
+import { apiUrl } from '../config/config';
 
 function EvaluationTypeTab({
   evalType,
@@ -25,7 +26,7 @@ function EvaluationTypeTab({
     const fetchEvalChecker = async () => {
       try {
         const response1 = await axios.get(
-          "http://localhost:8080/evaluation/isEvaluationCompleted",
+          `${apiUrl}evaluation/isEvaluationCompleted`,
           {
             params: {
               userID: userId,
@@ -37,7 +38,7 @@ function EvaluationTypeTab({
         );
 
         const response2 = await axios.get(
-          "http://localhost:8080/evaluation/isEvaluationCompleted",
+          `${apiUrl}evaluation/isEvaluationCompleted`,
           {
             params: {
               userID: userId,
@@ -49,7 +50,7 @@ function EvaluationTypeTab({
         );
 
         const response3 = await axios.get(
-          "http://localhost:8080/evaluation/isEvaluationCompleted",
+          `${apiUrl}evaluation/isEvaluationCompleted`,
           {
             params: {
               userID: userId,

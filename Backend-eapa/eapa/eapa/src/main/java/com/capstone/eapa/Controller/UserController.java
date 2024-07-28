@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "*")
 public class UserController {
     @Autowired
     private UserService userServ;
@@ -136,6 +136,22 @@ public class UserController {
             return ResponseEntity.ok(randomPeer);
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    
+    //random assigned peers
+    @GetMapping("/getAssignedEvaluators")
+    public ResponseEntity<List<Integer>> getAssignedEvaluators(@RequestParam String dept, @RequestParam int excludedUserID) {
+        try {
+            List<Integer> assignedEvaluators = userServ.getAssignedEvaluators(dept, excludedUserID);
+            if (assignedEvaluators.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.ok(assignedEvaluators);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
         }
     }
 

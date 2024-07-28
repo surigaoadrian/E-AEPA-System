@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState} from 'react';
 import { Modal, Box, Menu, MenuItem, IconButton, Tabs, Tab } from '@mui/material';
 import PrintIcon from '@mui/icons-material/Print';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ThirdMonthEval from "../modals/ThirdMonthEval";
 import FifthMonthEval from "../modals/FifthMonthEval";
-import axios from 'axios';
 import GeneratePDF from '../components/GeneratePDF';  // Import the GeneratePDF function
 
 const TabPanel = (props) => {
@@ -50,7 +49,7 @@ const selectedMenuItemStyles = {
 const ViewResults = ({ open, onClose, employee }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const [filter, setFilter] = useState("overall");
-  const [selectedStaff, setSelectedStaff] = useState(employee);
+
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleFilterButtonClick = (event) => {
@@ -65,26 +64,6 @@ const ViewResults = ({ open, onClose, employee }) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:8080/user/getUser/${userId}`
-        );
-        setSelectedStaff(response.data);
-      } catch (error) {
-        if (error.response) {
-          console.log(error.response.data);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-        } else {
-          console.log(`Error: ${error.message}`);
-        }
-      }
-    };
-    fetchUser();
-  }, []);
 
   const handleTabChange = (event, newIndex) => {
     setTabIndex(newIndex);

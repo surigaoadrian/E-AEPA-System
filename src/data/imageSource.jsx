@@ -7,9 +7,11 @@ import thirteen from "../assets/13.png";
 import fifteen from "../assets/15.png";
 import sixteen from "../assets/16.png";
 import fourteen from "../assets/wew.jpg";
+import back from "../assets/back.jpg";
 
 const imageSources = [
   { src: thirteen, alt: "CIT-U", objectFit: "cover", width: "90%" },
+  { src: back, alt: "rawr", objectFit: "cover", width: "90%" },
   { src: fourteen, alt: "This is CIT-U", objectFit: "cover", width: "55%" },
   { src: sixteen, alt: "Vision", objectFit: "fit", width: "70%" },
   {src: one, alt:"VisionInfo", objectFit:"cover", width: "85%"},

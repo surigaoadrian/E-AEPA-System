@@ -11,11 +11,10 @@ const selfQuestionLabels = {
   24: "[ACTION/S] What could you, your Immediate Head, or CIT management do to best support you in accomplishing these goals?"
 };
 
-const ThirdMonthComments = ({ userId, filter }) => {
-  const role = sessionStorage.getItem("userRole");
+const ThirdComments = ({ userId, filter, role }) => {
+//   const role = sessionStorage.getItem("userRole");
+   console.log("Si role:", role);
   const [selfComments, setSelfComments] = useState([]);
-  const [peerComments, setPeerComments] = useState([]);
-  const [peerIds, setPeerIds] = useState([]);
   const [commentsData, setCommentsData] = useState({
     27: '', // GAP comment
     28: '', // TARGET comment
@@ -34,7 +33,7 @@ const ThirdMonthComments = ({ userId, filter }) => {
     const comments = commentsResponse.data;
 
     // Fetch response IDs
-    const responsesResponse = await axios.get(`${apiUrl}response/getAllResponses`);
+    const responsesResponse = await axios.get(`${apiUrl}response/getAllResponses`);;
     const responses = responsesResponse.data;
 
     // Update comments and response IDs state
@@ -104,14 +103,27 @@ useEffect(() => {
     setCommentsData(prevData => ({ ...prevData, [quesID]: value }));
   };
 
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}user/getUser/${userId}`);
+        setDepartment(response.data.dept);
+        setFullname(response.data.fName + " " + response.data.lName);
+        setPosition(response.data.position);
+      } catch (error) {
+        console.error("Error checking evaluation status:", error);
+      }
+    };
 
+    fetchUserData();
+  }, [userId]);
 
-  //FETCH SELF COMMENTS
   useEffect(() => {
   const fetchSelfComments = async () => {
     try {
       const response = await axios.get(`${apiUrl}response/getAllResponses`);
       const allResponses = response.data;
+      console.log('All responses:', allResponses);
 
       // Filter comments based on userId, question_id, and evaluation type
       const filteredComments = allResponses.filter(response => {
@@ -120,6 +132,8 @@ useEffect(() => {
         const isSelfEvaluation = response.evaluation?.evalType === 'SELF';
         return isCorrectUser && isCorrectQuestion && isSelfEvaluation;
       });
+
+      console.log('Filtered self comments:', filteredComments);
 
       setSelfComments(filteredComments);
     } catch (error) {
@@ -160,7 +174,6 @@ useEffect(() => {
                   backgroundColor: "black",
                   color: "white",
                   fontSize: "1rem",
-                  fontWeight: "bold",
                   height: "40px",
                   display: "flex",
                   alignItems: "center",
@@ -196,143 +209,100 @@ useEffect(() => {
     );
   };
 
-    //FETCH PEER COMMENTS
-  useEffect(() => {
-    const fetchPeerComments = async () => {
-      try {
-        // Fetch assigned peer ID
-        const assignedPeerIdResponse = await axios.get(
-          `${apiUrl}assignedPeers/getAssignedPeersId`,
-          {
-            params: {
-              period: "3rd Month",
-              evaluateeId: userId,
-            },
-          }
-        );
-        const assignedPeersId = assignedPeerIdResponse.data;
-
-        // Fetch evaluator IDs
-        const evaluatorIdsResponse = await axios.get(
-          `${apiUrl}assignedPeers/getEvaluatorIds`,
-          {
-            params: {
-              assignedPeersId: assignedPeersId,
-            },
-          }
-        );
-        const evaluatorIds = evaluatorIdsResponse.data;
-        console.log('Evaluator IDs:', evaluatorIds);
-
-        // Fetch comments for each evaluator
-        const commentsPromises = evaluatorIds.map((evaluatorId) =>
-          axios.get(`${apiUrl}response/getAllResponses`).then(response => {
-            const allResponses = response.data;
-
-            // Filter comments based on evaluator ID, evaluatee ID, question ID, and evaluation type
-            const filteredPeerComments = allResponses.filter(res => {
-              const isCorrectEvaluator = res.evaluation?.user?.userID === evaluatorId;
-              const isCorrectEvaluatee = res.evaluation?.peer?.userID === parseInt(userId, 10);
-              const isCorrectQuestion = [31, 32].includes(res.question?.quesID);
-              const isPeerEvaluation = res.evaluation?.evalType === 'PEER-A';
-
-              return isCorrectEvaluator && isCorrectEvaluatee && isCorrectQuestion && isPeerEvaluation;
-            });
-
-            return { evaluatorId, comments: filteredPeerComments };
-          }).catch(error => {
-            console.error(`Error fetching comments for evaluator ${evaluatorId}:`, error);
-            return { evaluatorId, comments: [] }; // Return empty comments in case of an error
-          })
-        );
-
-        const commentsResults = await Promise.all(commentsPromises);
-        setPeerComments(commentsResults);
-      } catch (error) {
-        console.error('Error fetching peer comments:', error);
-      }
-    };
-
-    fetchPeerComments();
-  }, [userId]);
-
-  
-  const renderPeerComments = () => {
-    return (
-      <>
-        {peerComments.map(({ evaluatorId, comments }, index) => (
-          <React.Fragment key={evaluatorId}>
-            <Box
-              className="mb-2 mt-4"
-              sx={{
-                backgroundColor: "#E81B1B",
-                color: "white",
-                p: 2,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "1rem",
-                fontWeight: "bold",
-                height: "30px",
-                borderBottom: "3px solid #F8C702",
-              }}
-            >
-              SUGGESTIONS / INSIGHTS FOR THE CO-WORKER (Peer {index + 1})
-            </Box>
-            {[31, 32].map(questionId => {
-              const comment = comments.find(c => c.question.quesID === questionId);
-              return (
-                <Box key={questionId} mb={2}>
-                  <Typography
-                    sx={{
-                      backgroundColor: "black",
-                      color: "white",
-                      fontSize: "1rem",
-                      fontWeight: "bold",
-                      height: "40px",
-                      display: "flex",
-                      alignItems: "center",
-                      width: "100%",
-                      paddingLeft: "8px",
-                      fontFamily: "poppins",
-                      height: "50px",
-                    }}
-                  >
-                    {questionId === 31
-                      ? "What suggestions do you have for your CO-WORKER to maintain or improve team relationships?"
-                      : "What else would you like CIT management or your Immediate Head to know about your CO-WORKER? Your CO-WORKER'S job? Other comments/remarks/suggestions?"}
-                  </Typography>
-                  <TextareaAutosize
-                    disabled
-                    minRows={5}
-                    style={{
-                      width: '100%',
-                      padding: '8px',
-                      fontSize: '1rem',
-                      color: 'black',
-                      backgroundColor: 'white',
-                      border: '1px solid black',
-                      borderRadius: '4px',
-                      boxSizing: 'border-box',
-                      marginTop: '8px',
-                      resize: 'none',
-                    }}
-                    defaultValue={comment ? comment.answers : 'No comments available'}
-                  />
-                </Box>
-              );
-            })}
-          </React.Fragment>
-        ))}
-      </>
-    );
-  };
-  
 
   return (
     <div>
       {filter === 'self' && renderSelfComments()}
-      {filter === "peer" && renderPeerComments()}
+
+      {filter === "peer" && (
+        <>
+        <Box
+          className="mb-2 mt-2"
+          sx={{
+            backgroundColor: "#E81B1B",
+            color: "white",
+            p: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "1rem",
+            fontWeight: "bold",
+            height: "30px",
+            borderBottom: "3px solid #F8C702",
+          }}
+      >
+        SUGGESTIONS / INSIGHTS FOR THE CO-WORKER
+      </Box>
+          <Typography
+                sx={{
+                  backgroundColor: "black",
+                  color: "white",
+                  fontSize: "1rem",
+                  height: "40px",
+                  display: "flex",
+                  alignItems: "center",
+                  width: "100%",
+                  paddingLeft: "8px",
+                  fontFamily: "poppins",
+                }}
+          >
+            {" "}
+            &nbsp; What suggestions do you have for your CO-WORKER to maintain or improve team relationships?{" "}
+          </Typography>
+          <TextareaAutosize
+              disabled
+              minRows={5}
+              style={{
+                width: '100%',
+                padding: '8px',
+                fontSize: '1rem',
+                color: 'black',
+                backgroundColor: 'white',
+                border: '1px solid black',
+                borderRadius: '4px',
+                boxSizing: 'border-box',
+                marginTop: '8px',
+                resize: 'none',  
+               
+              }}
+          />
+                    <Typography
+                sx={{
+                  backgroundColor: "black",
+                  color: "white",
+                  fontSize: "1rem",
+                  height: "40px",
+                  display: "flex",
+                  alignItems: "center",
+                  width: "100%",
+                  paddingLeft: "8px",
+                  fontFamily: "poppins",
+                  height: "50px",
+                  marginTop: '8px',
+                }}
+          >
+            {" "}
+            &nbsp; What else would you like CIT management or your Immediate Head to know about your CO-WORKER? Your CO-WORKER'S job? <br/> Other comments/remarks/suggestions?{" "}
+          </Typography>
+          <TextareaAutosize
+              disabled
+              minRows={5}
+              style={{
+                width: '100%',
+                padding: '8px',
+                fontSize: '1rem',
+                color: 'black',
+                backgroundColor: 'white',
+                border: '1px solid black',
+                borderRadius: '4px',
+                boxSizing: 'border-box',
+                marginTop: '8px',
+                resize: 'none',  
+            }}
+          />
+        </>
+      )}
+
 {  (filter === "overall" || filter === "head") && (
       <>
         <Box
@@ -365,7 +335,6 @@ useEffect(() => {
                   backgroundColor: "black",
                   color: "white",
                   fontSize: "1rem",
-                  fontWeight: "bold",
                   height: "40px",
                   display: "flex",
                   alignItems: "center",
@@ -375,7 +344,7 @@ useEffect(() => {
                 }}
               >
               {label}
-              {role !== "EMPLOYEE" && (
+              {role !== "EMPLOYEE" && role !== "ADMIN" &&   (
                 <IconButton
                 onClick={() => handleEditComment(quesID)}
 
@@ -462,4 +431,4 @@ useEffect(() => {
 };
 
 
-export default ThirdMonthComments;
+export default ThirdComments;

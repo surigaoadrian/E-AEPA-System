@@ -18,7 +18,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@mui/material";
 import Animated from "../components/motion";
-import View3rd from "../modals/ThirdMonthEval";
+import AdminViewResult from "../modals/AdminViewResults";
+import { apiUrl } from '../config/config';
 
 const theme = createTheme({
 	palette: {
@@ -55,10 +56,12 @@ function EmployeeProfile({ user, handleBack }) {
 	const [selectedEvaluationPeriod, setSelectedEvaluationPeriod] =
 		useState("3rd Month");
 	const [evaluationsData, setEvaluationsData] = useState([]);
+	const role = sessionStorage.getItem("userRole");
+	console.log(role);
 
 	useEffect(() => {
 		axios
-			.get("http://localhost:8080/evaluation/getAllEvaluation")
+			.get(`${apiUrl}evaluation/getAllEvaluation`)
 			.then((response) => {
 				console.log("Fetched Evaluations:", response.data);
 
@@ -80,7 +83,7 @@ function EmployeeProfile({ user, handleBack }) {
 		const fetchEvaluations = async () => {
 			try {
 				const response = await axios.get(
-					"http://localhost:8080/evaluation/getAllEvaluation"
+					`${apiUrl}evaluation/getAllEvaluation`
 				);
 				const data = response.data;
 
@@ -553,13 +556,12 @@ function EmployeeProfile({ user, handleBack }) {
 										</Typography>
 										{renderEvaluationTable()}
 										{show3rd && (
-											<View3rd
+											<AdminViewResult
 												userId={user.userID}
-												fName={fName}
-												lName={lName}
-												pos={user.position}
 												open={show3rd}
 												onClose={handleCloseModal}
+												employee={user}
+												role={role}
 											/>
 										)}
 									</Box>

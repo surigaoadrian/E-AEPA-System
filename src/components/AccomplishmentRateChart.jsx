@@ -3,6 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import axios from 'axios';
 import { Box, Select, MenuItem, Typography } from '@mui/material';
 import { styled } from '@mui/system';
+import { apiUrl } from '../config/config';
 
 const BorderlessSelect = styled(Select)({
   '& .MuiOutlinedInput-notchedOutline': {
@@ -28,13 +29,13 @@ const AccomplishmentRateChart = () => {
   const getEndpoint = (period) => {
     switch (period) {
       case 'annual':
-        return 'http://localhost:8080/evaluation/annualPerDept';
+        return `${apiUrl}/evaluation/annualPerDept`;
       case 'thirdMonth':
-        return 'http://localhost:8080/evaluation/thirdMonthPerDept';
+        return `${apiUrl}evaluation/thirdMonthPerDept`;
       case 'fifthMonth':
-        return 'http://localhost:8080/evaluation/fifthMonthPerDept';
+        return `${apiUrl}evaluation/fifthMonthPerDept`;
       default:
-        return 'http://localhost:8080/evaluation/annualPerDept';
+        return `${apiUrl}evaluation/annualPerDept`;
     }
   };
 

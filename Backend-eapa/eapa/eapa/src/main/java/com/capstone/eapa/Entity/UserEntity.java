@@ -1,10 +1,10 @@
 package com.capstone.eapa.Entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.sql.Blob;
 import java.util.Collection;
@@ -42,7 +42,7 @@ public class UserEntity implements UserDetails {
     private String dateHired;
     @Column(name = "Date Started")
     private String dateStarted;
-    @JsonIgnore
+    //@JsonIgnore
     @Lob
     @Column(name = "Profile Picture", columnDefinition = "LONGBLOB")
     private byte[] profilePic;
