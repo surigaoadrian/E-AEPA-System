@@ -583,7 +583,7 @@ function EvaluateEmployee() {
             >
 
               <TableContainer
-                sx={{ borderRadius: "5px 5px 0 0 ", maxHeight: "100%", border: '1px solid lightgray' }}
+                sx={{height:'30.68em', borderRadius: "5px 5px 0 0 ", maxHeight: "100%", border: '1px solid lightgray' }}
               >
                 <Table stickyHeader aria-label="a dense table" size="small">
                   <TableHead sx={{ height: "2em" }}>
@@ -611,6 +611,7 @@ function EvaluateEmployee() {
                       {paginatedRows.map((row) => (
                         <TableRow
                           sx={{
+                           
                             bgcolor: "white",
                             "&:hover": {
                               backgroundColor: "rgba(248, 199, 2, 0.5)",
@@ -669,13 +670,13 @@ function EvaluateEmployee() {
         < div
           className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-9"
           style={{
-            position: "absolute", // Change to relative to keep it in place
-            bottom: 45,
-            left: '21.5%',
-            transform: "translateX(-50%)",
+            position: "relative", // Change to relative to keep it in place
+            // bottom: 45,
+            // left: '21.5%',
+            // transform: "translateX(-50%)",
             display: "flex",
             alignItems: "center",
-            ml: '4em'
+            // ml: '4em'
           }}
         >
           <ol className="flex justify-end gap-1 text-xs font-medium">
