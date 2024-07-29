@@ -74,7 +74,7 @@ public class EvaluationController {
         return evalServ.getAggregatedEvaluations();
     }
 
-    @GetMapping("/mergedPeerStatus")
+    @GetMapping("/mergedPeerStatus") //done
     public List<PeerEvaluationDTO> getMergedPeerEvaluations() {
         return evalServ.getMergedPeerEvaluations();
     }

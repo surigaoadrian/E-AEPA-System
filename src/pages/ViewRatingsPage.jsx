@@ -1,8 +1,11 @@
-import React, { useState } from "react";
-import { Box, Tabs, Tab, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
+import React, { useState, useRef } from "react";
+import { Box, Tabs, Tab, MenuItem, Select, FormControl, Button } from "@mui/material";
 import { styled } from '@mui/system';
 import ThirdMonthEval from "../modals/ThirdMonthEval";
 import FifthMonthEval from "../modals/FifthMonthEval";
+import domtoimage from 'dom-to-image';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -66,10 +69,10 @@ const CustomSelect = styled(Select)(({ theme }) => ({
   color: "#8C383E",
   fontWeight: "bold",
   fontFamily: "Poppins",
-  border: "2px solid #8C383E",
+  fontsize: "13px",
+  border: "1px solid #8C383E",
   width: "120px",
   height: "40px",
-  backgroundColor: "#fff",
   marginRight: "30px",
   '& .MuiSelect-icon': {
     color: "#8C383E",
@@ -103,6 +106,7 @@ const ViewRatingsPage = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const [filter, setFilter] = useState("overall");
   const userId = sessionStorage.getItem("userID");
+  const contentRef = useRef(null);
 
   const handleTabChange = (event, newIndex) => {
     setTabIndex(newIndex);
@@ -110,6 +114,24 @@ const ViewRatingsPage = () => {
 
   const handleFilterChange = (event) => {
     setFilter(event.target.value);
+  };
+
+  const exportToPDF = () => {
+    const input = contentRef.current;
+  
+    html2canvas(input, { useCORS: true, scrollX: 0, scrollY: -window.scrollY }).then((canvas) => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4', true);
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width; // Use canvas dimensions
+  
+      // Add the image to the PDF
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+  
+      pdf.save('invoice.pdf');
+    }).catch((error) => {
+      console.error('Error generating PDF:', error);
+    });
   };
 
   return (
@@ -144,8 +166,12 @@ const ViewRatingsPage = () => {
             <CustomMenuItem value="head">Head</CustomMenuItem>
           </CustomSelect>
         </FormControl>
+        {/* <Button variant="contained" onClick={exportToPDF} sx={{ backgroundColor: "#8C383E", color: "#fff" }}>
+          Export
+        </Button> */}
       </div>
       <Box
+        ref={contentRef}
         sx={{
           backgroundColor: "white",
           borderRadius: 2,
@@ -160,7 +186,7 @@ const ViewRatingsPage = () => {
           <Tab label="5th Month" sx={tabStyle} />
         </Tabs>
         <TabPanel value={tabIndex} index={0}>
-          <ThirdMonthEval userId={userId} filter={filter} />
+          <ThirdMonthEval  userId={userId} filter={filter} />
         </TabPanel>
         <TabPanel value={tabIndex} index={1}>
           <FifthMonthEval userId={userId} filter={filter} />

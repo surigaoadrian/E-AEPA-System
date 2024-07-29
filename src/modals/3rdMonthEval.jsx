@@ -16,13 +16,21 @@ const ThirdMonthEval = ({ userId, role, filter}) => {
   const [department, setDepartment] = useState("");
   const [headFullname, setHeadFullname] = useState("");
   const [headPosition, setHeadPosition] = useState("");
-  //const userId = sessionStorage.getItem("userID");
+  const [currentDate, setCurrentDate] = useState('');
 
   //self values:
   const [selfCultAve, setSelfCultAve] = useState(0.0);
   const [selfIntAve, setSelfIntAve] = useState(0.0);
   const [selfTeamAve, setSelfTeamAve] = useState(0.0);
   const [selfUnivAve, setSelfUnivAve] = useState(0.0);
+
+  //peer values:
+  const [peerCultAve, setPeerCultAve] = useState(0.0);
+  const [peerIntAve, setPeerIntAve] = useState(0.0);
+  const [peerTeamAve, setPeerTeamAve] = useState(0.0);
+  const [peerUnivAve, setPeerUnivAve] = useState(0.0);
+  const [peerEvaluationAverages, setPeerEvaluationAverages] = useState([]);
+  const [overallPeerVBPA, setOverallPeerVBPA] = useState(0.0);
 
   //head values:
   const [headCultAve, setHeadCultAve] = useState(0.0);
@@ -64,11 +72,11 @@ const ThirdMonthEval = ({ userId, role, filter}) => {
     self: {
       overallEAPAAverage: (((overallSelfVBPA * 0.6) + (overallSelfJBPA * 0.4))).toFixed(2),
       overallVBPAAverage: overallSelfVBPA.toFixed(2),
-      overallJBPAverage: overallSelfJBPA.toFixed(2),
+      overallJBPAverage: overallSelfJBPA,
     },
     peer: {
       overallEAPAAverage: null,
-      overallVBPAAverage: 4.5,
+      overallVBPAAverage: overallPeerVBPA,
       overallJBPAverage: 0,
     },
     head: {
@@ -83,7 +91,7 @@ const ThirdMonthEval = ({ userId, role, filter}) => {
   useEffect(() => {
     const fetchHeadData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/user/getAllUser`);
+        const response = await axios.get(`${apiUrl}user/getAllUser`);
         const users = response.data;
 
         const head = users.find(
@@ -116,8 +124,9 @@ const ThirdMonthEval = ({ userId, role, filter}) => {
     const headVBPA = validNumber(overallHeadVBPA);
     const selfJBPA = validNumber(overallSelfJBPA);
     const headJBPA = validNumber(overallHeadJBPA);
+    const peerVBPA = validNumber(overallPeerVBPA);
   
-    const vbpaAverage = ((selfVBPA + headVBPA + 4.5) / 3).toFixed(2);
+    const vbpaAverage = ((selfVBPA + headVBPA + peerVBPA) / 3).toFixed(2);
     const jbpaAverage = ((selfJBPA + headJBPA) / 2).toFixed(2);
     const overallAverage = (((vbpaAverage * .6)+ (jbpaAverage * .4)) ).toFixed(2);
 
@@ -131,11 +140,11 @@ const ThirdMonthEval = ({ userId, role, filter}) => {
   useEffect(() => {
     const fetchData =  async () => {
       //setLoading(true); 
-      //SELF VALUES
+      // SELF VALUES
       const fetchSelfValuesThirdMonth = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:8080/results/getAverages`,
+            `${apiUrl}results/getAverages`,
             {
               params: {
                 userId: userId,
@@ -147,21 +156,29 @@ const ThirdMonthEval = ({ userId, role, filter}) => {
           );
 
           const data = response.data;
-          setSelfCultAve(data.cultureOfExcellenceAverage);
-          setSelfIntAve(data.integrityAverage);
-          setSelfTeamAve(data.teamworkAverage);
-          setSelfUnivAve(data.universalityAverage);
+
+          // Rounding each value to two decimal places
+          const roundedCultureOfExcellenceAverage = parseFloat(data.cultureOfExcellenceAverage.toFixed(2));
+          const roundedIntegrityAverage = parseFloat(data.integrityAverage.toFixed(2));
+          const roundedTeamworkAverage = parseFloat(data.teamworkAverage.toFixed(2));
+          const roundedUniversalityAverage = parseFloat(data.universalityAverage.toFixed(2));
+
+          setSelfCultAve(roundedCultureOfExcellenceAverage);
+          setSelfIntAve(roundedIntegrityAverage);
+          setSelfTeamAve(roundedTeamworkAverage);
+          setSelfUnivAve(roundedUniversalityAverage);
 
           const overallSelfVBPA = handleOverallSelfVBPA(
-            data.cultureOfExcellenceAverage,
-            data.integrityAverage,
-            data.teamworkAverage,
-            data.universalityAverage
+            roundedCultureOfExcellenceAverage,
+            roundedIntegrityAverage,
+            roundedTeamworkAverage,
+            roundedUniversalityAverage
           );
 
-          setOverallSelfVBPA(isNaN(overallSelfVBPA) ? 0 : overallSelfVBPA);
+          setOverallSelfVBPA(parseFloat(overallSelfVBPA.toFixed(2))); // Rounding overallSelfVBPA
 
-          console.log("Overall Self Values Based PA:", overallSelfVBPA);
+          console.log("Overall Self Values Based PA:", parseFloat(overallSelfVBPA.toFixed(2)));
+
         } catch (error) {
           if (error.response) {
             console.log(error.response.data);
@@ -173,111 +190,223 @@ const ThirdMonthEval = ({ userId, role, filter}) => {
         }
       };
 
-      //SELF JOB
-      const fetchSelfJobThirdMonth = async () => {
-        try {
-          const response = await axios.get(
-            `http://localhost:8080/results/getAverages`,
-            {
-              params: {
-                userId: userId,
-                evalType: "SELF",
-                stage: "JOB",
-                period: "3rd Month",
-              },
-            }
-          );
+
+    // SELF JOB
+    const fetchSelfJobThirdMonth = async () => {
+      try {
+        const response = await axios.get(
+          `${apiUrl}results/getAverages`,
+          {
+            params: {
+              userId: userId,
+              evalType: "SELF",
+              stage: "JOB",
+              period: "3rd Month",
+            },
+          }
+        );
+
+        const data = response.data;
+
+        const overallSelfJBPA = handleOverallSelfJBPA(data.jobRespAverage);
+        const roundedOverallSelfJBPA = parseFloat(overallSelfJBPA.toFixed(2));
+        setOverallSelfJBPA(roundedOverallSelfJBPA);
+        console.log("Overall Self Job Based PA:", roundedOverallSelfJBPA);
+      } catch (error) {
+        console.error(`Error: ${error.message}`);
+      }
+    };
+
       
-          const data = response.data;
-      
-          const overallSelfJBPA = handleOverallSelfJBPA(data.jobRespAverage);
-          setOverallSelfJBPA(isNaN(overallSelfJBPA) ? 0 : overallSelfJBPA);
-          console.log("Overall Self Job Based PA:", overallSelfJBPA);
-        } catch (error) {
-          console.error(`Error: ${error.message}`);
+//PEER VALUES
+const fetchPeerThirdMonth = async () => {
+  try {
+    // Fetch assigned peer ID
+    const assignedPeerIdResponse = await axios.get(
+      `${apiUrl}assignedPeers/getAssignedPeersId`,
+      {
+        params: {
+          period: "3rd Month",
+          evaluateeId: userId,
+        },
+      }
+    );
+    const assignedPeersId = assignedPeerIdResponse.data;
+    console.log('Assigned Peers ID:', assignedPeersId);
+    // Fetch evaluator IDs
+    const evaluatorIdsResponse = await axios.get(
+      `${apiUrl}assignedPeers/getEvaluatorIds`,
+      {
+        params: {
+          assignedPeersId: assignedPeersId,
+        },
+      }
+    );
+    const evaluatorIds = evaluatorIdsResponse.data;
+    console.log('Evaluator IDs:', evaluatorIds);
+
+        // Initialize peer evaluation averages with default values
+        const defaultAverages = {
+          coe: '-',
+          int: '-',
+          tea: '-',
+          uni: '-',
+        };
+        const initialPeerEvaluationAverages = evaluatorIds.map(() => defaultAverages);
+    
+        setPeerEvaluationAverages(initialPeerEvaluationAverages);
+
+    // Fetch peer evaluation averages for each evaluator
+    const evaluationAveragesPromises = evaluatorIds.map((evaluatorId) =>
+      axios.get(
+        `${apiUrl}evaluation/getPeerEvaluationAverages`,
+        {
+          params: {
+            userID: evaluatorId,
+            peerID: userId,
+            period: "3rd Month",
+            evalType: 'PEER-A',
+          },
         }
-      };
-      
+      ).catch(error => {
+        console.error(`Error fetching data for evaluator ${evaluatorId}:`, error);
+        return { data: defaultAverages }; // Return default averages in case of an error
+      })
+    );
+    
+    const evaluationAveragesResponses = await Promise.all(evaluationAveragesPromises);
+    const peerEvaluationAverages = evaluationAveragesResponses.map(response => response.data);
+
+    // Combine the results into a single state
+    const combinedPeerEvaluationAverages = evaluatorIds.map((_, index) => {
+      return peerEvaluationAverages[index] || defaultAverages;
+    });
+
+    setPeerEvaluationAverages(combinedPeerEvaluationAverages);
+
+    console.log('Peer Evaluation Averages:', combinedPeerEvaluationAverages);
+  } catch (error) {
+    console.error('Error fetching peer evaluation data:', error);
+  }
+};
 
       //HEAD JOB
       const fetchHeadJobThirdMonth = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:8080/results/getJobRespAverageByEmpId`,
+            `${apiUrl}results/getJobRespAverageByEmpId`,
             {
               params: {
                 empId: userId,
               },
             }
           );
-
+      
           const data = response.data;
           const overallHeadJBPA = handleOverallHeadJBPA(data);
-          setOverallHeadJBPA(overallHeadJBPA);
-          console.log("Overall Head Job Based PA:", overallHeadJBPA);
+          const roundedOverallHeadJBPA = parseFloat(overallHeadJBPA.toFixed(2));
+          setOverallHeadJBPA(roundedOverallHeadJBPA);
+          console.log("Overall Head Job Based PA:", roundedOverallHeadJBPA);
         } catch (error) {
           console.error(`Error: ${error.message}`);
         }
       };
+      
 
       //HEAD VALUES
       const fetchHeadValuesThirdMonth = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:8080/results/getValuesAveragesByEmpIdAndEvalType`,
+            `${apiUrl}results/getValuesAveragesByEmpIdAndEvalType`,
             {
               params: {
                 empId: userId,
               },
             }
           );
-
+      
           const data = response.data;
-
+      
+          // Rounding each value to two decimal places
+          const roundedCultureOfExcellenceAverage = parseFloat(data.cultureOfExcellenceAverage.toFixed(2));
+          const roundedIntegrityAverage = parseFloat(data.integrityAverage.toFixed(2));
+          const roundedTeamworkAverage = parseFloat(data.teamworkAverage.toFixed(2));
+          const roundedUniversalityAverage = parseFloat(data.universalityAverage.toFixed(2));
+      
           const overallHeadVBPA = handleOverallHeadVBPA(
-            data.cultureOfExcellenceAverage,
-            data.integrityAverage,
-            data.teamworkAverage,
-            data.universalityAverage
+            roundedCultureOfExcellenceAverage,
+            roundedIntegrityAverage,
+            roundedTeamworkAverage,
+            roundedUniversalityAverage
           );
-
-          setHeadCultAve(data.cultureOfExcellenceAverage);
-          setHeadIntAve(data.integrityAverage);
-          setHeadTeamAve(data.teamworkAverage);
-          setHeadUnivAve(data.universalityAverage);
-
-          setOverallHeadVBPA(overallHeadVBPA);
-          console.log("Overall Head Values Based PA:", overallHeadVBPA);
+      
+          setHeadCultAve(roundedCultureOfExcellenceAverage);
+          setHeadIntAve(roundedIntegrityAverage);
+          setHeadTeamAve(roundedTeamworkAverage);
+          setHeadUnivAve(roundedUniversalityAverage);
+      
+          setOverallHeadVBPA(parseFloat(overallHeadVBPA.toFixed(2))); // Rounding overallHeadVBPA
+      
+          console.log("Overall Head Values Based PA:", parseFloat(overallHeadVBPA.toFixed(2)));
+      
         } catch (error) {
           console.error(`Error: ${error.message}`);
         }
       };
+      
 
       fetchSelfValuesThirdMonth();
       fetchSelfJobThirdMonth();
       fetchHeadValuesThirdMonth();
       fetchHeadJobThirdMonth();
+      fetchPeerThirdMonth();
             
     };
 
     fetchData();
   }, [userId]);
 
+  // Function to calculate peer averages
+  const calculatePeerAverage = (coreValue) => {
+    if (peerEvaluationAverages.length === 0) return 0;
+    const total = peerEvaluationAverages.reduce((sum, peer) => sum + (peer[coreValue] || 0), 0);
+    return total / peerEvaluationAverages.length;
+  };
+
+  useEffect(() => {
+    const cultAve = calculatePeerAverage('coe');
+    const intAve = calculatePeerAverage('int');
+    const teamAve = calculatePeerAverage('tea');
+    const univAve = calculatePeerAverage('uni');
+
+    setPeerCultAve(cultAve.toFixed(2));
+    setPeerIntAve(intAve.toFixed(2));
+    setPeerTeamAve(teamAve.toFixed(2));
+    setPeerUnivAve(univAve.toFixed(2));
+
+    const overallPeerAve = ((cultAve + intAve + teamAve + univAve) / 4).toFixed(2);
+    console.log("overallPeerAve: ", overallPeerAve);
+    setOverallPeerVBPA(overallPeerAve);
+  }, [peerEvaluationAverages]);
+
+
   const formatValue = (value) => {
-    if (value === undefined || value === null || isNaN(value)) {
-      return '';
+    const num = parseFloat(value);
+    if (isNaN(num) || num === 0) {
+      return '-';
     }
-    return (value.toFixed(2).replace(/(\.0+|(?<=\.\d)0+)$/, '') || '0');
+    return num.toFixed(2).replace(/(\.0+|(?<=\.\d)0+)$/, '');
   };
   
-// Custom shape function that renders an emoji
-const renderPin = (props) => {
+  
+  // Custom shape function that renders an emoji
+  const renderPin = (props) => {
   const { cx, cy } = props;
   return <text x={cx} y={cy} dy={5} dx={-15} fontSize={20} >✅</text>;
-};
+  };
 
-// Custom tooltip function
-const CustomTooltip = ({ active, payload }) => {
+  // Custom tooltip function
+  const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     return (
       <div style={{ backgroundColor: '#fff', border: '1px solid #999', padding: '8px', fontSize:'0.8em' }}>
@@ -293,7 +422,7 @@ const CustomTooltip = ({ active, payload }) => {
     const fetchUser = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/user/getUser/${userId}`
+          `${apiUrl}user/getUser/${userId}`
         );
         setEmployee(response.data);
         setDepartment(response.data.dept);
@@ -362,7 +491,7 @@ const CustomTooltip = ({ active, payload }) => {
     },
     {
       name: "Peer",
-      data: [4.5, null],
+      data: [overallPeerVBPA, null],
     },
   ];
 
@@ -377,7 +506,7 @@ const CustomTooltip = ({ active, payload }) => {
     },
     {
       name: "Peer",
-      data: [4.4, 4.6, 4.4, 4.6],
+      data: [peerCultAve, peerIntAve, peerTeamAve, peerUnivAve],
     },
   ];
 
@@ -431,14 +560,28 @@ const CustomTooltip = ({ active, payload }) => {
     {valuesPerformance: filteredScores.overallVBPAAverage, jobsPerformance: filteredScores.overallJBPAverage }
   ];
 
+  useEffect(() => {
+    const today = new Date();
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const formattedDate = today.toLocaleDateString(undefined, options);
+    setCurrentDate(formattedDate);
+  }, []);
+
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const date = new Date(dateString);
+    return date.toLocaleDateString(undefined, options);
+  };
+
 
   return (
-    <div className="mt-4 mx-4 justify-center items-center" >
+    <div className="justify-center items-center" >
 
         {/* 3RD EVALUATION TAB*/}
-        <div className="mx-4 mb-4">
+        <div className="mx-4 mb-4 mt-10">
             <Typography
               variant="h5"
+              component="div"
               sx={{
                 textAlign: "center",
                 fontWeight: "bold",
@@ -620,8 +763,10 @@ const CustomTooltip = ({ active, payload }) => {
                             fontWeight: "bold",
                             fontSize: "1em",
                           }}
+                          align="center"
                         >
-                           {filteredScores.overallEAPAAverage}
+                            {formatValue(filteredScores.overallEAPAAverage)}
+                           
                         </TableCell>
                       </TableRow>
                     </TableHead>
@@ -632,6 +777,7 @@ const CustomTooltip = ({ active, payload }) => {
                             border: "1px solid #ccc",
                             fontFamily: "Poppins",
                           }}
+                          align="center"
                         >
                           60%
                         </TableCell>
@@ -648,9 +794,9 @@ const CustomTooltip = ({ active, payload }) => {
                             border: "1px solid #ccc",
                             fontFamily: "Poppins",
                           }}
-                          align="right"
+                          align="center"
                         >
-                           {filteredScores.overallVBPAAverage}
+                           {formatValue(filteredScores.overallVBPAAverage)}
           
                         </TableCell>
                       </TableRow>
@@ -660,6 +806,7 @@ const CustomTooltip = ({ active, payload }) => {
                             border: "1px solid #ccc",
                             fontFamily: "Poppins",
                           }}
+                          align="center"
                         >
                           40%
                         </TableCell>
@@ -676,9 +823,9 @@ const CustomTooltip = ({ active, payload }) => {
                             border: "1px solid #ccc",
                             fontFamily: "Poppins",
                           }}
-                          align="right"
+                          align="center"
                         >
-                             {filteredScores.overallJBPAverage}
+                             {formatValue(filteredScores.overallJBPAverage)}
                         </TableCell>
                       </TableRow>
                     </TableBody>
@@ -739,7 +886,7 @@ const CustomTooltip = ({ active, payload }) => {
                     <TableCell
                       sx={{ border: "1px solid #ccc", fontFamily: "Poppins" }}
                     >
-                      07/03/2024
+                      {currentDate}
                     </TableCell>
                   </TableRow>
                   <TableRow>
@@ -755,7 +902,7 @@ const CustomTooltip = ({ active, payload }) => {
                     <TableCell
                       sx={{ border: "1px solid #ccc", fontFamily: "Poppins" }}
                     >
-                      {employee.dateHired}
+                      {formatDate(employee.dateHired)}
                     </TableCell>
                   </TableRow>
                   <TableRow>
@@ -771,7 +918,7 @@ const CustomTooltip = ({ active, payload }) => {
                     <TableCell
                       sx={{ border: "1px solid #ccc", fontFamily: "Poppins" }}
                     >
-                      07/03/2024
+                     {currentDate}
                     </TableCell>
                   </TableRow>
                 </TableBody>
@@ -971,7 +1118,7 @@ const CustomTooltip = ({ active, payload }) => {
                             textAlign: "center",
                           }}
                         >
-                          4.5
+                          {formatValue(overallPeerVBPA)}
                         </TableCell>
                       </TableRow>
                       <TableRow>
@@ -1045,7 +1192,7 @@ const CustomTooltip = ({ active, payload }) => {
                             textAlign: "center",
                           }}
                         >
-                          4.50
+                          {formatValue(overallPeerVBPA)}
                         </TableCell>
                       </TableRow>
                     </TableBody>
@@ -1146,7 +1293,7 @@ const CustomTooltip = ({ active, payload }) => {
                             textAlign: "center",
                           }}
                         >
-                          4.4
+                         {formatValue(peerCultAve)}
                         </TableCell>
                       </TableRow>
                       <TableRow>
@@ -1178,7 +1325,7 @@ const CustomTooltip = ({ active, payload }) => {
                             textAlign: "center",
                           }}
                         >
-                          4.6
+                          {formatValue(peerIntAve)}
                         </TableCell>
                       </TableRow>
                       <TableRow>
@@ -1210,7 +1357,7 @@ const CustomTooltip = ({ active, payload }) => {
                             textAlign: "center",
                           }}
                         >
-                          4.4
+                          {formatValue(peerTeamAve)}
                         </TableCell>
                       </TableRow>
                       <TableRow>
@@ -1242,7 +1389,7 @@ const CustomTooltip = ({ active, payload }) => {
                             textAlign: "center",
                           }}
                         >
-                          4.6
+                          {formatValue(peerUnivAve)}
                         </TableCell>
                       </TableRow>
                       <TableRow>
@@ -1290,7 +1437,7 @@ const CustomTooltip = ({ active, payload }) => {
                             textAlign: "center",
                           }}
                         >
-                          4.50
+                          {formatValue(overallPeerVBPA)}
                         </TableCell>
                       </TableRow>
                     </TableBody>
@@ -1320,7 +1467,7 @@ const CustomTooltip = ({ active, payload }) => {
         <ResponsiveContainer width="100%" height="100%">
           <ScatterChart
             margin={{top: 20,right: 15,bottom: 20,left: 10 }}>
-            <image xlinkHref={matrix} x="0" y="0" width="100%" height="100%" />
+            <svg > <image href={matrix} x="0" y="0" width="100%" height="100%" /> </svg>
             <XAxis type="number" dataKey="valuesPerformance" name="Values-Based Performance" domain={[1, 5]}>
               <Label value="Values-Based Performance" offset={-20} position="insideBottom" style={{ fontWeight:'bold',textAnchor: 'middle' }} />
             </XAxis>
@@ -1336,277 +1483,123 @@ const CustomTooltip = ({ active, payload }) => {
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginRight:'124px' }}>
   <img src={bottomArrow} alt="Bottom Arrow" style={{ width: 'auto', height: '100px' }} />
-  
 </div>
 
-
 {filter === "peer" && (
-  <div>      
-      <Box className="mt-4 mb-4" sx={{ 
-        backgroundColor: '#E81B1B', 
-        color: 'white', 
-        p: 2, 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        fontSize: '1rem', 
-        fontWeight: 'bold', 
-        height: '30px', 
-        borderBottom: '3px solid #F8C702'
-      }}>
-    Values-Based Performance Assessment Summary
+  <>
+ <Box className="mb-2 mt-4" sx={{ 
+  backgroundColor: '#E81B1B', 
+  color: 'white', 
+  p: 2, 
+  display: 'flex', 
+  alignItems: 'center', 
+  justifyContent: 'center', 
+  fontSize: '1rem', 
+  fontWeight: 'bold', 
+  height: '30px', 
+  borderBottom: '3px solid #F8C702'
+}}>
+  Values-Based Performance Assessment Summary
+</Box>
+<Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+  <Box sx={{ width: "50%", p: 1, marginBottom:"2px"}}>
+  <TableContainer sx={{ width: "550px", height: "auto", border: "2px solid #ccc", borderRadius: "4px" }}>
+  <Table size="small">
+    <TableHead>
+      <TableRow>
+        <TableCell sx={{ backgroundColor: "grey", color: "white", fontWeight: "bold", fontFamily: "Poppins" }}>
+          CIT-U's Core Values
+        </TableCell>
+        <TableCell sx={{width: "80px", backgroundColor: "grey", color: "white", fontWeight: "bold", border: "1px solid #ccc", fontFamily: "Poppins", textAlign: "center" }}>
+          Average
+        </TableCell>
+        {['Peer 1', 'Peer 2', 'Peer 3'].map((peer, index) => (
+          <TableCell
+            key={`peer${index + 1}`}
+            sx={{
+              backgroundColor: ["#151515", "#FF0000", "#FCDC2A"][index % 3],
+              color: index === 2 ? 'black' : 'white',
+              fontWeight: "bold",
+              border: "1px solid #ccc",
+              fontFamily: "Poppins",
+              textAlign: "center",
+              width: "80px",
+            }}
+            align="center"
+          >
+            {peer}
+          </TableCell>
+        ))}
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      {['coe', 'int', 'tea', 'uni'].map((coreValue) => (
+        <TableRow key={coreValue}>
+          <TableCell sx={{ fontFamily: "Poppins" }}>
+            {{
+              coe: 'Culture of Excellence',
+              int: 'Integrity',
+              tea: 'Teamwork',
+              uni: 'Universality'
+            }[coreValue]}
+          </TableCell>
+          <TableCell sx={{ border: "1px solid #ccc", fontFamily: "Poppins", textAlign: "center" }}>
+            {peerEvaluationAverages.length > 0 ? formatValue(calculatePeerAverage(coreValue)) : "-"}
+          </TableCell>
+          {[0, 1, 2].map((index) => (
+            <TableCell
+              key={`${coreValue}-peer-${index}`}
+              sx={{ border: "1px solid #ccc", fontFamily: "Poppins", textAlign: "center" }}
+            >
+              {peerEvaluationAverages[index] ? formatValue(peerEvaluationAverages[index][coreValue]) : "-"}
+            </TableCell>
+          ))}
+        </TableRow>
+      ))}
+      <TableRow>
+        <TableCell sx={{ backgroundColor: "grey", color: "white", fontWeight: "bold", fontFamily: "Poppins" }}>
+          Overall VBPA
+        </TableCell>
+        <TableCell
+          sx={{
+            backgroundColor: "grey",
+            color: "white",
+            fontWeight: "bold",
+            border: "1px solid #ccc",
+            fontFamily: "Poppins",
+            textAlign: "center",
+          }}
+        >
+          {peerEvaluationAverages.length > 0 ? formatValue(
+            (calculatePeerAverage('coe') +
+            calculatePeerAverage('int') +
+            calculatePeerAverage('tea') +
+            calculatePeerAverage('uni')) / 4
+          ) : ""}
+        </TableCell>
+        {[0, 1, 2].map((index) => (
+          <TableCell
+            key={`overall-peer-${index}`}
+            sx={{ backgroundColor: "grey", color: "white", fontWeight: "bold", border: "1px solid #ccc", fontFamily: "Poppins", textAlign: "center" }}
+          >
+            {peerEvaluationAverages[index] ? formatValue(
+              (peerEvaluationAverages[index].coe +
+              peerEvaluationAverages[index].int +
+              peerEvaluationAverages[index].tea +
+              peerEvaluationAverages[index].uni) / 4
+            ) : " "}
+          </TableCell>
+        ))}
+      </TableRow>
+    </TableBody>
+  </Table>
+</TableContainer>
   </Box>
-        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
-{/* Overall VBPA Average Table (per peer) */}
-<Box  sx={{ width: "45%", p: 1}}>
-                <TableContainer
-                  sx={{
-                    maxWidth: "600px",
-                    maxHeight: "400px",
-                    border: "2px solid #ccc",
-                    borderRadius: "4px",
-                  }}
-                >
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell
-                          sx={{
-                            backgroundColor: "grey",
-                            color: "white",
-                            fontWeight: "bold",
-                            fontFamily: "Poppins",
-                          }}
-                        >
-                          CIT-U's Core Values
-                        </TableCell>
-                        <TableCell
-                        className="w-24"
-                          sx={{
-                            backgroundColor: "#151515",
-                            color: "white",
-                            fontWeight: "bold",
-                            border: "1px solid #ccc",
-                            fontFamily: "Poppins",
-                          }}
-                          align="center"
-                        >
-                          Peer 1
-                        </TableCell>
-                        <TableCell
-                        className="w-24"
-                          sx={{
-                            backgroundColor: "#FF0000",
-                            color: "white",
-                            fontWeight: "bold",
-                            border: "1px solid #ccc",
-                            fontFamily: "Poppins",
-                          }}
-                          align="center"
-                        >
-                          Peer 2
-                        </TableCell>
-                        <TableCell
-                        className="w-24"
-                          sx={{
-                            backgroundColor: "#FCDC2A",
-                            color: "black",
-                            fontWeight: "bold",
-                            border: "1px solid #ccc",
-                            fontFamily: "Poppins",
-                          }}
-                          align="center"
-                        >
-                          Peer 3
-                        </TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      <TableRow>
-                        <TableCell sx={{ fontFamily: "Poppins" }}>
-                          Culture of Excellence
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            border: "1px solid #ccc",
-                            fontFamily: "Poppins",
-                            textAlign: "center",
-                          }}
-                        >
-                          {formatValue(headCultAve)}
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            border: "1px solid #ccc",
-                            fontFamily: "Poppins",
-                            textAlign: "center",
-                          }}
-                        >
-                          {formatValue(selfCultAve)}
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            border: "1px solid #ccc",
-                            fontFamily: "Poppins",
-                            textAlign: "center",
-                          }}
-                        >
-                          4.4
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell sx={{ fontFamily: "Poppins" }}>
-                          Integrity
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            border: "1px solid #ccc",
-                            fontFamily: "Poppins",
-                            textAlign: "center",
-                          }}
-                        >
-                         {formatValue(headIntAve)}
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            border: "1px solid #ccc",
-                            fontFamily: "Poppins",
-                            textAlign: "center",
-                          }}
-                        >
-                          {formatValue(selfIntAve)}
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            border: "1px solid #ccc",
-                            fontFamily: "Poppins",
-                            textAlign: "center",
-                          }}
-                        >
-                          4.6
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell sx={{ fontFamily: "Poppins" }}>
-                          Teamwork
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            border: "1px solid #ccc",
-                            fontFamily: "Poppins",
-                            textAlign: "center",
-                          }}
-                        >
-                          {formatValue(headTeamAve)}
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            border: "1px solid #ccc",
-                            fontFamily: "Poppins",
-                            textAlign: "center",
-                          }}
-                        >
-                          {formatValue(selfTeamAve)}
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            border: "1px solid #ccc",
-                            fontFamily: "Poppins",
-                            textAlign: "center",
-                          }}
-                        >
-                          4.4
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell sx={{ fontFamily: "Poppins" }}>
-                          Universality
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            border: "1px solid #ccc",
-                            fontFamily: "Poppins",
-                            textAlign: "center",
-                          }}
-                        >
-                         {formatValue(headUnivAve)}
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            border: "1px solid #ccc",
-                            fontFamily: "Poppins",
-                            textAlign: "center",
-                          }}
-                        >
-                          {formatValue(selfUnivAve)}
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            border: "1px solid #ccc",
-                            fontFamily: "Poppins",
-                            textAlign: "center",
-                          }}
-                        >
-                          4.6
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell
-                          sx={{
-                            backgroundColor: "grey",
-                            color: "white",
-                            fontWeight: "bold",
-                            fontFamily: "Poppins",
-                          }}
-                        >
-                          Overall VBPA
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            backgroundColor: "grey",
-                            color: "white",
-                            fontWeight: "bold",
-                            border: "1px solid #ccc",
-                            fontFamily: "Poppins",
-                            textAlign: "center",
-                          }}
-                        >
-              {formatValue((headCultAve + headIntAve + headTeamAve + headUnivAve) / 4)}
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            backgroundColor: "grey",
-                            color: "white",
-                            fontWeight: "bold",
-                            border: "1px solid #ccc",
-                            fontFamily: "Poppins",
-                            textAlign: "center",
-                          }}
-                        >
-              {formatValue((selfCultAve + selfIntAve + selfTeamAve + selfUnivAve) / 4)}
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            backgroundColor: "grey",
-                            color: "white",
-                            fontWeight: "bold",
-                            border: "1px solid #ccc",
-                            fontFamily: "Poppins",
-                            textAlign: "center",
-                          }}
-                        >
-                          4.50
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-                </Box>
-              </Box>
-              </div>
+</Box>
+</>
       )}
     </div>
-            <ThirdMonthComments userId={userId} filter={filter} role={role} />
+            <ThirdMonthComments userId={userId} role={role} filter={filter} />
             <div
         style={{
           display: "flex",
@@ -1714,5 +1707,4 @@ const CustomTooltip = ({ active, payload }) => {
     
   );
 }
-
 export default ThirdMonthEval;

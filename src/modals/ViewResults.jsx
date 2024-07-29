@@ -5,6 +5,10 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import ThirdMonthEval from "../modals/ThirdMonthEval";
 import FifthMonthEval from "../modals/FifthMonthEval";
 import GeneratePDF from '../components/GeneratePDF';  // Import the GeneratePDF function
+import { jsPDF } from 'jspdf';
+import domtoimage from 'dom-to-image';
+import html2canvas from 'html2canvas';
+
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -83,19 +87,51 @@ const ViewResults = ({ open, onClose, employee }) => {
     },
   };
 
-  const handlePrint = async () => {
+  const handlePrint = () => {
     const printAreaId = `tabPanel-${tabIndex}`;
     const input = document.getElementById(printAreaId);
-
+  
     if (!input) {
       console.error("Print area not found");
       return;
     }
-
-    const htmlContent = input.outerHTML;
-    await GeneratePDF(htmlContent);  // Use the GeneratePDF function
+  
+    // Ensure the image is fully loaded
+    const images = input.getElementsByTagName('img');
+    const promises = Array.from(images).map(img => {
+      return new Promise((resolve) => {
+        if (img.complete) {
+          resolve();
+        } else {
+          img.onload = resolve;
+          img.onerror = resolve;
+        }
+      });
+    });
+  
+    Promise.all(promises).then(() => {
+      // Add a short delay to ensure everything is rendered properly
+      setTimeout(() => {
+        html2canvas(input, {
+          backgroundColor: null,
+          useCORS: true,
+        }).then(canvas => {
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'px',
+            format: [canvas.width, canvas.height]
+          });
+          pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+          pdf.save('download.pdf');
+        }).catch(error => {
+          console.error('Error capturing the PDF:', error);
+        });
+      }, 100); // Adjust delay as needed
+    }).catch(error => {
+      console.error('Error loading images:', error);
+    });
   };
-
   
 
   return (
@@ -152,7 +188,7 @@ const ViewResults = ({ open, onClose, employee }) => {
         <Box sx={{ flex: 1, overflowY: 'auto' }}>
           <Tabs className='ml-4' value={tabIndex} onChange={handleTabChange} sx={tabStyle}>
             <Tab label="3rd Month" sx={tabStyle} />
-            <Tab label="5th Month" sx={tabStyle} />
+            <Tab disabled label="5th Month" sx={tabStyle} />
           </Tabs>
 
           <Menu
@@ -187,7 +223,7 @@ const ViewResults = ({ open, onClose, employee }) => {
           </Menu>
           
           <TabPanel value={tabIndex} index={0}>
-            <ThirdMonthEval userId={employee.userID} employee={employee} filter={filter} />
+            <ThirdMonthEval id="printArea" userId={employee.userID} employee={employee} filter={filter} />
           </TabPanel>
           <TabPanel value={tabIndex} index={1}>
             <FifthMonthEval userId={employee.userID} employee={employee} filter={filter} />
