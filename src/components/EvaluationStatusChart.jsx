@@ -1,59 +1,61 @@
 import React, { useEffect, useState } from 'react';
 import { ResponsiveBar } from '@nivo/bar';
-import { apiUrl } from '../config/config';
 
 const EvaluationStatusChart = () => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Fetch the 3rd month evaluation status
-                const thirdMonthResponse = await fetch(`${apiUrl}evaluation/thirdMonthStatus`);
-                if (!thirdMonthResponse.ok) {
-                    throw new Error(`HTTP error! status: ${thirdMonthResponse.status}`);
+                const [thirdMonthResponse, fifthMonthResponse] = await Promise.all([
+                    fetch('http://localhost:8080/evaluation/thirdMonthStatus'),
+                    fetch('http://localhost:8080/evaluation/fifthMonthStatus'),
+                ]);
+
+                if (!thirdMonthResponse.ok || !fifthMonthResponse.ok) {
+                    throw new Error('One or more fetch requests failed');
                 }
-                const thirdMonthData = await thirdMonthResponse.json();
 
-                // Fetch the 5th month evaluation status
-                const fifthMonthResponse = await fetch(`${apiUrl}evaluation/fifthMonthStatus`);
-                if (!fifthMonthResponse.ok) {
-                    throw new Error(`HTTP error! status: ${fifthMonthResponse.status}`);
-                }
-                const fifthMonthData = await fifthMonthResponse.json();
+                const [thirdMonthData, fifthMonthData] = await Promise.all([
+                    thirdMonthResponse.json(),
+                    fifthMonthResponse.json(),
+                ]);
 
-                // Fetch the total number of probationary employees
-                const totalEmployeesResponse = await fetch(`${apiUrl}user/countProbationaryUsers`);
-                if (!totalEmployeesResponse.ok) {
-                    throw new Error(`HTTP error! status: ${totalEmployeesResponse.status}`);
-                }
-                const totalEmployees = await totalEmployeesResponse.json();
+                const totalThirdMonthEvaluations = thirdMonthData.completed + thirdMonthData.notCompleted;
+                const totalFifthMonthEvaluations = fifthMonthData.completed + fifthMonthData.notCompleted;
 
-                // Calculate percentages
-                const thirdMonthCompletedPercentage = totalEmployees > 0 ? ((thirdMonthData.completed / totalEmployees) * 100).toFixed(2) : 0;
-                const thirdMonthNotCompletedPercentage = totalEmployees > 0 ? ((thirdMonthData.notCompleted / totalEmployees) * 100).toFixed(2) : 0;
-                const fifthMonthCompletedPercentage = totalEmployees > 0 ? ((fifthMonthData.completed / totalEmployees) * 100).toFixed(2) : 0;
-                const fifthMonthNotCompletedPercentage = totalEmployees > 0 ? ((fifthMonthData.notCompleted / totalEmployees) * 100).toFixed(2) : 0;
+                const calculatePercentages = (completed, total) => {
+                    const completedPercentage = total > 0 ? ((completed / total) * 100).toFixed(2) : 0;
+                    const notCompletedPercentage = total > 0 ? (((total - completed) / total) * 100).toFixed(2) : 0;
+                    return {
+                        completedPercentage: parseFloat(completedPercentage),
+                        notCompletedPercentage: parseFloat(notCompletedPercentage),
+                    };
+                };
 
-                // Combine data into chart format
+                const thirdMonthPercentages = calculatePercentages(thirdMonthData.completed, totalThirdMonthEvaluations);
+                const fifthMonthPercentages = calculatePercentages(fifthMonthData.completed, totalFifthMonthEvaluations);
+
                 const chartData = [
                     {
-                        evaluation: '3rd Evaluation',
-                        completed: parseFloat(thirdMonthCompletedPercentage) || 0,
-                        notCompleted: parseFloat(thirdMonthNotCompletedPercentage) || 0,
+                        evaluation: '3rd Month',
+                        completed: thirdMonthPercentages.completedPercentage,
+                        notCompleted: thirdMonthPercentages.notCompletedPercentage,
                     },
                     {
-                        evaluation: '5th Evaluation',
-                        completed: parseFloat(fifthMonthCompletedPercentage) || 0,
-                        notCompleted: parseFloat(fifthMonthNotCompletedPercentage) || 0,
+                        evaluation: '5th Month',
+                        completed: fifthMonthPercentages.completedPercentage,
+                        notCompleted: fifthMonthPercentages.notCompletedPercentage,
                     },
                 ];
-                setData(chartData);
 
+                setData(chartData);
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching data:', error);
+                setError('Failed to load data. Please try again later.');
                 setLoading(false);
             }
         };
@@ -63,6 +65,10 @@ const EvaluationStatusChart = () => {
 
     if (loading) {
         return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>{error}</div>;
     }
 
     if (data.length === 0) {
@@ -85,12 +91,11 @@ const EvaluationStatusChart = () => {
             axisRight={null}
             axisBottom={{
                 tickSize: 5,
-                tickPadding: 1,
+                tickPadding: 5,
                 tickRotation: 0,
-                legend: 'Percentage',
                 legendPosition: 'middle',
-                legendOffset: 22,
-                tickValues: [0, 20, 40, 60, 80, 100], // Ensure tick values from 0 to 100
+                legendOffset: 40,
+                tickValues: [0, 20, 40, 60, 80, 100],
                 format: (value) => `${value}%`,
             }}
             axisLeft={{
@@ -99,8 +104,8 @@ const EvaluationStatusChart = () => {
                 tickRotation: 0,
                 legend: 'Evaluation',
                 legendPosition: 'middle',
-                legendOffset: -100,
-                tickValues: data.map(d => d.evaluation), // Ensure tick values are based on evaluation categories
+                legendOffset: -99,
+                tickValues: data.map(d => d.evaluation),
                 renderTick: ({ opacity, textAnchor, textBaseline, value, x, y, onMouseEnter, onMouseMove, onMouseLeave }) => (
                     <g
                         transform={`translate(${x},${y})`}
@@ -112,12 +117,12 @@ const EvaluationStatusChart = () => {
                         <text
                             alignmentBaseline={textBaseline}
                             textAnchor={textAnchor}
-                            style={{ fontSize: 14, fontWeight: 'bold' ,fontSize:'12px'}} // Increase font size and make bold
+                            style={{ fontSize: 14, fontWeight: 'bold' }}
                         >
                             {value}
                         </text>
                     </g>
-                )
+                ),
             }}
             label={(d) => (
                 <tspan style={{ fill: '#ffffff', fontWeight: 'bold' }}>{`${d.value}%`}</tspan>
