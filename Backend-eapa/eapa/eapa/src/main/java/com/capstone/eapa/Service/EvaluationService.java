@@ -130,12 +130,20 @@ public class EvaluationService {
         return evalRepo.findEvalIDByUserIDAndPeriodAndStageAndEvalType(userID, period, stage, evalType);
     }
 
-    // Get evaluation ID for assigned peer
-    public Integer getEvalIDByUserIDPeriodStageEvalTypePeerID(int userID, String period, String stage, String evalType,
-            int peerID) {
-        return evalRepo.findEvalIDByUserIDAndPeriodAndStageAndEvalTypeAndPeerID(userID, period, stage, evalType,
-                peerID);
+    //get peer id using eval id
+    public Integer getPeerIDByEvalID(int evalID) {
+        Integer peerID = evalRepo.findPeerIDByEvalID(evalID);
+        return peerID;
     }
+
+    //Get evaluation ID for assigned peer
+    public Integer getEvalIDByUserIDPeriodStageEvalTypePeerID(int userID, String period, String stage, String evalType, int peerID) {
+        return evalRepo.findEvalIDByUserIDAndPeriodAndStageAndEvalTypeAndPeerID(userID, period, stage, evalType, peerID);
+    }
+//    public Integer getEvalIDByUserIDPeriodStageEvalTypePeerID(int userID, String period, String stage, String evalType, int peerID) {
+//        Integer evalID = evalRepo.findEvalIDByUserIDAndPeriodAndStageAndEvalTypeAndPeerID(userID, period, stage, evalType, peerID);
+//        return evalID != null ? evalID : null;
+//    }
 
     // Get evaluation ID for HEAD
     public Integer getEvalIDByUserIdPeriodStageHead(int userID, int empID, String period, String stage,

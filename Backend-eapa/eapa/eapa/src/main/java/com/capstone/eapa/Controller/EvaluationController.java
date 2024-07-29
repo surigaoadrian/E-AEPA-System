@@ -8,6 +8,7 @@ import com.capstone.eapa.DTO.PeerEvaluationDTO;
 import com.capstone.eapa.Entity.EvaluationEntity;
 import com.capstone.eapa.Service.EvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
@@ -74,7 +75,7 @@ public class EvaluationController {
         return evalServ.getAggregatedEvaluations();
     }
 
-    @GetMapping("/mergedPeerStatus") //done
+    @GetMapping("/mergedPeerStatus")
     public List<PeerEvaluationDTO> getMergedPeerEvaluations() {
         return evalServ.getMergedPeerEvaluations();
     }
@@ -85,7 +86,18 @@ public class EvaluationController {
         return evalServ.isEvaluationCompletedHead(userID, empID, period, stage, evalType);
     }
 
-   //total employees for recommendation
+    @GetMapping("/getPeerID")
+    public ResponseEntity<Integer> getPeerIDByEvalID(@RequestParam int evalID) {
+        Integer peerID = evalServ.getPeerIDByEvalID(evalID);
+        if (peerID != null) {
+            return ResponseEntity.ok(peerID);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+
+      //total employees for recommendation
     @GetMapping("/countRecommendedEmployees")
     public long countRecommendedEmployees() {
         return evalServ.countRecommendedEmployees();

@@ -11,6 +11,7 @@ import ConfirmationModal from "./ConfirmationModal";
 import ReactRouterPrompt from "react-router-prompt";
 import LeaveConfirmationModal from "../modals/LeaveConfirmationModal";
 import { apiUrl } from '../config/config';
+import Loader from "./Loader";
 
 function EvaluationForm({
   stage,
@@ -21,7 +22,7 @@ function EvaluationForm({
   setEvalType,
   selectedEmp,
   selectedAssignedPeerId,
-  randomPeerId,
+  evalID,
 }) {
   const [questions, setQuestions] = useState([]);
   const [responses, setResponses] = useState([]);
@@ -108,6 +109,16 @@ function EvaluationForm({
     "Consistently exceeds expectations.",
   ];
 
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const hasUnsavedChanges = responses.length > 0 || jobResponses.length > 0;
 
   const openModal = () => {
@@ -119,13 +130,68 @@ function EvaluationForm({
   };
 
   //empty the peer when evaluation is open
-  useEffect(() => {
-    if (setOpenForm) {
-      setPeer({});
-    }
-  }, [setOpenForm]);
+  // useEffect(() => {
+  //   if (setOpenForm) {
+  //     setPeer({});
+  //   }
+  // }, [setOpenForm]);
 
-  //fetch id from random
+  const [randomPID, setrandomPID] = useState();
+
+  //fetch peer id
+  useEffect(() => {
+    if (evaluationID) {
+      const fetchPeerID = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:8080/evaluation/getPeerID`,
+            {
+              params: {
+                evalID: evaluationID,
+              },
+            }
+          );
+          console.log("Fetched Peer ID:", response.data);
+          setrandomPID(response.data);
+        } catch (error) {
+          if (error.response) {
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          } else {
+            console.log(`Error: ${error.message}`);
+          }
+        }
+      };
+
+      fetchPeerID();
+    }
+  }, [evaluationID]);
+
+  //fetch random peer details
+  useEffect(() => {
+    if (randomPID) {
+      const fetchRandomPeer = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:8080/user/getUser/${randomPID}`
+          );
+          console.log("Peer data:", response.data); // Debugging log
+          setPeer(response.data);
+        } catch (error) {
+          if (error.response) {
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          } else {
+            console.log(`Error: ${error.message}`);
+          }
+        }
+      };
+
+      fetchRandomPeer();
+    }
+  }, [randomPID]);
 
   //fetch id from assigned peer table
   const [assignPeerID, setAssignPeerID] = useState(null);
@@ -199,14 +265,13 @@ function EvaluationForm({
       try {
         if (evalType === "PEER") {
           response = await axios.get(
-            `${apiUrl}evaluation/getEvalIDAssignedPeer`,
+            "http://localhost:8080/evaluation/getEvalID",
             {
               params: {
                 userID: userId,
                 period: evalPeriod,
                 stage: stageType,
                 evalType: formType,
-                peerID: randomPeerId,
               },
             }
           );
@@ -267,6 +332,8 @@ function EvaluationForm({
 
     return () => clearInterval(intervalId); // Cleanup on unmount
   }, [userId, evalPeriod, stageType]);
+
+  console.log("EVALUATION IDDDD:" + evaluationID);
 
   //fetch selected emp job responses
   useEffect(() => {
@@ -334,31 +401,6 @@ function EvaluationForm({
       fetchAssignedPeer();
     }
   }, [selectedAssignedPeerId, evalType === "PEER-A"]);
-
-  //fetch peer details if peer is selected
-  useEffect(() => {
-    if (evalType === "PEER") {
-      const fetchRandomPeer = async () => {
-        try {
-          const response = await axios.get(
-            `${apiUrl}user/getUser/${randomPeerId}`
-          );
-
-          setPeer(response.data);
-        } catch (error) {
-          if (error.response) {
-            console.log(error.response.data);
-            console.log(error.response.status);
-            console.log(error.response.headers);
-          } else {
-            console.log(`Error: ${error.message}`);
-          }
-        }
-      };
-
-      fetchRandomPeer();
-    }
-  }, [evalType]);
 
   //fetch all questions
   useEffect(() => {
@@ -733,6 +775,10 @@ function EvaluationForm({
   const filteredQuestions = questions.filter(
     (ques) => ques.evalType === formType || ques.kind === "RADIO"
   );
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   return (
     <div style={formContainer}>

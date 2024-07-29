@@ -581,7 +581,6 @@ const fetchPeerThirdMonth = async () => {
         <div className="mx-4 mb-4 mt-10">
             <Typography
               variant="h5"
-              component="div"
               sx={{
                 textAlign: "center",
                 fontWeight: "bold",
@@ -1483,7 +1482,9 @@ const fetchPeerThirdMonth = async () => {
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginRight:'124px' }}>
   <img src={bottomArrow} alt="Bottom Arrow" style={{ width: 'auto', height: '100px' }} />
+  
 </div>
+
 
 {filter === "peer" && (
   <>

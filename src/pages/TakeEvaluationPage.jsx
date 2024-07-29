@@ -5,10 +5,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGears } from "@fortawesome/free-solid-svg-icons";
 import EvaluationForm from "../components/EvaluationForm";
 import PeerEvaluationCard from "../components/PeerEvaluationCard";
-import { apiUrl } from '../config/config';
+import { apiUrl } from "../config/config";
+import Loader from "../components/Loader";
 
 function TakeEvaluationPage() {
+  const [loading, setLoading] = useState(true);
   const [openForm, setOpenForm] = useState(false);
+  const [isFormLoading, setIsFormLoading] = useState(false);
   const [evalType, setEvalType] = useState("");
   const [stage, setStage] = useState("");
   const [openModal, setOpenModal] = useState(false);
@@ -28,13 +31,16 @@ function TakeEvaluationPage() {
   const insertionExecuted = useRef(false);
   const insertionExecuted5th = useRef(false);
 
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
   //fetch school year
   useEffect(() => {
     const fetchSchoolYear = async () => {
       try {
-        const response = await axios.get(
-          `${apiUrl}schoolYear/currentyear`
-        );
+        const response = await axios.get(`${apiUrl}schoolYear/currentyear`);
         setSchoolYear(response.data);
       } catch (error) {
         if (error.response) {
@@ -54,9 +60,7 @@ function TakeEvaluationPage() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get(
-          `${apiUrl}user/getUser/${userID}`
-        );
+        const response = await axios.get(`${apiUrl}user/getUser/${userID}`);
         setLoggedUser(response.data);
         setDateHired(response.data.dateHired);
       } catch (error) {
@@ -75,6 +79,13 @@ function TakeEvaluationPage() {
   //3rd
   const evaluationStartDate = new Date(dateHired);
   evaluationStartDate.setMonth(evaluationStartDate.getMonth() + 2);
+
+  // Format the date
+  const formattedDate = evaluationStartDate.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 
   //5th
   const evaluationStartDate5th = new Date(dateHired);
@@ -291,20 +302,18 @@ function TakeEvaluationPage() {
   };
 
   const [randomPeer, setRandomPeer] = useState({});
+  const [evalID, setEvalID] = useState();
 
   useEffect(() => {
-    if (evalType === "PEER" && loggedUser.dept && loggedUser.userID) {
+    if (evalType === "PEER") {
       const fetchRandomPeer = async () => {
         try {
-          const response = await axios.get(
-            `${apiUrl}/user/randomPeer`,
-            {
-              params: {
-                dept: loggedUser.dept,
-                excludedUserID: loggedUser.userID,
-              },
-            }
-          );
+          const response = await axios.get(`${apiUrl}/user/randomPeer`, {
+            params: {
+              dept: loggedUser.dept,
+              excludedUserID: loggedUser.userID,
+            },
+          });
           setRandomPeer(response.data);
 
           console.log("Random Peer fetched:", response.data);
@@ -320,7 +329,7 @@ function TakeEvaluationPage() {
       };
       fetchRandomPeer();
     }
-  }, [evalType, loggedUser.dept, loggedUser.userID]);
+  }, [evalType]);
 
   const handleConfirm = async () => {
     setOpenForm(true);
@@ -435,18 +444,18 @@ function TakeEvaluationPage() {
     if (evalType === "PEER") {
       try {
         const response = await axios.get(
-          `${apiUrl}evaluation/getEvalIDAssignedPeer`,
+          "http://localhost:8080/evaluation/getEvalID",
           {
             params: {
               userID: userID,
               period: period,
               stage: selectedStage,
               evalType: evalType,
-              peerID: randomPeer.userID,
             },
           }
         );
         existingEvalID = response.data;
+        setEvalID(response.data);
         console.log("Existing evaluation ID:", existingEvalID);
       } catch (error) {
         if (error.response) {
@@ -456,6 +465,7 @@ function TakeEvaluationPage() {
         } else {
           console.log(`Error: ${error.message}`);
         }
+        existingEvalID = null; // Handle the case where no evaluation is found
       }
     } else if (evalType === "PEER-A") {
       try {
@@ -481,20 +491,18 @@ function TakeEvaluationPage() {
         } else {
           console.log(`Error: ${error.message}`);
         }
+        existingEvalID = null; // Handle the case where no evaluation is found
       }
     } else {
       try {
-        const response = await axios.get(
-          `${apiUrl}evaluation/getEvalID`,
-          {
-            params: {
-              userID: userID,
-              period: period,
-              stage: selectedStage,
-              evalType: evalType,
-            },
-          }
-        );
+        const response = await axios.get(`${apiUrl}evaluation/getEvalID`, {
+          params: {
+            userID: userID,
+            period: period,
+            stage: selectedStage,
+            evalType: evalType,
+          },
+        });
         existingEvalID = response.data;
         console.log("Existing evaluation ID:", existingEvalID);
       } catch (error) {
@@ -507,6 +515,8 @@ function TakeEvaluationPage() {
         }
       }
     }
+
+    console.log("Final value of existingEvalID:", existingEvalID);
 
     if (!existingEvalID) {
       try {
@@ -535,8 +545,13 @@ function TakeEvaluationPage() {
   console.log(selectedAssignedPeerId);
 
   const handleOpenForm = (stage) => {
+    setIsFormLoading(true); // Start form loading immediately
     setOpenForm(!openForm);
     setStage(stage);
+
+    setTimeout(() => {
+      setIsFormLoading(false); // Stop form loading after delay
+    }, 1000); // Adjust delay as needed
   };
 
   const handleEvalTypeChange = (e) => {
@@ -580,24 +595,26 @@ function TakeEvaluationPage() {
         >
           Evaluation
         </h1>
-        {/* <div style={dateHiredStyles}>
-          <p>Date Hired:</p>
-          <p>{loggedUser.dateHired}</p>
-        </div> */}
         <div></div>
       </div>
 
-      {openForm ? (
-        <EvaluationForm
-          period={period}
-          loggedUser={loggedUser}
-          stage={stage}
-          evalType={evalType}
-          setOpenForm={setOpenForm}
-          setEvalType={setEvalType}
-          selectedAssignedPeerId={selectedAssignedPeerId}
-          randomPeerId={randomPeer.userID}
-        />
+      {loading ? (
+        <Loader />
+      ) : openForm ? (
+        isFormLoading ? (
+          <Loader />
+        ) : (
+          <EvaluationForm
+            period={period}
+            loggedUser={loggedUser}
+            stage={stage}
+            evalType={evalType}
+            setOpenForm={setOpenForm}
+            setEvalType={setEvalType}
+            selectedAssignedPeerId={selectedAssignedPeerId}
+            evalID={evalID}
+          />
+        )
       ) : (
         <div style={{ position: "relative" }}>
           {today >= evaluationStartDate &&
@@ -605,6 +622,8 @@ function TakeEvaluationPage() {
               <EvaluationCard
                 id={"3rdMonth"}
                 period={"3rd Month"}
+                dateHired={dateHired}
+                evalDate={formattedDate}
                 loggedUser={loggedUser}
                 evalType={evalType}
                 handleOpenForm={handleOpenForm}
@@ -638,20 +657,6 @@ function TakeEvaluationPage() {
                 setActiveCard={setActiveCard}
               />
             )}
-          {/* <EvaluationCard
-            period={"Annual"}
-            loggedUser={loggedUser}
-            evalType={evalType}
-            handleOpenForm={handleOpenForm}
-            handleEvalTypeChange={handleEvalTypeChange}
-            setEvalType={setEvalType}
-            handleOpenModal={handleOpenModal}
-            openModal={openModal}
-            handleCloseModal={handleCloseModal}
-            handleConfirm={handleConfirm}
-          /> */}
-
-          {/* to be fixed */}
 
           {evaluateesDetails && evaluateesDetails.length > 0
             ? evaluateesDetails.map((evalDeets) => {

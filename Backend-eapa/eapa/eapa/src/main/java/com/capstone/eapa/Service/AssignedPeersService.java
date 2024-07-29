@@ -104,4 +104,33 @@ public class AssignedPeersService {
     public List<Integer> getEvaluatorIdsByAssignedPeersId(int assignedPeersId) {
         return apRepo.findEvaluatorIdsByAssignedPeersId(assignedPeersId);
     }
+
+    //update evaluator
+    public void updateAssignedEvaluators(int assignPeerId, List<Integer> evaluatorIds) {
+        Optional<AssignedPeersEntity> optionalAssignedPeers = apRepo.findById(assignPeerId);
+        if (optionalAssignedPeers.isPresent()) {
+            AssignedPeersEntity assignedPeers = optionalAssignedPeers.get();
+
+            // Clear current evaluators
+            assignedPeers.getEvaluators().clear();
+
+            // Add new evaluators based on provided IDs
+            for (Integer evaluatorId : evaluatorIds) {
+                Optional<UserEntity> evaluator = userRepo.findById(evaluatorId);
+                if (evaluator.isPresent()) {
+                    AssignedPeerEvaluators assignedPeerEvaluators = new AssignedPeerEvaluators();
+                    assignedPeerEvaluators.setAssignedPeers(assignedPeers);
+                    assignedPeerEvaluators.setEvaluator(evaluator.get());
+                    assignedPeerEvaluators.setStatus("PENDING"); // or some default status
+                    assignedPeers.getEvaluators().add(assignedPeerEvaluators);
+                } else {
+                    throw new RuntimeException("User not found with id: " + evaluatorId);
+                }
+            }
+            apRepo.save(assignedPeers);
+        } else {
+            throw new RuntimeException("Assigned peers not found with id: " + assignPeerId);
+        }
+    }
+
 }

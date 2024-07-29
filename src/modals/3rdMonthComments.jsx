@@ -33,7 +33,7 @@ const ThirdComments = ({ userId, filter, role }) => {
     const comments = commentsResponse.data;
 
     // Fetch response IDs
-    const responsesResponse = await axios.get(`${apiUrl}response/getAllResponses`);
+    const responsesResponse = await axios.get(`${apiUrl}response/getAllResponses`);;
     const responses = responsesResponse.data;
 
     // Update comments and response IDs state
@@ -159,7 +159,6 @@ useEffect(() => {
                   backgroundColor: "black",
                   color: "white",
                   fontSize: "1rem",
-                  fontWeight: "bold",
                   height: "40px",
                   display: "flex",
                   alignItems: "center",
@@ -364,7 +363,6 @@ useEffect(() => {
                   backgroundColor: "black",
                   color: "white",
                   fontSize: "1rem",
-                  fontWeight: "bold",
                   height: "40px",
                   display: "flex",
                   alignItems: "center",

@@ -125,7 +125,6 @@ const ThirdMonthEval = ({ userId, filter }) => {
     const selfJBPA = validNumber(overallSelfJBPA);
     const headJBPA = validNumber(overallHeadJBPA);
     const peerVBPA = validNumber(overallPeerVBPA);
-
     const vbpaAverage = ((selfVBPA + headVBPA + peerVBPA) / 3).toFixed(2);
     const jbpaAverage = ((selfJBPA + headJBPA) / 2).toFixed(2);
     const overallAverage = (((vbpaAverage * .6) + (jbpaAverage * .4))).toFixed(2);
@@ -301,7 +300,7 @@ const ThirdMonthEval = ({ userId, filter }) => {
               },
             }
           );
-
+      
           const data = response.data;
           const overallHeadJBPA = handleOverallHeadJBPA(data);
           const roundedOverallHeadJBPA = parseFloat(overallHeadJBPA.toFixed(2));
@@ -311,6 +310,7 @@ const ThirdMonthEval = ({ userId, filter }) => {
           console.error(`Error: ${error.message}`);
         }
       };
+      
 
 
       //HEAD VALUES
@@ -324,22 +324,19 @@ const ThirdMonthEval = ({ userId, filter }) => {
               },
             }
           );
-
+      
           const data = response.data;
-
           // Rounding each value to two decimal places
           const roundedCultureOfExcellenceAverage = parseFloat(data.cultureOfExcellenceAverage.toFixed(2));
           const roundedIntegrityAverage = parseFloat(data.integrityAverage.toFixed(2));
           const roundedTeamworkAverage = parseFloat(data.teamworkAverage.toFixed(2));
           const roundedUniversalityAverage = parseFloat(data.universalityAverage.toFixed(2));
-
           const overallHeadVBPA = handleOverallHeadVBPA(
             roundedCultureOfExcellenceAverage,
             roundedIntegrityAverage,
             roundedTeamworkAverage,
             roundedUniversalityAverage
           );
-
           setHeadCultAve(roundedCultureOfExcellenceAverage);
           setHeadIntAve(roundedIntegrityAverage);
           setHeadTeamAve(roundedTeamworkAverage);
@@ -353,6 +350,7 @@ const ThirdMonthEval = ({ userId, filter }) => {
           console.error(`Error: ${error.message}`);
         }
       };
+      
 
 
       fetchSelfValuesThirdMonth();
@@ -360,7 +358,6 @@ const ThirdMonthEval = ({ userId, filter }) => {
       fetchHeadValuesThirdMonth();
       fetchHeadJobThirdMonth();
       fetchPeerThirdMonth();
-
     };
 
     fetchData();
