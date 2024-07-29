@@ -471,8 +471,8 @@ function NavBar() {
         </Box>
         <DialogContent>
           <DialogContentText style={{ fontFamily: 'Poppins', fontSize: '15px' }}>
-            <Box sx={{bgcolor: 'rgba(128, 128, 128, 0.2)' , height:'7vh', borderRadius:'.5em'}}>
-              <Typography style={{padding:'5px', fontFamily: 'Poppins', fontSize: '13px',  }}>Switching to <span style={{fontStyle:'italic', color:'#8c383e'}}>'{targetUsername}'</span>, an <span style={{fontStyle:'italic', fontWeight:'initial'}}>{targetRole}</span> account of yours. Please enter your  <span style={{fontWeight:'bold'}}>password</span> to confirm this change.</Typography>
+            <Box sx={{bgcolor: 'rgba(128, 128, 128, 0.2)' , height:'8.2vh', borderRadius:'.5em'}}>
+            <Typography style={{padding:'5px', fontFamily: 'Poppins', fontSize: '13px',  }}> Switching to <span style={{fontStyle:'italic', color:'#8c383e', fontWeight:600}}>'{targetUsername}'</span>, an <span style={{fontStyle:'italic', fontWeight:500}}>{targetRole}</span> account of yours. To confirm, please enter the <span style={{fontWeight:700}}>password</span> for <span style={{fontStyle:'italic', color:'#8c383e',fontWeight:600}}>'{targetUsername}'</span>.</Typography>            
             </Box>
            
             <div style={{ display: "flex", flexDirection: "column", marginTop: '1.2vh', marginLeft: '2em' }}>
