@@ -308,7 +308,7 @@ function TakeEvaluationPage() {
     if (evalType === "PEER") {
       const fetchRandomPeer = async () => {
         try {
-          const response = await axios.get(`${apiUrl}/user/randomPeer`, {
+          const response = await axios.get(`${apiUrl}user/randomPeer`, {
             params: {
               dept: loggedUser.dept,
               excludedUserID: loggedUser.userID,
@@ -330,6 +330,8 @@ function TakeEvaluationPage() {
       fetchRandomPeer();
     }
   }, [evalType]);
+
+  console.log("random peer: "+randomPeer);
 
   const handleConfirm = async () => {
     setOpenForm(true);

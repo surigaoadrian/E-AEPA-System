@@ -96,6 +96,12 @@ public class EvaluationController {
         }
     }
 
+    @GetMapping("/getPeerEvaluationAverages")
+    public ResponseEntity<AveragesDTO> getPeerEvaluationAverages(@RequestParam int peerID, @RequestParam int userID, @RequestParam String period, @RequestParam String evalType) {
+        AveragesDTO averages = evalServ.getPeerEvaluationAverages(peerID, userID, period, evalType);
+        return ResponseEntity.ok(averages);
+    }
+
 
       //total employees for recommendation
     @GetMapping("/countRecommendedEmployees")

@@ -107,37 +107,65 @@ function EvaluateEmployee() {
 
     console.log("Evaluation object to be sent:", evaluation);
 
-    try {
-      const response = await axios.post(
-        `${apiUrl}evaluation/createEvaluation`,
-        evaluation
-      );
+    let existingEvalID = null;
 
-      const evalPeriod = getEvaluationPeriod(selectedEmp.probeStatus);
-      await handleCompleteStatus(
-        userID,
-        selectedEmp.userID,
-        evalPeriod,
-        "VALUES",
-        "HEAD"
-      );
-      await handleCompleteStatus(
-        userID,
-        selectedEmp.userID,
-        evalPeriod,
-        "JOB",
-        "HEAD"
-      );
+    try {
+      const response = await axios.get(`${apiUrl}evaluation/getEvalIDHead`, {
+        params: {
+          userID: userID,
+          empID: selectedEmp.userID,
+          period: period,
+          stage: selectedStage,
+          evalType: "HEAD",
+        }
+      });
+      existingEvalID = response.data;
     } catch (error) {
-      console.error("Creating evaluation failed", error);
-      if (error.response) {
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
-      } else {
-        console.log(`Error: ${error.message}`);
+      console.error("Fetching evaluation id failed", error);
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else {
+          console.log(`Error: ${error.message}`);
+        }
+    }
+
+    if(!existingEvalID){
+      try {
+        const response = await axios.post(
+          `${apiUrl}evaluation/createEvaluation`,
+          evaluation
+        );
+  
+        const evalPeriod = getEvaluationPeriod(selectedEmp.probeStatus);
+        await handleCompleteStatus(
+          userID,
+          selectedEmp.userID,
+          evalPeriod,
+          "VALUES",
+          "HEAD"
+        );
+        await handleCompleteStatus(
+          userID,
+          selectedEmp.userID,
+          evalPeriod,
+          "JOB",
+          "HEAD"
+        );
+      } catch (error) {
+        console.error("Creating evaluation failed", error);
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else {
+          console.log(`Error: ${error.message}`);
+        }
       }
     }
+
+    
   };
 
   const handleClick = (event, selectedUser) => {
