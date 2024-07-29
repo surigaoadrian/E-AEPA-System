@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import axios from 'axios';
 
 const COLORS = ['#FFBA00', '#597001'];
 
@@ -11,12 +10,12 @@ const EmployeeStatusChart = () => {
     const fetchData = async () => {
       try {
         const [probationaryRes, regularRes] = await Promise.all([
-          axios.get(`user/countProbationaryUsers`),
-          axios.get(`user/getRegularEmployees`)
+          fetch(`http://localhost:8080/user/countProbationaryUsers`),
+          fetch(`http://localhost:8080/user/getRegularEmployees`)
         ]);
 
-        const probationaryCount = probationaryRes.data;
-        const regularCount = regularRes.data;
+        const probationaryCount = await probationaryRes.json();
+        const regularCount = await regularRes.json();
 
         const total = probationaryCount + regularCount;
 
@@ -40,7 +39,7 @@ const EmployeeStatusChart = () => {
   };
 
   return (
-    <div style={{ textAlign: 'center', padding: '20px', borderRadius: '8px', width: '100%', height: '100%' }}>
+    <div style={{ textAlign: 'center', padding: '20px', borderRadius: '8px', width: '100%', height: '300px' }}>
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
@@ -48,7 +47,7 @@ const EmployeeStatusChart = () => {
             cx="50%"
             cy="50%"
             innerRadius="40%"
-            outerRadius="80%"
+            outerRadius="90%"
             fill="#8884d8"
             paddingAngle={1}
             dataKey="value"
