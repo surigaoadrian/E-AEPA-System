@@ -81,7 +81,7 @@ const EvaluationStatusChart = () => {
             keys={['completed', 'notCompleted']}
             indexBy="evaluation"
             margin={{ top: 20, right: 20, bottom: 60, left: 120 }}
-            padding={0.2}
+            padding={0.3}
             layout="horizontal"
             valueScale={{ type: 'linear' }}
             indexScale={{ type: 'band', round: true }}
