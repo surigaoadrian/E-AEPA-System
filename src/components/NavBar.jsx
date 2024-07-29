@@ -102,14 +102,14 @@ function NavBar() {
         );
         setLoggedUserData(response.data);
 
-         // Check for admin account
+        // Check for admin account
         //  const adminUsername = `adm_${response.data.username}`;
-         const checkAdminResponse = await axios.get(`http://localhost:8080/checkAdminAccount/${response.data.username}`);
-         setHasAdminAccount(checkAdminResponse.data);
+        const checkAdminResponse = await axios.get(`http://localhost:8080/checkAdminAccount/${response.data.username}`);
+        setHasAdminAccount(checkAdminResponse.data);
 
-         const checkEmpResponse = await axios.get(`http://localhost:8080/checkEmpAccount/${response.data.username}`);
-          setHasEmpAccount(checkEmpResponse.data);
-          console.log("Has Employee account:", checkEmpResponse.data);
+        const checkEmpResponse = await axios.get(`http://localhost:8080/checkEmpAccount/${response.data.username}`);
+        setHasEmpAccount(checkEmpResponse.data);
+        console.log("Has Employee account:", checkEmpResponse.data);
       } catch (error) {
         if (error.response) {
           //not in 200 response range
@@ -146,7 +146,8 @@ function NavBar() {
     setPassword("");
     setOpenPasswordModal(true);
   }
-  const handleSwitchConfirm = async () => {
+  const handleSwitchConfirm = async (e) => {
+    e.preventDefault();
     setMessage("");
     try {
       const response = await axios.post("http://localhost:8080/swapAccount", {
@@ -456,7 +457,7 @@ function NavBar() {
                     }}
                   />
                 </Grid>
-                <Grid  item >Switch Account</Grid>
+                <Grid item >Switch Account</Grid>
               </Grid>
             </Grid>
           </Grid>
@@ -469,66 +470,73 @@ function NavBar() {
             />
           </IconButton>
         </Box>
-        <DialogContent>
-          <DialogContentText style={{ fontFamily: 'Poppins', fontSize: '15px' }}>
-            <Box sx={{bgcolor: 'rgba(128, 128, 128, 0.2)' , height:'8.2vh', borderRadius:'.5em'}}>
-            <Typography style={{padding:'5px', fontFamily: 'Poppins', fontSize: '13px',  }}> Switching to <span style={{fontStyle:'italic', color:'#8c383e', fontWeight:600}}>'{targetUsername}'</span>, an <span style={{fontStyle:'italic', fontWeight:500}}>{targetRole}</span> account of yours. To confirm, please enter the <span style={{fontWeight:700}}>password</span> for <span style={{fontStyle:'italic', color:'#8c383e',fontWeight:600}}>'{targetUsername}'</span>.</Typography>            
-            </Box>
-           
-            <div style={{ display: "flex", flexDirection: "column", marginTop: '1.2vh', marginLeft: '2em' }}>
-              <div style={{ display: "flex", alignItems: "center", marginTop: '1vh' }}>
-                <Typography
-                  color="text.secondary"
-                  sx={{
-                    fontFamily: "Poppins",
-                    fontSize: ".9em",
+        <div style={{ display:'flex', justifyContent:'center',paddingLeft:'1em', paddingRight:'1em', paddingTop:'1em'}}>
+          <Box sx={{ bgcolor: 'rgba(128, 128, 128, 0.2)', height: '8.2vh', borderRadius: '.5em', display: 'flex', justifyContent: 'center' }}>
+            <Typography style={{ padding: '5px', fontFamily: 'Poppins', fontSize: '13px', }}> Switching to <span style={{ fontStyle: 'italic', color: '#8c383e', fontWeight: 600 }}>'{targetUsername}'</span>, an <span style={{ fontStyle: 'italic', fontWeight: 500 }}>{targetRole}</span> account of yours. To confirm, please enter the <span style={{ fontWeight: 700 }}>password</span> for <span style={{ fontStyle: 'italic', color: '#8c383e', fontWeight: 600 }}>'{targetUsername}'</span>.</Typography>
+          </Box>
+        </div>
 
-                  }}
-                >
-                  Password:
-                </Typography>
-                <TextField
-                  placeholder="Enter Password"
-                  size="small"
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={handlePasswordChange}
-                  inputProps={{
-                    style: { fontFamily: "Poppins", fontSize: ".9em" },
-                  }}
-                  style={{ marginLeft: '1.2vh' }}></TextField>
+        <form
+          onSubmit={handleSwitchConfirm}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+             // Center contents horizontally
+            padding: '.5em',
+              width: '100%',
+          }}
+        >
+          <DialogContent>
+            <DialogContentText style={{ fontFamily: 'Poppins', fontSize: '15px' }}>
+              {/* <div style={{display: 'flex', gap: '0.5em' }}> */}
+                <div style={{ display: 'flex', alignItems: 'left',}}>
+                  <Typography
+                    color="text.secondary"
+                    sx={{ fontFamily: 'Poppins', fontSize: '.9em', mr: "10px", mt: '8px' }}
 
-              </div>
-              {message && (
-                <FormHelperText style={{ color: 'red', fontSize: '12px', marginLeft: '7em', fontFamily: 'Poppins' }}>{message}</FormHelperText>
-              )}
-
-            </div>
-
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions sx={{ display: "flex", justifyContent: "center" }}>
-          <Button
-            type="submit"
-            onClick={handleSwitchConfirm}
-            variant="contained"
-            sx={{
-              bgcolor: "#8C383E",
-              height: "2.5em",
-              borderRadius: "5px",
-              textTransform: "none",
-              width: "35%",
-              mr: ".5em",
-              mb: "1em",
-              fontFamily: "Poppins",
-              color: "white",
-              "&:hover": { bgcolor: "#762F34", color: "white" },
-            }}
+                  >
+                    Password:
+                  </Typography>
+                  <TextField
+                    placeholder="Enter Password"
+                    size="small"
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={handlePasswordChange}
+                    inputProps={{ style: { fontFamily: 'Poppins', fontSize: '.9em' } }}
+                    style={{ width: '60%' }}
+                  />
+                </div>
+                {message && (
+                  <FormHelperText style={{ color: 'red', fontSize: '12px', fontFamily: 'Poppins', marginLeft: "7em"}}>
+                    {message}
+                  </FormHelperText>
+                )}
+              {/* </div> */}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions
+            sx={{ display: 'flex', justifyContent: 'center', width: '100%', }}
           >
-            Confirm{" "}
-          </Button>
-        </DialogActions>
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{
+                bgcolor: '#8C383E',
+                borderRadius: '5px',
+                textTransform: 'none',
+                width: '35%',
+                fontFamily: 'Poppins',
+                color: 'white',
+                
+                '&:hover': { bgcolor: '#762F34', color: 'white' },
+              }}
+            >
+              Confirm
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
     </div>
   );
