@@ -113,5 +113,3 @@ const AccomplishmentRateChart = () => {
 };
 
 export default AccomplishmentRateChart;
-
-
