@@ -9,21 +9,22 @@ const EvaluationStatusChart = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [thirdMonthResponse, fifthMonthResponse, totalEmployeesResponse] = await Promise.all([
+                const [thirdMonthResponse, fifthMonthResponse] = await Promise.all([
                     fetch('http://localhost:8080/evaluation/thirdMonthStatus'),
                     fetch('http://localhost:8080/evaluation/fifthMonthStatus'),
-                    fetch('http://localhost:8080/user/countProbationaryUsers'),
                 ]);
 
-                if (!thirdMonthResponse.ok || !fifthMonthResponse.ok || !totalEmployeesResponse.ok) {
+                if (!thirdMonthResponse.ok || !fifthMonthResponse.ok) {
                     throw new Error('One or more fetch requests failed');
                 }
 
-                const [thirdMonthData, fifthMonthData, totalEmployees] = await Promise.all([
+                const [thirdMonthData, fifthMonthData] = await Promise.all([
                     thirdMonthResponse.json(),
                     fifthMonthResponse.json(),
-                    totalEmployeesResponse.json(),
                 ]);
+
+                const totalThirdMonthEvaluations = thirdMonthData.completed + thirdMonthData.notCompleted;
+                const totalFifthMonthEvaluations = fifthMonthData.completed + fifthMonthData.notCompleted;
 
                 const calculatePercentages = (completed, total) => {
                     const completedPercentage = total > 0 ? ((completed / total) * 100).toFixed(2) : 0;
@@ -34,17 +35,17 @@ const EvaluationStatusChart = () => {
                     };
                 };
 
-                const thirdMonthPercentages = calculatePercentages(thirdMonthData.completed, totalEmployees);
-                const fifthMonthPercentages = calculatePercentages(fifthMonthData.completed, totalEmployees);
+                const thirdMonthPercentages = calculatePercentages(thirdMonthData.completed, totalThirdMonthEvaluations);
+                const fifthMonthPercentages = calculatePercentages(fifthMonthData.completed, totalFifthMonthEvaluations);
 
                 const chartData = [
                     {
-                        evaluation: '3rd Evaluation',
+                        evaluation: '3rd Month',
                         completed: thirdMonthPercentages.completedPercentage,
                         notCompleted: thirdMonthPercentages.notCompletedPercentage,
                     },
                     {
-                        evaluation: '5th Evaluation',
+                        evaluation: '5th Month',
                         completed: fifthMonthPercentages.completedPercentage,
                         notCompleted: fifthMonthPercentages.notCompletedPercentage,
                     },
@@ -80,7 +81,7 @@ const EvaluationStatusChart = () => {
             keys={['completed', 'notCompleted']}
             indexBy="evaluation"
             margin={{ top: 20, right: 20, bottom: 60, left: 120 }}
-            padding={0.3}
+            padding={0.2}
             layout="horizontal"
             valueScale={{ type: 'linear' }}
             indexScale={{ type: 'band', round: true }}
@@ -92,9 +93,8 @@ const EvaluationStatusChart = () => {
                 tickSize: 5,
                 tickPadding: 5,
                 tickRotation: 0,
-                legend: 'Percentage',
                 legendPosition: 'middle',
-                legendOffset: 32,
+                legendOffset: 40,
                 tickValues: [0, 20, 40, 60, 80, 100],
                 format: (value) => `${value}%`,
             }}
@@ -104,7 +104,7 @@ const EvaluationStatusChart = () => {
                 tickRotation: 0,
                 legend: 'Evaluation',
                 legendPosition: 'middle',
-                legendOffset: -100,
+                legendOffset: -99,
                 tickValues: data.map(d => d.evaluation),
                 renderTick: ({ opacity, textAnchor, textBaseline, value, x, y, onMouseEnter, onMouseMove, onMouseLeave }) => (
                     <g
@@ -117,7 +117,7 @@ const EvaluationStatusChart = () => {
                         <text
                             alignmentBaseline={textBaseline}
                             textAnchor={textAnchor}
-                            style={{ fontSize: 12, fontWeight: 'bold' }}
+                            style={{ fontSize: 14, fontWeight: 'bold' }}
                         >
                             {value}
                         </text>
@@ -160,4 +160,3 @@ const EvaluationStatusChart = () => {
 };
 
 export default EvaluationStatusChart;
-
