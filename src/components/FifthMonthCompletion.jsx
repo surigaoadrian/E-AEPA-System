@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Typography from '@mui/material/Typography';
-import { apiUrl } from '../config/config';
+
 const FifthMonthCompletion = () => {
     const [count, setCount] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -8,7 +8,7 @@ const FifthMonthCompletion = () => {
     useEffect(() => {
         const fetchCompletedCount = async () => {
             try {
-                const response = await fetch(`${apiUrl}evaluation/fifthMonthStatus`);
+                const response = await fetch('http://localhost:8080/evaluation/fifthMonthCompleted');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
