@@ -13,6 +13,10 @@ public interface EvaluationRepository extends JpaRepository<EvaluationEntity, In
     @Query(value = "SELECT * FROM tblevaluation eval WHERE eval.is_deleted = 0", nativeQuery = true)
     List<EvaluationEntity> findAllEvals();
 
+    //return peer id using eval id
+    @Query("SELECT e.peer.userID FROM EvaluationEntity e WHERE e.evalID = :evalID AND e.isDeleted = 0")
+    Integer findPeerIDByEvalID(@Param("evalID") int evalID);
+
     //Query to get evaluation id
     @Query(value = "SELECT evalID FROM tblevaluation WHERE TRIM(user_id) = :userID AND TRIM(period) = :period AND TRIM(stage) = :stage AND TRIM(eval_type) = :evalType AND TRIM(is_deleted) = 0", nativeQuery = true)
     Integer findEvalIDByUserIDAndPeriodAndStageAndEvalType(int userID, String period, String stage, String evalType);

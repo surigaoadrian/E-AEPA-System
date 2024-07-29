@@ -7,6 +7,7 @@ import com.capstone.eapa.DTO.EvaluationStatusDTO;
 import com.capstone.eapa.Entity.EvaluationEntity;
 import com.capstone.eapa.Service.EvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
@@ -73,6 +74,16 @@ public class EvaluationController {
     @GetMapping("/isEvaluationCompletedHead")
     public boolean isEvaluationCompletedHead(@RequestParam int userID, @RequestParam int empID, @RequestParam String period, @RequestParam String stage, @RequestParam String evalType) {
         return evalServ.isEvaluationCompletedHead(userID, empID, period, stage, evalType);
+    }
+
+    @GetMapping("/getPeerID")
+    public ResponseEntity<Integer> getPeerIDByEvalID(@RequestParam int evalID) {
+        Integer peerID = evalServ.getPeerIDByEvalID(evalID);
+        if (peerID != null) {
+            return ResponseEntity.ok(peerID);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
 
