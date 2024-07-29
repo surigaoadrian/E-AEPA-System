@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import axios from 'axios';
-import { Box, Select, MenuItem, Typography } from '@mui/material';
+import { Box, Select, MenuItem, Typography, CircularProgress } from '@mui/material';
 import { styled } from '@mui/system';
-import { apiUrl } from '../config/config';
 
 const BorderlessSelect = styled(Select)({
   '& .MuiOutlinedInput-notchedOutline': {
@@ -25,41 +24,39 @@ const AccomplishmentRateChart = () => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [period, setPeriod] = useState('annual');
+  const [error, setError] = useState(null);
 
   const getEndpoint = (period) => {
     switch (period) {
       case 'annual':
-        return `${apiUrl}/evaluation/annualPerDept`;
+        return 'http://localhost:8080/evaluation/annualPerDept';
       case 'thirdMonth':
-        return `${apiUrl}evaluation/thirdMonthPerDept`;
+        return 'http://localhost:8080/evaluation/thirdMonthPerDept';
       case 'fifthMonth':
-        return `${apiUrl}evaluation/fifthMonthPerDept`;
+        return 'http://localhost:8080/evaluation/fifthMonthPerDept';
       default:
-        return `${apiUrl}evaluation/annualPerDept`;
+        return 'http://localhost:8080/evaluation/annualPerDept';
     }
   };
 
   useEffect(() => {
     const endpoint = getEndpoint(period);
+    setIsLoading(true);
+    setError(null);
     axios.get(endpoint)
       .then(response => {
-        if (response.data && response.data.length > 0) {
-          setData(response.data);
-        } else {
-          setData([]); // Reset data if response is empty
-        }
+        setData(response.data || []);
         setIsLoading(false);
       })
       .catch(error => {
         console.error('Error fetching data:', error);
-        setData([]); // Reset data on error
+        setError('Failed to load data');
         setIsLoading(false);
       });
   }, [period]);
 
   const handlePeriodChange = (event) => {
     setPeriod(event.target.value);
-    setIsLoading(true); // Set loading state to true while fetching new data
   };
 
   const chartHeight = data.length > 10 ? data.length * 40 : 342;
@@ -82,33 +79,31 @@ const AccomplishmentRateChart = () => {
         </BorderlessSelect>
       </Box>
       {isLoading ? (
-        <div>Loading...</div>
+        <Box display="flex" justifyContent="center" alignItems="center" height={chartHeight}>
+          <CircularProgress />
+        </Box>
+      ) : error ? (
+        <Box display="flex" justifyContent="center" alignItems="center" height={chartHeight}>
+          <Typography color="error">{error}</Typography>
+        </Box>
       ) : data.length === 0 ? (
-        <div>No data available for the selected period</div>
+        <Box display="flex" justifyContent="center" alignItems="center" height={chartHeight}>
+          <Typography>No data available for the selected period</Typography>
+        </Box>
       ) : (
-        <Box sx={{ overflowY: 'auto', maxHeight: 342 }}>
+        <Box sx={{ overflowX: 'auto', maxHeight: 342 }}>
           <ResponsiveContainer width="100%" height={chartHeight}>
             <BarChart
               data={data}
-              layout="vertical"
+              layout="horizontal"
               margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" />
-              <YAxis
-                type="category"
-                dataKey="department"
-                tick={({ x, y, payload }) => (
-                  <text x={x} y={y} dy={16} textAnchor="end" fill="#666" fontSize={13}>
-                    {payload.value}
-                  </text>
-                )}
-              />
+              <XAxis type="category" dataKey="department" label={{ value: 'Department', position: 'insideBottomRight', offset: 0 }} />
+              <YAxis type="number" tickFormatter={(tick) => Math.floor(tick)} label={{ value: 'Count', angle: -90, position: 'insideLeft' }} />
               <Tooltip />
               <Legend />
-              {data.map((entry, index) => (
-                <Bar key={entry.department} dataKey="count" fill={getColor(index)} />
-              ))}
+              <Bar dataKey="count" fill={colorPalette[0]} />
             </BarChart>
           </ResponsiveContainer>
         </Box>
@@ -118,3 +113,5 @@ const AccomplishmentRateChart = () => {
 };
 
 export default AccomplishmentRateChart;
+
+
