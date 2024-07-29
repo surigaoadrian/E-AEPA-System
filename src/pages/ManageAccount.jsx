@@ -52,6 +52,8 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"; //p
 import axios from "axios";
 import Animated from "../components/motion";
 import { BorderBottom } from "@mui/icons-material";
+import { apiUrl } from '../config/config';
+
 
 const CustomAlert = ({ open, onClose, severity, message }) => {
   return (
@@ -393,7 +395,7 @@ function ManageAccount() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:8080/user/getAllUser");
+        const response = await fetch(`${apiUrl}user/getAllUser`);
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
@@ -452,10 +454,10 @@ function ManageAccount() {
     const fetchDeptAndUsers = async () => {
       try {
         const deptResponse = await axios.get(
-          "http://localhost:8080/department/getAllDepts"
+          `${apiUrl}department/getAllDepts`
         );
         const userResponse = await axios.get(
-          "http://localhost:8080/user/getAllUser"
+          `${apiUrl}user/getAllUser`
         );
 
         const fetchedDepartments = deptResponse.data;
@@ -498,7 +500,7 @@ function ManageAccount() {
     const fetchUsername = async () => {
       try {
         const response = await axios.put(
-          `http://localhost:8080/user/checkUsername/${modifiedUsername}`
+          `${apiUrl}user/checkUsername/${modifiedUsername}`
         );
         const availability = response.data === "Username is available";
         setMsgInfo(response.data);
@@ -525,7 +527,7 @@ function ManageAccount() {
     const fetchEmail = async () => {
       try {
         const response = await axios.put(
-          `http://localhost:8080/user/checkEmail/${emailChange}`
+          `${apiUrl}user/checkEmail/${emailChange}`
         );
         const emailAvailability =
           response.data === "Email Address is available";
@@ -601,7 +603,7 @@ function ManageAccount() {
         userData.workEmail = emailChange;
       }
 
-      const response = await fetch(`http://localhost:8080/register/${loggedId}`, {
+      const response = await fetch(`${apiUrl}register/${loggedId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -646,7 +648,7 @@ function ManageAccount() {
   const handleClickEditBtn = async (userID) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/user/getUser/${userID}`
+        `${apiUrl}user/getUser/${userID}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch user data");
@@ -692,10 +694,12 @@ function ManageAccount() {
         dept: selectedUser.dept,
         empStatus: selectedUser.empStatus,
         probeStatus: selectedUser.probeStatus,
+        dateHired: selectedUser.dateHired,
         dateStarted: selectedUser.dateStarted,
+        dateHired: selectedUser.dateHired,
       };
       await axios.patch(
-        `http://localhost:8080/user/editUser/${loggedId}/${selectedUser.userID}`,
+        `${apiUrl}user/editUser/${loggedId}/${selectedUser.userID}`,
         userPayload,
         {
           headers: {
@@ -724,7 +728,7 @@ function ManageAccount() {
     console.log("delete Yes user:", userID);
     try {
       const response = await fetch(
-        `http://localhost:8080/user/delete/${loggedId}/${userID}`,
+        `${apiUrl}user/delete/${loggedId}/${userID}`,
         {
           method: "DELETE",
           headers: {
@@ -1010,7 +1014,7 @@ function ManageAccount() {
               <Grid
                 item
                 xs={12}
-                sx={{ height: "3em", display: "flex", mt: "-1em", mb: '.2em' }}
+                sx={{ height: "2em", display: "flex", mt: "-1em", mb: '.2em' }}
               >
                 <Tabs
                   value={selectedTab}
@@ -1040,7 +1044,7 @@ function ManageAccount() {
 
             <TableContainer
 
-              sx={{ borderRadius: "5px 5px 0 0 ", maxHeight: "100%", position: 'relative', border: '1px solid lightgray' }}
+              sx={{height:'29.55em', borderRadius: "5px 5px 0 0 ", maxHeight: "100%",maxWidth:'100%', position: 'relative', border: '1px solid lightgray' }}
             >
               {loggedUserRole === "SUPERUSER" && loading ? (
                 <div style={{
@@ -1145,14 +1149,14 @@ function ManageAccount() {
         <div
           className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-9"
           style={{
-            position: "absolute", // Change to relative to keep it in place
-            bottom: 30,
-            left: '21.5%',
-            transform: "translateX(-50%",
+            position: "relative", // Change to relative to keep it in place
+            // bottom: 30,
+            // left: '21.5%',
+            // transform: "translateX(-50%",
             display: "flex",
             alignItems: "center",
 
-            ml: '4em'
+            // ml: '4em'
           }}
         >
           <ol className="flex justify-end gap-1 text-xs font-medium">

@@ -9,7 +9,7 @@ import Chart from "react-apexcharts";
 import ThirdMonthComments from "../modals/3rdMonthComments";
 import CircularProgress from '@mui/material/CircularProgress';
 import axios from "axios";
-
+import { apiUrl } from '../config/config';
 
 const ThirdMonthEval = ({ userId, role, filter}) => {
   const [employee, setEmployee] = useState({});
@@ -433,21 +433,12 @@ const CustomTooltip = ({ active, payload }) => {
 
 
   return (
-    <div
-      style={{
-        //backgroundColor: "yellow",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
+    <div className="mt-4 mx-4 justify-center items-center" >
 
         {/* 3RD EVALUATION TAB*/}
         <div className="mx-4 mb-4">
             <Typography
               variant="h5"
-              component="div"
               sx={{
                 textAlign: "center",
                 fontWeight: "bold",
@@ -1345,22 +1336,24 @@ const CustomTooltip = ({ active, payload }) => {
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginRight:'124px' }}>
   <img src={bottomArrow} alt="Bottom Arrow" style={{ width: 'auto', height: '100px' }} />
+  
 </div>
 
+
 {filter === "peer" && (
-  <Box>      
-    <Box className="mb-2 mt-4" sx={{ 
-    backgroundColor: '#E81B1B', 
-    color: 'white', 
-    p: 2, 
-    display: 'flex', 
-    alignItems: 'center', 
-    justifyContent: 'center', 
-    fontSize: '1rem', 
-    fontWeight: 'bold', 
-    height: '30px', 
-    borderBottom: '3px solid #F8C702'
-  }}>
+  <div>      
+      <Box className="mt-4 mb-4" sx={{ 
+        backgroundColor: '#E81B1B', 
+        color: 'white', 
+        p: 2, 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        fontSize: '1rem', 
+        fontWeight: 'bold', 
+        height: '30px', 
+        borderBottom: '3px solid #F8C702'
+      }}>
     Values-Based Performance Assessment Summary
   </Box>
         <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
@@ -1610,7 +1603,7 @@ const CustomTooltip = ({ active, payload }) => {
                 </TableContainer>
                 </Box>
               </Box>
-              </Box>
+              </div>
       )}
     </div>
             <ThirdMonthComments userId={userId} filter={filter} role={role} />

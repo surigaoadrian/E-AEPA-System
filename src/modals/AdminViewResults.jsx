@@ -1,35 +1,12 @@
 import React, { useState, useEffect } from "react";
-import {
-	Modal,
-	Box,
-	Menu,
-	MenuItem,
-	IconButton,
-	Tabs,
-	Tab,
-} from "@mui/material";
+import {Modal, Box, Menu, MenuItem, IconButton} from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import Third from "../modals/3rdMonthEval";
-import FifthMonthEval from "../modals/FifthMonthEval";
 import axios from "axios";
 import GeneratePDF from "../components/GeneratePDF"; // Import the GeneratePDF function
+import { apiUrl } from '../config/config';
 
-const TabPanel = (props) => {
-	const { children, value, index, ...other } = props;
-
-	return (
-		<div
-			role="tabpanel"
-			hidden={value !== index}
-			id={`tabPanel-${index}`}
-			aria-labelledby={`tab-${index}`}
-			{...other}
-		>
-			{value === index && <Box sx={{ p: 3 }}>{children}</Box>}
-		</div>
-	);
-};
 
 const menuItemStyles = {
 	fontFamily: "Poppins",
@@ -52,7 +29,6 @@ const selectedMenuItemStyles = {
 };
 
 const AdminViewResults = ({ userId, open, onClose, employee, role }) => {
-	const [tabIndex, setTabIndex] = useState(0);
 	const [filter, setFilter] = useState("overall");
 	const [selectedStaff, setSelectedStaff] = useState(employee);
 	const [anchorEl, setAnchorEl] = useState(null);
@@ -74,7 +50,7 @@ const AdminViewResults = ({ userId, open, onClose, employee, role }) => {
 		const fetchUser = async () => {
 			try {
 				const response = await axios.get(
-					`http://localhost:8080/user/getUser/${userId}`
+					`${apiUrl}user/getUser/${userId}`
 				);
 				setSelectedStaff(response.data);
 			} catch (error) {
@@ -90,23 +66,6 @@ const AdminViewResults = ({ userId, open, onClose, employee, role }) => {
 		fetchUser();
 	}, []);
 
-	const handleTabChange = (event, newIndex) => {
-		setTabIndex(newIndex);
-	};
-
-	const tabStyle = {
-		textTransform: "none",
-		color: "#9D9D9D",
-		fontFamily: "Poppins",
-		fontSize: "13px",
-		fontWeight: "bold",
-		"& .MuiTabs-indicator": {
-			backgroundColor: "#8C383E",
-		},
-		"&.Mui-selected": {
-			color: "#8C383E",
-		},
-	};
 
 	const handlePrint = async () => {
 		const printAreaId = `tabPanel-${tabIndex}`;

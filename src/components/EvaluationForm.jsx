@@ -201,7 +201,7 @@ function EvaluationForm({
       const fetchAssignPeerID = async () => {
         try {
           const response = await axios.get(
-            "http://localhost:8080/assignedPeers/getAssignedPeersId",
+            `${apiUrl}assignedPeers/getAssignedPeersId`,
             {
               params: {
                 period: evalPeriod,
@@ -232,7 +232,7 @@ function EvaluationForm({
       const fetchAssignEvalutaorsID = async () => {
         try {
           const response = await axios.get(
-            "http://localhost:8080/assignedPeers/getAssignedEvaluatorId",
+            `${apiUrl}assignedPeers/getAssignedEvaluatorId`,
             {
               params: {
                 evaluatorId: userId,
@@ -276,7 +276,7 @@ function EvaluationForm({
           );
         } else if (evalType === "PEER-A") {
           response = await axios.get(
-            "http://localhost:8080/evaluation/getEvalIDAssignedPeer",
+            `${apiUrl}evaluation/getEvalIDAssignedPeer`,
             {
               params: {
                 userID: userId,
@@ -314,7 +314,7 @@ function EvaluationForm({
           );
         }
 
-        console.log(response.data);
+        //console.log(response.data);
         setEvaluationID(response.data);
       } catch (error) {
         if (error.response) {
@@ -340,7 +340,7 @@ function EvaluationForm({
       const fetchJobResp = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:8080/jobbasedresponse/getAllResponsesByID/${selectedEmp.userID}`
+            `${apiUrl}jobbasedresponse/getAllResponsesByID/${selectedEmp.userID}`
           );
           const jobResponsesWithScores = response.data.map((resp, index) => ({
             index,
@@ -383,7 +383,7 @@ function EvaluationForm({
       const fetchAssignedPeer = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:8080/user/getUser/${selectedAssignedPeerId}`
+            `${apiUrl}user/getUser/${selectedAssignedPeerId}`
           );
           setAssignedPeer(response.data);
         } catch (error) {
@@ -595,12 +595,12 @@ function EvaluationForm({
 
       if (stage === "VALUES" && evalType === "PEER-A") {
         response = await axios.post(
-          "http://localhost:8080/response/createResponses",
+          `${apiUrl}response/createResponses`,
           responses
         );
 
         updateEval = await axios.patch(
-          `http://localhost:8080/evaluation/updateEvaluation/${evaluationID}`,
+          `${apiUrl}evaluation/updateEvaluation/${evaluationID}`,
           peerAEvalPayload,
           {
             headers: {
@@ -611,7 +611,7 @@ function EvaluationForm({
 
         if (assignEvaluatorID) {
           updateEvaluatorStatus = await axios.patch(
-            `http://localhost:8080/assignedPeers/updateEvaluatorStatus/${assignEvaluatorID}`,
+            `${apiUrl}assignedPeers/updateEvaluatorStatus/${assignEvaluatorID}`,
             assignPeerEvalPayload,
             {
               headers: {
@@ -624,12 +624,12 @@ function EvaluationForm({
         }
       } else if (stage === "VALUES" && evalType === "PEER") {
         response = await axios.post(
-          "http://localhost:8080/response/createResponses",
+          `${apiUrl}response/createResponses`,
           responses
         );
 
         updateEval = await axios.patch(
-          `http://localhost:8080/evaluation/updateEvaluation/${evaluationID}`,
+          `${apiUrl}evaluation/updateEvaluation/${evaluationID}`,
           peerEvalPayload,
           {
             headers: {
@@ -639,7 +639,7 @@ function EvaluationForm({
         );
 
         createResults = await axios.post(
-          `http://localhost:8080/results/calculateResults?evaluationID=${evaluationID}`,
+          `${apiUrl}results/calculateResults?evaluationID=${evaluationID}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -648,12 +648,12 @@ function EvaluationForm({
         );
       } else if (stage === "VALUES" && evalType === "HEAD") {
         response = await axios.post(
-          "http://localhost:8080/response/createResponses",
+          `${apiUrl}response/createResponses`,
           responses
         );
 
         updateEval = await axios.patch(
-          `http://localhost:8080/evaluation/updateEvaluation/${evaluationID}`,
+          `${apiUrl}evaluation/updateEvaluation/${evaluationID}`,
           evalPayload,
           {
             headers: {
@@ -663,7 +663,7 @@ function EvaluationForm({
         );
 
         createResults = await axios.post(
-          `http://localhost:8080/results/calculateResults?evaluationID=${evaluationID}`,
+          `${apiUrl}results/calculateResults?evaluationID=${evaluationID}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -672,12 +672,12 @@ function EvaluationForm({
         );
       } else if (stage === "VALUES") {
         response = await axios.post(
-          "http://localhost:8080/response/createResponses",
+          `${apiUrl}response/createResponses`,
           responses
         );
 
         updateEval = await axios.patch(
-          `http://localhost:8080/evaluation/updateEvaluation/${evaluationID}`,
+          `${apiUrl}evaluation/updateEvaluation/${evaluationID}`,
           evalPayload,
           {
             headers: {
@@ -718,7 +718,7 @@ function EvaluationForm({
         );
 
         createResults = await axios.post(
-          `http://localhost:8080/results/calculateJobResults?evaluationID=${evaluationID}`,
+          `${apiUrl}results/calculateJobResults?evaluationID=${evaluationID}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -729,13 +729,13 @@ function EvaluationForm({
         console.log("Job Responses:", jobResponses);
 
         response = await axios.post(
-          "http://localhost:8080/jobbasedresponse/createResponses",
+          `${apiUrl}jobbasedresponse/createResponses`,
           jobResponses
         );
 
         console.log("Eval Payload:", evalPayload);
         updateEval = await axios.patch(
-          `http://localhost:8080/evaluation/updateEvaluation/${evaluationID}`,
+          `${apiUrl}evaluation/updateEvaluation/${evaluationID}`,
           evalPayload,
           {
             headers: {
@@ -745,7 +745,7 @@ function EvaluationForm({
         );
 
         createResults = await axios.post(
-          `http://localhost:8080/results/calculateJobResults?evaluationID=${evaluationID}`,
+          `${apiUrl}results/calculateJobResults?evaluationID=${evaluationID}`,
           {
             headers: {
               "Content-Type": "application/json",

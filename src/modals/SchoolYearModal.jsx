@@ -8,6 +8,7 @@ import MenuItem from "@mui/material/MenuItem";
 import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
 import Typography from "@mui/material/Typography";
+import { apiUrl } from '../config/config';
 
 const months = [
   "January",
@@ -49,7 +50,7 @@ function SchoolYearModal({ openModal, handleCloseModal }) {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8080/schoolYear/current")
+      .get(`${apiUrl}schoolYear/current`)
       .then((response) => {
         setCurrentSchoolYear(response.data.year);
         const semesters = response.data.semesters;
@@ -87,7 +88,7 @@ function SchoolYearModal({ openModal, handleCloseModal }) {
 
     axios
       .post(
-        `http://localhost:8080/schoolYear/semester/1`,
+        `${apiUrl}schoolYear/semester/1`,
         updatedFirstSemester.months
       )
       .then((response) => console.log("First semester updated:", response.data))
@@ -95,7 +96,7 @@ function SchoolYearModal({ openModal, handleCloseModal }) {
 
     axios
       .post(
-        `http://localhost:8080/schoolYear/semester/2`,
+        `${apiUrl}schoolYear/semester/2`,
         updatedSecondSemester.months
       )
       .then((response) =>

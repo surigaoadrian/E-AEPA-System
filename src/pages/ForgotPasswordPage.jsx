@@ -9,6 +9,8 @@ import { faArrowLeftLong } from "@fortawesome/free-solid-svg-icons";
 import ForgottenPassForm from "../components/ForgottenPassForm";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { apiUrl } from '../config/config';
+
 
 function ForgotPasswordPage() {
 	const [email, setEmail] = useState("");
@@ -26,7 +28,7 @@ function ForgotPasswordPage() {
 			params.append("email", email);
 
 			const response = await axios.post(
-				"http://localhost:8080/auth/forgotPassword",
+				`${apiUrl}auth/forgotPassword`,
 				params,
 				{
 					headers: {

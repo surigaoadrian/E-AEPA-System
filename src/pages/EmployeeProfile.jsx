@@ -19,6 +19,7 @@ import { faArrowLeft, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@mui/material";
 import Animated from "../components/motion";
 import AdminViewResult from "../modals/AdminViewResults";
+import { apiUrl } from "../config/config";
 import ManagePeerModal from "../modals/ManagePeerModal";
 
 const theme = createTheme({
