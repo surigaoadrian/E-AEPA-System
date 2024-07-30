@@ -45,4 +45,13 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
     @Query("SELECT u.userID FROM UserEntity u WHERE u.role = 'HEAD' AND u.dept = :dept AND u.isDeleted = 0")
     Integer findHeadUserIdByDept(@Param("dept") String dept);
 
+     // Details for 3rd Month and 5th Month evaluators
+    @GetMapping("/thirdMonthEligibleEvaluators")
+    public List<UserEntity> getThirdMonthEligibleEvaluators() {
+        return userServ.getEligibleEvaluatorsDetailsFor3rdMonth();
+    }
+    @GetMapping("/fifthMonthEligibleEvaluators")
+    public List<UserEntity> getFifthMonthEligibleEvaluators() {
+        return userServ.getEligibleEvaluatorsDetailsFor5thMonth();
+    }
 }
