@@ -182,13 +182,21 @@ public class UserController {
     // }
 
 
-
-
-
     @GetMapping("/getHeadUserIdByDept")
     public ResponseEntity<Integer> getHeadUserIdByDept(@RequestParam String dept) {
         Integer userId = userServ.getHeadUserIdByDept(dept);
         return ResponseEntity.ok(userId);
+    }
+
+    
+    // Details for 3rd Month and 5th Month evaluators
+    @GetMapping("/thirdMonthEligibleEvaluators")
+    public List<UserEntity> getThirdMonthEligibleEvaluators() {
+        return userServ.getEligibleEvaluatorsDetailsFor3rdMonth();
+    }
+    @GetMapping("/fifthMonthEligibleEvaluators")
+    public List<UserEntity> getFifthMonthEligibleEvaluators() {
+        return userServ.getEligibleEvaluatorsDetailsFor5thMonth();
     }
 }
 
