@@ -20,6 +20,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import EvaluateEmployee from "./pages/EvaluateEmployee";
 import ActivityLog from "./pages/ActivityLogs";
 import AdminDashboard from "./pages/AdminDashboard";
+import EligibleEvaluators from "./components/EligibleEvaluators";
 
 const router = createBrowserRouter([
   {
@@ -124,6 +125,14 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
+      {
+        path: "/AdminDashboard/EligibleEvaluators",
+        element: (
+          <PrivateRoute requiredRoles={["ADMIN"]}>
+            <EligibleEvaluators />
+          </PrivateRoute>
+        ),
+      }
     ],
   },
   {
@@ -136,7 +145,6 @@ const router = createBrowserRouter([
   { path: "*", element: <NotFoundPage /> },
   // { path: "/loading", element:<Loading/>},
 ]);
-
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
