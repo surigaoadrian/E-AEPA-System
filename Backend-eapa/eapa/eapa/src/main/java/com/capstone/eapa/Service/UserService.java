@@ -361,6 +361,13 @@ public class UserService implements UserDetailsService {
      //count regular Employees
     public long getRegularEmployee(){return userRepo.countRegularEmployees();}
 
+     // Evaluators for 3rd and 5th Month Details
+    public List<UserEntity> getEligibleEvaluatorsDetailsFor3rdMonth() {
+        return userRepo.getUsersDetailsFor3rdMonthEvaluation();}
+    public List<UserEntity> getEligibleEvaluatorsDetailsFor5thMonth() {
+        return userRepo.getUsersDetailsFor5thMonthEvaluation();}
+    
+
     public boolean verifyPassword(int userID, String rawPassword) {
         UserEntity user = userRepo.findByUserID(userID).orElse(null);
         if (user == null) {
