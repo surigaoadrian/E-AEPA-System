@@ -373,4 +373,12 @@ public class UserService implements UserDetailsService {
         return userRepo.findHeadUserIdByDept(dept);
     }
 
+    // Evaluators for 3rd and 5th Month Details
+    public List<UserEntity> getEligibleEvaluatorsDetailsFor3rdMonth() {
+        return userRepo.getUsersDetailsFor3rdMonthEvaluation();
+    }
+    public List<UserEntity> getEligibleEvaluatorsDetailsFor5thMonth() {
+        return userRepo.getUsersDetailsFor5thMonthEvaluation();
+    }
+
 }
