@@ -45,4 +45,44 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
     @Query("SELECT u.userID FROM UserEntity u WHERE u.role = 'HEAD' AND u.dept = :dept AND u.isDeleted = 0")
     Integer findHeadUserIdByDept(@Param("dept") String dept);
 
+    
+    // get count users  For 3rd, 5th and Annual Month Eval.
+
+    @Query(value = "SELECT u.userID " +
+            "FROM tbluser u " +
+            "WHERE u.`Employment Status` = 'Probationary' " +
+            "AND DATEDIFF(CURDATE(), STR_TO_DATE(u.`Date Hired`, '%Y-%m-%d')) <= 90",
+            nativeQuery = true)
+    List<Long> getUsersFor3rdMonthEvaluation();
+
+    @Query(value = "SELECT u.userID " +
+            "FROM tbluser u " +
+            "WHERE u.`Employment Status` = 'Probationary' " +
+            "AND DATEDIFF(CURDATE(), STR_TO_DATE(u.`Date Hired`, '%Y-%m-%d')) BETWEEN 121 AND 150",
+            nativeQuery = true)
+    List<Long> getUsersFor5thMonthEvaluation();
+
+    @Query(value = "SELECT u.userID " +
+            "FROM tbluser u " +
+            "WHERE u.`Employment Status` = 'Probationary' " +
+            "AND DATEDIFF(CURDATE(), STR_TO_DATE(u.`Date Hired`, '%Y-%m-%d')) BETWEEN 335 AND 395",
+            nativeQuery = true)
+    List<Long> getUsersForAnnualEvaluation();
+
+// Users Details | Upcoming Evaluators for 3rd and 5th Month
+    @Query(value = "SELECT u.* " +
+            "FROM tbluser u " +
+            "WHERE u.`Employment Status` = 'Probationary' " +
+            "AND DATEDIFF(CURDATE(), STR_TO_DATE(u.`Date Hired`, '%Y-%m-%d')) <= 90",
+            nativeQuery = true)
+    List<UserEntity> getUsersDetailsFor3rdMonthEvaluation();
+
+    @Query(value = "SELECT u.* " +
+            "FROM tbluser u " +
+            "WHERE u.`Employment Status` = 'Probationary' " +
+            "AND DATEDIFF(CURDATE(), STR_TO_DATE(u.`Date Hired`, '%Y-%m-%d')) BETWEEN 121 AND 150",
+            nativeQuery = true)
+    List<UserEntity> getUsersDetailsFor5thMonthEvaluation();
+
+
 }
