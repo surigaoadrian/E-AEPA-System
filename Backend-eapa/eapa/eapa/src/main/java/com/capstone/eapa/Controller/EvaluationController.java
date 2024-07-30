@@ -85,41 +85,31 @@ public class EvaluationController {
         return evalServ.isEvaluationCompletedHead(userID, empID, period, stage, evalType);
     }
 
-   //total employees for recommendation
+   
+      //total employees for recommendation
     @GetMapping("/countRecommendedEmployees")
     public long countRecommendedEmployees() {
         return evalServ.countRecommendedEmployees();
     }
 
     // Endpoint for 3rd Month evaluation status
-@GetMapping("/thirdMonthStatus")
-public ResponseEntity<Map<String, Long>> getThirdMonthStatus() {
-    EvaluationStatusDTO statusDTO = evalServ.getThirdMonthEvaluationStatus();
-    Map<String, Long> statusMap = new HashMap<>();
-    statusMap.put("completed", statusDTO.getCompleted());
-    statusMap.put("notCompleted", statusDTO.getNotCompleted());
-    return ResponseEntity.ok(statusMap);
-}
-
-    // Endpoint for 5th Month evaluation status
+    @GetMapping("/thirdMonthStatus")
+    public ResponseEntity<EvaluationStatusDTO> getThirdMonthStatus() {
+        EvaluationStatusDTO status = evalServ.getThirdMonthEvaluationStatus();
+        return ResponseEntity.ok(status);
+    }
     @GetMapping("/fifthMonthStatus")
-    public ResponseEntity<Map<String, Long>> getFifthMonthStatus() {
-        EvaluationStatusDTO statusDTO = evalServ.getFifthMonthEvaluationStatus();
-        Map<String, Long> statusMap = new HashMap<>();
-        statusMap.put("completed", statusDTO.getCompleted());
-        statusMap.put("notCompleted", statusDTO.getNotCompleted());
-        return ResponseEntity.ok(statusMap);
+    public ResponseEntity<EvaluationStatusDTO> getFifthMonthEvaluationStatus() {
+        EvaluationStatusDTO status = evalServ.getFifthMonthEvaluationStatus();
+        return ResponseEntity.ok(status);
+    }
+    @GetMapping("/annualStatus")
+    public ResponseEntity<EvaluationStatusDTO> getAnnualEvaluationStatus() {
+        EvaluationStatusDTO status = evalServ.getAnnualEvaluationStatus();
+        return ResponseEntity.ok(status);
     }
 
-    // Endpoint for Annual evaluation status
-    @GetMapping("/annualStatus")
-    public ResponseEntity<Map<String, Long>> getAnnualStatus() {
-        EvaluationStatusDTO statusDTO = evalServ.getAnnualEvaluationStatus();
-        Map<String, Long> statusMap = new HashMap<>();
-        statusMap.put("completed", statusDTO.getCompleted());
-        statusMap.put("notCompleted", statusDTO.getNotCompleted());
-        return ResponseEntity.ok(statusMap);
-    }
+
 
     // Endpoint for 3rd Month completed evaluations only
     @GetMapping("/thirdMonthCompleted")
