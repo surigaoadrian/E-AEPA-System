@@ -26,6 +26,9 @@ const EvaluationStatusChart = () => {
                 const totalThirdMonthEvaluations = thirdMonthData.completed + thirdMonthData.notCompleted;
                 const totalFifthMonthEvaluations = fifthMonthData.completed + fifthMonthData.notCompleted;
 
+                console.log("Total 3rd Month Evaluations:", totalThirdMonthEvaluations);
+                console.log("Total 5th Month Evaluations:", totalFifthMonthEvaluations);
+
                 const calculatePercentages = (completed, total) => {
                     const completedPercentage = total > 0 ? ((completed / total) * 100).toFixed(2) : 0;
                     const notCompletedPercentage = total > 0 ? (((total - completed) / total) * 100).toFixed(2) : 0;
@@ -160,3 +163,4 @@ const EvaluationStatusChart = () => {
 };
 
 export default EvaluationStatusChart;
+
