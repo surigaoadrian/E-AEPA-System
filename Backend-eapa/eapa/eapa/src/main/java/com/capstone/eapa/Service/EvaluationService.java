@@ -193,6 +193,7 @@ public class EvaluationService {
                     }
 
                     String workID = user.getWorkID();
+                    String position = user.getPosition();
                     String dept = user.getDept();
                     String empStatus = user.getEmpStatus();
                     String fName = user.getfName();
@@ -203,6 +204,7 @@ public class EvaluationService {
 
                     EvaluationDTO dto = new EvaluationDTO();
                     dto.setUserId(userId);
+                    dto.setPosition(position);
                     dto.setWorkID(workID);
                     dto.setDept(dept);
                     dto.setEmpStatus(empStatus);

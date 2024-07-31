@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Button, FormHelperText, Box, IconButton } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Button, FormHelperText, Box, IconButton, Typography } from '@mui/material';
 import axios from 'axios';
 import HighlightOffOutlinedIcon from "@mui/icons-material/HighlightOffOutlined";
 import { useNavigate } from 'react-router-dom';
-import { apiUrl } from '../config/config';
 
 const PasswordConfirmationModal = ({ open, onClose, onConfirm, loggedUserData }) => {
 //   const [loggedUserData, setLoggedUserData] = useState({});
@@ -28,7 +27,7 @@ const PasswordConfirmationModal = ({ open, onClose, onConfirm, loggedUserData })
     const username = loggedUserData?.username;
     console.log("Username:", username);
     try {
-      const response = await axios.post(`${apiUrl}verifyPassword`, {
+      const response = await axios.post("http://localhost:8080/verifyPassword", {
         username,
         password,
       });
@@ -67,8 +66,24 @@ const PasswordConfirmationModal = ({ open, onClose, onConfirm, loggedUserData })
             />
           </IconButton>
         </Box>
-      <DialogContent >
-        <DialogContentText sx={{display:"flex", justifyContent:"center", fontSize:'1.8vh',fontFamily: "Poppins",}}>Please enter your password to access this page</DialogContentText>
+
+        {/* <DialogContentText sx={{display:"flex", justifyContent:"center", fontSize:'1.8vh',fontFamily: "Poppins",paddingLeft:'1em', paddingTop:'1em', paddingRight:'1em'}}>Please enter your password to access this page</DialogContentText> */}
+        <div style={{ display:'flex', justifyContent:'center',paddingLeft:'1em', paddingRight:'1em', paddingTop:'1em'}}>
+          <Box>
+            <Typography style={{ padding: '5px', fontFamily: 'Poppins', fontSize: '13px', }}>Please enter your password to access this page</Typography>
+          </Box>
+        </div>
+        <form
+      onSubmit={handleConfirm}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        // alignItems: 'center', // Center contents horizontally
+        // padding: '.5em',
+        width: '100%',
+      }}
+    >
+      <DialogContent>
         <TextField
           autoFocus
           margin="dense"
@@ -80,34 +95,39 @@ const PasswordConfirmationModal = ({ open, onClose, onConfirm, loggedUserData })
           value={password}
           onChange={handlePasswordChange}
           InputLabelProps={{
-            style: { fontFamily: "Poppins", fontSize: "1.8vh" },
+            style: { fontFamily: 'Poppins', fontSize: '1.8vh' },
           }}
           inputProps={{
-            style: { fontSize: "1.8vh", fontFamily: "Poppins" },
+            style: { fontSize: '1.8vh', fontFamily: 'Poppins' },
           }}
         />
         {message && (
-          <FormHelperText style={{ color: 'red', fontFamily:'Poppins' }}>{message}</FormHelperText>
+          <FormHelperText style={{ color: 'red', fontFamily: 'Poppins' }}>
+            {message}
+          </FormHelperText>
         )}
       </DialogContent>
-      <DialogActions sx={{ display: "flex", justifyContent: "center" }}>
-        <Button 
-            type="submit"
-            variant="contained"
-            sx={{
-                bgcolor: "#8C383E",
-                height: "2.5em",
-                borderRadius: "5px",
-                textTransform: "none",
-                width: "35%",
-                mr: ".5em",
-                mb: "1em",
-                fontFamily: "Poppins",
-                color: "white",
-                "&:hover": { bgcolor: "#762F34", color: "white" },
-            }}
-            onClick={handleConfirm}>Confirm{" "}</Button>
+      <DialogActions sx={{ display: 'flex', justifyContent: 'center', width: '100%', }}>
+        <Button
+          type="submit"
+          variant="contained"
+          sx={{
+            bgcolor: '#8C383E',
+            height: '2.5em',
+            borderRadius: '5px',
+            textTransform: 'none',
+            width: '35%',
+            mr: '.5em',
+            mb: '1em',
+            fontFamily: 'Poppins',
+            color: 'white',
+            '&:hover': { bgcolor: '#762F34', color: 'white' },
+          }}
+        >
+          Confirm
+        </Button>
       </DialogActions>
+    </form>
     </Dialog>
   );
 };

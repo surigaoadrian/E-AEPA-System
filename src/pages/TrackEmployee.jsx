@@ -1,13 +1,18 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Box, Button, Grid, Typography, TableContainer, Table, TableBody, TableCell, TableHead, TableRow, TablePagination, Skeleton, Card, TextField, InputAdornment, IconButton, Menu, MenuItem, ListItemIcon, ListItemText } from "@mui/material";
+import Paper from "@mui/material/Paper";
+import { Box, Button, Grid, Typography, TableContainer, Table, TableBody, TableCell, TableHead, TableRow, TablePagination, Skeleton, Card, TextField, InputAdornment } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faSearch } from "@fortawesome/free-solid-svg-icons";
 import Animated from "../components/motion";
 import ViewResults from "../modals/ViewResults";
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import ViewRatingsPage from "./ViewRatingsPage"; 
+import Fade from '@mui/material/Fade';
 import PasswordConfirmationModal from "../modals/PasswordConfirmation";
-import { apiUrl } from '../config/config';
-import CheckIcon from '@mui/icons-material/Check';
+import {
+  faChevronLeft,
+  faChevronRight
+} from "@fortawesome/free-solid-svg-icons";
+import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
 
 function TrackEmployee() {
   const userID = sessionStorage.getItem("userID");
@@ -21,8 +26,7 @@ function TrackEmployee() {
   const itemsPerPage = 9; // Adjust this based on your needs
   const pagesPerGroup = 5;
   const [searchTerm, setSearchTerm] = useState('');
-  const [empStatusFilter, setEmpStatusFilter] = useState('');
-  const [filterAnchorEl, setFilterAnchorEl] = useState(null);
+
 
   const totalPages = Math.ceil(rows.length / itemsPerPage);
 
@@ -52,14 +56,14 @@ function TrackEmployee() {
 
   const fetchData = async () => {
     try {
-      const userResponse = await fetch(`${apiUrl}user/getUser/${userID}`);
+      const userResponse = await fetch(`http://localhost:8080/user/getUser/${userID}`);
       if (!userResponse.ok) {
         throw new Error("Failed to fetch user data");
       }
       const userData = await userResponse.json();
       setLoggedUserData(userData);
 
-      const allUsersResponse = await fetch(`${apiUrl}evaluation/evaluations`);
+      const allUsersResponse = await fetch("http://localhost:8080/evaluation/evaluations");
       if (!allUsersResponse.ok) {
         throw new Error("Failed to fetch all users data");
       }
@@ -70,16 +74,7 @@ function TrackEmployee() {
           ...item,
           name: `${item.fName} ${item.lName}`,
           userID: item.userID,
-        }))
-        .filter((item) => {
-          if (empStatusFilter === '') {
-            return true;
-          }
-          if (empStatusFilter === 'Regular' && item.empStatus === '') {
-            return true;
-          }
-          return item.empStatus === empStatusFilter;
-        });
+        }));
       // Apply search filter
       const searchFilteredData = processedData.filter((item) =>
         Object.values(item).some(
@@ -97,7 +92,7 @@ function TrackEmployee() {
 
   useEffect(() => {
     fetchData();
-  }, [userID, updateFetch, searchTerm, empStatusFilter]);
+  }, [userID, updateFetch, searchTerm]);
 
   useEffect(() => {
     if (!showPasswordModal) {
@@ -107,7 +102,7 @@ function TrackEmployee() {
 
   const handleViewResultClick = async (userId) => {
     try {
-      const response = await fetch(`${apiUrl}user/getUser/${userId}`);
+      const response = await fetch(`http://localhost:8080/user/getUser/${userId}`);
       if (!response.ok) {
         throw new Error("Failed to fetch user data");
       }
@@ -119,17 +114,6 @@ function TrackEmployee() {
     }
   };
   
-  const handleFilterClick = (event) => {
-    setFilterAnchorEl(event.currentTarget);
-  };
-  const handleCloseFilter = () => {
-    setFilterAnchorEl(null);
-  };
-
-  const handleMenuClick = (value) => {
-    setEmpStatusFilter(value);
-    handleCloseFilter();
-  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -145,7 +129,7 @@ function TrackEmployee() {
       id: "workID",
       label: "ID No.",
       align: "center",
-      minWidth: 90,
+      minWidth: 100,
     },
     {
       id: "name",
@@ -154,69 +138,26 @@ function TrackEmployee() {
       align: "center",
       format: (value) => formatName(value),
     },
+
+
+    {
+      id: "position",
+      label: "Position",
+      minWidth: 150,
+      align: "center",
+      format: (value) => (value ? value.toLocaleString("en-US") : ""),
+    },
     {
       id: "empStatus",
-      label: (
-        <div style={{ display: 'flex', alignItems: 'center', }}>
-          <span>Employee Status</span>
-          <IconButton
-            onClick={handleFilterClick}
-            sx={{ color: 'white', width: '1.3em', height: '1.3em', ml: '.6vh' }}
-          >
-            <FilterAltIcon fontSize="medium" />
-          </IconButton>
-          <Menu
-            anchorEl={filterAnchorEl}
-            open={Boolean(filterAnchorEl)}
-            onClose={handleCloseFilter}
-            PaperProps={{
-              sx: {
-                '& .MuiMenuItem-root': {
-                  fontSize: '.7em',
-                  fontFamily: 'Poppins',
-                },
-              },
-            }}
-          >
-            <MenuItem
-            dense
-              onClick={() => handleMenuClick('')}
-              selected={empStatusFilter === ''}
-              sx={{ fontFamily: 'Poppins' }}
-            >
-              <ListItemIcon>{empStatusFilter === '' && <CheckIcon fontSize="small" />}</ListItemIcon>
-              <ListItemText  primary="All" style={{ fontFamily: 'Poppins',fontSize:'.5em',  }} />
-            </MenuItem>
-            <MenuItem
-            dense
-              onClick={() => handleMenuClick('Regular')}
-              selected={empStatusFilter === 'Regular'}
-              sx={{ fontFamily: 'Poppins',fontSize:'.5em' }}
-            >
-              <ListItemIcon>{empStatusFilter === 'Regular' && <CheckIcon fontSize="small" />}</ListItemIcon>
-              <ListItemText primary="Regular" sx={{ fontFamily: 'Poppins',fontSize:'.5em' }} />
-            </MenuItem>
-            <MenuItem
-            dense
-              onClick={() => handleMenuClick('Probationary')}
-              selected={empStatusFilter === 'Probationary'}
-              sx={{ fontFamily: 'Poppins',fontSize:'.5em' }}
-            >
-              <ListItemIcon>{empStatusFilter === 'Probationary' && <CheckIcon fontSize="small" />}</ListItemIcon>
-              <ListItemText primary="Probationary" sx={{ fontFamily: 'Poppins',fontSize:'.5em' }} />
-            </MenuItem>
-          </Menu>
-
-        </div>
-      ),
-      minWidth: 180.3,
+      label: "Employee Status",
+      minWidth: 150,
       align: "center",
       format: (value) => (value ? value.toLocaleString("en-US") : ""),
     },
     {
       id: "sjbpStatus",
-      label: "S-JBPA",
-      minWidth: 120,
+      label: "S-JBPA Status",
+      minWidth: 150,
       align: "center",
       format: (value) => {
         if (value === "OPEN") {
@@ -231,23 +172,8 @@ function TrackEmployee() {
 
     {
       id: "svbpaStatus",
-      label: "S-VBPA ",
-      minWidth: 120,
-      align: "center",
-      format: (value) => {
-        if (value === "OPEN") {
-          return <span style={{ color: 'red', fontWeight: 'bold' }}>OPEN</span>;
-        } else if (value === "COMPLETED") {
-          return <span style={{ color: 'green', fontWeight: "bold" }}>COMPLETED</span>;
-        } else {
-          return "Not Yet Open"
-        }
-      },
-    },
-    {
-      id: "pavbpaStatus",
-      label: "P-VBPA (as evaluator) ",
-      minWidth: 120,
+      label: "S-VBPA Status",
+      minWidth: 150,
       align: "center",
       format: (value) => {
         if (value === "OPEN") {
@@ -261,7 +187,7 @@ function TrackEmployee() {
     },
     {
       id: "pvbpaStatus",
-      label: "P-VBPA",
+      label: "P-VBPA Status",
       minWidth: 150,
       align: "center",
       format: (value) => {
@@ -269,9 +195,7 @@ function TrackEmployee() {
           return <span style={{ color: 'red', fontWeight: 'bold' }}>OPEN</span>;
         } else if (value === "COMPLETED") {
           return <span style={{ color: 'green', fontWeight: "bold" }}>COMPLETED</span>;
-        } else if(value === "IN PROGRESS"){
-          return <span style={{ color: 'blue', fontWeight: "bold" }}>IN PROGRESS</span>;
-        }else{
+        } else {
           return "Not Yet Open"
         }
       },
@@ -280,18 +204,18 @@ function TrackEmployee() {
     {
       id: "actions",
       label: "Result",
-      minWidth: 80,
+      minWidth: 150,
       align: "center",
       format: (value, row) => {
         return (
           <div>
-            {row.sjbpStatus === "COMPLETED" && row.svbpaStatus === "COMPLETED" && {/*row.pvbpaStatus === "COMPLETED"*/} &&  row.pavbpaStatus === "COMPLETED" && (
+            {row.empStatus === "Probationary" && row.sjbpStatus === "COMPLETED" && row.svbpaStatus === "COMPLETED" && row.pvbpaStatus === "COMPLETED" && (
               <Button sx={{
                 color: '#8c383e',
                 fontSize: '.9em', "&:hover": { color: "red", },
                 fontFamily: 'Poppins'
               }}
-                style={{ textTransform: "none", }} startIcon={<FontAwesomeIcon icon={faEye} style={{ fontSize: ".9rem", }} />}
+                style={{ textTransform: "none", }} startIcon={<FontAwesomeIcon icon={faEye} style={{ fontSize: ".8rem", }} />}
                 onClick={() => handleViewResultClick(row.userId)}>
                 View
               </Button>
@@ -320,7 +244,7 @@ function TrackEmployee() {
           <Skeleton variant="text" sx={{ fontSize: '3em', width: '8em', ml: '1em', mt: '.3em' }}></Skeleton>
         ) : (
           <Typography ml={6.5} mt={3} sx={{ fontFamily: "Poppins", fontWeight: "bold", fontSize: "1.5em" }}>
-            Evaluation Tracking
+            Track Employees
           </Typography>
         )}
         {showPasswordModal ? (
@@ -376,20 +300,19 @@ function TrackEmployee() {
         )}
 
 
-        <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml: 6, mt: 1, width: "93%" } }}>
-          <Grid container  sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
-            {/* <Card variant="outlined" sx={{ borderRadius: "5px", width: "100%", height: "27.1em", backgroundColor: "transparent",position:'relative'}}> */}
+        <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml: 6, mt: 4, width: "93.5%" } }}>
+          <Grid container spacing={1.5} sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
+            <Card variant="outlined" sx={{ borderRadius: "5px", width: "100%", height: "27.1em", backgroundColor: "transparent"}}>
               {showPasswordModal ? (
-                <Skeleton variant="rectangular" width="100%" height="27.1em" sx={{bgcolor:'lightgray'}}></Skeleton>
+                <Skeleton variant="rectangular" width="100%" height="100%"></Skeleton>
               ) : (
-                <TableContainer sx={{ borderRadius: "5px 5px 0 0",height:'29.8em',border:'1px solid lightgray' }}>
-                  <Table stickyHeader aria-label="a dense table" size="small">
+                <TableContainer sx={{ borderRadius: "5px 5px 0 0", maxHeight: "100%" }}>
+                  <Table stickyHeader aria-label="sticky table" size="small">
                     <TableHead sx={{ height: "2em" }}>
                       <TableRow>
                         {columnsEmployees.map((column) => (
                           <TableCell
-                           component="th" scope="row"
-                            sx={{ fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: "bold", fontSize: ".8em" }}
+                            sx={{ fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: "bold", maxWidth: "2em" }}
                             key={column.id}
                             align={column.align}
                             style={{ minWidth: column.minWidth }}
@@ -403,11 +326,11 @@ function TrackEmployee() {
                       <TableBody>
                         {paginatedRows.map((row) => (
                           <TableRow
-                            sx={{height:'2.87em', bgcolor: 'white', "&:hover": { backgroundColor: "rgba(248, 199, 2, 0.5)", color: "black" } }}
+                            sx={{ bgcolor: 'white', "&:hover": { backgroundColor: "rgba(248, 199, 2, 0.5)", color: "black" }, height: '3em' }}
                             key={row.id}
                           >
                             {columnsEmployees.map((column) => (
-                              <TableCell  component="th" scope="row" sx={{ fontFamily: "Poppins" ,fontSize:'.8em'}} key={`${row.id}-${column.id}`} align={column.align}>
+                              <TableCell sx={{ fontFamily: "Poppins" }} key={`${row.id}-${column.id}`} align={column.align}>
                                 {column.id === "name" ? row.name : column.id === "actions" ? column.format ? column.format(row[column.id], row) : null : column.format ? column.format(row[column.id]) : row[column.id]}
                               </TableCell>
                             ))}
@@ -437,7 +360,7 @@ function TrackEmployee() {
                   </Table>
                 </TableContainer>
               )}
-            {/* </Card> */}
+            </Card>
           </Grid>
           <ViewResults
             open={showViewRatingsModal}
@@ -453,8 +376,8 @@ function TrackEmployee() {
             className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-9"
             style={{
               position: "relative", // Change to relative to keep it in place
-              // bottom: 170,
-              // left: '21%',
+              // bottom: 200,
+              // left: '20%',
               // transform: "translateX(-50%)",
               display: "flex",
               alignItems: "center",
