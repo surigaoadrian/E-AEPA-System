@@ -67,7 +67,8 @@ public interface EvaluationRepository extends JpaRepository<EvaluationEntity, In
     @Query("SELECT COUNT(DISTINCT e.user.id) FROM EvaluationEntity e")
     long countUniqueUserIds();
 
-    //3rd Month Evaluation Completed - PerDepartment
+//--------------------------------------------------------------------------------------------
+    //3rd Month Evaluation Per Department | Corrected Completed Definition --- Final
     @Query("SELECT e.user.dept, COUNT(DISTINCT e.user.id) " +
             "FROM EvaluationEntity e " +
             "WHERE e.period = '3rd Month' " +
@@ -81,18 +82,19 @@ public interface EvaluationRepository extends JpaRepository<EvaluationEntity, In
             "    HAVING " +
             "        SUM(CASE WHEN ee.stage = 'VALUES' AND ee.evalType = 'SELF' THEN 1 ELSE 0 END) > 0 " +
             "        AND SUM(CASE WHEN ee.stage = 'VALUES' AND ee.evalType = 'HEAD' THEN 1 ELSE 0 END) > 0 " +
-            "        AND (SUM(CASE WHEN ee.stage = 'VALUES' AND ee.evalType = 'PEER' THEN 1 ELSE 0 END) > 0 OR " +
-            "             (SELECT COUNT(eee.evalType) FROM EvaluationEntity eee WHERE eee.user.id = ee.user.id AND eee.period = '3rd Month' AND eee.stage = 'VALUES') = 2) " +
+            "        AND SUM(CASE WHEN ee.stage = 'VALUES' AND ee.evalType = 'PEER' THEN 1 ELSE 0 END) > 0 " +
             "        AND SUM(CASE WHEN ee.stage = 'JOB' AND ee.evalType = 'SELF' THEN 1 ELSE 0 END) > 0 " +
             "        AND SUM(CASE WHEN ee.stage = 'JOB' AND ee.evalType = 'HEAD' THEN 1 ELSE 0 END) > 0 " +
-            "        AND (SUM(CASE WHEN ee.stage = 'JOB' AND ee.evalType = 'PEER' THEN 1 ELSE 0 END) > 0 OR " +
-            "             (SELECT COUNT(eee.evalType) FROM EvaluationEntity eee WHERE eee.user.id = ee.user.id AND eee.period = '3rd Month' AND eee.stage = 'JOB') = 2) " +
+            "        AND (SELECT COUNT(eee.evalType) " +
+            "             FROM EvaluationEntity eee " +
+            "             WHERE eee.user.id = ee.user.id " +
+            "             AND eee.period = '3rd Month' " +
+            "             AND eee.stage = 'JOB') = 2 " +
             ") " +
             "GROUP BY e.user.dept")
     List<Object[]> countCompletedForThirdMonthPerDept();
 
-
-    //Annual Evaluation Per Department : Complete
+    //Annual Evaluation Per Department | Corrected Completed Definition --- Final
     @Query("SELECT e.user.dept, COUNT(DISTINCT e.user.id) " +
             "FROM EvaluationEntity e " +
             "WHERE e.period = 'Annual' " +
@@ -106,19 +108,21 @@ public interface EvaluationRepository extends JpaRepository<EvaluationEntity, In
             "    HAVING " +
             "        SUM(CASE WHEN ee.stage = 'VALUES' AND ee.evalType = 'SELF' THEN 1 ELSE 0 END) > 0 " +
             "        AND SUM(CASE WHEN ee.stage = 'VALUES' AND ee.evalType = 'HEAD' THEN 1 ELSE 0 END) > 0 " +
-            "        AND (SUM(CASE WHEN ee.stage = 'VALUES' AND ee.evalType = 'PEER' THEN 1 ELSE 0 END) > 0 OR " +
-            "             (SELECT COUNT(eee.evalType) FROM EvaluationEntity eee WHERE eee.user.id = ee.user.id AND eee.period = 'Annual' AND eee.stage = 'VALUES') = 2) " +
+            "        AND SUM(CASE WHEN ee.stage = 'VALUES' AND ee.evalType = 'PEER' THEN 1 ELSE 0 END) > 0 " +
             "        AND SUM(CASE WHEN ee.stage = 'JOB' AND ee.evalType = 'SELF' THEN 1 ELSE 0 END) > 0 " +
             "        AND SUM(CASE WHEN ee.stage = 'JOB' AND ee.evalType = 'HEAD' THEN 1 ELSE 0 END) > 0 " +
-            "        AND (SUM(CASE WHEN ee.stage = 'JOB' AND ee.evalType = 'PEER' THEN 1 ELSE 0 END) > 0 OR " +
-            "             (SELECT COUNT(eee.evalType) FROM EvaluationEntity eee WHERE eee.user.id = ee.user.id AND eee.period = 'Annual' AND eee.stage = 'JOB') = 2) " +
+            "        AND (SELECT COUNT(eee.evalType) " +
+            "             FROM EvaluationEntity eee " +
+            "             WHERE eee.user.id = ee.user.id " +
+            "             AND eee.period = 'Annual' " +
+            "             AND eee.stage = 'JOB') = 2 " +
             ") " +
             "GROUP BY e.user.dept")
       List<Object[]> countCompletedForAnnualPerDept();
 
 
 
-    //5th Month Evaluation Per Department : Complete
+    //5th Month Evaluation Per Department | Corrected Completed Definition --- Final
     @Query("SELECT e.user.dept, COUNT(DISTINCT e.user.id) " +
             "FROM EvaluationEntity e " +
             "WHERE e.period = '5th Month' " +
@@ -132,89 +136,92 @@ public interface EvaluationRepository extends JpaRepository<EvaluationEntity, In
             "    HAVING " +
             "        SUM(CASE WHEN ee.stage = 'VALUES' AND ee.evalType = 'SELF' THEN 1 ELSE 0 END) > 0 " +
             "        AND SUM(CASE WHEN ee.stage = 'VALUES' AND ee.evalType = 'HEAD' THEN 1 ELSE 0 END) > 0 " +
-            "        AND (SUM(CASE WHEN ee.stage = 'VALUES' AND ee.evalType = 'PEER' THEN 1 ELSE 0 END) > 0 OR " +
-            "             (SELECT COUNT(eee.evalType) FROM EvaluationEntity eee WHERE eee.user.id = ee.user.id AND eee.period = '5th Month' AND eee.stage = 'VALUES') = 2) " +
+            "        AND SUM(CASE WHEN ee.stage = 'VALUES' AND ee.evalType = 'PEER' THEN 1 ELSE 0 END) > 0 " +
             "        AND SUM(CASE WHEN ee.stage = 'JOB' AND ee.evalType = 'SELF' THEN 1 ELSE 0 END) > 0 " +
             "        AND SUM(CASE WHEN ee.stage = 'JOB' AND ee.evalType = 'HEAD' THEN 1 ELSE 0 END) > 0 " +
-            "        AND (SUM(CASE WHEN ee.stage = 'JOB' AND ee.evalType = 'PEER' THEN 1 ELSE 0 END) > 0 OR " +
-            "             (SELECT COUNT(eee.evalType) FROM EvaluationEntity eee WHERE eee.user.id = ee.user.id AND eee.period = '5th Month' AND eee.stage = 'JOB') = 2) " +
+            "        AND (SELECT COUNT(eee.evalType) " +
+            "             FROM EvaluationEntity eee " +
+            "             WHERE eee.user.id = ee.user.id " +
+            "             AND eee.period = '5th Month' " +
+            "             AND eee.stage = 'JOB') = 2 " +
             ") " +
             "GROUP BY e.user.dept")
     List<Object[]> countCompletedForFifthMonthPerDept();
 
-
-    //Get List of users completed 3rd Month Evaluation
-    @Query("SELECT DISTINCT e.user.id " +
+    //------ FINAL GET 3RD MONTH COMPLETED LIST -------------
+    @Query("SELECT DISTINCT e.peer.id " +
             "FROM EvaluationEntity e " +
             "WHERE e.period = '3rd Month' " +
             "AND e.status = 'COMPLETED' " +
-            "AND e.user.id IN (" +
-            "    SELECT ee.user.id " +
-            "    FROM EvaluationEntity ee " +
-            "    WHERE ee.period = '3rd Month' " +
-            "    AND ee.status = 'COMPLETED' " +
-            "    GROUP BY ee.user.id " +
-            "    HAVING " +
-            "        SUM(CASE WHEN ee.stage = 'VALUES' AND ee.evalType = 'SELF' THEN 1 ELSE 0 END) > 0 " +
-            "        AND SUM(CASE WHEN ee.stage = 'VALUES' AND ee.evalType = 'HEAD' THEN 1 ELSE 0 END) > 0 " +
-            "        AND (SUM(CASE WHEN ee.stage = 'VALUES' AND ee.evalType = 'PEER' THEN 1 ELSE 0 END) > 0 OR " +
-            "             (SELECT COUNT(eee.evalType) FROM EvaluationEntity eee WHERE eee.user.id = ee.user.id AND eee.period = '3rd Month' AND eee.stage = 'VALUES') = 2) " +
-            "        AND SUM(CASE WHEN ee.stage = 'JOB' AND ee.evalType = 'SELF' THEN 1 ELSE 0 END) > 0 " +
-            "        AND SUM(CASE WHEN ee.stage = 'JOB' AND ee.evalType = 'HEAD' THEN 1 ELSE 0 END) > 0 " +
-            "        AND (SUM(CASE WHEN ee.stage = 'JOB' AND ee.evalType = 'PEER' THEN 1 ELSE 0 END) > 0 OR " +
-            "             (SELECT COUNT(eee.evalType) FROM EvaluationEntity eee WHERE eee.user.id = ee.user.id AND eee.period = '3rd Month' AND eee.stage = 'JOB') = 2) " +
-            ")")
-    List<Long> getCompleted3rdMonthEvaluation();
+            "AND e.peer.id IS NOT NULL " +
+            "AND e.peer.id IN (" +
+            "    SELECT se.user.id " +
+            "    FROM EvaluationEntity se " +
+            "    WHERE se.period = '3rd Month' " +
+            "    AND se.status = 'COMPLETED' " +
+            "    AND se.evalType = 'SELF' " +
+            "    AND se.peer.id IS NULL " +
+            "    AND se.user.id = e.peer.id" +
+            ") " +
+            "GROUP BY e.peer.id " +
+            "HAVING " +
+            "    SUM(CASE WHEN e.stage = 'VALUES' AND e.evalType = 'SELF' THEN 1 ELSE 0 END) > 0 " +
+            "    AND SUM(CASE WHEN e.stage = 'VALUES' AND e.evalType = 'HEAD' THEN 1 ELSE 0 END) > 0 " +
+            "    AND SUM(CASE WHEN e.stage = 'VALUES' AND e.evalType = 'PEER' THEN 1 ELSE 0 END) > 0 " +
+            "    AND SUM(CASE WHEN e.stage = 'JOB' AND e.evalType = 'SELF' THEN 1 ELSE 0 END) > 0 " +
+            "    AND SUM(CASE WHEN e.stage = 'JOB' AND e.evalType = 'HEAD' THEN 1 ELSE 0 END) > 0 ")
+    List<Long> getCompleted3rdMonthEvaluation(); // ------FINAL -------
 
 
-    //get List of users completed 5th Month Evaluation
-    @Query("SELECT DISTINCT e.user.id " +
+    // ------FINAL | Completed Definition Fixed ------- Recheck
+    @Query("SELECT DISTINCT e.peer.id " +
             "FROM EvaluationEntity e " +
             "WHERE e.period = '5th Month' " +
             "AND e.status = 'COMPLETED' " +
-            "AND e.user.id IN (" +
-            "    SELECT ee.user.id " +
-            "    FROM EvaluationEntity ee " +
-            "    WHERE ee.period = '5th Month' " +
-            "    AND ee.status = 'COMPLETED' " +
-            "    GROUP BY ee.user.id " +
-            "    HAVING " +
-            "        SUM(CASE WHEN ee.stage = 'VALUES' AND ee.evalType = 'SELF' THEN 1 ELSE 0 END) > 0 " +
-            "        AND SUM(CASE WHEN ee.stage = 'VALUES' AND ee.evalType = 'HEAD' THEN 1 ELSE 0 END) > 0 " +
-            "        AND (SUM(CASE WHEN ee.stage = 'VALUES' AND ee.evalType = 'PEER' THEN 1 ELSE 0 END) > 0 OR " +
-            "             (SELECT COUNT(eee.evalType) FROM EvaluationEntity eee WHERE eee.user.id = ee.user.id AND eee.period = '5th Month' AND eee.stage = 'VALUES') = 2) " +
-            "        AND SUM(CASE WHEN ee.stage = 'JOB' AND ee.evalType = 'SELF' THEN 1 ELSE 0 END) > 0 " +
-            "        AND SUM(CASE WHEN ee.stage = 'JOB' AND ee.evalType = 'HEAD' THEN 1 ELSE 0 END) > 0 " +
-            "        AND (SUM(CASE WHEN ee.stage = 'JOB' AND ee.evalType = 'PEER' THEN 1 ELSE 0 END) > 0 OR " +
-            "             (SELECT COUNT(eee.evalType) FROM EvaluationEntity eee WHERE eee.user.id = ee.user.id AND eee.period = '5th Month' AND eee.stage = 'JOB') = 2) " +
-            ")")
+            "AND e.peer.id IS NOT NULL " +
+            "AND e.peer.id IN (" +
+            "    SELECT se.user.id " +
+            "    FROM EvaluationEntity se " +
+            "    WHERE se.period = '5th Month' " +
+            "    AND se.status = 'COMPLETED' " +
+            "    AND se.evalType = 'SELF' " +
+            "    AND se.peer.id IS NULL " +
+            "    AND se.user.id = e.peer.id" +
+            ") " +
+            "GROUP BY e.peer.id " +
+            "HAVING " +
+            "    SUM(CASE WHEN e.stage = 'VALUES' AND e.evalType = 'SELF' THEN 1 ELSE 0 END) > 0 " +
+            "    AND SUM(CASE WHEN e.stage = 'VALUES' AND e.evalType = 'HEAD' THEN 1 ELSE 0 END) > 0 " +
+            "    AND SUM(CASE WHEN e.stage = 'VALUES' AND e.evalType = 'PEER' THEN 1 ELSE 0 END) > 0 " +
+            "    AND SUM(CASE WHEN e.stage = 'JOB' AND e.evalType = 'SELF' THEN 1 ELSE 0 END) > 0 " +
+            "    AND SUM(CASE WHEN e.stage = 'JOB' AND e.evalType = 'HEAD' THEN 1 ELSE 0 END) > 0 ")
     List<Long> getCompleted5thMonthEvaluation();
 
-    //get List of users completed Annual
-    @Query("SELECT DISTINCT e.user.id " +
+    // ------FINAL | Completed Definition Fixed ------- Annual
+    @Query("SELECT DISTINCT e.peer.id " +
             "FROM EvaluationEntity e " +
             "WHERE e.period = 'Annual' " +
             "AND e.status = 'COMPLETED' " +
-            "AND e.user.id IN (" +
-            "    SELECT ee.user.id " +
-            "    FROM EvaluationEntity ee " +
-            "    WHERE ee.period = 'Annual' " +
-            "    AND ee.status = 'COMPLETED' " +
-            "    GROUP BY ee.user.id " +
-            "    HAVING " +
-            "        SUM(CASE WHEN ee.stage = 'VALUES' AND ee.evalType = 'SELF' THEN 1 ELSE 0 END) > 0 " +
-            "        AND SUM(CASE WHEN ee.stage = 'VALUES' AND ee.evalType = 'HEAD' THEN 1 ELSE 0 END) > 0 " +
-            "        AND (SUM(CASE WHEN ee.stage = 'VALUES' AND ee.evalType = 'PEER' THEN 1 ELSE 0 END) > 0 OR " +
-            "             (SELECT COUNT(eee.evalType) FROM EvaluationEntity eee WHERE eee.user.id = ee.user.id AND eee.period = 'Annual' AND eee.stage = 'VALUES') = 2) " +
-            "        AND SUM(CASE WHEN ee.stage = 'JOB' AND ee.evalType = 'SELF' THEN 1 ELSE 0 END) > 0 " +
-            "        AND SUM(CASE WHEN ee.stage = 'JOB' AND ee.evalType = 'HEAD' THEN 1 ELSE 0 END) > 0 " +
-            "        AND (SUM(CASE WHEN ee.stage = 'JOB' AND ee.evalType = 'PEER' THEN 1 ELSE 0 END) > 0 OR " +
-            "             (SELECT COUNT(eee.evalType) FROM EvaluationEntity eee WHERE eee.user.id = ee.user.id AND eee.period = 'Annual' AND eee.stage = 'JOB') = 2) " +
-            ")")
+            "AND e.peer.id IS NOT NULL " +
+            "AND e.peer.id IN (" +
+            "    SELECT se.user.id " +
+            "    FROM EvaluationEntity se " +
+            "    WHERE se.period = 'Annual' " +
+            "    AND se.status = 'COMPLETED' " +
+            "    AND se.evalType = 'SELF' " +
+            "    AND se.peer.id IS NULL " +
+            "    AND se.user.id = e.peer.id" +
+            ") " +
+            "GROUP BY e.peer.id " +
+            "HAVING " +
+            "    SUM(CASE WHEN e.stage = 'VALUES' AND e.evalType = 'SELF' THEN 1 ELSE 0 END) > 0 " +
+            "    AND SUM(CASE WHEN e.stage = 'VALUES' AND e.evalType = 'HEAD' THEN 1 ELSE 0 END) > 0 " +
+            "    AND SUM(CASE WHEN e.stage = 'VALUES' AND e.evalType = 'PEER' THEN 1 ELSE 0 END) > 0 " +
+            "    AND SUM(CASE WHEN e.stage = 'JOB' AND e.evalType = 'SELF' THEN 1 ELSE 0 END) > 0 " +
+            "    AND SUM(CASE WHEN e.stage = 'JOB' AND e.evalType = 'HEAD' THEN 1 ELSE 0 END) > 0 ")
     List<Long> getCompletedAnnualEvaluation();
-
-
-     @Query("SELECT e FROM EvaluationEntity e WHERE e.user.userID = :userID")
+//---------------------------------------------------------------------------------------------------
+    @Query("SELECT e FROM EvaluationEntity e WHERE e.user.userID = :userID")
     List<EvaluationEntity> findByUserID(@Param("userID") int userID);
 
     @Query(value = "SELECT * FROM tblevaluation WHERE TRIM(user_id) = :userID AND TRIM(peer_id) = :empID AND TRIM(period) = :period AND TRIM(stage) = :stage AND TRIM(eval_type) = :evalType AND TRIM(is_deleted) = 0", nativeQuery = true)
