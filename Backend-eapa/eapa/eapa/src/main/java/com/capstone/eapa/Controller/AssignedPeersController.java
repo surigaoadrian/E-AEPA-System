@@ -9,6 +9,8 @@ import com.capstone.eapa.Entity.AssignedPeersEntity;
 import com.capstone.eapa.Entity.UserEntity;
 import com.capstone.eapa.Service.AssignedPeersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -100,4 +102,19 @@ public class AssignedPeersController {
     public List<Integer> getEvaluatorIds(@RequestParam int assignedPeersId) {
         return apServ.getEvaluatorIdsByAssignedPeersId(assignedPeersId);
     }
+
+    //update assigned peers
+    @PatchMapping("/updateAssignedEvaluators/{assignPeerId}")
+    public ResponseEntity<String> updateAssignedEvaluators(
+            @PathVariable int assignPeerId,
+            @RequestBody List<Integer> evaluatorIds) {
+        try {
+            apServ.updateAssignedEvaluators(assignPeerId, evaluatorIds);
+            return ResponseEntity.ok("Assigned evaluators updated successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating assigned evaluators.");
+        }
+    }
+
+
 }

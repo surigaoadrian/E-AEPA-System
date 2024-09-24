@@ -4,7 +4,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import axios from "axios";
-
+import { apiUrl } from '../config/config';
 function PeerEvaluationCard({
   id,
   setEvalType,
@@ -56,7 +56,7 @@ function PeerEvaluationCard({
     const fetchEvaluatee = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/user/getUser/${evalDeets.evaluateeId}`
+          `${apiUrl}user/getUser/${evalDeets.evaluateeId}`
         );
         setEvaluatee(response.data);
       } catch (error) {
@@ -73,8 +73,6 @@ function PeerEvaluationCard({
     fetchEvaluatee();
   }, []);
 
-  //fetch tbl assigned peers data
-
   return (
     <div style={cardContainer}>
       {/**Evaluation header */}
@@ -89,9 +87,9 @@ function PeerEvaluationCard({
         <h3
           style={{
             fontWeight: "600",
-            // backgroundColor: "lightblue",
+
             fontSize: "18px",
-            width: "82%",
+            width: "84%",
           }}
         >
           Peer Evaluation
@@ -101,13 +99,13 @@ function PeerEvaluationCard({
         <div
           style={{
             display: "flex",
-            // backgroundColor: "tomato",
+
             width: "18%",
             justifyContent: "space-between",
           }}
         >
           <p>Date:</p>
-          <p>September 11, 2024</p>
+          <p>{formatDate(evalDeets.dateAssigned)}</p>
         </div>
       </div>
 
@@ -120,7 +118,9 @@ function PeerEvaluationCard({
               {evaluatee.fName}
             </b>{" "}
             has completed his 3-month probationary period. During this e-AEPA,
-            he will be evaluated by you, his Peer Evaluator.
+            he will be evaluated by you, his{" "}
+            <b style={{ fontWeight: "600", color: "black" }}>Peer Evaluator</b>{" "}
+            .
           </p>
         </div>
         {/**Evaluation footer */}

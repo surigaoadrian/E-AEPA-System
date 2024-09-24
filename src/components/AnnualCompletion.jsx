@@ -9,7 +9,7 @@ const AnnualCompletion = () => {
     useEffect(() => {
         const fetchCompletedCount = async () => {
             try {
-                const response = await fetch('http://localhost:8080/evaluation/annualStatus');
+                const response = await fetch('http://localhost:8080/evaluation/annualCompleted');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }

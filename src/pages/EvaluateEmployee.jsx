@@ -17,6 +17,7 @@ import Fade from "@mui/material/Fade";
 import EvaluationForm from "../components/EvaluationForm";
 import CheckIcon from '@mui/icons-material/Check';
 import { set } from "date-fns";
+import { apiUrl } from '../config/config';
 
 function EvaluateEmployee() {
   const userID = sessionStorage.getItem("userID");
@@ -106,37 +107,65 @@ function EvaluateEmployee() {
 
     console.log("Evaluation object to be sent:", evaluation);
 
-    try {
-      const response = await axios.post(
-        "http://localhost:8080/evaluation/createEvaluation",
-        evaluation
-      );
+    let existingEvalID = null;
 
-      const evalPeriod = getEvaluationPeriod(selectedEmp.probeStatus);
-      await handleCompleteStatus(
-        userID,
-        selectedEmp.userID,
-        evalPeriod,
-        "VALUES",
-        "HEAD"
-      );
-      await handleCompleteStatus(
-        userID,
-        selectedEmp.userID,
-        evalPeriod,
-        "JOB",
-        "HEAD"
-      );
+    try {
+      const response = await axios.get(`${apiUrl}evaluation/getEvalIDHead`, {
+        params: {
+          userID: userID,
+          empID: selectedEmp.userID,
+          period: period,
+          stage: selectedStage,
+          evalType: "HEAD",
+        }
+      });
+      existingEvalID = response.data;
     } catch (error) {
-      console.error("Creating evaluation failed", error);
-      if (error.response) {
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
-      } else {
-        console.log(`Error: ${error.message}`);
+      console.error("Fetching evaluation id failed", error);
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else {
+          console.log(`Error: ${error.message}`);
+        }
+    }
+
+    if(!existingEvalID){
+      try {
+        const response = await axios.post(
+          `${apiUrl}evaluation/createEvaluation`,
+          evaluation
+        );
+  
+        const evalPeriod = getEvaluationPeriod(selectedEmp.probeStatus);
+        await handleCompleteStatus(
+          userID,
+          selectedEmp.userID,
+          evalPeriod,
+          "VALUES",
+          "HEAD"
+        );
+        await handleCompleteStatus(
+          userID,
+          selectedEmp.userID,
+          evalPeriod,
+          "JOB",
+          "HEAD"
+        );
+      } catch (error) {
+        console.error("Creating evaluation failed", error);
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else {
+          console.log(`Error: ${error.message}`);
+        }
       }
     }
+
+    
   };
 
   const handleClick = (event, selectedUser) => {
@@ -185,7 +214,7 @@ function EvaluateEmployee() {
   ) => {
     try {
       const response = await axios.get(
-        "http://localhost:8080/evaluation/isEvaluationCompletedHead",
+        `${apiUrl}evaluation/isEvaluationCompletedHead`,
         {
           params: {
             userID: userID,
@@ -212,7 +241,7 @@ function EvaluateEmployee() {
       try {
         // Fetch specific user data based on userID
         const userResponse = await fetch(
-          `http://localhost:8080/user/getUser/${userID}`
+          `${apiUrl}user/getUser/${userID}`
         );
         if (!userResponse.ok) {
           throw new Error("Failed to fetch user data");
@@ -222,7 +251,7 @@ function EvaluateEmployee() {
 
         // Fetch all users
         const allUsersResponse = await fetch(
-          "http://localhost:8080/user/getAllUser"
+          `${apiUrl}user/getAllUser`
         );
         if (!allUsersResponse.ok) {
           throw new Error("Failed to fetch all users data");

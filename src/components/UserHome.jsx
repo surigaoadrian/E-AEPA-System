@@ -18,6 +18,7 @@ import transparencyImg from "../assets/transparency.png";
 import evaluate from "../assets/evaluate.png";
 import select from "../assets/select.png";
 import done from "../assets/done.png";
+import { apiUrl } from '../config/config';
 
 function UserHome() {
   const [loggedUserData, setLoggedUserData] = useState(null);
@@ -27,7 +28,7 @@ function UserHome() {
       try {
         const userID = sessionStorage.getItem("userID");
         const response = await axios.get(
-          `http://localhost:8080/user/getUser/${userID}`
+          `${apiUrl}user/getUser/${userID}`
         );
 
         setLoggedUserData(response.data);

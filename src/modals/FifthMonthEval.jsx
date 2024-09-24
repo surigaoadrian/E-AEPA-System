@@ -17,7 +17,7 @@ import Chart from "react-apexcharts";
 import Matrix from "../modals/Matrix";
 import FifthMonthComments from "../modals/FifthMonthComments";
 import axios from "axios";
-
+import { apiUrl } from '../config/config';
 
 
 

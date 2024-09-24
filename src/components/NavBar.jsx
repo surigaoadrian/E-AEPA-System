@@ -17,6 +17,9 @@ import axios from "axios";
 import { Box, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormHelperText, Grid, IconButton, ListItemIcon, TextField } from "@mui/material";
 import profile from "../assets/logo.png";
 import HighlightOffOutlinedIcon from "@mui/icons-material/HighlightOffOutlined";
+import { apiUrl } from '../config/config';
+
+
 
 function NavBar() {
   const [loggedUserData, setLoggedUserData] = useState({});
@@ -50,7 +53,7 @@ function NavBar() {
   const getImageUrl = async (userID) => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/user/image/${userID}`,
+        `${apiUrl}user/image/${userID}`,
         {
           responseType: "arraybuffer",
         }
@@ -98,18 +101,18 @@ function NavBar() {
       try {
         const userID = sessionStorage.getItem("userID");
         const response = await axios.get(
-          `http://localhost:8080/user/getUser/${userID}`
+          `${apiUrl}user/getUser/${userID}`
         );
         setLoggedUserData(response.data);
 
         // Check for admin account
         //  const adminUsername = `adm_${response.data.username}`;
-        const checkAdminResponse = await axios.get(`http://localhost:8080/checkAdminAccount/${response.data.username}`);
-        setHasAdminAccount(checkAdminResponse.data);
+         const checkAdminResponse = await axios.get(`${apiUrl}checkAdminAccount/${response.data.username}`);
+         setHasAdminAccount(checkAdminResponse.data);
 
-        const checkEmpResponse = await axios.get(`http://localhost:8080/checkEmpAccount/${response.data.username}`);
-        setHasEmpAccount(checkEmpResponse.data);
-        console.log("Has Employee account:", checkEmpResponse.data);
+         const checkEmpResponse = await axios.get(`${apiUrl}checkEmpAccount/${response.data.username}`);
+          setHasEmpAccount(checkEmpResponse.data);
+          console.log("Has Employee account:", checkEmpResponse.data);
       } catch (error) {
         if (error.response) {
           //not in 200 response range
@@ -150,7 +153,7 @@ function NavBar() {
     e.preventDefault();
     setMessage("");
     try {
-      const response = await axios.post("http://localhost:8080/swapAccount", {
+      const response = await axios.post(`${apiUrl}swapAccount`, {
         username: targetUsername,
         password: password
       });
@@ -162,11 +165,12 @@ function NavBar() {
 
         // Fetch new user data
         const userID = sessionStorage.getItem("userID");
-        const userResponse = await axios.get(`http://localhost:8080/user/getUser/${userID}`);
+        const userResponse = await axios.get("${apiUrl}/user/getUser/${userID}");
 
         // Update state and handle navigation
         setLoggedUserData(userResponse.data);
         console.log("Logged in as", userResponse.data.role);
+        console.log("successfully switched account");
         window.location.reload();
         navigate("/"); // Navigate to home or another page
         handleClose(); // Close the dialog

@@ -8,11 +8,8 @@ import ViewResults from "../modals/ViewResults";
 import ViewRatingsPage from "./ViewRatingsPage"; 
 import Fade from '@mui/material/Fade';
 import PasswordConfirmationModal from "../modals/PasswordConfirmation";
-import {
-  faChevronLeft,
-  faChevronRight
-} from "@fortawesome/free-solid-svg-icons";
-import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
+import { apiUrl } from '../config/config';
+import CheckIcon from '@mui/icons-material/Check';
 
 function TrackEmployee() {
   const userID = sessionStorage.getItem("userID");
@@ -56,14 +53,14 @@ function TrackEmployee() {
 
   const fetchData = async () => {
     try {
-      const userResponse = await fetch(`http://localhost:8080/user/getUser/${userID}`);
+      const userResponse = await fetch(`${apiUrl}user/getUser/${userID}`);
       if (!userResponse.ok) {
         throw new Error("Failed to fetch user data");
       }
       const userData = await userResponse.json();
       setLoggedUserData(userData);
 
-      const allUsersResponse = await fetch("http://localhost:8080/evaluation/evaluations");
+      const allUsersResponse = await fetch(`${apiUrl}evaluation/evaluations`);
       if (!allUsersResponse.ok) {
         throw new Error("Failed to fetch all users data");
       }
@@ -102,7 +99,7 @@ function TrackEmployee() {
 
   const handleViewResultClick = async (userId) => {
     try {
-      const response = await fetch(`http://localhost:8080/user/getUser/${userId}`);
+      const response = await fetch(`${apiUrl}user/getUser/${userId}`);
       if (!response.ok) {
         throw new Error("Failed to fetch user data");
       }
