@@ -472,7 +472,7 @@ function NavBar() {
         </Box>
         <div style={{ display:'flex', justifyContent:'center',paddingLeft:'1em', paddingRight:'1em', paddingTop:'1em'}}>
           <Box sx={{ bgcolor: 'rgba(128, 128, 128, 0.2)', height: '8.2vh', borderRadius: '.5em', display: 'flex', justifyContent: 'center' }}>
-            <Typography style={{ padding: '5px', fontFamily: 'Poppins', fontSize: '13px', }}> Switching to <span style={{ fontStyle: 'italic', color: '#8c383e', fontWeight: 600 }}>'{targetUsername}'</span>, an <span style={{ fontStyle: 'italic', fontWeight: 500 }}>{targetRole}</span> account of yours. To confirm, please enter the <span style={{ fontWeight: 700 }}>password</span> for <span style={{ fontStyle: 'italic', color: '#8c383e', fontWeight: 600 }}>'{targetUsername}'</span>.</Typography>
+            <Typography style={{ padding: '5px', fontFamily: 'Poppins', fontSize: '12px', }}> You're about to switch to <span style={{ fontStyle: 'italic', color: '#8c383e', fontWeight: 600 }}>'{targetUsername}'</span>, your <span style={{ fontStyle: 'italic', fontWeight: 500 }}>{targetRole}</span> account. Please confirm the switch by entering the <span style={{ fontWeight: 700 }}>password</span> for <span style={{ fontStyle: 'italic', color: '#8c383e', fontWeight: 600 }}>'{targetUsername}'</span>.</Typography>
           </Box>
         </div>
 

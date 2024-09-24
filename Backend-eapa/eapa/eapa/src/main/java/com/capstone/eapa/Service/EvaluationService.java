@@ -185,6 +185,7 @@ public class EvaluationService {
                     }
 
                     String workID = user.getWorkID();
+                    String position = user.getPosition();
                     String dept = user.getDept();
                     String empStatus = user.getEmpStatus();
                     String fName = user.getfName();
@@ -196,6 +197,7 @@ public class EvaluationService {
                     EvaluationDTO dto = new EvaluationDTO();
                     dto.setUserId(userId);
                     dto.setWorkID(workID);
+                    dto.setPosition(position);
                     dto.setDept(dept);
                     dto.setEmpStatus(empStatus);
                     dto.setfName(fName);
@@ -210,25 +212,26 @@ public class EvaluationService {
                             case "SELF-VALUES":
                                 dto.setSvbpaStatus(eval.getStatus());
                                 break;
-                            case "PEER-A-VALUES":
+                            // case "PEER-A-VALUES":
                                 
-                                break;
+                            //     break;
                             case "PEER-VALUES":
+                                dto.setPvbpaStatus(eval.getStatus());
                                 // Do not set directly, will set below from peer evaluations
                                 break;
                             // Add more cases as needed
                         }
                     }
 
-                    // Set the combined peer status
-                    String combinedPeerStatus = calculateCombinedPeerStatus(userEvaluations);
-                    dto.setPavbpaStatus(combinedPeerStatus);
+                    // // Set the combined peer status
+                    // String combinedPeerStatus = calculateCombinedPeerStatus(userEvaluations);
+                    // dto.setPavbpaStatus(combinedPeerStatus);
 
-                    // Set the peer values status from peer evaluations
-                    String peerValuesStatus = peerEvaluationStatusMap.get(userId);
-                    if (peerValuesStatus != null) {
-                        dto.setPvbpaStatus(peerValuesStatus);
-                    }
+                    // // Set the peer values status from peer evaluations
+                    // String peerValuesStatus = peerEvaluationStatusMap.get(userId);
+                    // if (peerValuesStatus != null) {
+                    //     dto.setPvbpaStatus(peerValuesStatus);
+                    // }
 
                     return dto;
                 })
