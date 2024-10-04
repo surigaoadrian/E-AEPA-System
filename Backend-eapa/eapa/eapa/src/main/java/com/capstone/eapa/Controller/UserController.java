@@ -157,6 +157,31 @@ public class UserController {
         long count = userServ.getRegularEmployee();
         return ResponseEntity.ok(count);
     }
+
+    @PatchMapping("/{userId}/3rdEval")
+    public ResponseEntity<?> update3rdEvaluationStatus(@PathVariable int userId, @RequestParam boolean status) {
+        userServ.update3rdEvaluationStatus(userId, status);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{userId}/5thEval")
+    public ResponseEntity<?> update5thEvaluationStatus(@PathVariable int userId, @RequestParam boolean status) {
+        userServ.update5thEvaluationStatus(userId, status);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{userId}/promote")
+    public ResponseEntity<String> promoteTo5thProbationary(@PathVariable int userId) {
+        try {
+            userServ.promoteTo5thProbationary(userId);
+            return ResponseEntity.ok("User promoted to 5th Probationary successfully.");
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
 }
     //get the employees' data with the corresponding department head - Track Employee
     //  @GetMapping("/employees-with-head")

@@ -69,7 +69,7 @@ function LoginPage() {
 	
 
 	const centerDiv = {
-		minHeight: "95vh",
+		minHeight: "100vh",
 		display: "flex",
 		justifyContent: "center",
 		alignItems: "center",

@@ -15,10 +15,17 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faUsers } from "@fortawesome/free-solid-svg-icons";
+import {
+	faArrowLeft,
+	faUsers,
+	faPaperPlane,
+	faCheck,
+	faXmark,
+} from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@mui/material";
 import Animated from "../components/motion";
 import AdminViewResult from "../modals/AdminViewResults";
+import SendResultsModal from "../components/SendResultsModal";
 
 const theme = createTheme({
 	palette: {
@@ -56,6 +63,9 @@ function EmployeeProfile({ user, handleBack }) {
 		useState("3rd Month");
 	const [evaluationsData, setEvaluationsData] = useState([]);
 	const role = sessionStorage.getItem("userRole");
+	const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+	const [buttonText, setButtonText] = useState(false);
+	const [is3rdEvalComplete, setIs3rdEvalComplete] = useState(false);
 	console.log(role);
 
 	useEffect(() => {
@@ -77,6 +87,7 @@ function EmployeeProfile({ user, handleBack }) {
 				console.error("There was an error fetching the evaluations!", error);
 			});
 	}, [user.userID]);
+
 
 	useEffect(() => {
 		const fetchEvaluations = async () => {
@@ -110,14 +121,28 @@ function EmployeeProfile({ user, handleBack }) {
 	}, []);
 	console.log("user Data ", userData);
 
-	const getUserDetails = (userId) => {
-		return userData.find((user) => user.userId === userId) || {};
-	};
+	useEffect(() => {
+		const fetchUser = async () => {
+		  try {
+			const response = await axios.get(
+			  `http://localhost:8080/user/getUser/${user.userID}`
+			);
+			const data = response.data;
+	
+			// Set the is3rdEvalComplete state
+			setIs3rdEvalComplete(data.is3rdEvalComplete);
+			
+			
+		  } catch (error) {
+			console.error("Error fetching user data:", error);
+		  }
+		};
+		
+		fetchUser();
+	  }, [user.userID]);	
 
-	const userDetails = getUserDetails(user.userID);
-
-	const fName = userDetails.fName;
-	const lName = userDetails.lName;
+	  console.log("ANG DATA", is3rdEvalComplete);
+	
 
 	const handleYearEvaluationChange = (event) => {
 		setSelectedYearEvaluation(event.target.value);
@@ -136,6 +161,21 @@ function EmployeeProfile({ user, handleBack }) {
 
 	const handleCloseModal = () => {
 		setShow3rd(false); // Close the modal
+	};
+
+	const handleConfirmOpen = () => {
+		setIsConfirmOpen(true);
+	};
+
+	const handleCloseConfirm = () => {
+		setIsConfirmOpen(false);
+	};
+
+	const handleConfirmSent = () => {
+		setIsConfirmOpen(false);
+		setIs3rdEvalComplete(true);
+		setButtonText(true);
+
 	};
 
 	const tabStyle = {
@@ -165,7 +205,7 @@ function EmployeeProfile({ user, handleBack }) {
 			return null;
 		}
 
-		// Filter evaluations
+		// Check for Filter evaluations per user
 		const filteredEvaluations = userData.filter(
 			(evaluation) =>
 				new Date(evaluation.dateTaken).getFullYear() ===
@@ -174,6 +214,7 @@ function EmployeeProfile({ user, handleBack }) {
 				evaluation.period === selectedEvaluationPeriod
 		);
 
+		// Check for Filter evaluations per user under the department
 		const headEval = evaluationsData.filter(
 			(evaluation) =>
 				new Date(evaluation.dateTaken).getFullYear() ===
@@ -219,7 +260,8 @@ function EmployeeProfile({ user, handleBack }) {
 			hasCompletedValuesSelf &&
 			hasCompletedValuesPeer &&
 			hasCompletedJobSelf &&
-			hasCompletedHeadValues;
+			hasCompletedHeadValues &&
+			hasCompletedHeadJob;
 
 		return (
 			<TableContainer style={tableStyle}>
@@ -564,8 +606,61 @@ function EmployeeProfile({ user, handleBack }) {
 											/>
 										)}
 									</Box>
+									<Box
+										sx={{
+											display: "flex",
+											justifyContent: "flex-end",
+											mt: 2,
+											mb: 1,
+										}}
+									>
+										<Button
+											variant="contained"
+											sx={{
+												height: "2.5em",
+												width: "11em",
+												fontFamily: "Poppins",
+												backgroundColor: "#8c383e",
+												padding: "1px 1px 0 0",
+												textTransform: "none",
+												"&:hover": {
+													backgroundColor: "#762F34",
+													color: "white",
+												},
+												
+											}}
+											onClick={handleConfirmOpen}
+											disabled={is3rdEvalComplete}
+											
+											
+										>
+											{is3rdEvalComplete || buttonText ? (
+												<>
+													<FontAwesomeIcon
+														icon={faCheck}
+														style={{ fontSize: "15px", marginRight: "10px",}}
+													/>{" "}
+													Result Sent
+												</>
+											) : (
+												<>
+													<FontAwesomeIcon
+														icon={faPaperPlane}
+														style={{ fontSize: "15px", marginRight: "10px" }}
+													/>{" "}
+													Send Results
+												</>
+											)}
+										</Button>
+									</Box>
 								</Animated>
 							)}
+							<SendResultsModal
+								isOpen={isConfirmOpen}
+								onCancel={handleCloseConfirm}
+								onConfirm={handleConfirmSent}
+								empUserId={user.userID}
+							/>
 							{selectedTab === 1 && (
 								<Animated>
 									<Box>

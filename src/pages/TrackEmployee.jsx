@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Paper from "@mui/material/Paper";
-import { Box, Button, Grid, Typography, TableContainer, Table, TableBody, TableCell, TableHead, TableRow, TablePagination, Skeleton, Card, TextField, InputAdornment } from "@mui/material";
+import { Box, Button, Grid, Typography, TableContainer, Table, TableBody, TableCell, TableHead, TableRow, TablePagination, Skeleton, Card, TextField, InputAdornment, Hidden } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faSearch } from "@fortawesome/free-solid-svg-icons";
 import Animated from "../components/motion";
@@ -8,13 +8,9 @@ import ViewResults from "../modals/ViewResults";
 import ViewRatingsPage from "./ViewRatingsPage"; 
 import Fade from '@mui/material/Fade';
 import PasswordConfirmationModal from "../modals/PasswordConfirmation";
-import {
-  faChevronLeft,
-  faChevronRight
-} from "@fortawesome/free-solid-svg-icons";
-import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
 
-function TrackEmployee() {
+
+function TrackEmployee({isConfirmed}) {
   const userID = sessionStorage.getItem("userID");
   const [rows, setRows] = useState([]);
   const [updateFetch, setUpdateFetch] = useState(true);
@@ -26,6 +22,7 @@ function TrackEmployee() {
   const itemsPerPage = 12; // Adjust this based on your needs
   const pagesPerGroup = 5;
   const [searchTerm, setSearchTerm] = useState('');
+
 
 
   const totalPages = Math.ceil(rows.length / itemsPerPage);
@@ -53,7 +50,6 @@ function TrackEmployee() {
 
   const hasData = rows.length > 0;
 
-
   const fetchData = async () => {
     try {
       const userResponse = await fetch(`http://localhost:8080/user/getUser/${userID}`);
@@ -62,18 +58,21 @@ function TrackEmployee() {
       }
       const userData = await userResponse.json();
       setLoggedUserData(userData);
+      
 
       const allUsersResponse = await fetch("http://localhost:8080/evaluation/evaluations");
       if (!allUsersResponse.ok) {
         throw new Error("Failed to fetch all users data");
       }
       const allUsersData = await allUsersResponse.json();
+      console.log("ang EVAL", allUsersData);
       const processedData = allUsersData
         .filter((item) => item.role === "EMPLOYEE" && item.dept === userData.dept)
         .map((item) => ({
           ...item,
           name: `${item.fName} ${item.lName}`,
           userID: item.userID,
+          
         }));
       // Apply search filter
       const searchFilteredData = processedData.filter((item) =>
@@ -88,7 +87,10 @@ function TrackEmployee() {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
+    
   };
+
+  
 
   useEffect(() => {
     fetchData();
@@ -113,6 +115,8 @@ function TrackEmployee() {
       console.error("Error fetching user data:", error);
     }
   };
+
+
   
 
   const handleChangePage = (event, newPage) => {
@@ -139,7 +143,6 @@ function TrackEmployee() {
       format: (value) => formatName(value),
     },
 
-
     {
       id: "position",
       label: "Position",
@@ -147,13 +150,22 @@ function TrackEmployee() {
       align: "center",
       format: (value) => (value ? value.toLocaleString("en-US") : ""),
     },
+    
     {
       id: "empStatus",
       label: "Employee Status",
       minWidth: 150,
       align: "center",
-      format: (value) => (value ? value.toLocaleString("en-US") : ""),
-    },
+      format: (value) => {
+        const color = value === "Probationary" ? "red" : value === "Regular" ? "green" : "black";
+        return(
+          <span style={{color, fontWeight: 600}}>
+        {value ? value.toLocaleString("en-US") : ""}
+        </span>
+        );
+     }
+   },
+
     {
       id: "sjbpStatus",
       label: "S-JBPA Status",
@@ -185,6 +197,8 @@ function TrackEmployee() {
         }
       },
     },
+
+
     {
       id: "pvbpaStatus",
       label: "P-VBPA Status",
@@ -207,9 +221,10 @@ function TrackEmployee() {
       minWidth: 150,
       align: "center",
       format: (value, row) => {
+        
         return (
           <div>
-            {row.empStatus === "Probationary" && row.sjbpStatus === "COMPLETED" && row.svbpaStatus === "COMPLETED" && row.pvbpaStatus === "COMPLETED" && (
+            {row.empStatus === "Probationary" && row.sjbpStatus === "COMPLETED" && row.svbpaStatus === "COMPLETED" && row.pvbpaStatus === "COMPLETED" &&(
               <Button sx={{
                 color: '#8c383e',
                 fontSize: '.9em', "&:hover": { color: "red", },
@@ -220,7 +235,6 @@ function TrackEmployee() {
                 View
               </Button>
             )}
-
           </div>
         );
       },
@@ -254,7 +268,7 @@ function TrackEmployee() {
             <div className="mr-10  flex items-center justify-between">
               <div className="ml-4 flex items-center justify-start">
                 <TextField
-                  placeholder="Search ..."
+                  placeholder="Search Employee..."
                   value={searchTerm}
                   onChange={handleSearchChange}
                   sx={{
@@ -351,7 +365,8 @@ function TrackEmployee() {
                                 padding: "25px",
                               }}
                             >
-                              There are currently no data in this table</Typography>
+                              Oops! We couldn't find any results matching your
+															search.</Typography>
                           </TableCell>
                         </TableRow>
                       </TableBody>

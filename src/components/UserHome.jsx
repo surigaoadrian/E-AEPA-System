@@ -48,13 +48,13 @@ function UserHome() {
   }, []);
 
   const formatDate = (date) => {
-    const options = { month: "long", day: "numeric", year: "numeric" };
-    return new Date(date).toLocaleDateString("en-US", options);
+    const calender = { month: "short", day: "numeric", year: "numeric" };
+    return new Date(date).toLocaleDateString("en-US", calender);
   };
 
   const getWeekday = (date) => {
-    const options = { weekday: "long" };
-    return new Date(date).toLocaleDateString("en-US", options);
+    const calender = { weekday: "long" };
+    return new Date(date).toLocaleDateString("en-US", calender);
   };
 
   return (

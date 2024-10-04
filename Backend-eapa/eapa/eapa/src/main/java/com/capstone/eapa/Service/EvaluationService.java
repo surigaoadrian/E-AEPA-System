@@ -11,12 +11,9 @@ import com.capstone.eapa.Repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 public class EvaluationService {
@@ -140,7 +137,6 @@ public class EvaluationService {
                 String lName = userRepo.findByUserID(userId).get().getlName();
                 Role role = userRepo.findByUserID(userId).get().getRole();
 
-
                 List<EvaluationEntity> userEvaluations = entry.getValue();
 
                 EvaluationDTO dto = new EvaluationDTO();
@@ -152,7 +148,8 @@ public class EvaluationService {
                 dto.setfName(fName);
                 dto.setlName(lName);
                 dto.setRole(role);
-                
+
+
                 for (EvaluationEntity eval : userEvaluations) {
                     switch (eval.getEvalType() + "-" + eval.getStage()) {
                         case "SELF-JOB":
@@ -168,7 +165,7 @@ public class EvaluationService {
                     }
                 }
                 return dto;
-            })
+            }).filter(Objects::nonNull)
             .collect(Collectors.toList());
     }
 
