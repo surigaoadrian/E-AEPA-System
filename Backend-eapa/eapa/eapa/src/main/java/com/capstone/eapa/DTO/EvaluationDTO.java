@@ -18,7 +18,7 @@ public class EvaluationDTO {
     private String sjbpStatus;
     private String svbpaStatus;
     private String pvbpaStatus;
-    private String pavbpaStatus;
+
     
 
     // Getters and Setters
@@ -110,14 +110,6 @@ public class EvaluationDTO {
 
     public void setRole(Role role) {
         this.role = role;
-    }
-
-    public String getPavbpaStatus() {
-        return pavbpaStatus;
-    }
-
-    public void setPavbpaStatus(String pavbpaStatus) {
-        this.pavbpaStatus = pavbpaStatus;
     }
 
 }

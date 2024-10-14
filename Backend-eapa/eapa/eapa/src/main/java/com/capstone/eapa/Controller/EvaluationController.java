@@ -69,15 +69,10 @@ public class EvaluationController {
         List<EvaluationEntity> evaluations = evalServ.getEvaluationsByUser(userID);
         return ResponseEntity.ok(evaluations);
     }
-
+    //ANGELA
     @GetMapping("/evaluations")
     public List<EvaluationDTO> getEvaluations() {
         return evalServ.getAggregatedEvaluations();
-    }
-
-    @GetMapping("/mergedPeerStatus")
-    public List<PeerEvaluationDTO> getMergedPeerEvaluations() {
-        return evalServ.getMergedPeerEvaluations();
     }
 
     @GetMapping("/isEvaluationCompletedHead")

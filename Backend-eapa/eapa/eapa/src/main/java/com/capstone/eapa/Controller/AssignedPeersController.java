@@ -24,6 +24,12 @@ public class AssignedPeersController {
     @Autowired
     AssignedPeersService apServ;
 
+//ANGELA
+    @GetMapping("/status")
+    public Map<Integer, String> getOverallStatus() {
+        return apServ.getOverallStatus();
+    }
+
     @PostMapping("/createAssignedPeers")
     public AssignedPeersDTO createAssignedPeers(@RequestBody AssignedPeersEntity assignedPeers) {
         AssignedPeersEntity savedEntity = apServ.createAssignedPeers(assignedPeers);

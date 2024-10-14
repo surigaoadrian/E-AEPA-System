@@ -8,7 +8,7 @@ import AccomplishmentRateChart from '../components/AccomplishmentRateChart';
 import ThirdMonthCompletion from '../components/ThirdMonthCompletion';
 import FifthMonthCompletion from '../components/FifthMonthCompletion';
 import AnnualCompletion from '../components/AnnualCompletion';
-import EligibleEvaluators from '../components/EligibleEvaluators';
+// import EligibleEvaluators from '../components/EligibleEvaluators';
 
 function AdminDashboard() {
   const [currentDate, setCurrentDate] = useState('');

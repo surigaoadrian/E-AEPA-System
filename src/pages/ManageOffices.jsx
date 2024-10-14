@@ -429,7 +429,7 @@ useEffect(() => {
 											},
 										}}
 									>
-										Add
+										Save
 									</Button>
 								</div>
 							</form>

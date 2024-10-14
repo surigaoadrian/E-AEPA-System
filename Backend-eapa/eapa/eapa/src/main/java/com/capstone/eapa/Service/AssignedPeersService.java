@@ -4,13 +4,16 @@ import com.capstone.eapa.DTO.EvaluatorAssignmentDTO;
 import com.capstone.eapa.Entity.AssignedPeerEvaluators;
 import com.capstone.eapa.Entity.AssignedPeersEntity;
 import com.capstone.eapa.Entity.UserEntity;
+import com.capstone.eapa.Repository.AssignedPeerEvaluatorsRepository;
 import com.capstone.eapa.Repository.AssignedPeersRepository;
 import com.capstone.eapa.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -18,6 +21,10 @@ import java.util.stream.Collectors;
 public class AssignedPeersService {
     @Autowired
     AssignedPeersRepository apRepo;
+
+    //ANGELA
+    @Autowired 
+    AssignedPeerEvaluatorsRepository apeRepo;
 
     @Autowired
     UserRepository userRepo;
@@ -131,6 +138,39 @@ public class AssignedPeersService {
         } else {
             throw new RuntimeException("Assigned peers not found with id: " + assignPeerId);
         }
+    }
+
+    //ANGELA 
+    public Map<Integer, String> getOverallStatus() {
+        List<AssignedPeerEvaluators> evaluations = apeRepo.findAll();
+        Map<Integer, String> overallStatusMap = new HashMap<>();
+
+        // Group evaluations by assigned_peers_id
+        Map<Integer, List<AssignedPeerEvaluators>> groupedEvaluations = new HashMap<>();
+        for (AssignedPeerEvaluators evaluation : evaluations) {
+            groupedEvaluations
+                .computeIfAbsent(evaluation.getAssignedPeers().getId(), k -> new ArrayList<>())
+                .add(evaluation);
+        }
+
+        // Determine overall status for each assigned_peers_id
+        for (Map.Entry<Integer, List<AssignedPeerEvaluators>> entry : groupedEvaluations.entrySet()) {
+            int assignedPeerId = entry.getKey();
+            List<AssignedPeerEvaluators> evals = entry.getValue();
+
+            boolean allCompleted = true;
+
+            for (AssignedPeerEvaluators eval : evals) {
+                if (!"COMPLETED".equals(eval.getStatus())) {
+                    allCompleted = false;
+                    break; // No need to check further if we found a PENDING status
+                }
+            }
+
+            overallStatusMap.put(assignedPeerId, allCompleted ? "COMPLETED" : "PENDING");
+        }
+
+        return overallStatusMap;
     }
 
 }

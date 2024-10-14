@@ -1,16 +1,15 @@
+// NOTIFICATION KUWANG IF MADA
 import React, { useState, useEffect, useMemo } from "react";
 import Paper from "@mui/material/Paper";
-import { Box, Button, Grid, Typography, TableContainer, Table, TableBody, TableCell, TableHead, TableRow, TablePagination, Skeleton, Card, TextField, InputAdornment } from "@mui/material";
+import { Box, Button, Grid, Typography, TableContainer, Table, TableBody, TableCell, TableHead, TableRow, TablePagination, Skeleton, Card, TextField, InputAdornment, IconButton, Menu, MenuItem, ListItemIcon, ListItemText } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faSearch } from "@fortawesome/free-solid-svg-icons";
 import Animated from "../components/motion";
 import ViewResults from "../modals/ViewResults";
-import ViewRatingsPage from "./ViewRatingsPage"; 
-import Fade from '@mui/material/Fade';
 import PasswordConfirmationModal from "../modals/PasswordConfirmation";
 import { apiUrl } from '../config/config';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import CheckIcon from '@mui/icons-material/Check';
-
 function TrackEmployee() {
   const userID = sessionStorage.getItem("userID");
   const [rows, setRows] = useState([]);
@@ -23,8 +22,8 @@ function TrackEmployee() {
   const itemsPerPage = 9; // Adjust this based on your needs
   const pagesPerGroup = 5;
   const [searchTerm, setSearchTerm] = useState('');
-
-
+  const [filterAnchorEl, setFilterAnchorEl] = useState(null);
+  const [probeStatusFilter, setProbeStatusFilter] = useState('');
   const totalPages = Math.ceil(rows.length / itemsPerPage);
 
   const startPageGroup = Math.floor((currentPage - 1) / pagesPerGroup) * pagesPerGroup + 1;
@@ -50,9 +49,23 @@ function TrackEmployee() {
 
   const hasData = rows.length > 0;
 
+  const getProbationaryMonth = (probeStatus) => {
+    const statusNumber = probeStatus.split(" ")[0];
+    return parseInt(statusNumber); // Extract the number (e.g., 3 from "3rd probationary")
+  };
 
+  const calculateMonthsDifference = (startDate, endDate) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const yearsDiff = end.getFullYear() - start.getFullYear();
+    const monthsDiff = end.getMonth() - start.getMonth() + 1;
+
+    return yearsDiff * 12 + monthsDiff; // Total months difference
+  };
   const fetchData = async () => {
     try {
+      // Fetch user data
       const userResponse = await fetch(`${apiUrl}user/getUser/${userID}`);
       if (!userResponse.ok) {
         throw new Error("Failed to fetch user data");
@@ -60,20 +73,76 @@ function TrackEmployee() {
       const userData = await userResponse.json();
       setLoggedUserData(userData);
 
-      const allUsersResponse = await fetch(`${apiUrl}evaluation/evaluations`);
-      if (!allUsersResponse.ok) {
-        throw new Error("Failed to fetch all users data");
-      }
+      // Fetch all users data
+      const allUsersResponse = await fetch(`${apiUrl}user/getAllUser`);
       const allUsersData = await allUsersResponse.json();
-      const processedData = allUsersData
-        .filter((item) => item.role === "EMPLOYEE" && item.dept === userData.dept)
-        .map((item) => ({
-          ...item,
-          name: `${item.fName} ${item.lName}`,
-          userID: item.userID,
-        }));
+      console.log(allUsersData);
+
+      // Fetch evaluations data
+      const evaluationsResponse = await fetch(`${apiUrl}evaluation/evaluations`);
+      if (!evaluationsResponse.ok) {
+        throw new Error("Failed to fetch evaluations data");
+      }
+      const evaluationsData = await evaluationsResponse.json();
+      console.log("Evaluations Data:", evaluationsData);
+
+      const currentDate = new Date(); // Ensure currentDate is defined
+
+      // Create a map of evaluations by userID for easy lookup
+      const evaluationsMap = evaluationsData.reduce((map, evaluation) => {
+        map[evaluation.userId] = evaluation; // Assuming evaluations have a field called userID
+        return map;
+      }, {});
+
+      const processedData = await Promise.all(
+        allUsersData
+          .filter((item) => item.role === "EMPLOYEE" && item.dept === userData.dept) // Filter employees with matching department
+          .filter((item) => {
+            if (probeStatusFilter === '') {
+              return true;
+            }
+            if (probeStatusFilter === 'Annually' && item.probeStatus === '') {
+              return true;
+            }
+            return item.probeStatus === probeStatusFilter;
+          })
+          .map(async (item) => {
+            if (!item.dateHired) {
+              console.warn("Invalid date hired:", item);
+              return null;
+            }
+
+            const probationaryMonth = getProbationaryMonth(item.probeStatus);
+            const monthsSinceHired = calculateMonthsDifference(item.dateHired, currentDate);
+            const isRegularEmployee = item.empStatus === "Regular";
+
+            const isEligibleForEvaluation =
+              (isRegularEmployee && monthsSinceHired >= 6) ||
+              (!isRegularEmployee && monthsSinceHired >= probationaryMonth);
+
+            if (!isEligibleForEvaluation) return null;
+
+            // Augment employee data with evaluation information if available
+            const evaluation = evaluationsMap[item.userID]; // Match using userID
+            return {
+              ...item,
+              name: `${item.fName} ${item.lName}`,
+              userID: item.userID,
+              probeStatus: item.probeStatus || "",
+              probationaryMonth,
+              monthsSinceHired,
+              isEligibleForEvaluation,
+              evaluation, // Include the evaluation data
+            };
+          })
+      );
+
+      const filteredData = processedData.filter((item) => item !== null);
+      console.log("Filtered data:", filteredData);
+      setRows(filteredData);
+
       // Apply search filter
-      const searchFilteredData = processedData.filter((item) =>
+      const searchFilteredData = filteredData.filter((item) =>
         Object.values(item).some(
           (value) =>
             value &&
@@ -89,45 +158,27 @@ function TrackEmployee() {
 
   useEffect(() => {
     fetchData();
-  }, [userID, updateFetch, searchTerm]);
+  }, [userID, updateFetch, searchTerm, probeStatusFilter]);
 
   useEffect(() => {
     if (!showPasswordModal) {
       fetchData();
     }
   }, [showPasswordModal, updateFetch, userID]);
-
-  const handleViewResultClick = async (userId) => {
-    try {
-      const response = await fetch(`${apiUrl}user/getUser/${userId}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch user data");
-      }
-      const userData = await response.json();
-      setViewRatingsModal(true);
-      setEmployee(userData);
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  };
   
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+  const handleFilterClick = (event) => {
+    setFilterAnchorEl(event.currentTarget);
   };
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+  const handleCloseFilter = () => {
+    setFilterAnchorEl(null);
   };
 
+  const handleMenuClick = (value) => {
+    setProbeStatusFilter(value);
+    handleCloseFilter();
+  };
   const columnsEmployees = [
-    {
-      id: "workID",
-      label: "ID No.",
-      align: "center",
-      minWidth: 100,
-    },
     {
       id: "name",
       label: "Name",
@@ -135,21 +186,79 @@ function TrackEmployee() {
       align: "center",
       format: (value) => formatName(value),
     },
-
-
     {
-      id: "position",
-      label: "Position",
+      id: "probeStatus",
+      label: (
+        <div >
+          <span style={{ paddingLeft: 26 }}>Evaluation Period</span>
+          <IconButton
+            onClick={handleFilterClick}
+            sx={{ color: 'white', width: '1.3em', height: '1.3em', ml: '.6vh' }}
+          >
+            <FilterAltIcon fontSize="medium" />
+          </IconButton>
+          <Menu
+            anchorEl={filterAnchorEl}
+            open={Boolean(filterAnchorEl)}
+            onClose={handleCloseFilter}
+            PaperProps={{
+              sx: {
+                '& .MuiMenuItem-root': {
+                  fontSize: '.7em',
+                  fontFamily: 'Poppins',
+                },
+              },
+            }}
+          >
+            <MenuItem
+              dense
+              onClick={() => handleMenuClick('')}
+              selected={probeStatusFilter === ''}
+              sx={{ fontFamily: 'Poppins' }}
+            >
+              <ListItemIcon>{probeStatusFilter === '' && <CheckIcon fontSize="small" />}</ListItemIcon>
+              <ListItemText primary="All" style={{ fontFamily: 'Poppins', fontSize: '.5em', }} />
+            </MenuItem>
+            <MenuItem
+              dense
+              onClick={() => handleMenuClick('Annually')}
+              selected={probeStatusFilter === 'Annually'}
+              sx={{ fontFamily: 'Poppins', fontSize: '.5em' }}
+            >
+              <ListItemIcon>{probeStatusFilter === 'Annually' && <CheckIcon fontSize="small" />}</ListItemIcon>
+              <ListItemText primary="Annually" sx={{ fontFamily: 'Poppins', fontSize: '.5em' }} />
+            </MenuItem>
+            <MenuItem
+              dense
+              onClick={() => handleMenuClick('3rd Probationary')}
+              selected={probeStatusFilter === '3rd Probationary'}
+              sx={{ fontFamily: 'Poppins', fontSize: '.5em' }}
+            >
+              <ListItemIcon>{probeStatusFilter === '3rd Probationary' && <CheckIcon fontSize="small" />}</ListItemIcon>
+              <ListItemText primary="3rd Probationary" sx={{ fontFamily: 'Poppins', fontSize: '.5em' }} />
+            </MenuItem>
+            <MenuItem
+              dense
+              onClick={() => handleMenuClick('5th Probationary')}
+              selected={probeStatusFilter === '5th Probationary'}
+              style={{ fontFamily: 'Poppins', fontSize: '.5em' }}
+            >
+              <ListItemIcon>{probeStatusFilter === '5th Probationary' && <CheckIcon fontSize="small" />}</ListItemIcon>
+              <ListItemText primary="5th Probationary" sx={{ fontFamily: 'Poppins', fontSize: '.5em' }} />
+            </MenuItem>
+          </Menu>
+
+        </div>
+      ),
       minWidth: 150,
       align: "center",
-      format: (value) => (value ? value.toLocaleString("en-US") : ""),
-    },
-    {
-      id: "empStatus",
-      label: "Employee Status",
-      minWidth: 150,
-      align: "center",
-      format: (value) => (value ? value.toLocaleString("en-US") : ""),
+      format: (value) => {
+        if (value === "") {
+          return "Annually";
+        } else {
+          return value;
+        }
+      },
     },
     {
       id: "sjbpStatus",
@@ -158,11 +267,11 @@ function TrackEmployee() {
       align: "center",
       format: (value) => {
         if (value === "OPEN") {
-          return <span style={{ color: 'red', fontWeight: 'bold' }}>OPEN</span>;
+          return <span style={{ color: 'red', fontWeight: 'bold' }}>PENDING</span>;
         } else if (value === "COMPLETED") {
           return <span style={{ color: 'green', fontWeight: "bold" }}>COMPLETED</span>;
         } else {
-          return "Not Yet Open"
+          return <span style={{ color: 'red', fontWeight: 'bold' }}>PENDING</span>//SA WA PA NAOPEN ANG EVAL, PENDING RA AKO GBUTANG
         }
       },
     },
@@ -174,11 +283,11 @@ function TrackEmployee() {
       align: "center",
       format: (value) => {
         if (value === "OPEN") {
-          return <span style={{ color: 'red', fontWeight: 'bold' }}>OPEN</span>;
+          return <span style={{ color: 'red', fontWeight: 'bold' }}>PENDING</span>;
         } else if (value === "COMPLETED") {
           return <span style={{ color: 'green', fontWeight: "bold" }}>COMPLETED</span>;
         } else {
-          return "Not Yet Open"
+          return <span style={{ color: 'red', fontWeight: 'bold' }}>PENDING</span>//SA WA PA NAOPEN ANG EVAL, PENDING RA AKO GBUTANG
         }
       },
     },
@@ -189,37 +298,12 @@ function TrackEmployee() {
       align: "center",
       format: (value) => {
         if (value === "OPEN") {
-          return <span style={{ color: 'red', fontWeight: 'bold' }}>OPEN</span>;
+          return <span style={{ color: 'red', fontWeight: 'bold' }}>PENDING</span>;
         } else if (value === "COMPLETED") {
           return <span style={{ color: 'green', fontWeight: "bold" }}>COMPLETED</span>;
         } else {
-          return "Not Yet Open"
+          return <span style={{ color: 'red', fontWeight: 'bold' }}>PENDING</span>//SA WA PA NAOPEN ANG EVAL, PENDING RA AKO GBUTANG
         }
-      },
-    },
-
-    {
-      id: "actions",
-      label: "Result",
-      minWidth: 150,
-      align: "center",
-      format: (value, row) => {
-        return (
-          <div>
-            {row.empStatus === "Probationary" && row.sjbpStatus === "COMPLETED" && row.svbpaStatus === "COMPLETED" && row.pvbpaStatus === "COMPLETED" && (
-              <Button sx={{
-                color: '#8c383e',
-                fontSize: '.9em', "&:hover": { color: "red", },
-                fontFamily: 'Poppins'
-              }}
-                style={{ textTransform: "none", }} startIcon={<FontAwesomeIcon icon={faEye} style={{ fontSize: ".8rem", }} />}
-                onClick={() => handleViewResultClick(row.userId)}>
-                View
-              </Button>
-            )}
-
-          </div>
-        );
       },
     },
   ];
@@ -241,7 +325,7 @@ function TrackEmployee() {
           <Skeleton variant="text" sx={{ fontSize: '3em', width: '8em', ml: '1em', mt: '.3em' }}></Skeleton>
         ) : (
           <Typography ml={6.5} mt={3} sx={{ fontFamily: "Poppins", fontWeight: "bold", fontSize: "1.5em" }}>
-            Track Employees
+            Track Employees Evaluation
           </Typography>
         )}
         {showPasswordModal ? (
@@ -298,66 +382,82 @@ function TrackEmployee() {
 
 
         <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml: 6, mt: 4, width: "93.5%" } }}>
-          <Grid container spacing={1.5} sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
-            <Card variant="outlined" sx={{ borderRadius: "5px", width: "100%", height: "27.1em", backgroundColor: "transparent"}}>
-              {showPasswordModal ? (
-                <Skeleton variant="rectangular" width="100%" height="100%"></Skeleton>
-              ) : (
-                <TableContainer sx={{ borderRadius: "5px 5px 0 0", maxHeight: "100%" }}>
-                  <Table stickyHeader aria-label="sticky table" size="small">
-                    <TableHead sx={{ height: "2em" }}>
-                      <TableRow>
-                        {columnsEmployees.map((column) => (
-                          <TableCell
-                            sx={{ fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: "bold", maxWidth: "2em" }}
-                            key={column.id}
-                            align={column.align}
-                            style={{ minWidth: column.minWidth }}
-                          >
-                            {column.label}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    {hasData ? (
-                      <TableBody>
-                        {paginatedRows.map((row) => (
-                          <TableRow
-                            sx={{ bgcolor: 'white', "&:hover": { backgroundColor: "rgba(248, 199, 2, 0.5)", color: "black" }, height: '3em' }}
-                            key={row.id}
-                          >
-                            {columnsEmployees.map((column) => (
-                              <TableCell sx={{ fontFamily: "Poppins" }} key={`${row.id}-${column.id}`} align={column.align}>
-                                {column.id === "name" ? row.name : column.id === "actions" ? column.format ? column.format(row[column.id], row) : null : column.format ? column.format(row[column.id]) : row[column.id]}
-                              </TableCell>
-                            ))}
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    ) : (
-                      <TableBody>
-                        <TableRow>
-                          <TableCell sx={{ bgcolor: 'white', height: '28.25em', borderRadius: '0 0 5px 5px' }} colSpan={columnsEmployees.length} align="center">
-                            <Typography
-                              sx={{
-                                textAlign: "center",
-                                fontFamily: "Poppins",
-                                fontSize: "17px",
-                                color: "#1e1e1e",
-                                fontWeight: 500,
-                                padding: "25px",
-                              }}
-                            >
-                              There are currently no data in this table</Typography>
-                          </TableCell>
+          <Grid container
+            spacing={1.5}
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center",
+            }}>
+            {/* <Card variant="outlined" sx={{ borderRadius: "5px", width: "100%", height: "27.1em", backgroundColor: "transparent"}}> */}
+            {showPasswordModal ? (
+              <Skeleton variant="rectangular" width="100%" height="100%"></Skeleton>
+            ) : (
+              <TableContainer sx={{ height: '100%', borderRadius: "5px 5px 0 0 ", border: '1px solid lightgray', width:'100%' }}>
+                <Table stickyHeader aria-label="sticky table" size="small">
+                  <TableHead sx={{ height: "2em" }}>
+                    <TableRow>
+                      {columnsEmployees.map((column) => (
+                        <TableCell
+                          sx={{ fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: "bold", maxWidth: "2em" }}
+                          key={column.id}
+                          align={column.align}
+                          style={{ minWidth: column.minWidth }}
+                        >
+                          {column.label}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  {hasData ? (
+                    <TableBody>
+                      {paginatedRows.map((row) => (
+                        <TableRow
+                          sx={{
+                            bgcolor: 'white',
+                            "&:hover": { backgroundColor: "rgba(248, 199, 2, 0.5)", color: "black" },
+                            height: '3em'
+                          }}
+                          key={row.userID} // Use a unique identifier for the key
+                        >
+                          {columnsEmployees.map((column) => (
+                            <TableCell sx={{ fontFamily: "Poppins" }} key={`${row.userID}-${column.id}`} align={column.align}>
+                              {column.id === "name" ? (
+                                row.name
+                              ) :  column.id === "probeStatus" ? (
+                                column.format(row.probeStatus) // Accessing the probeStatus correctly
+                            ) : (
+                                column.format ? column.format(row.evaluation?.[column.id]) : row.evaluation?.[column.id] || 'N/A' // Handle undefined evaluations
+                              )}
+                            </TableCell>
+                          ))}
                         </TableRow>
-                      </TableBody>
-                    )}
+                      ))}
+                    </TableBody>
+                  ) : (
+                    <TableBody>
+                      <TableRow>
+                        <TableCell sx={{ height: '30.87em', borderRadius: '5px 5px 0 0' }} colSpan={columnsEmployees.length} align="center">
+                          <Typography
+                            sx={{
+                              textAlign: "center",
+                              fontFamily: "Poppins",
+                              fontSize: "17px",
+                              color: "#1e1e1e",
+                              fontWeight: 500,
+                              padding: "25px",
+                            }}
+                          >
+                            There are currently no data in this table</Typography>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  )}
 
-                  </Table>
-                </TableContainer>
-              )}
-            </Card>
+                </Table>
+              </TableContainer>
+            )}
+            {/* </Card> */}
           </Grid>
           <ViewResults
             open={showViewRatingsModal}

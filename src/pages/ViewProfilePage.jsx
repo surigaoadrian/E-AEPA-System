@@ -255,12 +255,12 @@ function ViewProfilePage() {
 			<Grid container>
 				<Grid item xs={6}>
 					<Typography
-						ml={6}
+						ml={3.2}
 						mt={2}
 						sx={{
 							fontFamily: "Poppins",
 							fontWeight: "bold",
-							fontSize: "1.5em",
+							fontSize: "1.4em",
 						}}
 					>
 						User Profile
@@ -271,7 +271,7 @@ function ViewProfilePage() {
 				sx={{
 					display: "flex",
 					flexWrap: "wrap",
-					"& > :not(style)": { ml: 1.5, width: "97%" },
+					"& > :not(style)": { ml: .5, width: "97%" },
 				}}
 			>
 				<Grid
@@ -406,43 +406,22 @@ function ViewProfilePage() {
 												{selectedUser.empStatus}
 											</span>
 										</Typography>
-										{selectedUser.empStatus !== "Regular" && (
-											<>
-												<Typography
-													color="text.secondary"
-													sx={{
-														fontFamily: "Poppins",
-														mt: 1,
-														fontSize: ".9em",
-													}}
-												>
-													Probationary Status:{" "}
-													<span style={{ color: "black", fontWeight: 500 }}>
-														{selectedUser.probeStatus}
-													</span>
-												</Typography>
-												<Typography
-													color="text.secondary"
-													sx={{
-														fontFamily: "Poppins",
-														mt: 1,
-														fontSize: ".9em",
-													}}
-												>
-													Probationary Date Started:{" "}
-													<span style={{ color: "black", fontWeight: 500 }}>
-														{formatDate(selectedUser.dateStarted)}
-													</span>
-												</Typography>
-											</>
-										)}
+										<Typography
+											color="text.secondary"
+											sx={{ fontFamily: "Poppins", fontSize: ".9em", mt: 1 }}
+										>
+											Date Hired:{" "}
+											<span style={{ color: "black", fontWeight: 500 }}>
+												{formatDate(selectedUser.dateHired)}
+											</span>
+										</Typography>
 									</Grid>
 								</Grid>
 							</Grid>
 						</Grid>
 					</Paper>
 					<Grid container spacing={0.9}>
-						<Grid item xs={5.85} sx={{ mt: 1 }}>
+						<Grid item xs={7.33} sx={{ mt: 1 }}>
 							<Paper
 								elevation={0}
 								sx={{
@@ -454,7 +433,7 @@ function ViewProfilePage() {
 								}}
 							>
 								<Grid item xs={12} sm container>
-									<Grid item xs container spacing={2} sx={{ ml: 2 }}>
+									<Grid item xs container spacing={2} sx={{ ml: 1 }}>
 										<Grid item xs>
 											<Typography
 												sx={{
@@ -503,8 +482,8 @@ function ViewProfilePage() {
 												color="text.secondary"
 												sx={{
 													fontFamily: "Poppins",
-													fontSize: ".8em",
-													ml: 3,
+													fontSize: ".9em",
+													ml: 3.3,
 													mt: 2,
 												}}
 											>
@@ -517,7 +496,7 @@ function ViewProfilePage() {
 												onChange={handleDetailsChange}
 												variant="outlined"
 												size="small"
-												sx={{ ml: 3.2, mt: 1.5, width: "10em" }}
+												sx={{ ml: 3.2, mt: 1.5, width: "11em" }}
 												InputLabelProps={{
 													style: { fontFamily: "Poppins", fontSize: ".8em" },
 												}}
@@ -529,7 +508,7 @@ function ViewProfilePage() {
 												color="text.secondary"
 												sx={{
 													fontFamily: "Poppins",
-													fontSize: ".8em",
+													fontSize: ".9em",
 													ml: 9.2,
 													mt: 2,
 												}}
@@ -542,10 +521,10 @@ function ViewProfilePage() {
 												value={selectedUser.gender}
 												name="gender"
 												sx={{
-													ml: 1,
+													ml: 2.24,
 													mt: 1.5,
 													mr: 4,
-													width: "10em",
+													width: "11.13em",
 													height: "2.5em",
 													fontSize: ".9em",
 													fontFamily: "Poppins",
@@ -562,8 +541,8 @@ function ViewProfilePage() {
 												color="text.secondary"
 												sx={{
 													fontFamily: "Poppins",
-													fontSize: ".8em",
-													ml: 3,
+													fontSize: ".9em",
+													ml: 3.3,
 													mt: 2,
 												}}
 											>
@@ -576,7 +555,7 @@ function ViewProfilePage() {
 												onChange={handleDetailsChange}
 												variant="outlined"
 												size="small"
-												sx={{ ml: 1, mt: 1.5, width: "10em" }}
+												sx={{ ml: 1, mt: 1.5, width: "11em" }}
 												InputLabelProps={{
 													style: { fontFamily: "Poppins", fontSize: ".8em" },
 												}}
@@ -588,13 +567,13 @@ function ViewProfilePage() {
 												color="text.secondary"
 												sx={{
 													fontFamily: "Poppins",
-													fontSize: ".8em",
-													ml: 3,
+													fontSize: ".9em",
+													ml: 9,
 													mt: 2,
 												}}
 											>
 												{" "}
-												Mobile Number:{" "}
+												Mobile #:{" "}
 											</Typography>
 											<TextField
 												type="text"
@@ -615,8 +594,8 @@ function ViewProfilePage() {
 												color="text.secondary"
 												sx={{
 													fontFamily: "Poppins",
-													fontSize: ".8em",
-													ml: 3,
+													fontSize: ".9em",
+													ml: 3.3,
 													mt: 2,
 												}}
 											>
@@ -629,7 +608,7 @@ function ViewProfilePage() {
 												onChange={handleDetailsChange}
 												variant="outlined"
 												size="small"
-												sx={{ ml: 3.2, mt: 1.5, width: "10em" }}
+												sx={{ ml: 3.4, mt: 1.5, width: "11em" }}
 												InputLabelProps={{ style: { fontFamily: "Poppins" } }}
 												inputProps={{
 													style: { fontSize: ".8em", fontFamily: "Poppins" },
@@ -639,11 +618,12 @@ function ViewProfilePage() {
 												variant="outlined"
 												sx={{
 													color: "#B4B4B4",
-													height: "2.3em",
-													width: "7em",
+													height: "2em",
+													width: "6em",
+													fontSize: ".9em",
 													mr: 2,
 													mt: 2,
-													ml: 10,
+													ml: 20,
 													fontFamily: "Poppins",
 													backgroundColor: "transparent",
 													borderColor: "#E0E0E0",
@@ -663,10 +643,11 @@ function ViewProfilePage() {
 												variant="contained"
 												onClick={(e) => handleSavePrsnlChanges(e, selectedUser)}
 												sx={{
-													height: "2.3em",
-													width: "7em",
+													height: "2em",
+													width: "6em",
 													mr: 2,
 													mt: 2,
+													fontSize: ".9em",
 													fontFamily: "Poppins",
 													backgroundColor: "#8c383e",
 													padding: "1px 1px 0 0 ",
@@ -694,7 +675,7 @@ function ViewProfilePage() {
 													container
 													direction="column"
 													spacing={2}
-													sx={{ ml: 2 }}
+													sx={{ ml: 1.5 }}
 												>
 													<Grid item xs>
 														<Typography
@@ -702,7 +683,7 @@ function ViewProfilePage() {
 															sx={{
 																fontFamily: "Poppins",
 																mt: 2.5,
-																fontSize: "1em",
+																fontSize: ".9em",
 															}}
 														>
 															First Name:{" "}
@@ -720,8 +701,8 @@ function ViewProfilePage() {
 															color="text.secondary"
 															sx={{
 																fontFamily: "Poppins",
-																mt: 2.5,
-																fontSize: "1em",
+																mt: 2,
+																fontSize: ".9em",
 															}}
 														>
 															Middle Name:{" "}
@@ -733,8 +714,8 @@ function ViewProfilePage() {
 															color="text.secondary"
 															sx={{
 																fontFamily: "Poppins",
-																mt: 2.5,
-																fontSize: "1em",
+																mt: 2,
+																fontSize: ".9em",
 															}}
 														>
 															Last Name:{" "}
@@ -750,7 +731,7 @@ function ViewProfilePage() {
 													<Grid item xs sx={{ mt: 2.5 }}>
 														<Typography
 															color="text.secondary"
-															sx={{ fontFamily: "Poppins", fontSize: "1em" }}
+															sx={{ fontFamily: "Poppins", fontSize: ".9em" }}
 														>
 															Gender:{" "}
 															<span style={{ color: "black", fontWeight: 500 }}>
@@ -761,8 +742,8 @@ function ViewProfilePage() {
 															color="text.secondary"
 															sx={{
 																fontFamily: "Poppins",
-																mt: 2.5,
-																fontSize: "1em",
+																mt: 2,
+																fontSize: ".9em",
 															}}
 														>
 															Mobile Number:{" "}
@@ -778,7 +759,7 @@ function ViewProfilePage() {
 								)}
 							</Paper>
 						</Grid>
-						<Grid item xs={6} sx={{ mt: 1 }}>
+						<Grid item xs={4.5} sx={{ mt: 1 }}>
 							<Paper
 								elevation={0}
 								sx={{
@@ -811,7 +792,7 @@ function ViewProfilePage() {
 												color="text.secondary"
 												sx={{
 													fontFamily: "Poppins",
-													fontSize: "1em",
+													fontSize: ".9em",
 													mt: 5,
 													ml: 2,
 												}}
@@ -840,8 +821,8 @@ function ViewProfilePage() {
 											color="text.secondary"
 											sx={{
 												fontFamily: "Poppins",
-												fontSize: "1em",
-												mt: 3,
+												fontSize: ".9em",
+												mt: 2,
 												ml: 3,
 											}}
 										>
@@ -903,7 +884,7 @@ function ViewProfilePage() {
 										</Typography>
 										<Typography
 											color="text.secondary"
-											sx={{ fontFamily: "Poppins", mt: 2, fontSize: "1em" }}
+											sx={{ fontFamily: "Poppins", mt: 2, fontSize: ".9em" }}
 										>
 											Employee ID:{" "}
 											<span style={{ color: "black", fontWeight: 500 }}>
@@ -912,7 +893,7 @@ function ViewProfilePage() {
 										</Typography>
 										<Typography
 											color="text.secondary"
-											sx={{ fontFamily: "Poppins", mt: 2, fontSize: "1em" }}
+											sx={{ fontFamily: "Poppins", mt: 2, fontSize: ".9em" }}
 										>
 											Department:{" "}
 											<span style={{ color: "black", fontWeight: 500 }}>
@@ -921,7 +902,7 @@ function ViewProfilePage() {
 										</Typography>
 										<Typography
 											color="text.secondary"
-											sx={{ fontFamily: "Poppins", mt: 2, fontSize: "1em" }}
+											sx={{ fontFamily: "Poppins", mt: 2, fontSize: ".9em" }}
 										>
 											Position:{" "}
 											<span style={{ color: "black", fontWeight: 500 }}>
@@ -930,7 +911,7 @@ function ViewProfilePage() {
 										</Typography>
 										<Typography
 											color="text.secondary"
-											sx={{ fontFamily: "Poppins", mt: 2, fontSize: "1em" }}
+											sx={{ fontFamily: "Poppins", mt: 2, fontSize: ".9em" }}
 										>
 											Institutional Email:{" "}
 											<span style={{ color: "black", fontWeight: 500 }}>
@@ -950,15 +931,36 @@ function ViewProfilePage() {
 									sx={{ ml: 2 }}
 								>
 									<Grid item xs sx={{ mt: 6.5 }}>
-										<Typography
-											color="text.secondary"
-											sx={{ fontFamily: "Poppins", fontSize: "1em" }}
-										>
-											Date Hired:{" "}
-											<span style={{ color: "black", fontWeight: 500 }}>
-												{formatDate(selectedUser.dateHired)}
-											</span>
-										</Typography>
+										{selectedUser.empStatus !== "Regular" && (
+											<>
+												<Typography
+													color="text.secondary"
+													sx={{
+														fontFamily: "Poppins",
+														mt: 1,
+														fontSize: ".9em",
+													}}
+												>
+													Probationary Status:{" "}
+													<span style={{ color: "black", fontWeight: 500 }}>
+														{selectedUser.probeStatus}
+													</span>
+												</Typography>
+												<Typography
+													color="text.secondary"
+													sx={{
+														fontFamily: "Poppins",
+														mt: 1,
+														fontSize: ".9em",
+													}}
+												>
+													Probationary Date Started:{" "}
+													<span style={{ color: "black", fontWeight: 500 }}>
+														{formatDate(selectedUser.dateStarted)}
+													</span>
+												</Typography>
+											</>
+										)}
 										{/* <Typography
 											color="text.secondary"
 											sx={{ fontFamily: "Poppins", mt: 2, fontSize: "1em" }}

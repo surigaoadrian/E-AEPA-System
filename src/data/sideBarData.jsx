@@ -9,7 +9,7 @@ import {
 	faUsers,
 	faUserCheck,
   faListUl,
-  faBarChart
+  faBarChart,
 } from "@fortawesome/free-solid-svg-icons";
 import DashboardIcon from '@mui/icons-material/Dashboard';
 
@@ -87,10 +87,24 @@ export const SideBarData = [
   },
 
   {
-    title: "Evaluation Tracking",
-    path: "/TrackEmployee",
+    title: "Evaluation Overview",
     role: ["HEAD"],
     icon: <FontAwesomeIcon icon={faUserTie} style={{ fontSize: "15px" }} />,
-  },
+    isDropdown: true, // Indicates this is a dropdown
+    subItems: [
+      {
+        icon: <FontAwesomeIcon icon={faUserCheck} style={{ fontSize: "15px" }} />,
+        title: "Monitoring",
+        path: "/TrackEmployee",
+        role: ["HEAD"],
+      },
+      {
+        icon: <FontAwesomeIcon icon={faStar} style={{ fontSize: "15px" }} />,
+        title: "Result",
+        path: "/HeadEvalResult",
+        role: ["HEAD"],
+      },
+    ],
+  }
 
 ];

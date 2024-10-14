@@ -178,7 +178,7 @@ function NavBar() {
         console.error("Authentication failed");
       }
     } catch (error) {
-      setTimeout(() => setMessage("Password is invalid or missing."), 0);
+      setTimeout(() => setMessage("Password is invalid"), 0);
 
       console.error("Error during account swap:", error);
     }

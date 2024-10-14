@@ -42,6 +42,9 @@ public class EvaluationService {
     @Autowired
     AssignedPeerEvaluatorsRepository assignedPeerEvaluatorsRepo;
 
+    @Autowired
+    AssignedPeersService apeServ;
+
     // create evaluation
     public EvaluationEntity createEvaluation(EvaluationEntity evaluation) {
         Optional<UserEntity> user = userRepo.findByUserID(evaluation.getUser().getUserID());
@@ -172,14 +175,11 @@ public class EvaluationService {
     public List<EvaluationEntity> getEvaluationsByUser(int userID) {
         return evalRepo.findByUserID(userID);
     }
-
+//ANGELA
     public List<EvaluationDTO> getAggregatedEvaluations() {
         List<EvaluationEntity> evaluations = evalRepo.findAll();
 
-        // Fetch peer evaluations and create a map by evaluateeId
-        List<PeerEvaluationDTO> peerEvaluations = getMergedPeerEvaluations();
-        Map<Integer, String> peerEvaluationStatusMap = peerEvaluations.stream()
-                .collect(Collectors.toMap(PeerEvaluationDTO::getEvaluateeId, PeerEvaluationDTO::getMergedStatus));
+        Map<Integer, String> overallStatuses = apeServ.getOverallStatus();
 
         return evaluations.stream()
                 .collect(Collectors.groupingBy(EvaluationEntity::getUserId))
@@ -212,6 +212,10 @@ public class EvaluationService {
                     dto.setlName(lName);
                     dto.setRole(role);
 
+                    // Set overall status from AssignedPeerEvaluators
+                    String overallStatus = overallStatuses.get(userId); // assuming userId corresponds to assigned_peers_id
+                    dto.setPvbpaStatus(overallStatus != null ? overallStatus : "PENDING"); // Default to PENDING if not found
+
                     for (EvaluationEntity eval : userEvaluations) {
                         switch (eval.getEvalType() + "-" + eval.getStage()) {
                             case "SELF-JOB":
@@ -220,109 +224,13 @@ public class EvaluationService {
                             case "SELF-VALUES":
                                 dto.setSvbpaStatus(eval.getStatus());
                                 break;
-                            // case "PEER-A-VALUES":
-                                
-                            //     break;
-                            case "PEER-VALUES":
-                                dto.setPvbpaStatus(eval.getStatus());
-                                // Do not set directly, will set below from peer evaluations
-                                break;
                             // Add more cases as needed
                         }
                     }
-
-                    // // Set the combined peer status
-                    // String combinedPeerStatus = calculateCombinedPeerStatus(userEvaluations);
-                    // dto.setPavbpaStatus(combinedPeerStatus);
-
-                    // // Set the peer values status from peer evaluations
-                    // String peerValuesStatus = peerEvaluationStatusMap.get(userId);
-                    // if (peerValuesStatus != null) {
-                    //     dto.setPvbpaStatus(peerValuesStatus);
-                    // }
-
                     return dto;
                 })
                 // .filter(Objects::nonNull) // Remove any null entries
                 .collect(Collectors.toList());
-    }
-
-    public List<PeerEvaluationDTO> getMergedPeerEvaluations() {
-        List<AssignedPeerEvaluators> evaluations = assignedPeerEvaluatorsRepo.findAll();
-
-        // Create a map to store AssignedPeersEntity based on id
-        Map<Integer, AssignedPeersEntity> assignedPeersEntityMap = evaluations.stream()
-                .map(AssignedPeerEvaluators::getAssignedPeers) // Get AssignedPeersEntity
-                .distinct() // Ensure each entry is unique
-                .collect(Collectors.toMap(AssignedPeersEntity::getId, Function.identity()));
-
-        // Group evaluations by AssignedPeersEntity id
-        Map<Integer, List<AssignedPeerEvaluators>> groupedByPeersId = evaluations.stream()
-                .collect(Collectors.groupingBy(evaluation -> evaluation.getAssignedPeers().getId()));
-
-        return groupedByPeersId.entrySet().stream()
-                .map(entry -> {
-                    int assignedPeersId = entry.getKey();
-                    List<AssignedPeerEvaluators> peerEvaluations = entry.getValue();
-
-                    PeerEvaluationDTO dto = new PeerEvaluationDTO();
-                    dto.setAssignedPeersId(assignedPeersId);
-
-                    // Retrieve evaluateeId from AssignedPeersEntity
-                    AssignedPeersEntity assignedPeersEntity = assignedPeersEntityMap.get(assignedPeersId);
-                    if (assignedPeersEntity != null) {
-                        dto.setEvaluateeId(assignedPeersEntity.getEvaluatee().getUserID());
-                    }
-
-                    long pendingCount = peerEvaluations.stream()
-                            .filter(e -> "PENDING".equals(e.getStatus()))
-                            .count();
-
-                    long completedCount = peerEvaluations.stream()
-                            .filter(e -> "COMPLETED".equals(e.getStatus()))
-                            .count();
-
-                    String mergedStatus;
-                    if (pendingCount == 3) {
-                        mergedStatus = "Not Yet Open";
-                    } else if (completedCount == 3) {
-                        mergedStatus = "COMPLETED";
-                    } else if (pendingCount >= 1 && pendingCount < 3) {
-                        mergedStatus = "IN PROGRESS";
-                    } else {
-                        mergedStatus = "UNKNOWN"; // Default case, handle other cases as needed
-                    }
-
-                    dto.setMergedStatus(mergedStatus);
-
-                    return dto;
-                })
-                .collect(Collectors.toList());
-    }
-
-    public String calculateCombinedPeerStatus(List<EvaluationEntity> userEvaluations) {
-        boolean peerCompleted = false;
-        boolean peerACompleted = false;
-
-        for (EvaluationEntity eval : userEvaluations) {
-            if ("PEER-VALUES".equals(eval.getEvalType() + "-" + eval.getStage())) {
-                if ("COMPLETED".equals(eval.getStatus())) {
-                    peerCompleted = true;
-                }
-            } else if ("PEER-A-VALUES".equals(eval.getEvalType() + "-" + eval.getStage())) {
-                if ("COMPLETED".equals(eval.getStatus())) {
-                    peerACompleted = true;
-                }
-            }
-        }
-
-        if (peerCompleted && peerACompleted) {
-            return "COMPLETED";
-        } else if (peerCompleted || peerACompleted) {
-            return "IN PROGRESS";
-        } else {
-            return "Not Yet Open";
-        }
     }
 
 //total employee for recommendation

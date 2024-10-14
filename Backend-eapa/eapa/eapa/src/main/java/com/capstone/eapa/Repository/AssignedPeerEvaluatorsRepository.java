@@ -9,5 +9,6 @@ import java.util.List;
 
 public interface AssignedPeerEvaluatorsRepository extends JpaRepository<AssignedPeerEvaluators, Integer>{
      List<AssignedPeerEvaluators> findAll();
+     List<AssignedPeerEvaluators> findByAssignedPeersId(int assignedPeersId);
     
 }
