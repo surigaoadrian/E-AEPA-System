@@ -23,6 +23,25 @@ function AdminDashboard() {
     setCurrentDate(formattedDate);
   }, []);
 
+  useEffect(() => {
+    const handlePopState = () => {
+      if (window.location.pathname.includes('AdminDashboard/EligibleEvaluators')) {
+        setShowEligibleEvaluators(false);
+        navigate('/AdminDashboard');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [navigate]);
+
+  const handleShowEligibleEvaluators = () => {
+    navigate('/AdminDashboard/EligibleEvaluators');
+    setShowEligibleEvaluators(true);
+  }
   //adi codes
   const [openSYModal, setOpenSYModal] = useState(false);
   const [isOpenView, setIsOpenView] = useState(false);
