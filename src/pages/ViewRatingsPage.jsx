@@ -149,7 +149,7 @@ const ViewRatingsPage = () => {
             flex: 1,
             fontSize: "22px",
             fontWeight: "bold",
-            marginLeft: "25px",
+            marginLeft: "10px",
           }}
         >
           Results

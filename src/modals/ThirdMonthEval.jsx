@@ -1463,7 +1463,7 @@ const ThirdMonthEval = ({ userId, filter }) => {
             <div className='mt-10' style={{ height: '500px', width: '700px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
               <img src={matrix} style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'cover' }} alt="Background Matrix" />
               <ResponsiveContainer width="100%" height="100%">
-                <ScatterChart margin={{ top: 20, right: 15, bottom: 20, left: 10 }}>
+                <ScatterChart margin={{ top: 15, right: 10, bottom: 20, left: 5 }}>
                   <XAxis type="number" dataKey="valuesPerformance" name="Values-Based Performance" domain={[1, 5]}>
                     <Label value="Values-Based Performance" offset={-20} position="insideBottom" style={{ fontWeight: 'bold', textAnchor: 'middle' }} />
                   </XAxis>
