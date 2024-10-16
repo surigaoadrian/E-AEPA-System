@@ -210,9 +210,7 @@ public class EvaluationService {
 
                     EvaluationDTO dto = new EvaluationDTO();
                     dto.setUserId(userId);
-                    dto.setPosition(position);
                     dto.setWorkID(workID);
-                    dto.setPosition(position);
                     dto.setDept(dept);
                     dto.setEmpStatus(empStatus);
                     dto.setfName(fName);

@@ -144,32 +144,33 @@ public class AssignedPeersService {
     public Map<Integer, String> getOverallStatus() {
         List<AssignedPeerEvaluators> evaluations = apeRepo.findAll();
         Map<Integer, String> overallStatusMap = new HashMap<>();
-
-        // Group evaluations by assigned_peers_id
+    
+        // Group evaluations by evaluatee_id
         Map<Integer, List<AssignedPeerEvaluators>> groupedEvaluations = new HashMap<>();
         for (AssignedPeerEvaluators evaluation : evaluations) {
+            int evaluateeId = evaluation.getAssignedPeers().getEvaluatee().getUserID();
             groupedEvaluations
-                .computeIfAbsent(evaluation.getAssignedPeers().getId(), k -> new ArrayList<>())
+                .computeIfAbsent(evaluateeId, k -> new ArrayList<>())
                 .add(evaluation);
         }
-
-        // Determine overall status for each assigned_peers_id
+    
+        // Determine overall status for each evaluatee_id
         for (Map.Entry<Integer, List<AssignedPeerEvaluators>> entry : groupedEvaluations.entrySet()) {
-            int assignedPeerId = entry.getKey();
+            int evaluateeId = entry.getKey();
             List<AssignedPeerEvaluators> evals = entry.getValue();
-
+    
             boolean allCompleted = true;
-
+    
             for (AssignedPeerEvaluators eval : evals) {
                 if (!"COMPLETED".equals(eval.getStatus())) {
                     allCompleted = false;
-                    break; // No need to check further if we found a PENDING status
+                    break; // Stop checking if a pending status is found
                 }
             }
-
-            overallStatusMap.put(assignedPeerId, allCompleted ? "COMPLETED" : "PENDING");
+    
+            overallStatusMap.put(evaluateeId, allCompleted ? "COMPLETED" : "PENDING");
         }
-
+    
         return overallStatusMap;
     }
 

@@ -76,7 +76,6 @@ function TrackEmployee() {
       // Fetch all users data
       const allUsersResponse = await fetch(`${apiUrl}user/getAllUser`);
       const allUsersData = await allUsersResponse.json();
-      console.log(allUsersData);
 
       // Fetch evaluations data
       const evaluationsResponse = await fetch(`${apiUrl}evaluation/evaluations`);
@@ -128,6 +127,8 @@ function TrackEmployee() {
               ...item,
               name: `${item.fName} ${item.lName}`,
               userID: item.userID,
+              workID: item.workID,
+              position: item.position,
               probeStatus: item.probeStatus || "",
               probationaryMonth,
               monthsSinceHired,
@@ -180,9 +181,15 @@ function TrackEmployee() {
   };
   const columnsEmployees = [
     {
+      id: "workID",
+      label: "ID No.",
+      align: "center",
+      minWidth: 50,
+    },
+    {
       id: "name",
       label: "Name",
-      minWidth: 170,
+      minWidth: 150,
       align: "center",
       format: (value) => formatName(value),
     },
@@ -193,7 +200,7 @@ function TrackEmployee() {
       label: "Position",
       minWidth: 150,
       align: "center",
-      format: (value) => (value ? value.toLocaleString("en-US") : ""),
+      format: (value) => value 
     },
     {
       id: "probeStatus",
@@ -259,7 +266,7 @@ function TrackEmployee() {
 
         </div>
       ),
-      minWidth: 150,
+      minWidth: 200,
       align: "center",
       format: (value) => {
         if (value === "") {
@@ -402,7 +409,7 @@ function TrackEmployee() {
             {showPasswordModal ? (
               <Skeleton variant="rectangular" width="100%" height="100%"></Skeleton>
             ) : (
-              <TableContainer sx={{ height: '100%', borderRadius: "5px 5px 0 0 ", border: '1px solid lightgray', width:'100%' }}>
+              <TableContainer sx={{ height: '29.8em', borderRadius: "5px 5px 0 0 ", border: '1px solid lightgray', width:'100%' }}>
                 <Table stickyHeader aria-label="sticky table" size="small">
                   <TableHead sx={{ height: "2em" }}>
                     <TableRow>
@@ -433,9 +440,13 @@ function TrackEmployee() {
                             <TableCell sx={{ fontFamily: "Poppins" }} key={`${row.userID}-${column.id}`} align={column.align}>
                               {column.id === "name" ? (
                                 row.name
-                              ) :  column.id === "probeStatus" ? (
+                              ) :column.id === "workID" ? (
+                                row.workID
+                              ) : column.id === "position" ? (
+                                row.position
+                              ) : column.id === "probeStatus" ? (
                                 column.format(row.probeStatus) // Accessing the probeStatus correctly
-                            ) : (
+                              ) : (
                                 column.format ? column.format(row.evaluation?.[column.id]) : row.evaluation?.[column.id] || 'N/A' // Handle undefined evaluations
                               )}
                             </TableCell>
@@ -446,7 +457,7 @@ function TrackEmployee() {
                   ) : (
                     <TableBody>
                       <TableRow>
-                        <TableCell sx={{ height: '30.87em', borderRadius: '5px 5px 0 0' }} colSpan={columnsEmployees.length} align="center">
+                        <TableCell sx={{ height: '29.8em', borderRadius: '5px 5px 0 0' }} colSpan={columnsEmployees.length} align="center">
                           <Typography
                             sx={{
                               textAlign: "center",

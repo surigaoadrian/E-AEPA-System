@@ -188,7 +188,7 @@ function HeadEvalResult() {
           <Skeleton variant="text" sx={{ fontSize: '3em', width: '8em', ml: '1em', mt: '.3em' }}></Skeleton>
         ) : (
           <Typography ml={6.5} mt={3} sx={{ fontFamily: "Poppins", fontWeight: "bold", fontSize: "1.5em" }}>
-            Track Employees
+            Employee Evaluation Results
           </Typography>
         )}
         {showPasswordModal ? (
