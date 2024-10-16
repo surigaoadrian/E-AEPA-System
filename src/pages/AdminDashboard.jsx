@@ -174,4 +174,8 @@ function AdminDashboard() {
   );
 }
 
+<<<<<<< Updated upstream
 export default AdminDashboard;
+=======
+export default AdminDashboard;
+>>>>>>> Stashed changes
