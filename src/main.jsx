@@ -1,6 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider, Navigate  } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Navigate,
+} from "react-router-dom";
 import "./index.css";
 import HomeShowcase from "./pages/HomeShowcase";
 import ViewProfilePage from "./pages/ViewProfilePage";
@@ -27,11 +31,12 @@ const router = createBrowserRouter([
     path: "/",
     element: <Layout />,
     children: [
-
       {
-        path: "/", 
+        path: "/",
         element: (
-          <PrivateRoute requiredRoles={["EMPLOYEE", "HEAD", "ADMIN", "SUPERUSER"]}>
+          <PrivateRoute
+            requiredRoles={["EMPLOYEE", "HEAD", "SUPERUSER", "ADMIN"]}
+          >
             <HomeShowcase />
           </PrivateRoute>
         ),
@@ -84,7 +89,7 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-        
+
       {
         path: "/activityLogs",
         element: (
@@ -117,10 +122,10 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-       {
+      {
         path: "/AdminDashboard",
         element: (
-         <PrivateRoute requiredRoles={["ADMIN"]}>
+          <PrivateRoute requiredRoles={["ADMIN", "SUPERUSER"]}>
             <AdminDashboard />
           </PrivateRoute>
         ),
@@ -135,9 +140,7 @@ const router = createBrowserRouter([
       }
     ],
   },
-  {
-
-  },
+  {},
   { path: "/login", element: <LoginPage /> },
   { path: "/forgotPassword", element: <ForgotPasswordPage /> },
   { path: "/resetPassword/:token", element: <ResetPasswordPage /> },

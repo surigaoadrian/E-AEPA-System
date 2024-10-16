@@ -41,6 +41,10 @@ public interface EvaluationRepository extends JpaRepository<EvaluationEntity, In
  //total employees for recommendation
  @Query("SELECT COUNT(e) FROM EvaluationEntity e WHERE e.period = '5th Month' AND e.status = 'COMPLETED'")
  long countByPeriodAndStatus();
+    //Query to check annual evaluation status with schoolYear
+    @Query(value = "SELECT status FROM tblevaluation WHERE TRIM(user_id) = :userID AND TRIM(period) = :period AND TRIM(stage) = :stage AND TRIM(eval_type) = :evalType AND TRIM(school_year) = :schoolYear AND TRIM(is_deleted) = 0", nativeQuery = true)
+    String findStatusByUserIDPeriodStageEvalTypeAndSchoolYear(int userID, String period, String stage, String evalType, String schoolYear);
+
 
  // Open Evaluation for 3rd , 5th , and Annual
  @Query("SELECT COUNT(DISTINCT e.user.userID) " +

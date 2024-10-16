@@ -10,7 +10,7 @@ import Typography from "@mui/material/Typography";
 import ConfirmationModal from "./ConfirmationModal";
 import ReactRouterPrompt from "react-router-prompt";
 import LeaveConfirmationModal from "../modals/LeaveConfirmationModal";
-import { apiUrl } from '../config/config';
+import { apiUrl } from "../config/config";
 import Loader from "./Loader";
 
 function EvaluationForm({
@@ -23,6 +23,9 @@ function EvaluationForm({
   selectedEmp,
   selectedAssignedPeerId,
   evalID,
+  handleRenderFlag,
+  annualFirstSemId,
+  annualSecondSemId,
 }) {
   const [questions, setQuestions] = useState([]);
   const [responses, setResponses] = useState([]);
@@ -174,7 +177,7 @@ function EvaluationForm({
       const fetchRandomPeer = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:8080/user/getUser/${randomPID}`
+            `${apiUrl}user/getUser/${randomPID}`
           );
           console.log("Peer data:", response.data); // Debugging log
           setPeer(response.data);
@@ -289,30 +292,24 @@ function EvaluationForm({
             }
           );
         } else if (evalType === "SELF") {
-          response = await axios.get(
-             `${apiUrl}evaluation/getEvalID`,
-            {
-              params: {
-                userID: userId,
-                period: evalPeriod,
-                stage: stageType,
-                evalType: formType,
-              },
-            }
-          );
+          response = await axios.get(`${apiUrl}evaluation/getEvalID`, {
+            params: {
+              userID: userId,
+              period: evalPeriod,
+              stage: stageType,
+              evalType: formType,
+            },
+          });
         } else if (evalType === "HEAD") {
-          response = await axios.get(
-             `${apiUrl}evaluation/getEvalIDHead`,
-            {
-              params: {
-                userID: userId,
-                empID: selectedEmp.userID,
-                period: evalPeriod,
-                stage: stageType,
-                evalType: formType,
-              },
-            }
-          );
+          response = await axios.get(`${apiUrl}evaluation/getEvalIDHead`, {
+            params: {
+              userID: userId,
+              empID: selectedEmp.userID,
+              period: evalPeriod,
+              stage: stageType,
+              evalType: formType,
+            },
+          });
         }
 
         //console.log(response.data);
@@ -406,9 +403,7 @@ function EvaluationForm({
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await axios.get(
-          `${apiUrl}question/getAllQuestions`
-        );
+        const response = await axios.get(`${apiUrl}question/getAllQuestions`);
         setQuestions(response.data);
       } catch (error) {
         if (error.response) {
@@ -589,6 +584,7 @@ function EvaluationForm({
       let updateEval = null;
       let updateEvaluatorStatus = null;
       let createResults = null;
+      let updateAnnualEvalStatus = null;
 
       console.log("Stage:", stage);
       console.log("EvalType:", evalType);
@@ -688,7 +684,7 @@ function EvaluationForm({
         );
 
         createResults = await axios.post(
-           `${apiUrl}results/calculateResults?evaluationID=${evaluationID}`,
+          `${apiUrl}results/calculateResults?evaluationID=${evaluationID}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -704,12 +700,12 @@ function EvaluationForm({
         }));
 
         response = await axios.post(
-           `${apiUrl}jobbasedresponse/createResponses`,
+          `${apiUrl}jobbasedresponse/createResponses`,
           responsesToSubmit
         );
 
         updateEval = await axios.patch(
-           `${apiUrl}evaluation/updateEvaluation/${evaluationID}`,
+          `${apiUrl}evaluation/updateEvaluation/${evaluationID}`,
           evalPayload,
           {
             headers: {
@@ -764,6 +760,7 @@ function EvaluationForm({
         setOpenForm(false);
         setEvalType("");
         setEvaluationID(0);
+        handleRenderFlag();
       } else {
         console.error("No response data received.");
       }
@@ -844,14 +841,20 @@ function EvaluationForm({
       </ReactRouterPrompt>
       <div style={formHeader}>
         <h2 style={{ fontSize: "18px", fontWeight: 600 }}>
-          {period} Evaluation:{" "}
+          {period === "Annual-1st" ? (
+            "Annual Evaluation (First Semester):"
+          ) : period === "Annual-2nd" ? (
+            "Annual Evaluation (Second Semester):"
+          ) : (
+            <span>{period} Evaluation: </span>
+          )}
           {stageType === "VALUES"
             ? evalType === "PEER" || evalType === "PEER-A"
-              ? "Values-Based Performance Assessment (Peer)"
+              ? " Values-Based Performance Assessment (Peer)"
               : evalType === "HEAD"
-              ? "Values-Based Performance Assessment (Employee)"
-              : "Values-Based Performance Assessment"
-            : "Job-Based Performance Assessment"}
+              ? " Values-Based Performance Assessment (Employee)"
+              : " Values-Based Performance Assessment"
+            : " Job-Based Performance Assessment"}
         </h2>
       </div>
       <div style={formContent}>

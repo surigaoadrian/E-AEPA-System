@@ -1,11 +1,23 @@
-import React, { useState, useRef } from "react";
-import { Box, Tabs, Tab, MenuItem, Select, FormControl, Button } from "@mui/material";
-import { styled } from '@mui/system';
+import React, { useState, useRef, useEffect } from "react";
+import axios from "axios";
+import { apiUrl } from "../config/config";
+import {
+  Box,
+  Tabs,
+  Tab,
+  MenuItem,
+  Select,
+  FormControl,
+  Button,
+} from "@mui/material";
+import { styled } from "@mui/system";
 import ThirdMonthEval from "../modals/ThirdMonthEval";
 import FifthMonthEval from "../modals/FifthMonthEval";
-import domtoimage from 'dom-to-image';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import domtoimage from "dom-to-image";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGears } from "@fortawesome/free-solid-svg-icons";
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -74,22 +86,22 @@ const CustomSelect = styled(Select)(({ theme }) => ({
   width: "120px",
   height: "40px",
   marginRight: "30px",
-  '& .MuiSelect-icon': {
+  "& .MuiSelect-icon": {
     color: "#8C383E",
   },
-  '& .MuiOutlinedInput-notchedOutline': {
+  "& .MuiOutlinedInput-notchedOutline": {
     borderColor: "transparent",
   },
-  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
     borderColor: "transparent",
   },
-  '&:hover .MuiOutlinedInput-notchedOutline': {
+  "&:hover .MuiOutlinedInput-notchedOutline": {
     borderColor: "transparent",
   },
-  '&:after': {
+  "&:after": {
     borderBottom: `2px solid #8C383E`,
   },
-  '& .Mui-selected': {
+  "& .Mui-selected": {
     backgroundColor: "#8C383E !important",
     color: "#fff !important",
   },
@@ -97,7 +109,7 @@ const CustomSelect = styled(Select)(({ theme }) => ({
 
 const CustomMenuItem = styled(MenuItem)(({ theme }) => ({
   ...menuItemStyles,
-  '&.Mui-selected': {
+  "&.Mui-selected": {
     ...selectedMenuItemStyles,
   },
 }));
@@ -107,6 +119,8 @@ const ViewRatingsPage = () => {
   const [filter, setFilter] = useState("overall");
   const userId = sessionStorage.getItem("userID");
   const contentRef = useRef(null);
+  const [loggedUser, setLoggedUser] = useState({});
+  const [dateHired, setDateHired] = useState("");
 
   const handleTabChange = (event, newIndex) => {
     setTabIndex(newIndex);
@@ -118,21 +132,49 @@ const ViewRatingsPage = () => {
 
   const exportToPDF = () => {
     const input = contentRef.current;
-  
-    html2canvas(input, { useCORS: true, scrollX: 0, scrollY: -window.scrollY }).then((canvas) => {
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4', true);
-      const imgWidth = 210; // A4 width in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width; // Use canvas dimensions
-  
-      // Add the image to the PDF
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-  
-      pdf.save('invoice.pdf');
-    }).catch((error) => {
-      console.error('Error generating PDF:', error);
-    });
+
+    html2canvas(input, { useCORS: true, scrollX: 0, scrollY: -window.scrollY })
+      .then((canvas) => {
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF("p", "mm", "a4", true);
+        const imgWidth = 210; // A4 width in mm
+        const imgHeight = (canvas.height * imgWidth) / canvas.width; // Use canvas dimensions
+
+        // Add the image to the PDF
+        pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+
+        pdf.save("invoice.pdf");
+      })
+      .catch((error) => {
+        console.error("Error generating PDF:", error);
+      });
   };
+
+  //adi codes
+  //Fetch user details
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}user/getUser/${userId}`);
+        setLoggedUser(response.data);
+        setDateHired(response.data.dateHired);
+      } catch (error) {
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else {
+          console.log(`Error: ${error.message}`);
+        }
+      }
+    };
+    fetchUser();
+  }, []);
+
+  //3rd
+  const evaluationStartDate = new Date(dateHired);
+  evaluationStartDate.setMonth(evaluationStartDate.getMonth() + 2);
+  const today = new Date();
 
   return (
     <div
@@ -181,12 +223,49 @@ const ViewRatingsPage = () => {
           overflowY: "auto",
         }}
       >
-        <Tabs value={tabIndex} onChange={handleTabChange} className="ml-4" sx={tabStyle}>
+        <Tabs
+          value={tabIndex}
+          onChange={handleTabChange}
+          className="ml-4"
+          sx={tabStyle}
+        >
           <Tab label="3rd Month" sx={tabStyle} />
           <Tab label="5th Month" sx={tabStyle} />
         </Tabs>
         <TabPanel value={tabIndex} index={0}>
-          <ThirdMonthEval  userId={userId} filter={filter} />
+          {today >= evaluationStartDate ? (
+            <ThirdMonthEval userId={userId} filter={filter} />
+          ) : (
+            <div
+              style={{
+                height: "200px",
+                width: "100%",
+                //backgroundColor: "tomato",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "end",
+              }}
+            >
+              <div
+                style={{
+                  height: "75px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  color: "#a8a7a9",
+                }}
+              >
+                <FontAwesomeIcon
+                  icon={faGears}
+                  style={{ fontSize: "30px", color: "#a8a7a9" }}
+                />
+                <p>
+                  There are no results for the third-month evaluation at this
+                  time.
+                </p>
+              </div>
+            </div>
+          )}
         </TabPanel>
         <TabPanel value={tabIndex} index={1}>
           <FifthMonthEval userId={userId} filter={filter} />

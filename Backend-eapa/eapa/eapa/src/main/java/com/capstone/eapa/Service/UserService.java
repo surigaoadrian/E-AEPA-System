@@ -276,7 +276,7 @@ public class UserService implements UserDetailsService {
     }
 
     //peer evaluator assigned
-//    public List<UserEntity> getAssignedEvaluators(String dept, int excludedUserID) {
+//    public List<Integer> getAssignedEvaluators(String dept, int excludedUserID) {
 //        List<UserEntity> users = userRepo.findPeersByDeptRoleNotUserIDNotAndPositionNotSecretary(dept, Role.HEAD.name(), excludedUserID);
 //
 //        if (users.isEmpty()) {
@@ -295,47 +295,199 @@ public class UserService implements UserDetailsService {
 //        if (size <= 1) {
 //            return Collections.emptyList();
 //        } else if (size == 2) {
-//            return filteredUsers.subList(0, 1);
+//            return filteredUsers.subList(0, 1).stream()
+//                    .map(UserEntity::getUserID)
+//                    .collect(Collectors.toList());
 //        } else if (size == 3) {
-//            return filteredUsers.subList(0, 2);
+//            return filteredUsers.subList(0, 2).stream()
+//                    .map(UserEntity::getUserID)
+//                    .collect(Collectors.toList());
 //        } else {
 //            Collections.shuffle(filteredUsers);
-//            return filteredUsers.subList(0, 3);
+//            return filteredUsers.subList(0, 3).stream()
+//                    .map(UserEntity::getUserID)
+//                    .collect(Collectors.toList());
 //        }
 //    }
     public List<Integer> getAssignedEvaluators(String dept, int excludedUserID) {
+        // Step 1: Get all peers excluding heads, secretaries, and the excluded user
+        List<UserEntity> allUsers = userRepo.findPeersByDeptRoleNotUserIDNotAndPositionNotSecretary(dept, Role.HEAD.name(), excludedUserID);
+
+        // Step 2: Filter out "Regular" employees first
+        List<UserEntity> regularUsers = allUsers.stream()
+                .filter(user -> "Regular".equalsIgnoreCase(user.getEmpStatus()))
+                .collect(Collectors.toList());
+
+        // Step 3: If there are not enough "Regular" employees, include probationary employees (3rd or 5th)
+        if (regularUsers.size() < 3) {
+            List<UserEntity> probationaryUsers = allUsers.stream()
+                    .filter(user -> "3rd Probationary".equalsIgnoreCase(user.getProbeStatus())
+                            || "5th Probationary".equalsIgnoreCase(user.getProbeStatus()))
+                    .collect(Collectors.toList());
+            regularUsers.addAll(probationaryUsers);
+        }
+
+        // Step 4: Exclude the user with the `excludedUserID`
+        regularUsers.removeIf(user -> user.getUserID() == excludedUserID);
+
+        // Step 5: Handle the size and randomization logic
+        int size = regularUsers.size();
+
+        if (size == 0) {
+            return Collections.emptyList(); // No users to return
+        } else if (size <= 3) {
+            // Return all users if the size is 1, 2, or 3
+            return regularUsers.stream()
+                    .map(UserEntity::getUserID)
+                    .collect(Collectors.toList());
+        } else {
+            // If more than 3 users are available, shuffle and return only 3
+            Collections.shuffle(regularUsers);
+            return regularUsers.subList(0, 3).stream()
+                    .map(UserEntity::getUserID)
+                    .collect(Collectors.toList());
+        }
+    }
+
+
+    //get assigned evaluators for 5th month
+//    public List<Integer> get5thMonthAssignedEvaluators(String dept, int excludedUserID, List<Integer> excludedPeerIds) {
+//        List<UserEntity> users = userRepo.findPeersByDeptRoleNotUserIDNotAndPositionNotSecretary(dept, Role.HEAD.name(), excludedUserID);
+//
+//        if (users.isEmpty()) {
+//            return Collections.emptyList();
+//        }
+//
+//        // Filter out users with the position 'Secretary'
+//        List<UserEntity> filteredUsers = users.stream()
+//                .filter(user -> !user.getPosition().equalsIgnoreCase("secretary"))
+//                .collect(Collectors.toList());
+//
+//        // Remove the excluded user ID
+//        filteredUsers.removeIf(user -> user.getUserID() == excludedUserID);
+//
+//        // Filter out the excluded peer IDs
+//        List<UserEntity> finalFilteredUsers = filteredUsers.stream()
+//                .filter(user -> !excludedPeerIds.contains(user.getUserID()))
+//                .collect(Collectors.toList());
+//
+//        // If after filtering, the list is too small, re-add some of the excludedPeerIds
+//        if (finalFilteredUsers.size() < 3 && !excludedPeerIds.isEmpty()) {
+//            finalFilteredUsers = new ArrayList<>(filteredUsers); // Reset to the original filtered list without `excludedUserID`
+//        }
+//
+//        int size = finalFilteredUsers.size();
+//        if (size <= 1) {
+//            return Collections.emptyList();
+//        } else if (size == 2) {
+//            return finalFilteredUsers.subList(0, 1).stream()
+//                    .map(UserEntity::getUserID)
+//                    .collect(Collectors.toList());
+//        } else if (size == 3) {
+//            return finalFilteredUsers.subList(0, 2).stream()
+//                    .map(UserEntity::getUserID)
+//                    .collect(Collectors.toList());
+//        } else {
+//            Collections.shuffle(finalFilteredUsers);
+//            return finalFilteredUsers.subList(0, 3).stream()
+//                    .map(UserEntity::getUserID)
+//                    .collect(Collectors.toList());
+//        }
+//    }
+    public List<Integer> get5thMonthAssignedEvaluators(String dept, int excludedUserID, List<Integer> excludedPeerIds) {
+        // Step 1: Fetch users excluding heads, secretaries, and the excluded user
         List<UserEntity> users = userRepo.findPeersByDeptRoleNotUserIDNotAndPositionNotSecretary(dept, Role.HEAD.name(), excludedUserID);
+
+        if (users.isEmpty()) {
+            return Collections.emptyList(); // No users to return
+        }
+
+        // Step 2: Filter out users with the position 'Secretary'
+        List<UserEntity> filteredUsers = users.stream()
+                .filter(user -> !user.getPosition().equalsIgnoreCase("secretary"))
+                .collect(Collectors.toList());
+
+        // Step 3: Remove the excluded user ID
+        filteredUsers.removeIf(user -> user.getUserID() == excludedUserID);
+
+        // Step 4: Filter out the excluded peer IDs
+        List<UserEntity> finalFilteredUsers = filteredUsers.stream()
+                .filter(user -> !excludedPeerIds.contains(user.getUserID()))
+                .collect(Collectors.toList());
+
+        // Step 5: If after filtering the list is too small, re-add some of the excludedPeerIds
+        if (finalFilteredUsers.size() < 3 && !excludedPeerIds.isEmpty()) {
+            finalFilteredUsers = new ArrayList<>(filteredUsers); // Reset to the original filtered list without `excludedUserID`
+        }
+
+        // Step 6: Handle the size and randomization logic
+        int size = finalFilteredUsers.size();
+
+        if (size == 0) {
+            return Collections.emptyList(); // No users to return
+        } else if (size <= 3) {
+            // If the size is 1, 2, or 3, return all available users
+            return finalFilteredUsers.stream()
+                    .map(UserEntity::getUserID)
+                    .collect(Collectors.toList());
+        } else {
+            // If more than 3 users are available, shuffle and return only 3
+            Collections.shuffle(finalFilteredUsers);
+            return finalFilteredUsers.subList(0, 3).stream()
+                    .map(UserEntity::getUserID)
+                    .collect(Collectors.toList());
+        }
+    }
+
+
+    //get assigned evaluators for annual first sem
+    public List<Integer> get1stAnnualAssignedEvaluators(String dept, int excludedUserID) {
+        // Fetch users who are not the excluded user, are not secretaries, and have empStatus = 'Regular'
+        List<UserEntity> users = userRepo.findPeersByDeptRoleNotUserIDNotAndPositionNotSecretary(dept, Role.HEAD.name(), excludedUserID);
+
 
         if (users.isEmpty()) {
             return Collections.emptyList();
         }
 
-        // Filter out users with the position 'Secretary'
-        List<UserEntity> filteredUsers = users.stream()
-                .filter(user -> !user.getPosition().equalsIgnoreCase("secretary"))
+        // Filter out users who are not "Regular" and exclude the given user
+        List<UserEntity> regularUsers = users.stream()
+                .filter(user -> "Regular".equalsIgnoreCase(user.getEmpStatus()) && user.getUserID() != excludedUserID)
                 .collect(Collectors.toList());
 
-        // Remove the excluded user ID
-        filteredUsers.removeIf(user -> user.getUserID() == excludedUserID);
+        // Log the filtered regular users
+        //System.out.println("Filtered Regular Users: " + regularUsers);
 
-        int size = filteredUsers.size();
-        if (size <= 1) {
+
+        // Handle cases based on the size of the remaining list after filtering
+        int size = regularUsers.size();
+        if (size == 0) {
+            // If no users left after filtering, return an empty list
             return Collections.emptyList();
+        } else if (size == 1) {
+            // If only 1 user remains, return that user
+            return regularUsers.stream()
+                    .map(UserEntity::getUserID)
+                    .collect(Collectors.toList());
         } else if (size == 2) {
-            return filteredUsers.subList(0, 1).stream()
+            // If 2 users remain, return both users
+            return regularUsers.stream()
                     .map(UserEntity::getUserID)
                     .collect(Collectors.toList());
         } else if (size == 3) {
-            return filteredUsers.subList(0, 2).stream()
+            // If 3 users remain, return all three users
+            return regularUsers.stream()
                     .map(UserEntity::getUserID)
                     .collect(Collectors.toList());
         } else {
-            Collections.shuffle(filteredUsers);
-            return filteredUsers.subList(0, 3).stream()
+            // If more than 3 users remain, shuffle and return the first 3 users
+            Collections.shuffle(regularUsers);
+            return regularUsers.subList(0, 3).stream()
                     .map(UserEntity::getUserID)
                     .collect(Collectors.toList());
         }
     }
+
 
     //Get Employees under Department Head
 //    public List<UserEntity> getAllEmployeesFromDepartmentHead(String headName) {

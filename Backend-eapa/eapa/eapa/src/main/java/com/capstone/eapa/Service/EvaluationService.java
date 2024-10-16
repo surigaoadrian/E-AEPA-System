@@ -169,6 +169,12 @@ public class EvaluationService {
         return "COMPLETED".equals(status);
     }
 
+    // returns true if annual evaluation is done
+    public boolean isEvaluationCompletedAnnual(int userID, String period, String stage, String evalType, String schoolYear) {
+        String status = evalRepo.findStatusByUserIDPeriodStageEvalTypeAndSchoolYear(userID, period, stage, evalType, schoolYear);
+        return "COMPLETED".equals(status);
+    }
+
     public List<EvaluationEntity> getEvaluationsByUser(int userID) {
         return evalRepo.findByUserID(userID);
     }

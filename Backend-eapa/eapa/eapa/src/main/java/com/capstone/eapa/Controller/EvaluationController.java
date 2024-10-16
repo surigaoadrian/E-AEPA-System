@@ -86,6 +86,21 @@ public class EvaluationController {
         return evalServ.isEvaluationCompletedHead(userID, empID, period, stage, evalType);
     }
 
+    // New endpoint for checking if annual evaluation is completed
+    @GetMapping("/isEvaluationCompletedAnnual")
+    public ResponseEntity<Boolean> isEvaluationCompletedAnnual(
+            @RequestParam int userID,
+            @RequestParam String period,
+            @RequestParam String stage,
+            @RequestParam String evalType,
+            @RequestParam String schoolYear) {
+
+        boolean isCompleted = evalServ.isEvaluationCompletedAnnual(userID, period, stage, evalType, schoolYear);
+        return ResponseEntity.ok(isCompleted);
+    }
+
+
+
     @GetMapping("/getPeerID")
     public ResponseEntity<Integer> getPeerIDByEvalID(@RequestParam int evalID) {
         Integer peerID = evalServ.getPeerIDByEvalID(evalID);
