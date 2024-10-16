@@ -81,6 +81,21 @@ public class EvaluationController {
         return evalServ.isEvaluationCompletedHead(userID, empID, period, stage, evalType);
     }
 
+    // New endpoint for checking if annual evaluation is completed
+    @GetMapping("/isEvaluationCompletedAnnual")
+    public ResponseEntity<Boolean> isEvaluationCompletedAnnual(
+            @RequestParam int userID,
+            @RequestParam String period,
+            @RequestParam String stage,
+            @RequestParam String evalType,
+            @RequestParam String schoolYear) {
+
+        boolean isCompleted = evalServ.isEvaluationCompletedAnnual(userID, period, stage, evalType, schoolYear);
+        return ResponseEntity.ok(isCompleted);
+    }
+
+
+
     @GetMapping("/getPeerID")
     public ResponseEntity<Integer> getPeerIDByEvalID(@RequestParam int evalID) {
         Integer peerID = evalServ.getPeerIDByEvalID(evalID);
@@ -97,92 +112,81 @@ public class EvaluationController {
         return ResponseEntity.ok(averages);
     }
 
+//total employees for recommendation
+@GetMapping("/countRecommendedEmployees")
+public long countRecommendedEmployees() {
+    return evalServ.countRecommendedEmployees();
+}
 
-      //total employees for recommendation
-    @GetMapping("/countRecommendedEmployees")
-    public long countRecommendedEmployees() {
-        return evalServ.countRecommendedEmployees();
-    }
-
-    // Endpoint for 3rd Month evaluation status
+// Endpoint for 3rd Month evaluation status
 @GetMapping("/thirdMonthStatus")
-public ResponseEntity<Map<String, Long>> getThirdMonthStatus() {
-    EvaluationStatusDTO statusDTO = evalServ.getThirdMonthEvaluationStatus();
+public ResponseEntity<EvaluationStatusDTO> getThirdMonthStatus() {
+    EvaluationStatusDTO status = evalServ.getThirdMonthEvaluationStatus();
+    return ResponseEntity.ok(status);
+}
+@GetMapping("/fifthMonthStatus")
+public ResponseEntity<EvaluationStatusDTO> getFifthMonthEvaluationStatus() {
+    EvaluationStatusDTO status = evalServ.getFifthMonthEvaluationStatus();
+    return ResponseEntity.ok(status);
+}
+@GetMapping("/annualStatus")
+public ResponseEntity<EvaluationStatusDTO> getAnnualEvaluationStatus() {
+    EvaluationStatusDTO status = evalServ.getAnnualEvaluationStatus();
+    return ResponseEntity.ok(status);
+}
+
+
+
+// Endpoint for 3rd Month completed evaluations only
+@GetMapping("/thirdMonthCompleted")
+public ResponseEntity<Map<String, Long>> getThirdMonthCompleted() {
+    long completed = evalServ.getCompleted3rdMonthEvaluationCount();
     Map<String, Long> statusMap = new HashMap<>();
-    statusMap.put("completed", statusDTO.getCompleted());
-    statusMap.put("notCompleted", statusDTO.getNotCompleted());
+    statusMap.put("completed", completed);
     return ResponseEntity.ok(statusMap);
 }
 
-    // Endpoint for 5th Month evaluation status
-    @GetMapping("/fifthMonthStatus")
-    public ResponseEntity<Map<String, Long>> getFifthMonthStatus() {
-        EvaluationStatusDTO statusDTO = evalServ.getFifthMonthEvaluationStatus();
-        Map<String, Long> statusMap = new HashMap<>();
-        statusMap.put("completed", statusDTO.getCompleted());
-        statusMap.put("notCompleted", statusDTO.getNotCompleted());
-        return ResponseEntity.ok(statusMap);
-    }
+// Endpoint for 5th Month completed evaluations only
+@GetMapping("/fifthMonthCompleted")
+public ResponseEntity<Map<String, Long>> getFifthMonthCompleted() {
+    long completed = evalServ.getCompleted5thMonthEvaluationCount();
+    Map<String, Long> statusMap = new HashMap<>();
+    statusMap.put("completed", completed);
+    return ResponseEntity.ok(statusMap);
+}
 
-    // Endpoint for Annual evaluation status
-    @GetMapping("/annualStatus")
-    public ResponseEntity<Map<String, Long>> getAnnualStatus() {
-        EvaluationStatusDTO statusDTO = evalServ.getAnnualEvaluationStatus();
-        Map<String, Long> statusMap = new HashMap<>();
-        statusMap.put("completed", statusDTO.getCompleted());
-        statusMap.put("notCompleted", statusDTO.getNotCompleted());
-        return ResponseEntity.ok(statusMap);
-    }
+// Endpoint for Annual completed evaluations only
+@GetMapping("/annualCompleted")
+public ResponseEntity<Map<String, Long>> getAnnualCompleted() {
+    long completed = evalServ.getCompletedAnnualEvaluationCount();
+    Map<String, Long> statusMap = new HashMap<>();
+    statusMap.put("completed", completed);
+    return ResponseEntity.ok(statusMap);
+}
 
-    // Endpoint for 3rd Month completed evaluations only
-    @GetMapping("/thirdMonthCompleted")
-    public ResponseEntity<Map<String, Long>> getThirdMonthCompleted() {
-        long completed = evalServ.getCompleted3rdMonthEvaluationCount();
-        Map<String, Long> statusMap = new HashMap<>();
-        statusMap.put("completed", completed);
-        return ResponseEntity.ok(statusMap);
-    }
+//get the number of evaluators
+@GetMapping("/unique-user-count")
+public Long getUniqueUserCount() {
+    return evalServ.getTotalUniqueUserIds();
+}
 
-    // Endpoint for 5th Month completed evaluations only
-    @GetMapping("/fifthMonthCompleted")
-    public ResponseEntity<Map<String, Long>> getFifthMonthCompleted() {
-        long completed = evalServ.getCompleted5thMonthEvaluationCount();
-        Map<String, Long> statusMap = new HashMap<>();
-        statusMap.put("completed", completed);
-        return ResponseEntity.ok(statusMap);
-    }
+//3rd Month Completed Evaluation Per Department
+@GetMapping("/thirdMonthPerDept")
+public ResponseEntity<List<DepartmentEvaluationCountDTO>> getCompletedEvaluationsForThirdMonth() {
+    List<DepartmentEvaluationCountDTO> counts = evalServ.getCompletedEvaluationsForThirdMonth();
+    return ResponseEntity.ok(counts);
+}
+//Annual Completed Evaluation Per Department
+@GetMapping("/annualPerDept")
+public ResponseEntity<List<DepartmentEvaluationCountDTO>> getCompletedEvaluationsForAnnual() {
+    List<DepartmentEvaluationCountDTO> counts = evalServ.getCompletedEvaluationsForAnnual();
+    return ResponseEntity.ok(counts);
+}
+//5th Month Completed Evaluation Per Department
+@GetMapping("/fifthMonthPerDept")
+public ResponseEntity<List<DepartmentEvaluationCountDTO>> getCompletedEvaluationsForFifthMonth() {
+    List<DepartmentEvaluationCountDTO> counts = evalServ.getCompletedEvaluationsForFifthMonth();
+    return ResponseEntity.ok(counts);
+}
 
-    // Endpoint for Annual completed evaluations only
-    @GetMapping("/annualCompleted")
-    public ResponseEntity<Map<String, Long>> getAnnualCompleted() {
-        long completed = evalServ.getCompletedAnnualEvaluationCount();
-        Map<String, Long> statusMap = new HashMap<>();
-        statusMap.put("completed", completed);
-        return ResponseEntity.ok(statusMap);
-    }
-
-    //get the number of evaluators
-    @GetMapping("/unique-user-count")
-    public Long getUniqueUserCount() {
-        return evalServ.getTotalUniqueUserIds();
-    }
-
-    //3rd Month Completed Evaluation Per Department
-    @GetMapping("/thirdMonthPerDept")
-    public ResponseEntity<List<DepartmentEvaluationCountDTO>> getCompletedEvaluationsForThirdMonth() {
-        List<DepartmentEvaluationCountDTO> counts = evalServ.getCompletedEvaluationsForThirdMonth();
-        return ResponseEntity.ok(counts);
-    }
-    //Annual Completed Evaluation Per Department
-    @GetMapping("/annualPerDept")
-    public ResponseEntity<List<DepartmentEvaluationCountDTO>> getCompletedEvaluationsForAnnual() {
-        List<DepartmentEvaluationCountDTO> counts = evalServ.getCompletedEvaluationsForAnnual();
-        return ResponseEntity.ok(counts);
-    }
-    //5th Month Completed Evaluation Per Department
-    @GetMapping("/fifthMonthPerDept")
-    public ResponseEntity<List<DepartmentEvaluationCountDTO>> getCompletedEvaluationsForFifthMonth() {
-        List<DepartmentEvaluationCountDTO> counts = evalServ.getCompletedEvaluationsForFifthMonth();
-        return ResponseEntity.ok(counts);
-    }
 }

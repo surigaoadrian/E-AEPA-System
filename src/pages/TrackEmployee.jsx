@@ -186,6 +186,15 @@ function TrackEmployee() {
       align: "center",
       format: (value) => formatName(value),
     },
+
+
+    {
+      id: "position",
+      label: "Position",
+      minWidth: 150,
+      align: "center",
+      format: (value) => (value ? value.toLocaleString("en-US") : ""),
+    },
     {
       id: "probeStatus",
       label: (

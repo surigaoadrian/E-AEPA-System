@@ -29,4 +29,8 @@ public interface AssignedPeersRepository extends JpaRepository<AssignedPeersEnti
     @Query(value = "SELECT evaluator_id FROM assigned_evaluators WHERE assigned_peers_id = :assignedPeersId", nativeQuery = true)
     List<Integer> findEvaluatorIdsByAssignedPeersId(int assignedPeersId);
 
+    @Query(value = "SELECT id FROM tblassignedpeers WHERE period = ?1 AND evaluatee_id = ?2 AND school_year = ?3 AND semester = ?4", nativeQuery = true)
+    Integer findIdByPeriodAndEvaluateeIdAndSchoolYearAndSemester(String period, int evaluateeId, String schoolYear, String semester);
+
+
 }

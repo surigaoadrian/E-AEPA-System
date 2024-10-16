@@ -23,7 +23,9 @@ function NotFoundPage() {
   return (
     <div style={container}>
       <div style={pageText}>
-        <h1 style={{ fontSize: "150px", color: "#8C383E" }}>404</h1>
+        <h1 style={{ fontSize: "150px", fontWeight: 700, color: "#8C383E" }}>
+          404
+        </h1>
         <h2
           style={{ fontSize: "32px", marginBottom: "20px", color: "#636E72" }}
         >
@@ -36,7 +38,8 @@ function NotFoundPage() {
             to="/"
             style={{
               textDecoration: "none",
-              fontWeight: "400",
+              fontWeight: 500,
+              color: "#8C383E",
             }}
           >
             Go back to Home.

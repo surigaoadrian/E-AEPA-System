@@ -70,3 +70,19 @@ input[type="radio"]:checked + .custom-radio::after {
   border-radius: 100px;
   margin-left: 15px;
 }
+
+.carousel-container {
+  height: 400px; /* Set the desired height */
+  width: 100%; /* Adjust the width as needed */
+  display: flex;
+  align-items: center;
+}
+
+.carousel .slide {
+  height: 100%; /* Ensure the slides fill the parent height */
+}
+
+.carousel img {
+  height: 100%; /* Ensure the images fill the parent height */
+  object-fit: cover; /* Adjust the object-fit as needed */
+}

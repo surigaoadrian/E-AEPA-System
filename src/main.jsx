@@ -1,6 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider, Navigate  } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Navigate,
+} from "react-router-dom";
 import "./index.css";
 import HomeShowcase from "./pages/HomeShowcase";
 import ViewProfilePage from "./pages/ViewProfilePage";
@@ -21,17 +25,19 @@ import EvaluateEmployee from "./pages/EvaluateEmployee";
 import ActivityLog from "./pages/ActivityLogs";
 import AdminDashboard from "./pages/AdminDashboard";
 import HeadEvalResult from "./pages/HeadEvalResult";
+import EligibleEvaluators from "./components/EligibleEvaluators";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
     children: [
-
       {
-        path: "/", 
+        path: "/",
         element: (
-          <PrivateRoute requiredRoles={["EMPLOYEE", "HEAD", "ADMIN", "SUPERUSER"]}>
+          <PrivateRoute
+            requiredRoles={["EMPLOYEE", "HEAD", "SUPERUSER", "ADMIN"]}
+          >
             <HomeShowcase />
           </PrivateRoute>
         ),
@@ -84,7 +90,7 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-        
+
       {
         path: "/activityLogs",
         element: (
@@ -109,10 +115,10 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-       {
+      {
         path: "/AdminDashboard",
         element: (
-         <PrivateRoute requiredRoles={["ADMIN"]}>
+          <PrivateRoute requiredRoles={["ADMIN", "SUPERUSER"]}>
             <AdminDashboard />
           </PrivateRoute>
         ),
@@ -127,11 +133,17 @@ const router = createBrowserRouter([
         ),
       },
 
+      {
+        path: "/AdminDashboard/EligibleEvaluators",
+        element: (
+          <PrivateRoute requiredRoles={["ADMIN"]}>
+            <EligibleEvaluators />
+          </PrivateRoute>
+        ),
+      }
     ],
   },
-  {
-
-  },
+  {},
   { path: "/login", element: <LoginPage /> },
   { path: "/forgotPassword", element: <ForgotPasswordPage /> },
   { path: "/resetPassword/:token", element: <ResetPasswordPage /> },
@@ -139,7 +151,6 @@ const router = createBrowserRouter([
   { path: "*", element: <NotFoundPage /> },
   // { path: "/loading", element:<Loading/>},
 ]);
-
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

@@ -1,51 +1,98 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import { format } from "date-fns";
 import { useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
-import { Box, Grid, Typography, Paper, Container, Button } from '@mui/material';
-import EvaluationStatusChart from '../components/EvaluationStatusChart';
-import EmployeeStatusChart from '../components/EmployeeStatusChart';
-import AccomplishmentRateChart from '../components/AccomplishmentRateChart';
-import ThirdMonthCompletion from '../components/ThirdMonthCompletion';
-import FifthMonthCompletion from '../components/FifthMonthCompletion';
-import AnnualCompletion from '../components/AnnualCompletion';
-// import EligibleEvaluators from '../components/EligibleEvaluators';
+import { Box, Grid, Typography, Paper, Container } from "@mui/material";
+import EvaluationStatusChart from "../components/EvaluationStatusChart";
+import EmployeeStatusChart from "../components/EmployeeStatusChart";
+import AccomplishmentRateChart from "../components/AccomplishmentRateChart";
+import ThirdMonthCompletion from "../components/ThirdMonthCompletion";
+import FifthMonthCompletion from "../components/FifthMonthCompletion";
+import AnnualCompletion from "../components/AnnualCompletion";
+import SchoolYearModal from "../modals/SchoolYearModal";
+import Button from "@mui/material/Button";
+import EligibleEvaluators from '../components/EligibleEvaluators';
 
 function AdminDashboard() {
-  const [currentDate, setCurrentDate] = useState('');
+  const [currentDate, setCurrentDate] = useState("");
   const [showEligibleEvaluators, setShowEligibleEvaluators] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const now = new Date();
-    const formattedDate = format(now, 'MMMM dd, yyyy | EEEE');
+    const formattedDate = format(now, "MMMM dd, yyyy | EEEE");
     setCurrentDate(formattedDate);
   }, []);
 
-  useEffect(() => {
-    const handlePopState = () => {
-      if (window.location.pathname.includes('AdminDashboard/EligibleEvaluators')) {
-        setShowEligibleEvaluators(false);
-        navigate('/AdminDashboard');
-      }
-    };
+  //adi codes
+  const [openSYModal, setOpenSYModal] = useState(false);
+  const [isOpenView, setIsOpenView] = useState(false);
+  const [openAddSY, setOpenAddSY] = useState(false);
+  const [openEditView, setOpenEditView] = useState(false);
 
-    window.addEventListener('popstate', handlePopState);
+  const handleOpenEditView = () => {
+    setOpenEditView(true);
+  };
 
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-    };
-  }, [navigate]);
+  const handleCloseEditView = () => {
+    setOpenEditView(false);
+  };
 
-  const handleShowEligibleEvaluators = () => {
-    navigate('/AdminDashboard/EligibleEvaluators');
-    setShowEligibleEvaluators(true);
+  const handleOpenSYModal = () => {
+    setOpenSYModal(true);
+  };
+
+  const handleCloseSYModal = () => {
+    setOpenSYModal(false);
+    setIsOpenView(false);
+    setOpenEditView(false);
+  };
+
+  const handleOpenView = () => {
+    setIsOpenView(true);
+  };
+
+  const handleCloseView = () => {
+    setIsOpenView(false);
+    setOpenEditView(false);
+  };
+
+  const handleOpenAddSY = () => {
+    setOpenAddSY(true);
+  };
+
+  const handleCloseAddSY = () => {
+    setOpenAddSY(false);
+    setOpenEditView(false);
   };
 
   return (
     <Container maxWidth="120px" sx={{ padding: 2 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
-        <Typography variant="h5" fontWeight="bolder" fontFamily="Poppins">Dashboard</Typography>
-        <Typography variant="h7" fontFamily="Poppins">{currentDate}</Typography>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 2,
+        }}
+      >
+        <Typography variant="h5" fontWeight="bolder" fontFamily="Poppins">
+          Dashboard
+        </Typography>
+        {/* <Typography variant="h7" fontFamily="Poppins">{currentDate}</Typography> */}
+        <Button
+          onClick={handleOpenSYModal}
+          sx={{
+            width: "10%",
+            backgroundColor: "#8C383E",
+            "&:hover": {
+              backgroundColor: "#7C2828",
+            },
+            fontFamily: "poppins",
+          }}
+          variant="contained"
+        >
+          Manage S.Y.
+        </Button>
       </Box>
 
       {showEligibleEvaluators ? (
@@ -167,6 +214,20 @@ function AdminDashboard() {
                 <AccomplishmentRateChart />
               </Paper>
             </Grid>
+            <SchoolYearModal
+          openModal={openSYModal}
+          handleCloseModal={handleCloseSYModal}
+          isOpenView={isOpenView}
+          handleOpenView={handleOpenView}
+          handleCloseView={handleCloseView}
+          openAddSY={openAddSY}
+          setOpenAddSY={setOpenAddSY}
+          handleOpenAddSY={handleOpenAddSY}
+          handleCloseAddSY={handleCloseAddSY}
+          openEditView={openEditView}
+          handleOpenEditView={handleOpenEditView}
+          handleCloseEditView={handleCloseEditView}
+        />
           </Grid>
         </>
       )}

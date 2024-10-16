@@ -172,6 +172,12 @@ public class EvaluationService {
         return "COMPLETED".equals(status);
     }
 
+    // returns true if annual evaluation is done
+    public boolean isEvaluationCompletedAnnual(int userID, String period, String stage, String evalType, String schoolYear) {
+        String status = evalRepo.findStatusByUserIDPeriodStageEvalTypeAndSchoolYear(userID, period, stage, evalType, schoolYear);
+        return "COMPLETED".equals(status);
+    }
+
     public List<EvaluationEntity> getEvaluationsByUser(int userID) {
         return evalRepo.findByUserID(userID);
     }
@@ -204,6 +210,7 @@ public class EvaluationService {
 
                     EvaluationDTO dto = new EvaluationDTO();
                     dto.setUserId(userId);
+                    dto.setPosition(position);
                     dto.setWorkID(workID);
                     dto.setPosition(position);
                     dto.setDept(dept);
@@ -233,76 +240,165 @@ public class EvaluationService {
                 .collect(Collectors.toList());
     }
 
-//total employee for recommendation
-    public long countRecommendedEmployees() {
-        return evalRepo.countByPeriodAndStatus();
-    }
+    public List<PeerEvaluationDTO> getMergedPeerEvaluations() {
+        List<AssignedPeerEvaluators> evaluations = assignedPeerEvaluatorsRepo.findAll();
 
+        // Create a map to store AssignedPeersEntity based on id
+        Map<Integer, AssignedPeersEntity> assignedPeersEntityMap = evaluations.stream()
+                .map(AssignedPeerEvaluators::getAssignedPeers) // Get AssignedPeersEntity
+                .distinct() // Ensure each entry is unique
+                .collect(Collectors.toMap(AssignedPeersEntity::getId, Function.identity()));
 
+        // Group evaluations by AssignedPeersEntity id
+        Map<Integer, List<AssignedPeerEvaluators>> groupedByPeersId = evaluations.stream()
+                .collect(Collectors.groupingBy(evaluation -> evaluation.getAssignedPeers().getId()));
 
-    // Method to get 3rd Month evaluation status
-    public EvaluationStatusDTO getThirdMonthEvaluationStatus() {
-        List<Long> completedThirdMonthUsers = evalRepo.getCompleted3rdMonthEvaluation();
-            long completed = completedThirdMonthUsers.size();
-            long notCompleted = evalRepo.countOpenForThirdMonth();
-        return new EvaluationStatusDTO(completed, notCompleted);
-    }
+        return groupedByPeersId.entrySet().stream()
+                .map(entry -> {
+                    int assignedPeersId = entry.getKey();
+                    List<AssignedPeerEvaluators> peerEvaluations = entry.getValue();
 
-    // Method to get 5th Month evaluation status
-    public EvaluationStatusDTO getFifthMonthEvaluationStatus() {
-        List<Long> completedFifthMonthUsers = evalRepo.getCompleted5thMonthEvaluation();
-        long completed = completedFifthMonthUsers.size();
-        long notCompleted = evalRepo.countOpenForFifthMonth();
-        return new EvaluationStatusDTO(completed,notCompleted);
-    }
+                    PeerEvaluationDTO dto = new PeerEvaluationDTO();
+                    dto.setAssignedPeersId(assignedPeersId);
 
-    public EvaluationStatusDTO getAnnualEvaluationStatus() {
-        List<Long> completedAnnualUsers = evalRepo.getCompletedAnnualEvaluation();
-        long completed = completedAnnualUsers.size();
-        long notCompleted = evalRepo.countOpenForFifthMonth();
-        return new EvaluationStatusDTO(completed, notCompleted);
-    }
+                    // Retrieve evaluateeId from AssignedPeersEntity
+                    AssignedPeersEntity assignedPeersEntity = assignedPeersEntityMap.get(assignedPeersId);
+                    if (assignedPeersEntity != null) {
+                        dto.setEvaluateeId(assignedPeersEntity.getEvaluatee().getUserID());
+                    }
 
-    // New methods for only completed counts
-    public long getCompleted3rdMonthEvaluationCount() {
-        return evalRepo.getCompleted3rdMonthEvaluation().size();
-    }
+                    long pendingCount = peerEvaluations.stream()
+                            .filter(e -> "PENDING".equals(e.getStatus()))
+                            .count();
 
-    public long getCompleted5thMonthEvaluationCount() {
-        return evalRepo.getCompleted5thMonthEvaluation().size();
-    }
+                    long completedCount = peerEvaluations.stream()
+                            .filter(e -> "COMPLETED".equals(e.getStatus()))
+                            .count();
 
-    public long getCompletedAnnualEvaluationCount() {
-        return evalRepo.getCompletedAnnualEvaluation().size();
-    }
+                    String mergedStatus;
+                    if (pendingCount == 3) {
+                        mergedStatus = "Not Yet Open";
+                    } else if (completedCount == 3) {
+                        mergedStatus = "COMPLETED";
+                    } else if (pendingCount >= 1 && pendingCount < 3) {
+                        mergedStatus = "IN PROGRESS";
+                    } else {
+                        mergedStatus = "UNKNOWN"; // Default case, handle other cases as needed
+                    }
 
+                    dto.setMergedStatus(mergedStatus);
 
-    public Long getTotalUniqueUserIds() {
-        return evalRepo.countUniqueUserIds();
-    }
-
-    //Evaluation Count per Department : 3rd Month
-    public List<DepartmentEvaluationCountDTO> getCompletedEvaluationsForThirdMonth() {
-        List<Object[]> results = evalRepo.countCompletedForThirdMonthPerDept();
-        return results.stream()
-                .map(result -> new DepartmentEvaluationCountDTO((String) result[0], (Long) result[1]))
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
-    //Evaluation Count per Department : Annual
-    public List<DepartmentEvaluationCountDTO> getCompletedEvaluationsForAnnual() {
-        List<Object[]> results = evalRepo.countCompletedForAnnualPerDept();
-        return results.stream()
-                .map(result -> new DepartmentEvaluationCountDTO((String) result[0], (Long) result[1]))
-                .collect(Collectors.toList());
+    public String calculateCombinedPeerStatus(List<EvaluationEntity> userEvaluations) {
+        boolean peerCompleted = false;
+        boolean peerACompleted = false;
+
+        for (EvaluationEntity eval : userEvaluations) {
+            if ("PEER-VALUES".equals(eval.getEvalType() + "-" + eval.getStage())) {
+                if ("COMPLETED".equals(eval.getStatus())) {
+                    peerCompleted = true;
+                }
+            } else if ("PEER-A-VALUES".equals(eval.getEvalType() + "-" + eval.getStage())) {
+                if ("COMPLETED".equals(eval.getStatus())) {
+                    peerACompleted = true;
+                }
+            }
+        }
+
+        if (peerCompleted && peerACompleted) {
+            return "COMPLETED";
+        } else if (peerCompleted || peerACompleted) {
+            return "IN PROGRESS";
+        } else {
+            return "Not Yet Open";
+        }
     }
-    //Evaluation Count per Department : 5th Month
-    public List<DepartmentEvaluationCountDTO> getCompletedEvaluationsForFifthMonth() {
-        List<Object[]> results = evalRepo.countCompletedForFifthMonthPerDept();
-        return results.stream()
-                .map(result -> new DepartmentEvaluationCountDTO((String) result[0], (Long) result[1]))
-                .collect(Collectors.toList());
-    }
+
+ //total employee for recommendation
+ public long countRecommendedEmployees() {
+    return evalRepo.countByPeriodAndStatus();
+}
+
+//3rd Month: Eligible takers
+public EvaluationStatusDTO getThirdMonthEvaluationStatus() {
+List<Long> eligibleUsers = userRepo.getUsersFor3rdMonthEvaluation();
+List<Long> completedEvaluations = evalRepo.getCompleted3rdMonthEvaluation();
+
+int totalEligible = eligibleUsers.size();
+int completed = completedEvaluations.size();
+int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
+
+return new EvaluationStatusDTO(completed, notCompleted);
+}
+
+public EvaluationStatusDTO getFifthMonthEvaluationStatus() {
+    List<Long> eligibleUsers = userRepo.getUsersFor5thMonthEvaluation();
+    List<Long> completedEvaluations = evalRepo.getCompleted5thMonthEvaluation();
+
+    int totalEligible = eligibleUsers.size();
+    int completed = completedEvaluations.size();
+    int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
+
+    return new EvaluationStatusDTO(completed, notCompleted);
+}
+
+public EvaluationStatusDTO getAnnualEvaluationStatus() {
+    List<Long> eligibleUsers = userRepo.getUsersForAnnualEvaluation();
+    List<Long> completedEvaluations = evalRepo.getCompletedAnnualEvaluation();
+
+    int totalEligible = eligibleUsers.size();
+    int completed = completedEvaluations.size();
+    int notCompleted = Math.max(0, totalEligible - completed); // Ensure notCompleted is non-negative
+
+    return new EvaluationStatusDTO(completed, notCompleted);
+}
+
+
+// New methods for only completed counts
+public long getCompleted3rdMonthEvaluationCount() {
+    return evalRepo.getCompleted3rdMonthEvaluation().size();
+}
+
+public long getCompleted5thMonthEvaluationCount() {
+    return evalRepo.getCompleted5thMonthEvaluation().size();
+}
+
+public long getCompletedAnnualEvaluationCount() {
+    return evalRepo.getCompletedAnnualEvaluation().size();
+}
+
+
+public Long getTotalUniqueUserIds() {
+    return evalRepo.countUniqueUserIds();
+}
+
+//Evaluation Count per Department : 3rd Month
+public List<DepartmentEvaluationCountDTO> getCompletedEvaluationsForThirdMonth() {
+    List<Object[]> results = evalRepo.countCompletedForThirdMonthPerDept();
+    return results.stream()
+            .map(result -> new DepartmentEvaluationCountDTO((String) result[0], (Long) result[1]))
+            .collect(Collectors.toList());
+}
+
+//Evaluation Count per Department : Annual
+public List<DepartmentEvaluationCountDTO> getCompletedEvaluationsForAnnual() {
+    List<Object[]> results = evalRepo.countCompletedForAnnualPerDept();
+    return results.stream()
+            .map(result -> new DepartmentEvaluationCountDTO((String) result[0], (Long) result[1]))
+            .collect(Collectors.toList());
+}
+//Evaluation Count per Department : 5th Month
+public List<DepartmentEvaluationCountDTO> getCompletedEvaluationsForFifthMonth() {
+    List<Object[]> results = evalRepo.countCompletedForFifthMonthPerDept();
+    return results.stream()
+            .map(result -> new DepartmentEvaluationCountDTO((String) result[0], (Long) result[1]))
+            .collect(Collectors.toList());
+}
+
 
 
     public AveragesDTO getPeerEvaluationAverages(int peerID, int userID, String period, String evalType) {
