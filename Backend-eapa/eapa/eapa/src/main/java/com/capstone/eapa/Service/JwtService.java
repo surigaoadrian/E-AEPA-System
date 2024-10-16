@@ -64,7 +64,7 @@ public class JwtService {
                 .claim("userID", user.getUserID())
                 .claim("workEmail", user.getWorkEmail())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 8 * 60 * 60 * 1000))
+                .expiration(new Date(System.currentTimeMillis() + 8 * 60 * 60 * 1000)) //8 hrs
                 .signWith(getLoginKey())
                 .compact();
 

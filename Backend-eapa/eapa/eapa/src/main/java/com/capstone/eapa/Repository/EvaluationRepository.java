@@ -38,6 +38,10 @@ public interface EvaluationRepository extends JpaRepository<EvaluationEntity, In
     @Query(value = "SELECT status FROM tblevaluation WHERE TRIM(user_id) = :userID AND TRIM(peer_id) = :empID AND TRIM(period) = :period AND TRIM(stage) = :stage AND TRIM(eval_type) = :evalType AND TRIM(is_deleted) = 0", nativeQuery = true)
     String findStatusByUserIDEmpIDPeriodStageAndEvalType(int userID, int empID, String period, String stage, String evalType);
 
+    //Query to check annual evaluation status with schoolYear
+    @Query(value = "SELECT status FROM tblevaluation WHERE TRIM(user_id) = :userID AND TRIM(period) = :period AND TRIM(stage) = :stage AND TRIM(eval_type) = :evalType AND TRIM(school_year) = :schoolYear AND TRIM(is_deleted) = 0", nativeQuery = true)
+    String findStatusByUserIDPeriodStageEvalTypeAndSchoolYear(int userID, String period, String stage, String evalType, String schoolYear);
+
 
     //total employees for recommendation
     @Query("SELECT COUNT(e) FROM EvaluationEntity e WHERE e.period = '5th Month' AND e.status = 'COMPLETED'")

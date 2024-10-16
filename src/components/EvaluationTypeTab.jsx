@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import Button from "@mui/material/Button";
 import axios from "axios";
-import { apiUrl } from '../config/config';
+import { apiUrl } from "../config/config";
 
 function EvaluationTypeTab({
   evalType,
   handleOpenForm,
   handleOpenModal,
   period,
-  setShouldDisplay,
+  //setShouldDisplay,
 }) {
   const [response1, setResponse1] = useState(false);
   const [response2, setResponse2] = useState(false);
@@ -72,11 +72,11 @@ function EvaluationTypeTab({
     fetchEvalChecker();
   }, [evalType]);
 
-  useEffect(() => {
-    if (response1 && response2 && response3) {
-      setShouldDisplay(false);
-    }
-  }, [response1, response2, response3]);
+  // useEffect(() => {
+  //   if (response1 && response2 && response3) {
+  //     setShouldDisplay(false);
+  //   }
+  // }, [response1, response2, response3]);
 
   return (
     <>

@@ -133,4 +133,10 @@ public class AssignedPeersService {
         }
     }
 
+    public boolean isAssignedPeersIdPresentAnnual(String period, int evaluateeId, String schoolYear, String semester) {
+        Integer id = apRepo.findIdByPeriodAndEvaluateeIdAndSchoolYearAndSemester(period, evaluateeId, schoolYear, semester);
+        return id != null;
+    }
+
+
 }

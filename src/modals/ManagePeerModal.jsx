@@ -63,7 +63,7 @@ function ManagePeerModal({
   };
 
   const [value, setValue] = React.useState(0);
-  const [assignPeerId, setAssignPeerId] = useState();
+  const [assignPeerId, setAssignPeerId] = useState(null);
   const [assignedEvaluators, setAssignedEvaluators] = useState([]);
   const [deptUsers, setDeptUsers] = useState([]);
   const [openEditPeer, setOpenEditPeer] = useState(false);
@@ -118,7 +118,7 @@ function ManagePeerModal({
     };
 
     fetchAssignPeerID();
-  }, [userId]);
+  }, [userId, selectedEvaluationPeriod]);
 
   //fetching assigned evaluators id
   useEffect(() => {
@@ -246,6 +246,9 @@ function ManagePeerModal({
     setOpenEditPeer(false);
   };
 
+  console.log("Assigned peer id:" + assignPeerId);
+  console.log("selected evaluation period " + selectedEvaluationPeriod);
+
   return (
     <Modal
       open={openModal}
@@ -254,40 +257,38 @@ function ManagePeerModal({
       aria-describedby="modal-description"
     >
       <Box sx={modalStyle}>
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs
-            value={value}
-            onChange={handleChange}
-            aria-label="basic tabs example"
-          >
-            <Tab label="3rd Month" {...a11yProps(0)} />
-            <Tab label="5th Month" {...a11yProps(1)} />
-            <Tab label="Annual" {...a11yProps(2)} />
-          </Tabs>
-        </Box>
-        <CustomTabPanel value={value} index={0}>
+        <div
+          style={{
+            // backgroundColor: "yellow",
+            height: "100%",
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
           <div
             style={{
-              //backgroundColor: "yellow",
-              height: "210px",
-              display: "flex",
-              flexDirection: "column",
+              //backgroundColor: "lightblue",
+              height: "100%",
             }}
           >
-            <div
-              style={{
-                //backgroundColor: "lightblue",
-                height: "70%",
-              }}
-            >
-              {openEditPeer ? (
-                <div style={{ height: "100%" }}>
+            {openEditPeer ? (
+              <div
+                style={{
+                  height: "100%",
+                  //backgroundColor: "yellow",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div>
                   <p
                     style={{
                       fontWeight: 500,
                     }}
                   >
-                    Edit Peers:
+                    Edit {selectedEvaluationPeriod} Peers:
                   </p>
                   {assignedEvaluators.map((evaluatorId, index) => (
                     <div
@@ -338,257 +339,146 @@ function ManagePeerModal({
                       </select>
                     </div>
                   ))}
-
-                  {console.log("Selected Evaluators: " + selectedEvaluators)}
+                </div>
+                {console.log("Selected Evaluators: " + selectedEvaluators)}
+                <div
+                  style={{
+                    height: "30%",
+                    //backgroundColor: "tomato",
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    alignItems: "end",
+                    marginTop: "12px",
+                  }}
+                >
+                  <Button
+                    variant="contained"
+                    sx={{
+                      height: "2.5em",
+                      width: "8rem",
+                      fontFamily: "Poppins",
+                      backgroundColor: "#8c383e",
+                      padding: "1px 1px 0 0 ",
+                      "&:hover": {
+                        backgroundColor: "#762F34",
+                        color: "white",
+                      },
+                    }}
+                    style={{ textTransform: "none" }}
+                    onClick={handleSaveEditPeer}
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    variant="contained"
+                    sx={{
+                      height: "2.5em",
+                      width: "8rem",
+                      fontFamily: "Poppins",
+                      backgroundColor: "#8c383e",
+                      padding: "1px 1px 0 0 ",
+                      "&:hover": {
+                        backgroundColor: "#762F34",
+                        color: "white",
+                      },
+                      marginLeft: "15px",
+                    }}
+                    style={{ textTransform: "none" }}
+                    onClick={handleEditPeer}
+                  >
+                    Close
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div
+                style={{
+                  height: "100%",
+                }}
+              >
+                {assignPeerId ? (
                   <div
                     style={{
-                      height: "30%",
-                      //backgroundColor: "tomato",
+                      height: "100%",
                       display: "flex",
-                      justifyContent: "flex-end",
-                      alignItems: "end",
-                      marginTop: "12px",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
                     }}
                   >
-                    <Button
-                      variant="contained"
-                      sx={{
-                        height: "2.5em",
-                        width: "8rem",
-                        fontFamily: "Poppins",
-                        backgroundColor: "#8c383e",
-                        padding: "1px 1px 0 0 ",
-                        "&:hover": {
-                          backgroundColor: "#762F34",
-                          color: "white",
-                        },
-                      }}
-                      style={{ textTransform: "none" }}
-                      onClick={handleSaveEditPeer}
-                    >
-                      Save
-                    </Button>
-                    <Button
-                      variant="contained"
-                      sx={{
-                        height: "2.5em",
-                        width: "8rem",
-                        fontFamily: "Poppins",
-                        backgroundColor: "#8c383e",
-                        padding: "1px 1px 0 0 ",
-                        "&:hover": {
-                          backgroundColor: "#762F34",
-                          color: "white",
-                        },
-                        marginLeft: "15px",
-                      }}
-                      style={{ textTransform: "none" }}
-                      onClick={handleEditPeer}
-                    >
-                      Close
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div style={{ height: "100%" }}>
-                  <p style={{ fontWeight: 500, marginBottom: "20px" }}>
-                    Assigned Peers:
-                  </p>
+                    <div>
+                      <p style={{ fontWeight: 500, marginBottom: "20px" }}>
+                        {selectedEvaluationPeriod} Assigned Peers:
+                      </p>
 
-                  {filteredDeptUsers.map((evaluator) => (
+                      {filteredDeptUsers.map((evaluator) => (
+                        <div
+                          style={{
+                            display: "flex",
+                            //backgroundColor: "lightgreen",
+                            width: "100%",
+                            marginTop: "10px",
+                          }}
+                        >
+                          <FontAwesomeIcon
+                            icon={faUser}
+                            style={{ marginRight: "10px" }}
+                          />
+
+                          <p key={evaluator.userID}>
+                            {evaluator.fName} {evaluator.lName}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+
                     <div
                       style={{
+                        height: "30%",
+                        //backgroundColor: "tomato",
                         display: "flex",
-                        //backgroundColor: "lightgreen",
-                        width: "100%",
-                        marginTop: "10px",
+                        justifyContent: "flex-end",
+                        alignItems: "end",
+                        marginTop: "19px",
                       }}
                     >
-                      <FontAwesomeIcon
-                        icon={faUser}
-                        style={{ marginRight: "10px" }}
-                      />
-
-                      <p key={evaluator.userID}>
-                        {evaluator.fName} {evaluator.lName}
-                      </p>
+                      <Button
+                        variant="contained"
+                        sx={{
+                          height: "2.5em",
+                          width: "8rem",
+                          fontFamily: "Poppins",
+                          backgroundColor: "#8c383e",
+                          padding: "1px 1px 0 0 ",
+                          "&:hover": {
+                            backgroundColor: "#762F34",
+                            color: "white",
+                          },
+                        }}
+                        style={{ textTransform: "none" }}
+                        onClick={handleEditPeer}
+                      >
+                        Edit Peer
+                      </Button>
                     </div>
-                  ))}
-
+                  </div>
+                ) : (
                   <div
                     style={{
-                      height: "30%",
-                      //backgroundColor: "tomato",
+                      height: "100%",
                       display: "flex",
-                      justifyContent: "flex-end",
-                      alignItems: "end",
-                      marginTop: "19px",
+                      justifyContent: "center",
+                      alignItems: "center",
                     }}
                   >
-                    <Button
-                      variant="contained"
-                      sx={{
-                        height: "2.5em",
-                        width: "8rem",
-                        fontFamily: "Poppins",
-                        backgroundColor: "#8c383e",
-                        padding: "1px 1px 0 0 ",
-                        "&:hover": {
-                          backgroundColor: "#762F34",
-                          color: "white",
-                        },
-                      }}
-                      style={{ textTransform: "none" }}
-                      onClick={handleEditPeer}
-                    >
-                      Edit Peer
-                    </Button>
+                    <p style={{ fontWeight: 500, marginBottom: "20px" }}>
+                      There are no assigned peers available to display.
+                    </p>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </div>
-        </CustomTabPanel>
-        <CustomTabPanel value={value} index={1}>
-          {assignPeerId !== null ? (
-            <div>No assigned peer as of the moment</div>
-          ) : (
-            <div
-              style={{
-                //backgroundColor: "yellow",
-                height: "210px",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <div
-                style={{
-                  //backgroundColor: "lightblue",
-                  height: "70%",
-                }}
-              >
-                <p style={{ fontWeight: 500, marginBottom: "20px" }}>
-                  Assigned Peers:
-                </p>
-
-                {filteredDeptUsers.map((evaluator) => (
-                  <div
-                    style={{
-                      display: "flex",
-                      //backgroundColor: "lightgreen",
-                      width: "100%",
-                      marginTop: "10px",
-                    }}
-                  >
-                    <FontAwesomeIcon
-                      icon={faUser}
-                      style={{ marginRight: "10px" }}
-                    />
-
-                    <p key={evaluator.userID}>
-                      {evaluator.fName} {evaluator.lName}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              <div
-                style={{
-                  height: "30%",
-                  //backgroundColor: "tomato",
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  alignItems: "end",
-                }}
-              >
-                <Button
-                  variant="contained"
-                  sx={{
-                    height: "2.5em",
-                    width: "11em",
-                    fontFamily: "Poppins",
-                    backgroundColor: "#8c383e",
-                    padding: "1px 1px 0 0 ",
-                    "&:hover": { backgroundColor: "#762F34", color: "white" },
-                  }}
-                  style={{ textTransform: "none" }}
-                >
-                  Edit Peer
-                </Button>
-              </div>
-            </div>
-          )}
-        </CustomTabPanel>
-        <CustomTabPanel value={value} index={2}>
-          {assignPeerId !== null ? (
-            <div>No assigned peer as of the moment</div>
-          ) : (
-            <div
-              style={{
-                //backgroundColor: "yellow",
-                height: "210px",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <div
-                style={{
-                  //backgroundColor: "lightblue",
-                  height: "70%",
-                }}
-              >
-                <p style={{ fontWeight: 500, marginBottom: "20px" }}>
-                  Assigned Peers:
-                </p>
-
-                {filteredDeptUsers.map((evaluator) => (
-                  <div
-                    style={{
-                      display: "flex",
-                      //backgroundColor: "lightgreen",
-                      width: "100%",
-                      marginTop: "10px",
-                    }}
-                  >
-                    <FontAwesomeIcon
-                      icon={faUser}
-                      style={{ marginRight: "10px" }}
-                    />
-
-                    <p key={evaluator.userID}>
-                      {evaluator.fName} {evaluator.lName}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              <div
-                style={{
-                  height: "30%",
-                  //backgroundColor: "tomato",
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  alignItems: "end",
-                }}
-              >
-                <Button
-                  variant="contained"
-                  sx={{
-                    height: "2.5em",
-                    width: "11em",
-                    fontFamily: "Poppins",
-                    backgroundColor: "#8c383e",
-                    padding: "1px 1px 0 0 ",
-                    "&:hover": { backgroundColor: "#762F34", color: "white" },
-                  }}
-                  style={{ textTransform: "none" }}
-                >
-                  Edit Peer
-                </Button>
-              </div>
-            </div>
-          )}
-        </CustomTabPanel>
+        </div>
       </Box>
     </Modal>
   );

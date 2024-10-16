@@ -1,36 +1,27 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import {
-  Box,
-  Typography,
-  Container,
-  Divider,
-  Grid,
-} from "@mui/material";
-import { Carousel } from "react-responsive-carousel";
-import "react-responsive-carousel/lib/styles/carousel.min.css";
-import Animated from "./motion";
-import logo from "../assets/logo.png";
 import imageSources from "../data/imageSource";
-import efficiencyImg from "../assets/efficient.png";
-import accuracyImg from "../assets/accuracy.png";
-import transparencyImg from "../assets/transparency.png";
 import evaluate from "../assets/evaluate.png";
 import select from "../assets/select.png";
 import done from "../assets/done.png";
-import { apiUrl } from '../config/config';
+import ManageAccoount from "../assets/ManageAccount.png";
+import ManageOffice from "../assets/ManageOffice.png";
+import ManageEmployee from "../assets/ManageEmployee.png";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
+import { apiUrl } from "../config/config";
 
 function UserHome() {
-  const [loggedUserData, setLoggedUserData] = useState(null);
+  const [loggedUserData, setLoggedUserData] = useState({});
+  const userID = sessionStorage.getItem("userID");
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [allUser, setAllUser] = useState([]);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const userID = sessionStorage.getItem("userID");
-        const response = await axios.get(
-          `${apiUrl}user/getUser/${userID}`
-        );
-
+        const response = await axios.get(`${apiUrl}user/getUser/${userID}`);
         setLoggedUserData(response.data);
         console.log(userID);
         console.log(response.data);
@@ -48,471 +39,587 @@ function UserHome() {
     fetchUser();
   }, []);
 
-  const formatDate = (date) => {
-    const options = { month: "long", day: "numeric", year: "numeric" };
-    return new Date(date).toLocaleDateString("en-US", options);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) =>
+        prevIndex === imageSources.length - 1 ? 0 : prevIndex + 1
+      );
+    }, 3000); // Change image every 3 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const fetchDepartmentStaff = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}user/getAllUser`);
+        setAllUser(response.data);
+        console.log("All users: " + response.data);
+      } catch (error) {
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else {
+          console.log(`Error: ${error.message}`);
+        }
+      }
+    };
+
+    fetchDepartmentStaff();
+  }, []);
+
+  function base64ToDataURL(base64String) {
+    return `data:image/png;base64,${base64String}`;
+  }
+
+  const filteredDeptStaff = allUser
+    .filter((user) => user.dept === loggedUserData.dept && user.isDeleted === 0)
+    .sort((a, b) => {
+      if (a.role === "HEAD") return -1;
+      if (b.role === "HEAD") return 1;
+      if (a.position === "Secretary") return -1;
+      if (b.position === "Secretary") return 1;
+      return 0;
+    });
+
+  const filteredAdmins = allUser
+    .filter(
+      (user) =>
+        user.role === "ADMIN" ||
+        (user.role === "SUPERUSER" && user.isDeleted === 0)
+    )
+    .sort((a, b) => {
+      if (a.role === "SUPERUSER") return -1;
+      if (b.role === "SUPERUSER") return 1;
+      if (a.position === "ADMIN") return -1;
+      if (b.position === "ADMIN") return 1;
+      return 0;
+    });
+
+  const container = {
+    //backgroundColor: "tomato",
+    height: "100%",
+    padding: "10px 25px 0px 25px",
+    overflow: "auto",
   };
 
-  const getWeekday = (date) => {
-    const options = { weekday: "long" };
-    return new Date(date).toLocaleDateString("en-US", options);
+  const carouselContainer = {
+    height: "240px",
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    //backgroundColor: "red",
+    marginTop: "10px",
+    overflow: "hidden",
+    borderRadius: "10px",
+  };
+
+  const howTocardStyles = {
+    height: "100%",
+    width: "31%",
+    backgroundColor: "white",
+    borderRadius: "8px",
+    padding: "15px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "space-around",
+    textAlign: "start",
+    boxShadow:
+      "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
   };
 
   return (
-    <Animated>
-      <Box
-        sx={{
-          backgroundColor: "white",
-          borderRadius: "10px",
-          width: "80vw",
-          height: "85vh",
-          margin: "25px 0px 0px 43px",
-          boxShadow: "-1px 4px 5px rgba(0, 0, 0, 0.3)",
-          position: "relative",
-          overflow: "hidden",
+    <div style={container}>
+      {/** Welcome and Calendar/Status  */}
+      <div
+        style={{
+          display: "flex",
+          marginTop: "10px",
+          height: "43vh",
+          width: "100%",
+          //backgroundColor: "lavender",
         }}
       >
-        <Box
-          component="header"
-          sx={{
-            backgroundColor: "#8C383E",
-            borderRadius: "10px 10px 0 0",
-            position: "sticky",
-            top: 0,
-            zIndex: 1000,
+        <div
+          style={{
+            //backgroundColor: "lavender",
+            width: "75%",
+            height: "100%",
+            padding: "0px 0px 0px 0px",
           }}
         >
-          <Container sx={{ padding: 1 }}>
-            <Box
-              sx={{
+          <div
+            style={{
+              borderRadius: "8px",
+              width: "98%",
+              minHeight: "100%",
+              backgroundColor: "white",
+              padding: "15px",
+              boxShadow:
+                "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
+            }}
+          >
+            <h1
+              style={{
+                fontSize: "20px",
+                fontWeight: 600,
+              }}
+            >
+              Welcome back, {loggedUserData.fName}
+            </h1>
+
+            <div style={carouselContainer}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <img
+                  src={imageSources[currentImageIndex].src}
+                  alt={imageSources[currentImageIndex].alt}
+                  style={{
+                    width: imageSources[currentImageIndex].width,
+                    height: "100%",
+                    margin: imageSources[currentImageIndex].margin,
+                    objectFit: imageSources[currentImageIndex].objectFit,
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            //backgroundColor: "lightgreen",
+            width: "25%",
+            height: "100%",
+          }}
+        >
+          <div
+            style={{
+              //backgroundColor: "aqua",
+              height: "100%",
+              width: "100%",
+            }}
+          >
+            <div
+              className="card flex justify-content-center"
+              style={{
+                backgroundColor: "white",
+                height: "100%",
+                width: "100%",
+                borderRadius: "8px",
                 display: "flex",
-                flexDirection: "row",
+                justifyContent: "center",
                 alignItems: "center",
-                justifyContent: "space-between",
+                padding: "10px",
+                boxShadow:
+                  "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
               }}
             >
-              <Typography
-                variant="h5"
-                sx={{
-                  color: "white",
-                  fontWeight: 600,
-                  fontSize: "20px",
-                }}
-              >
-                Hello, {loggedUserData ? loggedUserData.fName : "User"}
-              </Typography>
-              <Box
-                component="img"
-                src={logo}
-                alt="Logo"
-                sx={{
-                  width: "50px",
-                  height: "auto",
-                }}
-              />
-              <Typography
-                variant="body1"
-                sx={{
-                  color: "white",
-                  fontWeight: 500,
-                  fontFamily: "Poppins",
-                  textAlign: "center",
-                  fontSize: "15px",
-                }}
-              >
-                {formatDate(new Date())} | {getWeekday(new Date())}
-              </Typography>
-            </Box>
-          </Container>
-        </Box>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DateCalendar
+                  sx={{
+                    height: "100%",
+                    width: "100%",
+                  }}
+                />
+              </LocalizationProvider>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <Box
-          sx={{
-            height: "74vh",
-            overflowY: "auto",
-            margin: "10px 10px",
+      {/** How to & Dept */}
+      <div
+        style={{
+          display: "flex",
+          height: "43vh",
+          width: "100%",
+          //backgroundColor: "lightyellow",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            height: "100%",
+            width: "75%",
+            fontSize: "15px",
+            //backgroundColor: "lavender",
+            //paddingTop: "10px",
           }}
         >
-          <Box sx={{ padding: 2 }}>
-            <Typography
-              variant="body1"
-              sx={{
-                fontFamily: "Poppins",
-                fontSize: "18px",
-                mt: 2,
-                ml: 2,
-                mr: 2,
-                mb: 5,
-                textAlign: "center",
-              }}
-            >
-              <span
-                style={{
-                  fontFamily: "Poppins",
-                  fontWeight: 900,
-                  color: "#252525",
-                  fontSize: "50px",
-                }}
-              >
-                WELCOME TO THE{" "}
-              </span>
-              <br />
-              <span style={{ fontWeight: 600, color: "#8C383E" }}>
-                Expanded Administrative Employee Performance Appraisal (e-AEPA)
-                System.
-              </span>
-            </Typography>
-
-            <Box
-              sx={{
-                margin: "5% auto",
-                width: "90%",
-                maxHeight: "300px",
-                overflow: "hidden",
-              }}
-            >
-              <Carousel
-                showThumbs={true}
-                autoPlay
-                infiniteLoop
-                interval={3000}
-                stopOnHover
-                swipeable
-                emulateTouch
-                showStatus={false}
-                style={{
-                  maxHeight: "300px",
-                }}
-              >
-                {imageSources.map((source, index) => (
-                  <div key={index}>
-                    <img
-                      src={source.src}
-                      alt={source.alt}
-                      style={{
-                        width: source.width,
-                        height: "100%",
-                        margin: source.margin,
-                        objectFit: source.objectFit,
-                      }}
-                    />
-                  </div>
-                ))}
-              </Carousel>
-            </Box>
-
-            <Typography
-              sx={{
-                fontFamily: "Poppins",
-                fontSize: "17px",
-                fontWeight: 400,
-                lineHeight: "2em",
-                ml: 2,
-                mr: 2,
-                padding: "0 30px",
-                textAlign: "justify",
-                color: "#2C2828",
-              }}
-            >
-              At CIT-U, we are committed to enhancing the way we evaluate our
-              team. The e-AEPA system is designed to modernize and streamline
-              the employee evaluation process, transitioning from traditional
-              manual Excel-based assessments to a comprehensive digital
-              platform.
-            </Typography>
-
-            <Divider sx={{ my: 8 }} />
-
-            <Typography
-              variant="h4"
-              sx={{
-                fontFamily: "Poppins",
-                fontWeight: "bold",
-                textAlign: "center",
-                color: "#8C383E",
-                mb: 8,
-              }}
-            >
-              E-AEPA FOCUSES ON THE FOLLOWING
-            </Typography>
-
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6} md={4}>
-                <Box
-                  sx={{
+          <h1 style={{ marginTop: "10px", fontSize: "20px", fontWeight: 600 }}>
+            {loggedUserData.role === "ADMIN" ||
+            loggedUserData.role === "SUPERUSER"
+              ? "How to use:"
+              : "How to Evaluate:"}
+          </h1>
+          <div
+            style={{
+              height: "85%",
+              width: "98%",
+              //backgroundColor: "lightyellow",
+              borderRadius: "8px",
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <div style={howTocardStyles}>
+              {loggedUserData.role === "ADMIN" ||
+              loggedUserData.role === "SUPERUSER" ? (
+                <div
+                  style={{
                     display: "flex",
-                    flexDirection: "column",
                     alignItems: "center",
+                    justifyContent: "center",
+                    //backgroundColor: "tomato",
+                    height: "40%",
                   }}
                 >
                   <img
-                    src={efficiencyImg}
-                    alt="Efficiency"
-                    style={{ width: "100%", maxWidth: "170px" }}
-                  />
-                  <div style={{ textAlign: "center", width: "100%" }}>
-                    <span
-                      style={{
-                        color: "#F8C720",
-                        fontWeight: "bold",
-                        fontFamily: "Poppins",
-                        fontSize: "20px",
-                      }}
-                    >
-                      EFFICIENT
-                    </span>
-                  </div>
-                  <Typography
-                    sx={{
-                      fontFamily: "Poppins",
-                      fontSize: "15px",
-                      textAlign: "justify",
-                      color: "#2C2828",
-                      mr: 3,
-                      ml: 3,
-                      mt: 1,
-                    }}
-                  >
-                    e-AEPA enhances efficiency by automating tedious tasks,
-                    allowing more time for critical decision-making.
-                  </Typography>
-                </Box>
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={4}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                  }}
-                >
-                  <img
-                    src={accuracyImg}
-                    alt="Accuracy"
-                    style={{ width: "100%", maxWidth: "210px" }}
-                  />
-                  <div style={{ textAlign: "center", width: "100%" }}>
-                    <span
-                      style={{
-                        color: "#F8C720",
-                        fontWeight: "bold",
-                        fontFamily: "Poppins",
-                        fontSize: "20px",
-                      }}
-                    >
-                      ACCURACY
-                    </span>
-                  </div>
-                  <Typography
-                    sx={{
-                      fontFamily: "Poppins",
-                      fontSize: "15px",
-                      textAlign: "justify",
-                      color: "#2C2828",
-                      mr: 3,
-                      ml: 3,
-                      mt: 1,
-                    }}
-                  >
-                    By reducing human error, our platform ensures accurate and
-                    reliable performance evaluations.
-                  </Typography>
-                </Box>
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={4}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                  }}
-                >
-                  <img
-                    src={transparencyImg}
-                    alt="Transparency"
-                    style={{ width: "100%", maxWidth: "320px" }}
-                  />
-                  <div style={{ textAlign: "center", width: "100%" }}>
-                    <span
-                      style={{
-                        color: "#F8C720",
-                        fontWeight: "bold",
-                        fontFamily: "Poppins",
-                        fontSize: "20px",
-                      }}
-                    >
-                      TRANSPARENCY
-                    </span>
-                  </div>
-                  <Typography
-                    sx={{
-                      fontFamily: "Poppins",
-                      fontSize: "15px",
-                      textAlign: "justify",
-                      color: "#2C2828",
-                      mr: 3,
-                      ml: 3,
-                      mt: 1,
-                    }}
-                  >
-                    The platform fosters transparency in the evaluation process,
-                    promoting a culture of fairness and accountability.
-                  </Typography>
-                </Box>
-              </Grid>
-            </Grid>
-
-            <Divider sx={{ my: 8 }} />
-
-            <Typography
-              variant="h4"
-              sx={{
-                fontFamily: "Poppins",
-                fontWeight: "bold",
-                textAlign: "center",
-                color: "#8C383E",
-                mb: 8,
-              }}
-            >
-            LEARN E-AEPA EVALUATION WITH 3 EASY STEPS:            
-          </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={4}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                  }}
-                >
-                  <img
-                    src={evaluate}
+                    src={ManageAccoount}
                     alt="Step 1"
-                    style={{ width: "100%", maxWidth: "225px" }}
+                    style={{ width: "50%" }}
                   />
-                  <div style={{ textAlign: "center", width: "100%" }}>
-                    <span
-                      style={{
-                        color: "#F8C720",
-                        fontWeight: "bold",
-                        fontFamily: "Poppins",
-                        fontSize: "20px",
-                      }}
-                    >
-                      STEP 1:
-                    </span>
-                  </div>
-                  <Typography
-                    sx={{
-                      fontFamily: "Poppins",
-                      fontSize: "15px",
-                      textAlign: "justify",
-                      color: "#2C2828",
-                      mr: 3,
-                      ml: 3,
-                      mt: 1,
-                    }}
-                  >
-                    Navigate to the Take Evaluation tab.
-                  </Typography>
-                </Box>
-              </Grid>
-
-              <Grid item xs={12} sm={4}>
-                <Box
-                  sx={{
+                </div>
+              ) : (
+                <img src={evaluate} alt="Step 1" style={{ width: "50%" }} />
+              )}
+              {loggedUserData.role === "EMPLOYEE" ? (
+                <p style={{ textAlign: "center" }}>
+                  Navigate to the Take Evaluation page.
+                </p>
+              ) : loggedUserData.role === "HEAD" ? (
+                <p style={{ textAlign: "center" }}>
+                  Navigate to the Staff Evaluation page.
+                </p>
+              ) : loggedUserData.role === "ADMIN" ||
+                loggedUserData.role === "SUPERUSER" ? (
+                <div
+                  style={{
+                    //backgroundColor: "lightgreen",
+                    height: "60%",
                     display: "flex",
                     flexDirection: "column",
+                    justifyContent: "space-between",
                     alignItems: "center",
                   }}
                 >
-                  <img
-                    src={select}
-                    alt="Step 2"
-                    style={{ width: "100%", maxWidth: "200px" }}
-                  />
-                  <div style={{ textAlign: "center", width: "100%" }}>
-                    <span
-                      style={{
-                        color: "#F8C720",
-                        fontWeight: "bold",
-                        fontFamily: "Poppins",
-                        fontSize: "20px",
-                      }}
-                    >
-                      STEP 2:
-                    </span>
-                  </div>
-                  <Typography
-                    sx={{
-                      fontFamily: "Poppins",
-                      fontSize: "15px",
-                      textAlign: "justify",
-                      color: "#2C2828",
-                      mr: 3,
-                      ml: 3,  
-                      mt: 1,
+                  <h2
+                    style={{
+                      fontSize: "17px",
+                      fontWeight: "500",
+                      color: "#F8C702",
                     }}
                   >
-                    You may opt to select Self or Peer Evaluation. You can decide which
-                    response to provide first.
-                  </Typography>
-                </Box>
-              </Grid>
-
-              <Grid item xs={12} sm={4}>
-                <Box
-                  sx={{
+                    Manage Account
+                  </h2>
+                  <p
+                    style={{
+                      fontSize: "13px",
+                      lineHeight: "2",
+                      textAlign: "center",
+                    }}
+                  >
+                    The Manage Account feature lets you create, update, and
+                    delete employee accounts, making it easy to manage employee
+                    information.
+                  </p>
+                </div>
+              ) : null}
+            </div>
+            <div style={howTocardStyles}>
+              {loggedUserData.role === "ADMIN" ||
+              loggedUserData.role === "SUPERUSER" ? (
+                <div
+                  style={{
                     display: "flex",
-                    flexDirection: "column",
                     alignItems: "center",
+                    justifyContent: "center",
+                    //backgroundColor: "tomato",
+                    height: "40%",
                   }}
                 >
                   <img
-                    src={done}
-                    alt="Step 3"
-                    style={{ width: "100%", maxWidth: "220px" }}
+                    src={ManageOffice}
+                    alt="Step 1"
+                    style={{ width: "35%" }}
                   />
-                  <div style={{ textAlign: "center", width: "100%" }}>
-                    <span
-                      style={{
-                        color: "#F8C720",
-                        fontWeight: "bold",
-                        fontFamily: "Poppins",
-                        fontSize: "20px",
-                        
-                      }}
-                    >
-                      STEP 3:
-                    </span>
-                  </div>
-                  <Typography
-                    sx={{
-                      fontFamily: "Poppins",
-                      fontSize: "15px",
-                      textAlign: "justify",
-                      color: "#2C2828",
-                      mr: 3,
-                      ml: 3,
-                      mt: 0.5,
+                </div>
+              ) : (
+                <img src={select} alt="Step 2" style={{ width: "50%" }} />
+              )}
+              {loggedUserData.role === "EMPLOYEE" ? (
+                <p style={{ textAlign: "center" }}>
+                  You may opt to select Self or Peer Evaluation. You can decide
+                  which response to provide first.
+                </p>
+              ) : loggedUserData.role === "HEAD" ? (
+                <p style={{ textAlign: "center" }}>
+                  Select a staff member to evaluate. There are two types of
+                  evaluations: Values-based and Job-based.
+                </p>
+              ) : loggedUserData.role === "ADMIN" ||
+                loggedUserData.role === "SUPERUSER" ? (
+                <div
+                  style={{
+                    //backgroundColor: "lightgreen",
+                    height: "60%",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "start",
+                    alignItems: "center",
+                  }}
+                >
+                  <h2
+                    style={{
+                      fontSize: "17px",
+                      fontWeight: "500",
+                      color: "#F8C702",
                     }}
                   >
-                    Make sure that every field is filled out correctly, then
-										send in your assessment. This concludes your participation.
-                  </Typography>
-                </Box>
-              </Grid>
-            </Grid>
-          </Box>
-        </Box>
-      </Box>
-    </Animated>
+                    Manage Offices
+                  </h2>
+                  <p
+                    style={{
+                      fontSize: "13px",
+                      lineHeight: "2",
+                      marginTop: "8px",
+                      textAlign: "center",
+                    }}
+                  >
+                    The Manage Offices feature allows you to create, update, and
+                    delete Offices, as well as assign Office heads.
+                  </p>
+                </div>
+              ) : null}
+            </div>
+            <div style={howTocardStyles}>
+              {loggedUserData.role === "ADMIN" ||
+              loggedUserData.role === "SUPERUSER" ? (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    //backgroundColor: "tomato",
+                    height: "40%",
+                  }}
+                >
+                  <img
+                    src={ManageEmployee}
+                    alt="Step 1"
+                    style={{ width: "35%" }}
+                  />
+                </div>
+              ) : (
+                <img src={done} alt="Step 3" style={{ width: "50%" }} />
+              )}
+              {loggedUserData.role === "EMPLOYEE" ? (
+                <p style={{ textAlign: "center" }}>
+                  Make sure that every field is filled out correctly, then send
+                  in your assessment. This concludes your participation.
+                </p>
+              ) : loggedUserData.role === "HEAD" ? (
+                <p style={{ textAlign: "center" }}>
+                  Ensure that every field is filled out correctly, then submit
+                  your assessment. This concludes the staff evaluation process.
+                </p>
+              ) : loggedUserData.role === "ADMIN" ||
+                loggedUserData.role === "SUPERUSER" ? (
+                <div
+                  style={{
+                    //backgroundColor: "lightgreen",
+                    height: "60%",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "start",
+                    alignItems: "center",
+                  }}
+                >
+                  <h2
+                    style={{
+                      fontSize: "17px",
+                      fontWeight: "500",
+                      color: "#F8C702",
+                    }}
+                  >
+                    Manage Employee
+                  </h2>
+                  <p
+                    style={{
+                      fontSize: "13px",
+                      lineHeight: "2",
+                      marginTop: "8px",
+                      textAlign: "center",
+                    }}
+                  >
+                    The Manage Employee feature lets you track employee
+                    regularization and evaluation status, ensuring easy
+                    monitoring of their progress.
+                  </p>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            height: "43vh",
+            width: "25%",
+            //backgroundColor: "lightpink",
+          }}
+        >
+          <h1 style={{ marginTop: "10px", fontSize: "20px", fontWeight: 600 }}>
+            {loggedUserData.role === "ADMIN" ||
+            loggedUserData.role === "SUPERUSER"
+              ? "Admins:"
+              : "Department:"}
+          </h1>
+          <div
+            style={{
+              marginTop: "7px",
+              //backgroundColor: "white",
+              height: "85%",
+              paddingTop: "10px",
+              overflow: "hidden",
+              overflowY: "auto",
+            }}
+          >
+            {loggedUserData.role === "ADMIN" ||
+            loggedUserData.role === "SUPERUSER" ? (
+              <ul>
+                {filteredAdmins.map((staff, index) => {
+                  return (
+                    <li
+                      key={index}
+                      style={{
+                        height: "50px",
+                        width: "100%",
+                        //backgroundColor: "yellow",
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: "12px",
+                        fontSize: "13px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          backgroundColor: "white",
+                          height: "50px",
+                          width: "50px",
+                          borderRadius: "50%",
+                          //border: "1px solid black",
+                        }}
+                      >
+                        <img
+                          style={{
+                            borderRadius: "50%",
+                            height: "100%",
+                          }}
+                          src={
+                            staff?.profilePic
+                              ? base64ToDataURL(staff.profilePic)
+                              : null
+                          }
+                          alt=""
+                        />
+                      </div>
+                      <div
+                        style={{
+                          marginLeft: "15px",
+                          height: "50px",
+                          //backgroundColor: "lightblue",
+                          width: "70%",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <h1>
+                          {staff.fName} {staff.lName}
+                        </h1>
+                        <p>{staff.position}</p>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <ul>
+                {filteredDeptStaff.map((staff, index) => {
+                  return (
+                    <li
+                      key={index}
+                      style={{
+                        height: "50px",
+                        width: "100%",
+                        //backgroundColor: "yellow",
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: "12px",
+                        fontSize: "13px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          backgroundColor: "white",
+                          height: "50px",
+                          width: "50px",
+                          borderRadius: "50%",
+                          //border: "1px solid black",
+                        }}
+                      >
+                        <img
+                          style={{
+                            borderRadius: "50%",
+                            height: "100%",
+                          }}
+                          src={
+                            staff?.profilePic
+                              ? base64ToDataURL(staff.profilePic)
+                              : null
+                          }
+                          alt=""
+                        />
+                      </div>
+                      <div
+                        style={{
+                          marginLeft: "15px",
+                          height: "50px",
+                          //backgroundColor: "lightblue",
+                          width: "70%",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <h1>
+                          {staff.fName} {staff.lName}
+                        </h1>
+                        <p>{staff.position}</p>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
 export default UserHome;
-
-
-        

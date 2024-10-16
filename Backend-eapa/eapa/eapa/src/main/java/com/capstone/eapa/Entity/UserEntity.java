@@ -62,6 +62,18 @@ public class UserEntity implements UserDetails {
     public UserEntity() {
     }
 
+    @Override
+    public String toString() {
+        return "UserEntity{" +
+                "userID=" + userID +
+                ", fName='" + fName + '\'' +
+                ", lName='" + lName + '\'' +
+                ", dept='" + dept + '\'' +
+                ", position='" + position + '\'' +
+                ", empStatus='" + empStatus + '\'' +
+                '}';
+    }
+
     public int getUserID() {
         return userID;
     }
