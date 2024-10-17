@@ -22,6 +22,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import Animated from "../components/motion";
+import { apiUrl } from '../config/config';
 
 const ManageOffices = () => {
 	const loggedId = sessionStorage.getItem("userID");
@@ -67,10 +68,10 @@ useEffect(() => {
 	const fetchData = async () => {
 		try {
 			const userResponse = await axios.get(
-				"http://localhost:8080/user/getAllUser"
+				`${apiUrl}user/getAllUser`
 			);
 			const deptResponse = await axios.get(
-				"http://localhost:8080/department/getAllDepts"
+				`${apiUrl}department/getAllDepts`
 			);
 
 			const fetchedUsers = userResponse.data;
@@ -116,7 +117,7 @@ useEffect(() => {
 		const fetchUsers = async () => {
 			try {
 				const response = await axios.get(
-					"http://localhost:8080/user/getAllUser"
+					`${apiUrl}user/getAllUser`
 				);
 				setAllUsers(response.data);
 				const officeHeads = response.data
@@ -146,7 +147,7 @@ useEffect(() => {
 		const fetchDepartments = async () => {
 			try {
 				const response = await axios.get(
-					"http://localhost:8080/department/getAllDepts"
+					`${apiUrl}department/getAllDepts`
 				);
 				setDepartments(response.data);
 				setFilteredDepartments(response.data);
@@ -166,10 +167,10 @@ useEffect(() => {
 	const confirmDeleteDepartment = async () => {
 		try {
 			await axios.delete(
-				`http://localhost:8080/department/deleteDept/${loggedId}/${departmentToDelete}`
+				`${apiUrl}department/deleteDept/${loggedId}/${departmentToDelete}`
 			);
 			const updatedUsers = await axios.get(
-				"http://localhost:8080/department/getAllDepts"
+				`${apiUrl}department/getAllDepts`
 			);
 			setDepartments(updatedUsers.data);
 			setFilteredDepartments(updatedUsers.data);
@@ -245,12 +246,12 @@ useEffect(() => {
 		}
 		try {
 			await axios.post(
-				`http://localhost:8080/department/addDept/${loggedId}`,
+				`${apiUrl}department/addDept/${loggedId}`,
 				departmentFormData
 			);
 
 			const updatedDepartments = await axios.get(
-				"http://localhost:8080/department/getAllDepts"
+				`${apiUrl}department/getAllDepts`
 			);
 			setDepartments(updatedDepartments.data);
 			setFilteredDepartments(updatedDepartments.data);
@@ -305,11 +306,11 @@ useEffect(() => {
 	const handleUpdateDepartment = async (editedDepartment) => {
 		try {
 			await axios.put(
-				`http://localhost:8080/department/updateDept/${loggedId}/?deptID=${editedDepartment.deptID}`,
+				`${apiUrl}department/updateDept/${loggedId}/?deptID=${editedDepartment.deptID}`,
 				editedDepartment
 			);
 			const updatedUsers = await axios.get(
-				"http://localhost:8080/department/getAllDepts"
+				`${apiUrl}department/getAllDepts`
 			);
 			setDepartments(updatedUsers.data);
 			setFilteredDepartments(updatedUsers.data);
@@ -428,7 +429,7 @@ useEffect(() => {
 											},
 										}}
 									>
-										Add
+										Save
 									</Button>
 								</div>
 							</form>

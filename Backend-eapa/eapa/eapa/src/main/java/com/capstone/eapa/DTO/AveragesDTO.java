@@ -1,10 +1,10 @@
 package com.capstone.eapa.DTO;
 
 public class AveragesDTO {
-    private double COE;
-    private double INT;
-    private double TEA;
-    private double UNI;
+    private double COE; //Culture of Excellence
+    private double INT; //Integrity
+    private double TEA; //Teamwork
+    private double UNI; //Unity
 
 
     public double getCOE() {

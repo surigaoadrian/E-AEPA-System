@@ -1,6 +1,12 @@
+/*
+ISSUE: if d mo update si admin sa MA sa probestat, walay makita dire na evaluation like:
+if si employee mana sa iyang 3rd din pa 5th na siya pero wa nag update sa probstat si admin, d makita dri ni head ang eval 
+unless d mag update si admin so maghuwat gyud ni dire sa update sa probestat
+so OPTION: DYNAMIC UPDATE probestat: IF kni, issue ani kay mawala ang prev period bisan wala pa nka eval ang head.
+*/
 import React, { useState, useEffect, useMemo } from "react";
 import Paper from "@mui/material/Paper";
-import { Box, Button, Grid, Typography, Menu, Modal, TextField, InputAdornment, IconButton, Select, FormControl, ListItemIcon, ListItemText } from "@mui/material";
+import { Box, Button, Grid, Typography, Menu, Modal, TextField, InputAdornment, IconButton, Select, FormControl, ListItemIcon, ListItemText, Tooltip } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -17,6 +23,8 @@ import Fade from "@mui/material/Fade";
 import EvaluationForm from "../components/EvaluationForm";
 import CheckIcon from '@mui/icons-material/Check';
 import { set } from "date-fns";
+import { apiUrl } from '../config/config';
+import Loader from "../components/Loader";
 
 function EvaluateEmployee() {
   const userID = sessionStorage.getItem("userID");
@@ -42,7 +50,7 @@ function EvaluateEmployee() {
   const [selectedStage, setSelectedStage] = useState("");
   const [isEvaluationCompleted, setIsEvaluationCompleted] = useState(false);
   const evalType = "HEAD";
-
+  const [isLoading, setIsLoading] = useState(false);
   const [isEvaluationCompletedValues, setIsEvaluationCompletedValues] =
     useState(false);
   const [isEvaluationCompletedJob, setIsEvaluationCompletedJob] =
@@ -77,6 +85,7 @@ function EvaluateEmployee() {
   };
 
   const handleConfirm = async () => {
+    // setIsLoading(true);
     setOpenForm(!openForm);
     setStage(selectedStage);
     setOpenModal(false);
@@ -106,29 +115,21 @@ function EvaluateEmployee() {
 
     console.log("Evaluation object to be sent:", evaluation);
 
-    try {
-      const response = await axios.post(
-        "http://localhost:8080/evaluation/createEvaluation",
-        evaluation
-      );
+    let existingEvalID = null;
 
-      const evalPeriod = getEvaluationPeriod(selectedEmp.probeStatus);
-      await handleCompleteStatus(
-        userID,
-        selectedEmp.userID,
-        evalPeriod,
-        "VALUES",
-        "HEAD"
-      );
-      await handleCompleteStatus(
-        userID,
-        selectedEmp.userID,
-        evalPeriod,
-        "JOB",
-        "HEAD"
-      );
+    try {
+      const response = await axios.get(`${apiUrl}evaluation/getEvalIDHead`, {
+        params: {
+          userID: userID,
+          empID: selectedEmp.userID,
+          period: period,
+          stage: selectedStage,
+          evalType: "HEAD",
+        }
+      });
+      existingEvalID = response.data;
     } catch (error) {
-      console.error("Creating evaluation failed", error);
+      console.error("Fetching evaluation id failed", error);
       if (error.response) {
         console.log(error.response.data);
         console.log(error.response.status);
@@ -137,7 +138,57 @@ function EvaluateEmployee() {
         console.log(`Error: ${error.message}`);
       }
     }
+
+    if (!existingEvalID) {
+      try {
+        const response = await axios.post(
+          `${apiUrl}evaluation/createEvaluation`,
+          evaluation
+        );
+
+        const evalPeriod = getEvaluationPeriod(selectedEmp.probeStatus);
+        await handleCompleteStatus(
+          userID,
+          selectedEmp.userID,
+          evalPeriod,
+          "VALUES",
+          "HEAD"
+        );
+        await handleCompleteStatus(
+          userID,
+          selectedEmp.userID,
+          evalPeriod,
+          "JOB",
+          "HEAD"
+        );
+      } catch (error) {
+        console.error("Creating evaluation failed", error);
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else {
+          console.log(`Error: ${error.message}`);
+        }
+      }
+    }
+    // setIsLoading(false);
+
+
   };
+
+  useEffect(() => {
+    if (!openForm) {
+      setIsLoading(true); // Set loading to true when form closes
+
+      // Simulate loading with a timeout, replace this with your data fetching logic
+      const timer = setTimeout(() => {
+        setIsLoading(false); // Stop loading after data fetching
+      }, 1000); // Adjust the delay as needed
+
+      return () => clearTimeout(timer); // Cleanup on unmount
+    }
+  }, [openForm]);
 
   const handleClick = (event, selectedUser) => {
     setAnchorEl(event.currentTarget);
@@ -185,7 +236,7 @@ function EvaluateEmployee() {
   ) => {
     try {
       const response = await axios.get(
-        "http://localhost:8080/evaluation/isEvaluationCompletedHead",
+        `${apiUrl}evaluation/isEvaluationCompletedHead`,
         {
           params: {
             userID: userID,
@@ -198,72 +249,111 @@ function EvaluateEmployee() {
       );
       if (stage === "VALUES") {
         setIsEvaluationCompletedValues(response.data);
+        return response.data;
       } else if (stage === "JOB") {
         setIsEvaluationCompletedJob(response.data);
+        return response.data;
       }
     } catch (error) {
       console.error("Error checking evaluation status:", error);
     }
   };
 
+  const getProbationaryMonth = (probeStatus) => {
+    const statusNumber = probeStatus.split(" ")[0];
+    return parseInt(statusNumber); // Extract the number (e.g., 3 from "3rd probationary")
+  };
+
+  const calculateMonthsDifference = (startDate, endDate) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const yearsDiff = end.getFullYear() - start.getFullYear();
+    const monthsDiff = end.getMonth() - start.getMonth() + 1;
+
+    return yearsDiff * 12 + monthsDiff; // Total months difference
+  };
+
   //fetch the user data
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
       try {
-        // Fetch specific user data based on userID
-        const userResponse = await fetch(
-          `http://localhost:8080/user/getUser/${userID}`
-        );
-        if (!userResponse.ok) {
-          throw new Error("Failed to fetch user data");
-        }
+        const userResponse = await fetch(`${apiUrl}user/getUser/${userID}`);
         const userData = await userResponse.json();
         setUser(userData);
 
-        // Fetch all users
-        const allUsersResponse = await fetch(
-          "http://localhost:8080/user/getAllUser"
-        );
-        if (!allUsersResponse.ok) {
-          throw new Error("Failed to fetch all users data");
-        }
+        const allUsersResponse = await fetch(`${apiUrl}user/getAllUser`);
         const allUsersData = await allUsersResponse.json();
-        const processedData = allUsersData
-          .filter(
-            (item) => item.role === "EMPLOYEE" && item.dept === userData.dept
-          )
-          .map((item) => ({
-            ...item,
-            name: `${item.fName} ${item.lName}`,
-            userID: item.userID,
-          }))
+        console.log(allUsersData);
+        const currentDate = new Date();
 
-          .filter((item) => {
-            if (probeStatusFilter === '') {
-              return true;
-            }
-            if (probeStatusFilter === 'Annually' && item.probeStatus === '') {
-              return true;
-            }
-            return item.probeStatus === probeStatusFilter;
-          });
-        // Apply search filter
-        const searchFilteredData = processedData.filter((item) =>
-          Object.values(item).some(
-            (value) =>
-              value &&
-              value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-          )
+        const processedData = await Promise.all(
+          allUsersData
+            .filter((item) => item.role === "EMPLOYEE" && item.dept === userData.dept)
+            .filter((item) => {
+              if (probeStatusFilter === '') {
+                return true;
+              }
+              if (probeStatusFilter === 'Annually' && item.probeStatus === '') {
+                return true;
+              }
+              return item.probeStatus === probeStatusFilter;
+            })
+            .map(async (item) => {
+              const probationaryMonth = getProbationaryMonth(item.probeStatus);
+              const monthsSinceHired = calculateMonthsDifference(item.dateHired, currentDate);
+              const isRegularEmployee = item.empStatus === "Regular";
+
+              const isEligibleForEvaluation =
+                (isRegularEmployee && monthsSinceHired >= 6) ||
+                (!isRegularEmployee && monthsSinceHired >= probationaryMonth);
+
+              if (!isEligibleForEvaluation) return null;
+
+              // Fetch evaluation statuses
+              const isEvaluationCompletedValues = await handleCompleteStatus(
+                userID,
+                item.userID,
+                getEvaluationPeriod(item.probeStatus),
+                "VALUES",
+                "HEAD"
+              );
+              const isEvaluationCompletedJob = await handleCompleteStatus(
+                userID,
+                item.userID,
+                getEvaluationPeriod(item.probeStatus),
+                "JOB",
+                "HEAD"
+              );
+              // If both evaluations are completed, skip this employee
+              if (isEvaluationCompletedValues && isEvaluationCompletedJob) {
+                return null;
+              }
+
+              return {
+                ...item,
+                name: `${item.fName} ${item.lName}`,
+                userID: item.userID,
+                probationaryMonth,
+                monthsSinceHired,
+                isEligibleForEvaluation,
+              };
+            })
         );
 
-        setRows(searchFilteredData);
+        const filteredData = processedData.filter(item => item !== null);
+        setRows(filteredData);
       } catch (error) {
         console.error("Error fetching data:", error);
+      }finally{
+        setIsLoading(false);
       }
     };
-
-    fetchData();
-  }, [userID, updateFetch, searchTerm, probeStatusFilter]);
+    if (!openForm && !isLoading) {
+      fetchData();
+    }
+  }, [userID, updateFetch, searchTerm, probeStatusFilter,openForm]);
 
 
   const totalPages = Math.ceil(rows.length / itemsPerPage);
@@ -333,8 +423,8 @@ function EvaluateEmployee() {
     {
       id: "probeStatus",
       label: (
-        <div style={{ display: 'flex', alignItems: 'center', }}>
-          <span>Evaluation Period</span>
+        <div >
+          <span style={{ paddingLeft: 26 }}>Evaluation Period</span>
           <IconButton
             onClick={handleFilterClick}
             sx={{ color: 'white', width: '1.3em', height: '1.3em', ml: '.6vh' }}
@@ -355,40 +445,40 @@ function EvaluateEmployee() {
             }}
           >
             <MenuItem
-            dense
+              dense
               onClick={() => handleMenuClick('')}
               selected={probeStatusFilter === ''}
               sx={{ fontFamily: 'Poppins' }}
             >
               <ListItemIcon>{probeStatusFilter === '' && <CheckIcon fontSize="small" />}</ListItemIcon>
-              <ListItemText  primary="All" style={{ fontFamily: 'Poppins',fontSize:'.5em',  }} />
+              <ListItemText primary="All" style={{ fontFamily: 'Poppins', fontSize: '.5em', }} />
             </MenuItem>
             <MenuItem
-            dense
+              dense
               onClick={() => handleMenuClick('Annually')}
               selected={probeStatusFilter === 'Annually'}
-              sx={{ fontFamily: 'Poppins',fontSize:'.5em' }}
+              sx={{ fontFamily: 'Poppins', fontSize: '.5em' }}
             >
               <ListItemIcon>{probeStatusFilter === 'Annually' && <CheckIcon fontSize="small" />}</ListItemIcon>
-              <ListItemText primary="Annually" sx={{ fontFamily: 'Poppins',fontSize:'.5em' }} />
+              <ListItemText primary="Annually" sx={{ fontFamily: 'Poppins', fontSize: '.5em' }} />
             </MenuItem>
             <MenuItem
-            dense
+              dense
               onClick={() => handleMenuClick('3rd Probationary')}
               selected={probeStatusFilter === '3rd Probationary'}
-              sx={{ fontFamily: 'Poppins',fontSize:'.5em' }}
+              sx={{ fontFamily: 'Poppins', fontSize: '.5em' }}
             >
               <ListItemIcon>{probeStatusFilter === '3rd Probationary' && <CheckIcon fontSize="small" />}</ListItemIcon>
-              <ListItemText primary="3rd Probationary" sx={{ fontFamily: 'Poppins',fontSize:'.5em' }} />
+              <ListItemText primary="3rd Probationary" sx={{ fontFamily: 'Poppins', fontSize: '.5em' }} />
             </MenuItem>
             <MenuItem
-            dense
+              dense
               onClick={() => handleMenuClick('5th Probationary')}
               selected={probeStatusFilter === '5th Probationary'}
-              style={{ fontFamily: 'Poppins',fontSize:'.5em' }}
+              style={{ fontFamily: 'Poppins', fontSize: '.5em' }}
             >
               <ListItemIcon>{probeStatusFilter === '5th Probationary' && <CheckIcon fontSize="small" />}</ListItemIcon>
-              <ListItemText primary="5th Probationary" sx={{ fontFamily: 'Poppins',fontSize:'.5em' }} />
+              <ListItemText primary="5th Probationary" sx={{ fontFamily: 'Poppins', fontSize: '.5em' }} />
             </MenuItem>
           </Menu>
 
@@ -404,7 +494,6 @@ function EvaluateEmployee() {
         }
       },
     },
-
     {
       id: "actions",
       label: "Action",
@@ -497,7 +586,7 @@ function EvaluateEmployee() {
           mt={3}
           sx={{ fontFamily: "Poppins", fontWeight: "bold", fontSize: "1.5em" }}
         >
-          {openForm ? "Evaluation" : "List of Staff"}{" "}
+          {openForm ? "Evaluation" : "List of Staff"}{" "} 
         </Typography>
         <div className="ml-8 mt-2">
           <div className="mr-10  flex items-center justify-between">
@@ -583,7 +672,7 @@ function EvaluateEmployee() {
             >
 
               <TableContainer
-                sx={{ borderRadius: "5px 5px 0 0 ", maxHeight: "100%", border: '1px solid lightgray' }}
+                sx={{ height: '30.68em', borderRadius: "5px 5px 0 0 ", maxHeight: "100%", border: '1px solid lightgray' }}
               >
                 <Table stickyHeader aria-label="a dense table" size="small">
                   <TableHead sx={{ height: "2em" }}>
@@ -606,11 +695,20 @@ function EvaluateEmployee() {
                       ))}
                     </TableRow>
                   </TableHead>
-                  {hasData ? (
+                  {isLoading ? ( // Show loading indicator if loading
+                    <TableBody>
+                      <TableRow>
+                        <TableCell colSpan={columnsEmployees.length} align="center">
+                          <Loader/>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  ) : hasData ? (
                     <TableBody>
                       {paginatedRows.map((row) => (
                         <TableRow
                           sx={{
+
                             bgcolor: "white",
                             "&:hover": {
                               backgroundColor: "rgba(248, 199, 2, 0.5)",
@@ -643,7 +741,7 @@ function EvaluateEmployee() {
                   ) : (
                     <TableBody>
                       <TableRow>
-                        <TableCell sx={{ bgcolor: 'white', height: '28.25em', borderRadius: '0 0 5px 5px' }} colSpan={columnsEmployees.length} align="center">
+                        <TableCell sx={{  height: '32em', borderRadius: '5px 5px 0 0' }} colSpan={columnsEmployees.length} align="center">
                           <Typography
                             sx={{
                               textAlign: "center",
@@ -669,13 +767,13 @@ function EvaluateEmployee() {
         < div
           className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-9"
           style={{
-            position: "absolute", // Change to relative to keep it in place
-            bottom: 45,
-            left: '21.5%',
-            transform: "translateX(-50%)",
+            position: "relative", // Change to relative to keep it in place
+            // bottom: 45,
+            // left: '21.5%',
+            // transform: "translateX(-50%)",
             display: "flex",
             alignItems: "center",
-            ml: '4em'
+            // ml: '4em'
           }}
         >
           <ol className="flex justify-end gap-1 text-xs font-medium">

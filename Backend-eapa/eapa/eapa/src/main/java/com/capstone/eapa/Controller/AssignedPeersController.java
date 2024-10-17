@@ -9,6 +9,8 @@ import com.capstone.eapa.Entity.AssignedPeersEntity;
 import com.capstone.eapa.Entity.UserEntity;
 import com.capstone.eapa.Service.AssignedPeersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +23,12 @@ import java.util.stream.Collectors;
 public class AssignedPeersController {
     @Autowired
     AssignedPeersService apServ;
+
+//ANGELA
+    @GetMapping("/status")
+    public Map<Integer, String> getOverallStatus() {
+        return apServ.getOverallStatus();
+    }
 
     @PostMapping("/createAssignedPeers")
     public AssignedPeersDTO createAssignedPeers(@RequestBody AssignedPeersEntity assignedPeers) {
@@ -81,6 +89,15 @@ public class AssignedPeersController {
         return apServ.isAssignedPeersIdPresent(period, evaluateeId);
     }
 
+    //is assign peer id present for annual
+    @GetMapping("/isAssignedPeersIdPresentAnnual")
+    public boolean isAssignedPeersIdPresentAnnual(
+            @RequestParam String period,
+            @RequestParam int evaluateeId,
+            @RequestParam String schoolYear,
+            @RequestParam String semester) {
+        return apServ.isAssignedPeersIdPresentAnnual(period, evaluateeId, schoolYear, semester);
+    }
 
     // Update status of assigned evaluators by ID
     @PatchMapping("/updateEvaluatorStatus/{id}")
@@ -100,4 +117,19 @@ public class AssignedPeersController {
     public List<Integer> getEvaluatorIds(@RequestParam int assignedPeersId) {
         return apServ.getEvaluatorIdsByAssignedPeersId(assignedPeersId);
     }
+
+    //update assigned peers
+    @PatchMapping("/updateAssignedEvaluators/{assignPeerId}")
+    public ResponseEntity<String> updateAssignedEvaluators(
+            @PathVariable int assignPeerId,
+            @RequestBody List<Integer> evaluatorIds) {
+        try {
+            apServ.updateAssignedEvaluators(assignPeerId, evaluatorIds);
+            return ResponseEntity.ok("Assigned evaluators updated successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating assigned evaluators.");
+        }
+    }
+
+
 }

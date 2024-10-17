@@ -1,3 +1,5 @@
+ 
+
 import React, { useState, useEffect, useMemo } from "react";
 import Paper from "@mui/material/Paper";
 import {
@@ -52,6 +54,9 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"; //p
 import axios from "axios";
 import Animated from "../components/motion";
 import { BorderBottom } from "@mui/icons-material";
+import { apiUrl } from '../config/config';
+import Loader from "../components/Loader";
+
 
 const CustomAlert = ({ open, onClose, severity, message }) => {
   return (
@@ -128,7 +133,7 @@ function ManageAccount() {
   const loggedUserRole = sessionStorage.getItem("userRole");
   const [countAdmin, setCountAdmin] = useState(0);
   const [countEmployee, setCountEmployee] = useState(0);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // Adjust this based on your needs
@@ -136,7 +141,8 @@ function ManageAccount() {
 
   const totalPages = Math.ceil(rows.length / itemsPerPage);
 
-  const startPageGroup = Math.floor((currentPage - 1) / pagesPerGroup) * pagesPerGroup + 1;
+  const startPageGroup =
+    Math.floor((currentPage - 1) / pagesPerGroup) * pagesPerGroup + 1;
   const endPageGroup = Math.min(startPageGroup + pagesPerGroup - 1, totalPages);
 
   const handlePageChange = (newPage) => {
@@ -393,7 +399,7 @@ function ManageAccount() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:8080/user/getAllUser");
+        const response = await fetch(`${apiUrl}user/getAllUser`);
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
@@ -413,22 +419,22 @@ function ManageAccount() {
           userID: item.userID,
         }));
 
-      // Columns to be considered for search
-      const columnsToSearch = new Set(
-        selectedTab === 0
-          ? ["workID", "name", "workEmail", "dept"]
-          : ["workID", "name", "username"]
-      );
+        // Columns to be considered for search
+        const columnsToSearch = new Set(
+          selectedTab === 0
+            ? ["workID", "name", "workEmail", "dept"]
+            : ["workID", "name", "username"]
+        );
 
-      // Apply search filter based on specific columns
-      const searchFilteredData = processedData.filter((item) =>
-        Object.entries(item).some(
-          ([key, value]) =>
-            columnsToSearch.has(key) &&
-            value &&
-            value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      );
+        // Apply search filter based on specific columns
+        const searchFilteredData = processedData.filter((item) =>
+          Object.entries(item).some(
+            ([key, value]) =>
+              columnsToSearch.has(key) &&
+              value &&
+              value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+          )
+        );
 
         setRows(searchFilteredData);
         const filterAdmin = processedData.filter(
@@ -451,12 +457,8 @@ function ManageAccount() {
   useEffect(() => {
     const fetchDeptAndUsers = async () => {
       try {
-        const deptResponse = await axios.get(
-          "http://localhost:8080/department/getAllDepts"
-        );
-        const userResponse = await axios.get(
-          "http://localhost:8080/user/getAllUser"
-        );
+        const deptResponse = await axios.get(`${apiUrl}department/getAllDepts`);
+        const userResponse = await axios.get(`${apiUrl}user/getAllUser`);
 
         const fetchedDepartments = deptResponse.data;
         const fetchedUsers = userResponse.data;
@@ -472,8 +474,9 @@ function ManageAccount() {
           return {
             ...dept,
             deptOfficeHead: officeHead
-              ? `${officeHead.fName} ${officeHead.mName ? officeHead.mName.charAt(0) + "." : ""
-              } ${officeHead.lName}`
+              ? `${officeHead.fName} ${
+                  officeHead.mName ? officeHead.mName.charAt(0) + "." : ""
+                } ${officeHead.lName}`
               : "",
           };
         });
@@ -498,7 +501,7 @@ function ManageAccount() {
     const fetchUsername = async () => {
       try {
         const response = await axios.put(
-          `http://localhost:8080/user/checkUsername/${modifiedUsername}`
+          `${apiUrl}user/checkUsername/${modifiedUsername}`
         );
         const availability = response.data === "Username is available";
         setMsgInfo(response.data);
@@ -525,7 +528,7 @@ function ManageAccount() {
     const fetchEmail = async () => {
       try {
         const response = await axios.put(
-          `http://localhost:8080/user/checkEmail/${emailChange}`
+          `${apiUrl}user/checkEmail/${emailChange}`
         );
         const emailAvailability =
           response.data === "Email Address is available";
@@ -562,7 +565,7 @@ function ManageAccount() {
       return;
     }
 
-    if (role !== 'ADMIN' && !emailIsAvailable) {
+    if (role !== "ADMIN" && !emailIsAvailable) {
       setEmailMsgInfo("Email already exists");
       return;
     }
@@ -597,11 +600,11 @@ function ManageAccount() {
         role: role,
       };
 
-      if (role !== 'ADMIN') {
+      if (role !== "ADMIN") {
         userData.workEmail = emailChange;
       }
 
-      const response = await fetch(`http://localhost:8080/register/${loggedId}`, {
+      const response = await fetch(`${apiUrl}register/${loggedId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -637,7 +640,6 @@ function ManageAccount() {
     }
   };
 
-
   const availableDepartments =
     role === "HEAD"
       ? departments.filter((dept) => !dept.deptOfficeHead)
@@ -645,9 +647,7 @@ function ManageAccount() {
 
   const handleClickEditBtn = async (userID) => {
     try {
-      const response = await fetch(
-        `http://localhost:8080/user/getUser/${userID}`
-      );
+      const response = await fetch(`${apiUrl}user/getUser/${userID}`);
       if (!response.ok) {
         throw new Error("Failed to fetch user data");
       }
@@ -692,10 +692,12 @@ function ManageAccount() {
         dept: selectedUser.dept,
         empStatus: selectedUser.empStatus,
         probeStatus: selectedUser.probeStatus,
+        dateHired: selectedUser.dateHired,
         dateStarted: selectedUser.dateStarted,
+        //dateHired: selectedUser.dateHired,
       };
       await axios.patch(
-        `http://localhost:8080/user/editUser/${loggedId}/${selectedUser.userID}`,
+        `${apiUrl}user/editUser/${loggedId}/${selectedUser.userID}`,
         userPayload,
         {
           headers: {
@@ -724,7 +726,7 @@ function ManageAccount() {
     console.log("delete Yes user:", userID);
     try {
       const response = await fetch(
-        `http://localhost:8080/user/delete/${loggedId}/${userID}`,
+        `${apiUrl}user/delete/${loggedId}/${userID}`,
         {
           method: "DELETE",
           headers: {
@@ -931,7 +933,6 @@ function ManageAccount() {
                 value={searchTerm}
                 onChange={handleSearchChange}
                 sx={{
-
                   "& .MuiOutlinedInput-root": {
                     backgroundColor: "#ffffff", // Set the background color for the entire input area
                   },
@@ -940,9 +941,9 @@ function ManageAccount() {
                     borderColor: "#e0e0e0",
                   },
                   "&:hover .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
-                  {
-                    borderColor: "#e0e0e0",
-                  },
+                    {
+                      borderColor: "#e0e0e0",
+                    },
                   "&:focus-within": {
                     "& fieldset": {
                       borderColor: "#8C383E !important",
@@ -969,12 +970,11 @@ function ManageAccount() {
               />
             </div>
 
-
             <div className="flex items-center">
               <Button
                 variant="contained"
                 sx={{
-                  display: 'flex-end',
+                  display: "flex-end",
                   height: "2.5em",
                   width: "9em",
                   fontFamily: "Poppins",
@@ -1010,20 +1010,18 @@ function ManageAccount() {
               <Grid
                 item
                 xs={12}
-                sx={{ height: "3em", display: "flex", mt: "-1em", mb: '.2em' }}
+                sx={{ height: "2em", display: "flex", mt: "-1em", mb: ".2em" }}
               >
                 <Tabs
                   value={selectedTab}
                   onChange={handleTabChange}
                   sx={tabStyle}
                 >
-                  <Tab label={`All Employees (${countEmployee})`} sx={tabStyle} />
-                  <Tab label={`All Admins (${countAdmin})`} sx={tabStyle} />
+                  <Tab label={`All Employees`} sx={tabStyle} />
+                  <Tab label={`All Admins`} sx={tabStyle} />
                 </Tabs>
               </Grid>
-
             )}
-
 
             {/* <Card
               variant="outlined"
@@ -1039,103 +1037,102 @@ function ManageAccount() {
             > */}
 
             <TableContainer
-
-              sx={{ borderRadius: "5px 5px 0 0 ", maxHeight: "100%", position: 'relative', border: '1px solid lightgray' }}
+              sx={{
+                height: '29.55em',
+                borderRadius: "5px 5px 0 0",
+                maxHeight: "100%",
+                maxWidth: '100%',
+                position: 'relative',
+                border: '1px solid lightgray',
+              }}
             >
-              {loggedUserRole === "SUPERUSER" && loading ? (
-                <div style={{
-                  height: '29em',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  fontWeight: 500,
-                }}>Loading... </div>
-              ) : (
-                <Table stickyHeader aria-label="a dense table" size="small">
-                  <TableHead sx={{ height: '2.3em' }}>
+              <Table stickyHeader aria-label="a dense table" size="small">
+                {/* Always render the TableHead */}
+                <TableHead sx={{ height: '2.3em' }}>
+                  <TableRow>
+                    {(selectedTab === 0 ? columnsEmployees : columnsAdmins).map((column) => (
+                      <TableCell
+                        component="th"
+                        scope="row"
+                        sx={{
+                          fontFamily: "Poppins",
+                          bgcolor: "#8c383e",
+                          color: "white",
+                          fontWeight: 500,
+                        }}
+                        key={column.id}
+                        align={column.align}
+                        style={{ minWidth: column.minWidth }}
+                      >
+                        {column.label}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+
+                {/* Render TableBody with conditional loading based on loggedUserRole */}
+                <TableBody>
+                  {loggedUserRole === "SUPERUSER" && loading ? (
+                    // Display loading message in the TableBody
                     <TableRow>
-                      {(selectedTab === 0
-                        ? columnsEmployees
-                        : columnsAdmins
-                      ).map((column) => (
-                        <TableCell
-                          component="th" scope="row"
-                          sx={{
-                            fontFamily: "Poppins",
-                            bgcolor: "#8c383e",
-                            color: "white",
-                            fontWeight: 500,
-
-                          }}
-                          key={column.id}
-                          align={column.align}
-                          style={{ minWidth: column.minWidth }}
-                        >
-                          {column.label}
-                        </TableCell>
-                      ))}
+                      <TableCell colSpan={columnsEmployees.length || columnsAdmins.length} align="center">
+                          <Loader />
+                      </TableCell>
                     </TableRow>
-                  </TableHead>
-                  {hasData ? (
-                    <TableBody>
-
-                      {paginatedRows.map((row) => (
-                        <TableRow
-                          sx={{
-                            bgcolor: "white",
-                            "&:hover": {
-                              backgroundColor: "rgba(248, 199, 2, 0.5)",
-                              color: "black",
-                            },
-                          }}
-                          key={row.id}
-                        >
-                          {(selectedTab === 0
-                            ? columnsEmployees
-                            : columnsAdmins
-                          ).map((column) => (
-                            <TableCell
-                              component="th" scope="row"
-                              sx={{ fontFamily: "Poppins", fontWeight: 500, fontSize: '.8em' }}
-                              key={`${row.id}-${column.id}`}
-                              align={column.align}
-                            >
-                              {column.id === "name"
-                                ? row.name
-                                : column.id === "actions"
-                                  ? column.format
-                                    ? column.format(row[column.id], row)
-                                    : null
-                                  : column.format
-                                    ? column.format(row[column.id])
-                                    : row[column.id]}
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  ) : (
-                    <TableBody>
-                      <TableRow>
-                        <TableCell sx={{ bgcolor: 'white', height: '5em', }} colSpan={columnsEmployees.length || columnsAdmins.length} align="center">
-                          <Typography
-                            sx={{
-                              textAlign: "center",
-                              fontFamily: "Poppins",
-                              fontSize: "17px",
-                              color: "#1e1e1e",
-                              fontWeight: 500,
-                              padding: "25px",
-                            }}
+                  ) : hasData ? (
+                    paginatedRows.map((row) => (
+                      <TableRow
+                        sx={{
+                          bgcolor: "white",
+                          "&:hover": {
+                            backgroundColor: "rgba(248, 199, 2, 0.5)",
+                            color: "black",
+                          },
+                        }}
+                        key={row.id}
+                      >
+                        {(selectedTab === 0 ? columnsEmployees : columnsAdmins).map((column) => (
+                          <TableCell
+                            component="th"
+                            scope="row"
+                            sx={{ fontFamily: "Poppins", fontWeight: 500, fontSize: '.8em' }}
+                            key={`${row.id}-${column.id}`}
+                            align={column.align}
                           >
-                            No user are currently registered
-                          </Typography>
-                        </TableCell>
+                            {column.id === "name"
+                              ? row.name
+                              : column.id === "actions"
+                                ? column.format
+                                  ? column.format(row[column.id], row)
+                                  : null
+                                : column.format
+                                  ? column.format(row[column.id])
+                                  : row[column.id]}
+                          </TableCell>
+                        ))}
                       </TableRow>
-                    </TableBody>
+                    ))
+                  ) : (
+                    // No data case
+                    <TableRow>
+                      <TableCell colSpan={columnsEmployees.length || columnsAdmins.length} align="center">
+                        <Typography
+                          sx={{
+                            textAlign: "center",
+                            fontFamily: "Poppins",
+                            fontSize: "17px",
+                            color: "#1e1e1e",
+                            fontWeight: 500,
+                            padding: "25px",
+                          }}
+                        >
+                          No user is currently registered
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
                   )}
-                </Table>
-              )}
+                </TableBody>
+              </Table>
             </TableContainer>
 
             {/* </Card> */}
@@ -1145,14 +1142,14 @@ function ManageAccount() {
         <div
           className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-9"
           style={{
-            position: "absolute", // Change to relative to keep it in place
-            bottom: 30,
-            left: '21.5%',
-            transform: "translateX(-50%",
+            position: "relative", // Change to relative to keep it in place
+            // bottom: 30,
+            // left: '21.5%',
+            // transform: "translateX(-50%",
             display: "flex",
             alignItems: "center",
 
-            ml: '4em'
+            // ml: '4em'
           }}
         >
           <ol className="flex justify-end gap-1 text-xs font-medium">
@@ -1178,20 +1175,24 @@ function ManageAccount() {
               </a>
             </li>
 
-            {Array.from({ length: endPageGroup - startPageGroup + 1 }, (_, index) => (
-              <li key={startPageGroup + index}>
-                <a
-                  href="#"
-                  className={`block h-8 w-8 rounded border ${currentPage === startPageGroup + index
-                    ? "border-pink-900 bg-pink-900 text-white"
-                    : "border-gray-100 bg-white text-gray-900"
+            {Array.from(
+              { length: endPageGroup - startPageGroup + 1 },
+              (_, index) => (
+                <li key={startPageGroup + index}>
+                  <a
+                    href="#"
+                    className={`block h-8 w-8 rounded border ${
+                      currentPage === startPageGroup + index
+                        ? "border-pink-900 bg-pink-900 text-white"
+                        : "border-gray-100 bg-white text-gray-900"
                     } text-center leading-8`}
-                  onClick={() => handlePageChange(startPageGroup + index)}
-                >
-                  {startPageGroup + index}
-                </a>
-              </li>
-            ))}
+                    onClick={() => handlePageChange(startPageGroup + index)}
+                  >
+                    {startPageGroup + index}
+                  </a>
+                </li>
+              )
+            )}
 
             <li>
               <a
@@ -2539,373 +2540,373 @@ function ManageAccount() {
                 )}
                 {(selectedUser?.role === "EMPLOYEE" ||
                   selectedUser?.role === "HEAD") && (
-                    <>
-                      <Grid item xs={4}>
-                        <Box style={{ fontFamily: "Poppins" }} height="100%">
-                          <TextField
-                            disabled
-                            fullWidth
-                            size="small"
-                            label="First Name"
-                            id="fName"
-                            name="fName"
-                            value={selectedUser.fName}
-                            onChange={handleUserDataChange}
-                            InputLabelProps={{
-                              style: { fontFamily: "Poppins", fontSize: ".8em" },
-                            }}
-                            inputProps={{
-                              style: { fontSize: ".8em", fontFamily: "Poppins" },
-                            }}
-                          />
-                        </Box>
-                      </Grid>
-                      <Grid item xs={4}>
-                        <Box style={{ fontFamily: "Poppins" }}>
-                          <TextField
-                            fullWidth
-                            size="small"
-                            label="Middle Name"
-                            id="mName"
-                            name="mName"
-                            value={selectedUser.mName}
-                            onChange={handleUserDataChange}
-                            InputLabelProps={{
-                              style: { fontFamily: "Poppins", fontSize: ".8em" },
-                            }}
-                            inputProps={{
-                              style: { fontSize: ".8em", fontFamily: "Poppins" },
-                            }}
-                          />
-                        </Box>
-                      </Grid>
-                      <Grid item xs={4}>
-                        <Box style={{ fontFamily: "Poppins" }}>
-                          <TextField
-                            fullWidth
-                            disabled
-                            size="small"
-                            label="Last Name"
-                            id="lName"
-                            value={selectedUser.lName}
-                            name="lName"
-                            onChange={handleUserDataChange}
-                            InputLabelProps={{
-                              style: { fontFamily: "Poppins", fontSize: ".8em" },
-                            }}
-                            inputProps={{
-                              style: { fontSize: ".8em", fontFamily: "Poppins" },
-                            }}
-                          />
-                        </Box>
-                      </Grid>
-                      <Grid item xs={6} sx={{ width: "100%" }}>
-                        <Box sx={{ height: "100%" }}>
-                          <Tooltip
-                            title="ID Numbers should be numbers only"
-                            placement="left"
-                            arrow
-                            slotProps={{
-                              popper: {
-                                modifiers: [
-                                  {
-                                    name: "offset",
-                                    options: {
-                                      offset: [0, -14],
-                                    },
+                  <>
+                    <Grid item xs={4}>
+                      <Box style={{ fontFamily: "Poppins" }} height="100%">
+                        <TextField
+                          disabled
+                          fullWidth
+                          size="small"
+                          label="First Name"
+                          id="fName"
+                          name="fName"
+                          value={selectedUser.fName}
+                          onChange={handleUserDataChange}
+                          InputLabelProps={{
+                            style: { fontFamily: "Poppins", fontSize: ".8em" },
+                          }}
+                          inputProps={{
+                            style: { fontSize: ".8em", fontFamily: "Poppins" },
+                          }}
+                        />
+                      </Box>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Box style={{ fontFamily: "Poppins" }}>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          label="Middle Name"
+                          id="mName"
+                          name="mName"
+                          value={selectedUser.mName}
+                          onChange={handleUserDataChange}
+                          InputLabelProps={{
+                            style: { fontFamily: "Poppins", fontSize: ".8em" },
+                          }}
+                          inputProps={{
+                            style: { fontSize: ".8em", fontFamily: "Poppins" },
+                          }}
+                        />
+                      </Box>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Box style={{ fontFamily: "Poppins" }}>
+                        <TextField
+                          fullWidth
+                          disabled
+                          size="small"
+                          label="Last Name"
+                          id="lName"
+                          value={selectedUser.lName}
+                          name="lName"
+                          onChange={handleUserDataChange}
+                          InputLabelProps={{
+                            style: { fontFamily: "Poppins", fontSize: ".8em" },
+                          }}
+                          inputProps={{
+                            style: { fontSize: ".8em", fontFamily: "Poppins" },
+                          }}
+                        />
+                      </Box>
+                    </Grid>
+                    <Grid item xs={6} sx={{ width: "100%" }}>
+                      <Box sx={{ height: "100%" }}>
+                        <Tooltip
+                          title="ID Numbers should be numbers only"
+                          placement="left"
+                          arrow
+                          slotProps={{
+                            popper: {
+                              modifiers: [
+                                {
+                                  name: "offset",
+                                  options: {
+                                    offset: [0, -14],
                                   },
-                                ],
+                                },
+                              ],
+                            },
+                          }}
+                        >
+                          <TextField
+                            fullWidth
+                            size="small"
+                            label="ID Number"
+                            id="workId"
+                            name="workID"
+                            value={selectedUser.workID}
+                            onChange={handleUserDataChange}
+                            InputLabelProps={{
+                              style: {
+                                fontFamily: "Poppins",
+                                fontSize: ".8em",
                               },
                             }}
+                            inputProps={{
+                              style: {
+                                fontSize: ".8em",
+                                fontFamily: "Poppins",
+                              },
+                            }}
+                          />
+                        </Tooltip>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Box>
+                        <FormControl fullWidth size="small" disabled>
+                          <InputLabel
+                            id="GenderLabel"
+                            value={gender}
+                            sx={{ fontSize: ".8em", fontFamily: "Poppins" }}
                           >
-                            <TextField
-                              fullWidth
-                              size="small"
-                              label="ID Number"
-                              id="workId"
-                              name="workID"
-                              value={selectedUser.workID}
-                              onChange={handleUserDataChange}
-                              InputLabelProps={{
-                                style: {
-                                  fontFamily: "Poppins",
-                                  fontSize: ".8em",
-                                },
-                              }}
-                              inputProps={{
-                                style: {
-                                  fontSize: ".8em",
-                                  fontFamily: "Poppins",
-                                },
-                              }}
-                            />
-                          </Tooltip>
-                        </Box>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Box>
-                          <FormControl fullWidth size="small" disabled>
-                            <InputLabel
-                              id="GenderLabel"
-                              value={gender}
-                              sx={{ fontSize: ".8em", fontFamily: "Poppins" }}
-                            >
-                              Gender
-                            </InputLabel>
-                            <Select
-                              labelId="GenderLabel"
-                              id="GenderLabel"
-                              value={selectedUser.gender}
-                              label="gender"
-                              name="gender"
-                              sx={{ fontFamily: "Poppins", fontSize: ".8em" }}
-                            >
-                              <MenuItem value={"Female"}>Female</MenuItem>
-                              <MenuItem value={"Male"}>Male</MenuItem>
-                              <MenuItem value={"Other"}>Other</MenuItem>
-                            </Select>
-                          </FormControl>
-                        </Box>
-                      </Grid>
-                      <Grid item xs={6} sx={{ width: "100%" }}>
-                        <Box>
-                          <FormControl
-                            size="small"
-                            fullWidth
-                            disabled={selectedUser?.role === "HEAD"}
+                            Gender
+                          </InputLabel>
+                          <Select
+                            labelId="GenderLabel"
+                            id="GenderLabel"
+                            value={selectedUser.gender}
+                            label="gender"
+                            name="gender"
+                            sx={{ fontFamily: "Poppins", fontSize: ".8em" }}
                           >
-                            <InputLabel
-                              id="employementStatusLabel"
-                              sx={{ fontSize: ".8em", fontFamily: "Poppins" }}
-                            >
-                              Employment Status
-                            </InputLabel>
-                            <Select
-                              labelId="employementStatusLabel"
-                              id="employementStatus"
-                              name="empStatus"
-                              value={selectedUser.empStatus}
-                              label="employment status"
-                              onChange={handleUserDataChange}
-                              sx={{ fontFamily: "Poppins", fontSize: ".8em" }}
-                            >
-                              <MenuItem
-                                style={{ fontFamily: "Poppins" }}
-                                value="Probationary"
-                              >
-                                Probationary
-                              </MenuItem>
-                              <MenuItem
-                                style={{ fontFamily: "Poppins" }}
-                                value="Regular"
-                              >
-                                {" "}
-                                Regular
-                              </MenuItem>
-                            </Select>
-                          </FormControl>
-                        </Box>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Box>
-                          <TextField
-                            fullWidth
-                            size="small"
-                            label="Date Hired "
-                            id="datehired"
-                            type="date"
-                            name="dateHired"
-                            value={selectedUser.dateHired}
-                            onChange={handleUserDataChange}
-                            InputLabelProps={{
-                              shrink: true,
-                              style: { fontFamily: "Poppins", fontSize: ".8em" },
-                            }}
-                            inputProps={{
-                              style: { fontSize: ".8em", fontFamily: "Poppins" },
-                              pattern:
-                                "(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/[0-9]{2}",
-                            }}
-                          />
-                        </Box>
-                      </Grid>
-                      <Grid item xs={6} sx={{ width: "100%" }}>
-                        <Box>
-                          <FormControl
-                            size="small"
-                            fullWidth
-                            disabled={
-                              selectedUser?.empStatus === "Regular" ||
-                              selectedUser?.role === "HEAD"
-                            }
+                            <MenuItem value={"Female"}>Female</MenuItem>
+                            <MenuItem value={"Male"}>Male</MenuItem>
+                            <MenuItem value={"Other"}>Other</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={6} sx={{ width: "100%" }}>
+                      <Box>
+                        <FormControl
+                          size="small"
+                          fullWidth
+                          disabled={selectedUser?.role === "HEAD"}
+                        >
+                          <InputLabel
+                            id="employementStatusLabel"
+                            sx={{ fontSize: ".8em", fontFamily: "Poppins" }}
                           >
-                            <InputLabel
-                              id="probationaryStatus"
-                              sx={{ fontSize: ".8em", fontFamily: "Poppins" }}
-                            >
-                              Probationary Status
-                            </InputLabel>
-                            <Select
-                              labelId="probationaryStatusLabel"
-                              id="probeStat"
-                              name="probeStatus"
-                              value={selectedUser.probeStatus}
-                              label="probationary status"
-                              onChange={handleUserDataChange}
-                              sx={{ fontFamily: "Poppins", fontSize: ".8em" }}
-                            >
-                              <MenuItem
-                                style={{ fontFamily: "Poppins" }}
-                                value={"3rd Probationary"}
-                              >
-                                3rd Probationary
-                              </MenuItem>
-                              <MenuItem
-                                style={{ fontFamily: "Poppins" }}
-                                value={"5th Probationary"}
-                              >
-                                5th Probationary
-                              </MenuItem>
-                            </Select>
-                          </FormControl>
-                        </Box>
-                      </Grid>
-                      <Grid item xs={6} sx={{ width: "100%" }}>
-                        <Box>
-                          <TextField
-                            fullWidth
-                            disabled={
-                              selectedUser?.empStatus === "Regular" ||
-                              selectedUser?.role === "HEAD"
-                            }
-                            size="small"
-                            label="Date Started "
-                            id="dateStarted"
-                            type="date"
-                            name="dateStarted"
-                            value={selectedUser.dateStarted}
+                            Employment Status
+                          </InputLabel>
+                          <Select
+                            labelId="employementStatusLabel"
+                            id="employementStatus"
+                            name="empStatus"
+                            value={selectedUser.empStatus}
+                            label="employment status"
                             onChange={handleUserDataChange}
-                            InputLabelProps={{
-                              shrink: true,
-                              style: { fontFamily: "Poppins", fontSize: ".8em" },
-                            }}
-                            inputProps={{
-                              style: { fontSize: ".8em", fontFamily: "Poppins" },
-                              pattern:
-                                "(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/[0-9]{2}",
-                            }}
-                          />
-                        </Box>
-                      </Grid>
-                      <Grid item xs={4.8}>
-                        <Box>
-                          <TextField
-                            fullWidth
-                            size="small"
-                            label="Position"
-                            id="position"
-                            name="position"
-                            value={selectedUser.position}
-                            onChange={handleUserDataChange}
-                            InputLabelProps={{
-                              style: { fontFamily: "Poppins", fontSize: ".8em" },
-                            }}
-                            inputProps={{
-                              style: { fontSize: ".8em", fontFamily: "Poppins" },
-                            }}
-                          />
-                        </Box>
-                      </Grid>
-                      <Grid item xs={7.2}>
-                        <Box>
-                          <FormControl fullWidth size="small">
-                            <InputLabel
-                              id="deptLabel"
-                              sx={{ fontSize: ".8em", fontFamily: "Poppins" }}
+                            sx={{ fontFamily: "Poppins", fontSize: ".8em" }}
+                          >
+                            <MenuItem
+                              style={{ fontFamily: "Poppins" }}
+                              value="Probationary"
                             >
-                              Department
-                            </InputLabel>
-                            <Select
-                              labelId="deptLabel"
-                              name="dept"
-                              id="dept"
-                              value={selectedUser.dept}
-                              label="dept"
-                              onChange={handleUserDataChange}
-                              sx={{ fontFamily: "Poppins", fontSize: ".8em" }}
+                              Probationary
+                            </MenuItem>
+                            <MenuItem
+                              style={{ fontFamily: "Poppins" }}
+                              value="Regular"
                             >
-                              {departments.map((dept, index) => {
-                                return (
-                                  <MenuItem
-                                    key={index}
-                                    style={{
-                                      fontFamily: "Poppins",
-                                      fontSize: ".8em",
-                                    }}
-                                    value={dept.deptName}
-                                    sx={{
-                                      fontFamily: "Poppins",
-                                      whiteSpace: "nowrap",
-                                      overflow: "hidden",
-                                      textOverflow: "ellipsis",
-                                      maxWidth: "300px",
-                                    }}
-                                  >
-                                    {dept.deptName}
-                                  </MenuItem>
-                                );
-                              })}
-                            </Select>
-                          </FormControl>
-                        </Box>
-                      </Grid>
-                      <Grid item xs={6.5}>
-                        <Box>
-                          <TextField
-                            disabled
-                            fullWidth
-                            size="small"
-                            label="Institutional Email"
-                            id="email"
-                            name="workEmail"
-                            value={selectedUser.workEmail}
+                              {" "}
+                              Regular
+                            </MenuItem>
+                          </Select>
+                        </FormControl>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Box>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          label="Date Hired "
+                          id="datehired"
+                          type="date"
+                          name="dateHired"
+                          value={selectedUser.dateHired}
+                          onChange={handleUserDataChange}
+                          InputLabelProps={{
+                            shrink: true,
+                            style: { fontFamily: "Poppins", fontSize: ".8em" },
+                          }}
+                          inputProps={{
+                            style: { fontSize: ".8em", fontFamily: "Poppins" },
+                            pattern:
+                              "(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/[0-9]{2}",
+                          }}
+                        />
+                      </Box>
+                    </Grid>
+                    <Grid item xs={6} sx={{ width: "100%" }}>
+                      <Box>
+                        <FormControl
+                          size="small"
+                          fullWidth
+                          disabled={
+                            selectedUser?.empStatus === "Regular" ||
+                            selectedUser?.role === "HEAD"
+                          }
+                        >
+                          <InputLabel
+                            id="probationaryStatus"
+                            sx={{ fontSize: ".8em", fontFamily: "Poppins" }}
+                          >
+                            Probationary Status
+                          </InputLabel>
+                          <Select
+                            labelId="probationaryStatusLabel"
+                            id="probeStat"
+                            name="probeStatus"
+                            value={selectedUser.probeStatus}
+                            label="probationary status"
                             onChange={handleUserDataChange}
-                            InputLabelProps={{
-                              style: { fontFamily: "Poppins", fontSize: ".8em" },
-                            }}
-                            inputProps={{
-                              style: { fontSize: ".8em", fontFamily: "Poppins" },
-                            }}
-                          />
-                          {!emailIsAvailable && (
-                            <FormHelperText style={{ color: "red" }}>
-                              {emailMsgInfo}
-                            </FormHelperText>
-                          )}
-                        </Box>
-                      </Grid>
-                      <Grid item xs={5.5}>
-                        <Box>
-                          <TextField
-                            disabled
-                            fullWidth
-                            size="small"
-                            label="Username"
-                            id="username"
-                            name="username"
-                            value={selectedUser.username}
+                            sx={{ fontFamily: "Poppins", fontSize: ".8em" }}
+                          >
+                            <MenuItem
+                              style={{ fontFamily: "Poppins" }}
+                              value={"3rd Probationary"}
+                            >
+                              3rd Probationary
+                            </MenuItem>
+                            <MenuItem
+                              style={{ fontFamily: "Poppins" }}
+                              value={"5th Probationary"}
+                            >
+                              5th Probationary
+                            </MenuItem>
+                          </Select>
+                        </FormControl>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={6} sx={{ width: "100%" }}>
+                      <Box>
+                        <TextField
+                          fullWidth
+                          disabled={
+                            selectedUser?.empStatus === "Regular" ||
+                            selectedUser?.role === "HEAD"
+                          }
+                          size="small"
+                          label="Date Started "
+                          id="dateStarted"
+                          type="date"
+                          name="dateStarted"
+                          value={selectedUser.dateStarted}
+                          onChange={handleUserDataChange}
+                          InputLabelProps={{
+                            shrink: true,
+                            style: { fontFamily: "Poppins", fontSize: ".8em" },
+                          }}
+                          inputProps={{
+                            style: { fontSize: ".8em", fontFamily: "Poppins" },
+                            pattern:
+                              "(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/[0-9]{2}",
+                          }}
+                        />
+                      </Box>
+                    </Grid>
+                    <Grid item xs={4.8}>
+                      <Box>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          label="Position"
+                          id="position"
+                          name="position"
+                          value={selectedUser.position}
+                          onChange={handleUserDataChange}
+                          InputLabelProps={{
+                            style: { fontFamily: "Poppins", fontSize: ".8em" },
+                          }}
+                          inputProps={{
+                            style: { fontSize: ".8em", fontFamily: "Poppins" },
+                          }}
+                        />
+                      </Box>
+                    </Grid>
+                    <Grid item xs={7.2}>
+                      <Box>
+                        <FormControl fullWidth size="small">
+                          <InputLabel
+                            id="deptLabel"
+                            sx={{ fontSize: ".8em", fontFamily: "Poppins" }}
+                          >
+                            Department
+                          </InputLabel>
+                          <Select
+                            labelId="deptLabel"
+                            name="dept"
+                            id="dept"
+                            value={selectedUser.dept}
+                            label="dept"
                             onChange={handleUserDataChange}
-                            InputLabelProps={{
-                              style: { fontFamily: "Poppins", fontSize: ".8em" },
-                            }}
-                            inputProps={{
-                              style: { fontSize: ".8em", fontFamily: "Poppins" },
-                            }}
-                          />
-                        </Box>
-                      </Grid>
-                    </>
-                  )}
+                            sx={{ fontFamily: "Poppins", fontSize: ".8em" }}
+                          >
+                            {departments.map((dept, index) => {
+                              return (
+                                <MenuItem
+                                  key={index}
+                                  style={{
+                                    fontFamily: "Poppins",
+                                    fontSize: ".8em",
+                                  }}
+                                  value={dept.deptName}
+                                  sx={{
+                                    fontFamily: "Poppins",
+                                    whiteSpace: "nowrap",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    maxWidth: "300px",
+                                  }}
+                                >
+                                  {dept.deptName}
+                                </MenuItem>
+                              );
+                            })}
+                          </Select>
+                        </FormControl>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={6.5}>
+                      <Box>
+                        <TextField
+                          disabled
+                          fullWidth
+                          size="small"
+                          label="Institutional Email"
+                          id="email"
+                          name="workEmail"
+                          value={selectedUser.workEmail}
+                          onChange={handleUserDataChange}
+                          InputLabelProps={{
+                            style: { fontFamily: "Poppins", fontSize: ".8em" },
+                          }}
+                          inputProps={{
+                            style: { fontSize: ".8em", fontFamily: "Poppins" },
+                          }}
+                        />
+                        {!emailIsAvailable && (
+                          <FormHelperText style={{ color: "red" }}>
+                            {emailMsgInfo}
+                          </FormHelperText>
+                        )}
+                      </Box>
+                    </Grid>
+                    <Grid item xs={5.5}>
+                      <Box>
+                        <TextField
+                          disabled
+                          fullWidth
+                          size="small"
+                          label="Username"
+                          id="username"
+                          name="username"
+                          value={selectedUser.username}
+                          onChange={handleUserDataChange}
+                          InputLabelProps={{
+                            style: { fontFamily: "Poppins", fontSize: ".8em" },
+                          }}
+                          inputProps={{
+                            style: { fontSize: ".8em", fontFamily: "Poppins" },
+                          }}
+                        />
+                      </Box>
+                    </Grid>
+                  </>
+                )}
               </Grid>
             </DialogContent>
             <DialogActions sx={{ display: "flex", justifyContent: "center" }}>
@@ -3039,5 +3040,5 @@ function ManageAccount() {
       </Animated>
     </div>
   );
-};
+}
 export default ManageAccount;

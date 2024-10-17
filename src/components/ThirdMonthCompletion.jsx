@@ -8,7 +8,7 @@ const ThirdMonthCompletion = () => {
     useEffect(() => {
         const fetchCompletedCount = async () => {
             try {
-                const response = await fetch('http://localhost:8080/evaluation/thirdMonthStatus');
+                const response = await fetch('http://localhost:8080/evaluation/thirdMonthCompleted');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }

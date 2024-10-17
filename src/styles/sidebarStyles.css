@@ -21,3 +21,45 @@
   background-color: #e0e0e0;
   transform: translateY(-2px);
 }
+/*ANGELA*/
+/* Styles for the main dropdown item */
+.dropdown-item {
+  cursor: pointer;
+  display: flex;
+  align-items: right;
+  padding-left: 29px;
+  color: #1e1e1e;
+  transition: background-color 200ms;
+}
+
+.dropdown-item:hover {
+  background-color: #f0f0f0;
+}
+
+/* Styles for open dropdown (change background or color) */
+.dropdown-item.open {
+  background-color: #8c383e; /* Or any color you want */
+  color: white;
+}
+
+/* Styles for dropdown sub-items */
+.dropdown-subitem {
+  display: block;
+  text-decoration: none;
+  color: #1e1e1e;
+  padding: 5px 0 5px 45px; /* Indented to differentiate from main item */
+  transition: background-color 200ms;
+}
+
+.dropdown-subitem:hover {
+  background-color: #e0e0e0;
+  transform: translateY(-2px);
+}
+
+/* Style for active sub-item link */
+.dropdown-subitem.active {
+  color: white;
+  background-color: #8c383e;
+}
+
+

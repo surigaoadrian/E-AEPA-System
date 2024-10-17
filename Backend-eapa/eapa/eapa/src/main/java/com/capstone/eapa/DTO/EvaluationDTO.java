@@ -10,7 +10,6 @@ public class EvaluationDTO {
     @Enumerated(value = EnumType.STRING)
     private Role role;
     private String workID;
-    private String position;
     private String dept;
     private String empStatus;
     private String fName;
@@ -18,6 +17,8 @@ public class EvaluationDTO {
     private String sjbpStatus;
     private String svbpaStatus;
     private String pvbpaStatus;
+
+    
 
     // Getters and Setters
 
@@ -36,14 +37,6 @@ public class EvaluationDTO {
 
     public void setWorkID(String workID) {
         this.workID = workID;
-    }
-    
-    public String getPosition() {
-        return position;
-    }
-
-    public void setPosition(String position) {
-        this.position = position;
     }
 
     public String getDept() {

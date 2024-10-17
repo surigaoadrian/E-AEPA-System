@@ -4,7 +4,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import axios from "axios";
-
+import { apiUrl } from "../config/config";
 function PeerEvaluationCard({
   id,
   setEvalType,
@@ -42,6 +42,15 @@ function PeerEvaluationCard({
     position: "relative",
   };
 
+  const periodResult =
+    evalDeets.period === "3rd Month"
+      ? "3-Month probationary"
+      : evalDeets.period === "5th Month"
+      ? "5-Month probationary"
+      : evalDeets.period === "Annual-1st"
+      ? "first annual"
+      : "second annual";
+
   //format date
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
@@ -56,7 +65,7 @@ function PeerEvaluationCard({
     const fetchEvaluatee = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/user/getUser/${evalDeets.evaluateeId}`
+          `${apiUrl}user/getUser/${evalDeets.evaluateeId}`
         );
         setEvaluatee(response.data);
       } catch (error) {
@@ -73,7 +82,7 @@ function PeerEvaluationCard({
     fetchEvaluatee();
   }, []);
 
-  //fetch tbl assigned peers data
+  const pronounsResult = evaluatee.gender === "Female" ? "her" : "his";
 
   return (
     <div style={cardContainer}>
@@ -89,9 +98,9 @@ function PeerEvaluationCard({
         <h3
           style={{
             fontWeight: "600",
-            // backgroundColor: "lightblue",
+
             fontSize: "18px",
-            width: "82%",
+            width: "84%",
           }}
         >
           Peer Evaluation
@@ -101,27 +110,47 @@ function PeerEvaluationCard({
         <div
           style={{
             display: "flex",
-            // backgroundColor: "tomato",
+
             width: "18%",
             justifyContent: "space-between",
           }}
         >
           <p>Date:</p>
-          <p>September 11, 2024</p>
+          <p>{formatDate(evalDeets.dateAssigned)}</p>
         </div>
       </div>
 
       <>
         {/**Evaluation description */}
         <div style={{ width: "82%" }}>
-          <p>
-            As of {formatDate(evalDeets.dateAssigned)},{" "}
-            <b style={{ fontWeight: "600", color: "#EE5253" }}>
-              {evaluatee.fName}
-            </b>{" "}
-            has completed his 3-month probationary period. During this e-AEPA,
-            he will be evaluated by you, his Peer Evaluator.
-          </p>
+          {periodResult === "first annual" ||
+          periodResult === "second annual" ? (
+            <p>
+              As of {formatDate(evalDeets.dateAssigned)}, following the
+              conclusion of the first semester, the {periodResult} evaluation
+              for{" "}
+              <b style={{ fontWeight: "600", color: "#EE5253" }}>
+                {evaluatee.fName}
+              </b>{" "}
+              is due. You will serve as{" "}
+              {evaluatee.gender === "Female" ? "her" : "his"} Peer Evaluator
+              during this e-AEPA.
+            </p>
+          ) : (
+            <p>
+              As of {formatDate(evalDeets.dateAssigned)},{" "}
+              <b style={{ fontWeight: "600", color: "#EE5253" }}>
+                {evaluatee.fName}
+              </b>{" "}
+              has completed {pronounsResult} {periodResult} period. During this
+              e-AEPA, {evaluatee.gender === "Female" ? "she" : "he"} will be
+              evaluated by you, {pronounsResult}{" "}
+              <b style={{ fontWeight: "600", color: "black" }}>
+                Peer Evaluator
+              </b>{" "}
+              .
+            </p>
+          )}
         </div>
         {/**Evaluation footer */}
         <div

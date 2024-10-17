@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "*")
 public class UserController {
     @Autowired
     private UserService userServ;
@@ -139,7 +139,48 @@ public class UserController {
         }
     }
 
-        //total probationary employees
+    
+    //random assigned peers for 3rd month
+    @GetMapping("/getAssignedEvaluators")
+    public ResponseEntity<List<Integer>> getAssignedEvaluators(@RequestParam String dept, @RequestParam int excludedUserID) {
+        try {
+            List<Integer> assignedEvaluators = userServ.getAssignedEvaluators(dept, excludedUserID);
+            if (assignedEvaluators.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.ok(assignedEvaluators);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    //random assigned peers for 5th month
+    @GetMapping("/get5thMonthAssignedEvaluators")
+    public ResponseEntity<List<Integer>> get5thMonthAssignedEvaluators(
+            @RequestParam String dept,
+            @RequestParam int excludedUserID,
+            @RequestParam List<Integer> excludedPeerIds) {
+        List<Integer> evaluatorIds = userServ.get5thMonthAssignedEvaluators(dept, excludedUserID, excludedPeerIds);
+        return ResponseEntity.ok(evaluatorIds);
+    }
+
+    //random assigned peers for Annual 1st Sem
+    @GetMapping("/get1stAnnualAssignedEvaluators")
+    public ResponseEntity<List<Integer>> get1stAnnualAssignedEvaluators(@RequestParam String dept, @RequestParam int excludedUserID) {
+        try {
+            List<Integer> assignedEvaluators = userServ.get1stAnnualAssignedEvaluators(dept, excludedUserID);
+            if (assignedEvaluators.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.ok(assignedEvaluators);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    //total probationary employees
     @GetMapping("/countProbationaryUsers")
     public ResponseEntity<Long> countProbationaryUsers() {
         long count = userServ.getTotalProbationaryUsers();
@@ -166,13 +207,21 @@ public class UserController {
     // }
 
 
-
-
-
     @GetMapping("/getHeadUserIdByDept")
     public ResponseEntity<Integer> getHeadUserIdByDept(@RequestParam String dept) {
         Integer userId = userServ.getHeadUserIdByDept(dept);
         return ResponseEntity.ok(userId);
     }
+
+    // Details for 3rd Month and 5th Month evaluators
+    @GetMapping("/thirdMonthEligibleEvaluators")
+    public List<UserEntity> getThirdMonthEligibleEvaluators() {
+        return userServ.getEligibleEvaluatorsDetailsFor3rdMonth();
+    }
+    @GetMapping("/fifthMonthEligibleEvaluators")
+    public List<UserEntity> getFifthMonthEligibleEvaluators() {
+        return userServ.getEligibleEvaluatorsDetailsFor5thMonth();
+    }
+
 }
 

@@ -13,6 +13,8 @@ import Typography from "@mui/material/Typography";
 function EvaluationCard({
   id,
   period,
+  dateHired,
+  evalDate,
   loggedUser,
   handleOpenForm,
   handleEvalTypeChange,
@@ -26,7 +28,19 @@ function EvaluationCard({
   setActiveCard = { setActiveCard },
 }) {
   const [takeEval, setTakeEval] = useState(false);
-  const [shouldDisplay, setShouldDisplay] = useState(true);
+  //const [shouldDisplay, setShouldDisplay] = useState(true);
+
+  // //eval start date
+  // const evaluationStartDate = new Date(dateHired);
+  // evaluationStartDate.setMonth(evaluationStartDate.getMonth() + 2);
+
+  // //current date
+  // // Get the current date
+  // const today = new Date();
+  // const options = { year: "numeric", month: "long", day: "numeric" };
+
+  // // Format the date
+  // const formattedDate = today.toLocaleDateString("en-US", options);
 
   const handleReturn = () => {
     setTakeEval(!takeEval);
@@ -65,9 +79,7 @@ function EvaluationCard({
     position: "relative",
   };
 
-  if (!shouldDisplay) {
-    return null;
-  }
+  const pronounsResult = loggedUser.gender === "Female" ? "her" : "his";
 
   return (
     <div style={cardContainer}>
@@ -88,7 +100,13 @@ function EvaluationCard({
             width: "82%",
           }}
         >
-          {period} Evaluation
+          {period === "Annual-1st" ? (
+            "Annual Evaluation (First Semester)"
+          ) : period === "Annual-2nd" ? (
+            "Annual Evaluation (Second Semester)"
+          ) : (
+            <span>{period} Evaluation</span>
+          )}
         </h3>
         {/*  */}
         {takeEval ? (
@@ -139,7 +157,7 @@ function EvaluationCard({
               }}
             >
               <p>Date:</p>
-              <p>September 11, 2024</p>
+              {evalDate}
             </div>
           </>
         )}
@@ -156,7 +174,7 @@ function EvaluationCard({
               }}
             >
               <p style={{ width: "20%" }}>Date:</p>
-              <p>February 11, 2024</p>
+              <p>{evalDate}</p>
             </div>
             <div
               style={{
@@ -195,9 +213,16 @@ function EvaluationCard({
                     <em>None</em>
                   </MenuItem>
                   <MenuItem value={"SELF"}>Self Evaluation</MenuItem>
-                  {loggedUser.position !== "Secretary" && (
-                    <MenuItem value={"PEER"}>Peer Evaluation</MenuItem>
-                  )}
+
+                  {/* <MenuItem
+                    disabled={
+                      loggedUser.employmentStatus !== "Regular" &&
+                      loggedUser.position !== "Secretary"
+                    }
+                    value={"PEER"}
+                  >
+                    Peer Evaluation
+                  </MenuItem> */}
                 </Select>
               </FormControl>
             </div>
@@ -207,13 +232,29 @@ function EvaluationCard({
         <>
           {/**Evaluation description */}
           <div style={{ width: "82%" }}>
-            <p>
-              As of February 11, 2024, the employee has completed his{" "}
-              {period + " "}
-              probationary period. During this e-AEPA, the employee will undergo
-              evaluations by their Immediate Head, Self Evaluation, and Peer
-              Evaluation.
-            </p>
+            {period === "Annual-1st" ? (
+              <p>
+                As the first semester concludes, the employee will undergo their
+                Annual Evaluation for the First Semester. During this e-AEPA,
+                the employee will be evaluated by their Immediate Head, as well
+                as through a Self-Evaluation and Peer Evaluation.
+              </p>
+            ) : period === "Annual-2nd" ? (
+              <p>
+                As the second semester concludes, the employee will undergo
+                their Annual Evaluation for the Second Semester. During this
+                e-AEPA, the employee will be evaluated by their Immediate Head,
+                as well as through a Self-Evaluation and Peer Evaluation.
+              </p>
+            ) : (
+              <p>
+                As of {evalDate}, the employee has completed {pronounsResult}{" "}
+                {period + " "}
+                probationary period. During this e-AEPA, the employee will
+                undergo evaluations by their Immediate Head, Self Evaluation,
+                and Peer Evaluation.
+              </p>
+            )}
           </div>
           {/**Evaluation footer */}
           <div
@@ -249,21 +290,22 @@ function EvaluationCard({
               >
                 <p>Self Evaluation</p>
               </div>
-              {loggedUser.position !== "Secretary" && (
-                <div
-                  style={{
-                    border: "2px solid #EE5253",
-                    padding: "5px 0px 5px 0px",
-                    height: "35px",
-                    width: "145px",
-                    borderRadius: "5px",
-                    color: "#EE5253",
-                    fontWeight: "500",
-                  }}
-                >
-                  <p>Peer Evaluation</p>
-                </div>
-              )}
+              {loggedUser.position !== "Secretary" &&
+                loggedUser.employmentStatus === "Regular" && (
+                  <div
+                    style={{
+                      border: "2px solid #EE5253",
+                      padding: "5px 0px 5px 0px",
+                      height: "35px",
+                      width: "145px",
+                      borderRadius: "5px",
+                      color: "#EE5253",
+                      fontWeight: "500",
+                    }}
+                  >
+                    <p>Peer Evaluation</p>
+                  </div>
+                )}
             </div>
             <Button
               sx={{
@@ -291,7 +333,7 @@ function EvaluationCard({
           evalType={evalType}
           handleOpenForm={handleOpenForm}
           handleOpenModal={handleOpenModal}
-          setShouldDisplay={setShouldDisplay}
+          //setShouldDisplay={setShouldDisplay}
         />
       )}
 
