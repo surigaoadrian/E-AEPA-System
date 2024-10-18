@@ -201,7 +201,7 @@ function PeerEvaluationCard({
             onClick={() => {
               setEvalType("PEER-A");
               setSelectedAssignedPeerId(evalDeets.evaluateeId);
-              handleOpenModal("VALUES", "3rd Month");
+              handleOpenModal("VALUES", evalDeets.period);
             }}
           >
             Take Evaluation

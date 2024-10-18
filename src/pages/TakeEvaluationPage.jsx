@@ -1031,37 +1031,37 @@ function TakeEvaluationPage() {
     setOpenModal(false);
   };
 
-  const [randomPeer, setRandomPeer] = useState({});
+  // const [randomPeer, setRandomPeer] = useState({});
   const [evalID, setEvalID] = useState();
 
-  useEffect(() => {
-    if (evalType === "PEER") {
-      const fetchRandomPeer = async () => {
-        try {
-          const response = await axios.get(`${apiUrl}user/randomPeer`, {
-            params: {
-              dept: loggedUser.dept,
-              excludedUserID: loggedUser.userID,
-            },
-          });
-          setRandomPeer(response.data);
+  // useEffect(() => {
+  //   if (evalType === "PEER") {
+  //     const fetchRandomPeer = async () => {
+  //       try {
+  //         const response = await axios.get(`${apiUrl}user/randomPeer`, {
+  //           params: {
+  //             dept: loggedUser.dept,
+  //             excludedUserID: loggedUser.userID,
+  //           },
+  //         });
+  //         setRandomPeer(response.data);
 
-          console.log("Random Peer fetched:", response.data);
-        } catch (error) {
-          if (error.response) {
-            console.log(error.response.data);
-            console.log(error.response.status);
-            console.log(error.response.headers);
-          } else {
-            console.log(`Error: ${error.message}`);
-          }
-        }
-      };
-      fetchRandomPeer();
-    }
-  }, [evalType]);
+  //         console.log("Random Peer fetched:", response.data);
+  //       } catch (error) {
+  //         if (error.response) {
+  //           console.log(error.response.data);
+  //           console.log(error.response.status);
+  //           console.log(error.response.headers);
+  //         } else {
+  //           console.log(`Error: ${error.message}`);
+  //         }
+  //       }
+  //     };
+  //     fetchRandomPeer();
+  //   }
+  // }, [evalType]);
 
-  console.log("random peer: " + randomPeer);
+  // console.log("random peer: " + randomPeer);
 
   const handleConfirm = async () => {
     setOpenForm(true);
@@ -1076,10 +1076,10 @@ function TakeEvaluationPage() {
     const currentDate = `${year}-${month}-${day}`;
 
     // Ensure randomPeer is set correctly
-    if (evalType === "PEER" && (!randomPeer || !randomPeer.userID)) {
-      console.error("Random Peer ID is undefined or null");
-      return;
-    }
+    // if (evalType === "PEER" && (!randomPeer || !randomPeer.userID)) {
+    //   console.error("Random Peer ID is undefined or null");
+    //   return;
+    // }
 
     const evaluation = {
       user: {
@@ -1095,29 +1095,29 @@ function TakeEvaluationPage() {
       isDeleted: 0,
     };
 
-    const periodResult =
-      randomPeer.empStatus === "Regular"
-        ? "Annual"
-        : randomPeer.probeStatus === "3rd Probationary"
-        ? "3rd Month"
-        : "5th Month";
+    // const periodResult =
+    //   randomPeer.empStatus === "Regular"
+    //     ? "Annual"
+    //     : randomPeer.probeStatus === "3rd Probationary"
+    //     ? "3rd Month"
+    //     : "5th Month";
 
-    const randomPeerEvaluation = {
-      user: {
-        userID: userID,
-      },
-      peer: {
-        userID: randomPeer.userID,
-      },
-      stage: selectedStage,
-      period: periodResult,
-      evalType: evalType,
-      status: "OPEN",
-      schoolYear: schoolYear,
-      semester: semester,
-      dateTaken: currentDate,
-      isDeleted: 0,
-    };
+    // const randomPeerEvaluation = {
+    //   user: {
+    //     userID: userID,
+    //   },
+    //   peer: {
+    //     userID: randomPeer.userID,
+    //   },
+    //   stage: selectedStage,
+    //   period: periodResult,
+    //   evalType: evalType,
+    //   status: "OPEN",
+    //   schoolYear: schoolYear,
+    //   semester: semester,
+    //   dateTaken: currentDate,
+    //   isDeleted: 0,
+    // };
 
     const assignPeerEvaluation = {
       user: {
@@ -1140,33 +1140,35 @@ function TakeEvaluationPage() {
 
     let existingEvalID = null;
 
-    if (evalType === "PEER") {
-      try {
-        const response = await axios.get(
-          "http://localhost:8080/evaluation/getEvalID",
-          {
-            params: {
-              userID: userID,
-              period: period,
-              stage: selectedStage,
-              evalType: evalType,
-            },
-          }
-        );
-        existingEvalID = response.data;
-        setEvalID(response.data);
-        console.log("Existing evaluation ID:", existingEvalID);
-      } catch (error) {
-        if (error.response) {
-          console.log(error.response.data);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-        } else {
-          console.log(`Error: ${error.message}`);
-        }
-        existingEvalID = null; // Handle the case where no evaluation is found
-      }
-    } else if (evalType === "PEER-A") {
+    // if (evalType === "PEER") {
+    //   try {
+    //     const response = await axios.get(
+    //       "http://localhost:8080/evaluation/getEvalID",
+    //       {
+    //         params: {
+    //           userID: userID,
+    //           period: period,
+    //           stage: selectedStage,
+    //           evalType: evalType,
+    //         },
+    //       }
+    //     );
+    //     existingEvalID = response.data;
+    //     setEvalID(response.data);
+    //     console.log("Existing evaluation ID:", existingEvalID);
+    //   } catch (error) {
+    //     if (error.response) {
+    //       console.log(error.response.data);
+    //       console.log(error.response.status);
+    //       console.log(error.response.headers);
+    //     } else {
+    //       console.log(`Error: ${error.message}`);
+    //     }
+    //     existingEvalID = null; // Handle the case where no evaluation is found
+    //   }
+    // } else
+
+    if (evalType === "PEER-A") {
       try {
         const response = await axios.get(
           `${apiUrl}evaluation/getEvalIDAssignedPeer`,
@@ -1221,11 +1223,7 @@ function TakeEvaluationPage() {
       try {
         const response = await axios.post(
           `${apiUrl}evaluation/createEvaluation`,
-          evalType === "PEER"
-            ? randomPeerEvaluation
-            : evalType === "PEER-A"
-            ? assignPeerEvaluation
-            : evaluation
+          evalType === "PEER-A" ? assignPeerEvaluation : evaluation
         );
         console.log("New evaluation created:", response.data);
       } catch (error) {

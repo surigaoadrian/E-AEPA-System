@@ -10,12 +10,19 @@ import FifthMonthCompletion from "../components/FifthMonthCompletion";
 import AnnualCompletion from "../components/AnnualCompletion";
 import SchoolYearModal from "../modals/SchoolYearModal";
 import Button from "@mui/material/Button";
-import EligibleEvaluators from '../components/EligibleEvaluators';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faSeedling,
+  faHandshake,
+  faUsers,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
+import ReactApexChart from "react-apexcharts";
+import Loader from "../components/Loader";
 
 function AdminDashboard() {
   const [currentDate, setCurrentDate] = useState("");
-  const [showEligibleEvaluators, setShowEligibleEvaluators] = useState(false);
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const now = new Date();
@@ -24,29 +31,190 @@ function AdminDashboard() {
   }, []);
 
   useEffect(() => {
-    const handlePopState = () => {
-      if (window.location.pathname.includes('AdminDashboard/EligibleEvaluators')) {
-        setShowEligibleEvaluators(false);
-        navigate('/AdminDashboard');
-      }
-    };
+    const timer = setTimeout(() => setLoading(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
-    window.addEventListener('popstate', handlePopState);
-
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-    };
-  }, [navigate]);
-
-  const handleShowEligibleEvaluators = () => {
-    navigate('/AdminDashboard/EligibleEvaluators');
-    setShowEligibleEvaluators(true);
-  }
   //adi codes
   const [openSYModal, setOpenSYModal] = useState(false);
   const [isOpenView, setIsOpenView] = useState(false);
   const [openAddSY, setOpenAddSY] = useState(false);
   const [openEditView, setOpenEditView] = useState(false);
+
+  const [month, setMonth] = useState("3rd Month");
+  const data = {
+    "3rd Month": [17, 30, 53],
+    "5th Month": [20, 25, 55],
+  };
+
+  const handleMonthChange = (event) => {
+    setMonth(event.target.value);
+  };
+
+  //pie chart
+  const [pieChartData, setPieChartData] = useState({
+    series: data[month], // Use the data for the selected month
+    options: {
+      chart: {
+        type: "donut",
+        height: 350,
+      },
+      labels: ["Pending", "In Progress", "Completed"],
+      legend: {
+        position: "bottom",
+      },
+      colors: ["#636E72", "#F8C702", "#7C2828"],
+    },
+  });
+
+  // Update the pie chart data when the month changes
+  useEffect(() => {
+    setPieChartData((prevState) => ({
+      ...prevState,
+      series: data[month], // Update series based on selected month
+    }));
+  }, [month]);
+
+  //line chart
+  const [lineChartData] = useState({
+    series: [
+      {
+        name: "Desktops",
+        data: [30, 40, 35, 50, 49, 60, 70, 91, 80, 85, 95, 100],
+      },
+    ],
+    options: {
+      chart: {
+        height: 350,
+        type: "line",
+        zoom: {
+          enabled: false,
+        },
+        toolbar: {
+          show: false,
+        },
+      },
+      colors: ["#F8C702"],
+      dataLabels: {
+        enabled: false,
+      },
+      stroke: {
+        curve: "smooth",
+      },
+      // title: {
+      //   text: "Product Trends by Month",
+      //   align: "left",
+      // },
+      grid: {
+        row: {
+          colors: ["#f3f3f3", "transparent"], // alternating row colors
+          opacity: 0.5,
+        },
+      },
+      xaxis: {
+        categories: [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ],
+      },
+      fill: {
+        type: "solid",
+        colors: ["#96CEB4"],
+      },
+    },
+  });
+
+  //column chart
+  const [chartData] = useState({
+    series: [
+      {
+        name: "3rd Month",
+        data: [10, 7, 5, 12, 6, 10, 4, 6, 5, 8, 3, 2, 5, 6, 3], // Example data for 3rd Month
+      },
+      {
+        name: "5th Month",
+        data: [5, 3, 4, 6, 3, 4, 2, 4, 3, 4, 1, 1, 2, 3, 1], // Example data for 5th Month
+      },
+      {
+        name: "Regular",
+        data: [15, 18, 12, 17, 20, 15, 16, 13, 17, 19, 12, 15, 18, 14, 20], // Example data for Regular
+      },
+    ],
+    options: {
+      chart: {
+        type: "bar",
+        height: 350,
+        stacked: false,
+        toolbar: {
+          show: false,
+        },
+      },
+      plotOptions: {
+        bar: {
+          horizontal: false,
+          columnWidth: "55%", // Adjust width of columns
+        },
+      },
+      dataLabels: {
+        enabled: false,
+      },
+      stroke: {
+        show: true,
+        width: 2,
+        colors: ["transparent"],
+      },
+      xaxis: {
+        categories: [
+          "HR",
+          "TSG",
+          "QAO",
+          "ETO",
+          "MIS",
+          "Finance",
+          "IMDC",
+          "Guidance",
+          "TSG",
+          "MSDO",
+          "WIL",
+          "OAS",
+          "SAO",
+          "Makerspace",
+          "CES",
+        ], // Department categories
+      },
+      yaxis: {
+        // title: {
+        //   text: "Employee Count",
+        // },
+      },
+      fill: {
+        opacity: 1,
+        colors: ["#7C2828", "#636E72", "#F8C702"], // Match your colors for each series
+      },
+      colors: ["#7C2828", "#636E72", "#F8C702"],
+      legend: {
+        position: "top", // Legend position
+        horizontalAlign: "center",
+      },
+      tooltip: {
+        y: {
+          formatter: function (val) {
+            return val + " employees"; // Customize tooltip
+          },
+        },
+      },
+    },
+  });
 
   const handleOpenEditView = () => {
     setOpenEditView(true);
@@ -85,13 +253,17 @@ function AdminDashboard() {
   };
 
   return (
-    <Container maxWidth="120px" sx={{ padding: 2 }}>
-      <Box
-        sx={{
+    <div style={{ minHeight: "91vh" }}>
+      <div
+        style={{
+          height: "9vh",
+          width: "100%",
+          padding: "0px 30px",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           marginBottom: 2,
+          //backgroundColor: "lightyellow",
         }}
       >
         <Typography variant="h5" fontWeight="bolder" fontFamily="Poppins">
@@ -101,7 +273,7 @@ function AdminDashboard() {
         <Button
           onClick={handleOpenSYModal}
           sx={{
-            width: "10%",
+            width: "12%",
             backgroundColor: "#8C383E",
             "&:hover": {
               backgroundColor: "#7C2828",
@@ -112,145 +284,636 @@ function AdminDashboard() {
         >
           Manage S.Y.
         </Button>
-      </Box>
+      </div>
 
-      {showEligibleEvaluators ? (
-        <EligibleEvaluators />
+      {loading ? (
+        <Loader />
       ) : (
-        <>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6} lg={6}>
-              <Paper elevation={3} sx={{ padding: 1, borderRadius: 2, boxShadow: '0 10px 20px -20px rgba(253, 10, 0.9, 0.9)' }}>
-                <Typography sx={{ textAlign: 'center', fontWeight: 500 }} fontSize={13} gutterBottom fontFamily="Poppins">Evaluation Status for 3rd and 5th Month</Typography>
-                <Box
-                  sx={{
-                    height: 150,
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    borderRadius: 1,
+        <div
+          style={{
+            height: "82vh",
+            width: "95%",
+            //backgroundColor: "tomato",
+            margin: "auto",
+            overflowX: "scroll",
+          }}
+        >
+          {/** 1st part */}
+          <div
+            style={{
+              height: "45vh",
+              width: "99%",
+              //backgroundColor: "lightgreen",
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            {/** Employee Counts */}
+            <div
+              style={{
+                height: "100%",
+                width: "19%",
+                //backgroundColor: "white",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+              }}
+            >
+              <div
+                style={{
+                  height: "31%",
+                  width: "100%",
+                  backgroundColor: "#7C2828",
+                  borderRadius: "8px",
+                  padding: "12px",
+                  boxShadow:
+                    "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
+                }}
+              >
+                <div
+                  style={{
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
                   }}
                 >
-                  <EvaluationStatusChart />
-                </Box>
-              </Paper>
-            </Grid>
-            <Grid item container spacing={2} xs={12} md={6} lg={6}>
-              <Grid item xs={4}>
-                <Paper elevation={3} sx={{ padding: 2, borderRadius: 2, boxShadow: '0 10px 20px -20px rgba(253, 10, 0.9, 0.9)' }}>
-                  <Typography sx={{ textAlign: 'center', fontWeight: 600 }} fontSize={12} gutterBottom fontFamily="Poppins">3rd Evaluation Completion</Typography>
-                  <Box
-                    sx={{
-                      height: 92,
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      borderRadius: 1,
+                  <div
+                    style={{ height: "30%", fontWeight: "500", color: "white" }}
+                  >
+                    <h3>3rd Month Employees</h3>
+                  </div>
+
+                  <div
+                    style={{
+                      height: "60%",
+                      //backgroundColor: "lightsteelblue",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
                     }}
                   >
-                    <ThirdMonthCompletion />
-                  </Box>
-                </Paper>
-              </Grid>
-              <Grid item xs={4}>
-                <Paper elevation={3} sx={{ padding: 2, borderRadius: 2, boxShadow: '0 10px 20px -20px rgba(253, 10, 0.9, 0.9)' }}>
-                  <Typography sx={{ textAlign: 'center', fontWeight: 600 }} fontSize={12} gutterBottom fontFamily="Poppins">5th Evaluation Completion</Typography>
-                  <Box
-                    sx={{
-                      height: 92,
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      borderRadius: 1,
-                    }}
-                  >
-                    <Typography variant="body2" color="textSecondary">
-                      <FifthMonthCompletion />
-                    </Typography>
-                  </Box>
-                </Paper>
-              </Grid>
-              <Grid item xs={4}>
-                <Paper elevation={3} sx={{ padding: 2, borderRadius: 2, boxShadow: '0 10px 20px -20px rgba(253, 10, 0.9, 0.9)' }}>
-                  <Typography sx={{ textAlign: 'center', fontWeight: 600 }} fontSize={12} gutterBottom fontFamily="Poppins">Annual Evaluation Completion</Typography>
-                  <Box
-                    sx={{
-                      height: 92,
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      borderRadius: 1,
-                    }}
-                  >
-                    <AnnualCompletion />
-                  </Box>
-                </Paper>
-              </Grid>
-            </Grid>
-            <Grid item xs={12} md={6} lg={6}>
-              <Box sx={{ display: 'flex'}}>
-                <Button
-                  onClick={handleShowEligibleEvaluators}
-                  sx={{
-                    writingMode: 'vertical-rl',
-                    transform: 'rotate(180deg)',
-                    height: '190px',
-                    backgroundColor: '#8C383E',
-                    color: 'white',
-                    fontWeight: 'bold',
-                    padding: '0.1px',
-                    textAlign: 'center',
-                    fontSize: '14px',
-                    textTransform: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    '&:hover': {
-                      backgroundColor: '#6C2A2E',
-                    },
-                    marginRight: '3px',
+                    <p
+                      style={{
+                        fontSize: "40px",
+                        fontWeight: "bolder",
+                        color: "white",
+                      }}
+                    >
+                      13
+                    </p>
+                    <FontAwesomeIcon
+                      icon={faSeedling}
+                      style={{ fontSize: "25px", color: "white" }}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div
+                style={{
+                  height: "31%",
+                  width: "100%",
+                  backgroundColor: "#636E72",
+                  //backgroundColor: "#FFEEAD",
+                  borderRadius: "8px",
+                  padding: "12px",
+                  boxShadow:
+                    "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
+                }}
+              >
+                <div
+                  style={{
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
                   }}
                 >
-                Eligible Evaluators
-                </Button>
-                <Paper elevation={3} sx={{ padding: 1, borderRadius: 2, boxShadow: '0 10px 20px -20px rgba(253, 10, 0.9, 0.9)', flexGrow: 1 }}>
-                  <Typography sx={{ fontWeight: 500 }} fontSize={20} gutterBottom fontFamily="Poppins">Employee Status</Typography>
-                  <Box
-                    sx={{
-                      height: 338,
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      borderRadius: 1,
+                  <div
+                    style={{ height: "30%", fontWeight: "500", color: "white" }}
+                  >
+                    <h3>5th Month Employees</h3>
+                  </div>
+
+                  <div
+                    style={{
+                      height: "60%",
+                      //backgroundColor: "lightsteelblue",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
                     }}
                   >
-                    <EmployeeStatusChart />
-                  </Box>
-                </Paper>
-              </Box>
-            </Grid>
-            <Grid item xs={12} md={6} lg={6} sx={{ marginTop: '-23px' }}>
-              <Paper elevation={3} sx={{ padding: 1, borderRadius: 2, boxShadow: '0 10px 20px -20px rgba(253, 10, 0.9, 0.9)' }}>
-                <AccomplishmentRateChart />
-              </Paper>
-            </Grid>
-            <SchoolYearModal
-          openModal={openSYModal}
-          handleCloseModal={handleCloseSYModal}
-          isOpenView={isOpenView}
-          handleOpenView={handleOpenView}
-          handleCloseView={handleCloseView}
-          openAddSY={openAddSY}
-          setOpenAddSY={setOpenAddSY}
-          handleOpenAddSY={handleOpenAddSY}
-          handleCloseAddSY={handleCloseAddSY}
-          openEditView={openEditView}
-          handleOpenEditView={handleOpenEditView}
-          handleCloseEditView={handleCloseEditView}
-        />
-          </Grid>
-        </>
+                    <p
+                      style={{
+                        fontSize: "40px",
+                        fontWeight: "bolder",
+                        color: "white",
+                      }}
+                    >
+                      10
+                    </p>
+                    <FontAwesomeIcon
+                      icon={faHandshake}
+                      style={{ fontSize: "25px", color: "white" }}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div
+                style={{
+                  height: "31%",
+                  width: "100%",
+                  backgroundColor: "#F8C702",
+                  borderRadius: "8px",
+                  padding: "12px",
+                  boxShadow:
+                    "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
+                }}
+              >
+                <div
+                  style={{
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    color: "#333333",
+                  }}
+                >
+                  <div style={{ height: "30%", fontWeight: "500" }}>
+                    <h3>Regular Employees</h3>
+                  </div>
+
+                  <div
+                    style={{
+                      height: "60%",
+                      //backgroundColor: "lightsteelblue",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <p style={{ fontSize: "40px", fontWeight: "bolder" }}>
+                      256
+                    </p>
+                    <FontAwesomeIcon
+                      icon={faUsers}
+                      style={{ fontSize: "25px" }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/** Total Employee Graph */}
+            <div
+              style={{
+                height: "100%",
+                width: "44%",
+                //backgroundColor: "lightgray",
+              }}
+            >
+              <div
+                id="line-chart"
+                style={{
+                  backgroundColor: "white",
+                  width: "100%",
+
+                  borderRadius: "10px",
+                  boxShadow:
+                    "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
+                }}
+              >
+                <h1
+                  style={{
+                    backgroundColor: "#F8C702",
+                    borderRadius: "10px 10px 0px 0px",
+                    padding: "5px 15px",
+                    fontWeight: "500",
+                    fontSize: "16px",
+                  }}
+                >
+                  Total Regular Employees
+                </h1>
+                <ReactApexChart
+                  options={lineChartData.options}
+                  series={lineChartData.series}
+                  type="line"
+                  height={280}
+                />
+              </div>
+            </div>
+            {/** Employee Evaluation Pie Chart */}
+            <div
+              style={{
+                height: "100%",
+                width: "34%",
+                //backgroundColor: "lightcyan",
+                //marginRight: "10px",
+                boxShadow:
+                  "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
+              }}
+            >
+              <div
+                id="pie-chart"
+                style={{
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-evenly",
+                  borderRadius: "10px",
+                  backgroundColor: "white",
+                  padding: "10px",
+                }}
+              >
+                <div
+                  style={{
+                    //backgroundColor: "yellow",
+                    display: "flex",
+                    justifyContent: "end",
+                    //padding: "5px",
+                  }}
+                >
+                  <select
+                    value={month}
+                    onChange={handleMonthChange}
+                    style={{ border: "2px solid #636E72", borderRadius: "5px" }}
+                  >
+                    <option value="3rd Month">3rd Month</option>
+                    <option value="5th Month">5th Month</option>
+                    {/* Add more months as needed */}
+                  </select>
+                </div>
+
+                <ReactApexChart
+                  options={pieChartData.options}
+                  series={pieChartData.series}
+                  type="donut"
+                  height={300}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/** 2nd part */}
+          <div
+            style={{
+              //backgroundColor: "#7E60BF",
+              height: "55vh",
+              width: "99%",
+              display: "flex",
+              alignItems: "end",
+            }}
+          >
+            <div
+              style={{
+                height: "93%",
+                width: "100%",
+                backgroundColor: "white",
+                borderRadius: "10px",
+                paddingTop: "15px",
+                boxShadow:
+                  "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
+              }}
+            >
+              <div id="chart">
+                <ReactApexChart
+                  options={chartData.options}
+                  series={chartData.series}
+                  type="bar"
+                  height={330}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/** Third part */}
+          <div
+            style={{
+              //backgroundColor: "#E4B1F0",
+              height: "45vh",
+              width: "99%",
+              display: "flex",
+              alignItems: "end",
+            }}
+          >
+            <div
+              style={{
+                height: "93%",
+                width: "100%",
+                //backgroundColor: "white",
+                display: "flex",
+                justifyContent: "space-between",
+              }}
+            >
+              <div
+                style={{
+                  height: "100%",
+                  width: "49%",
+                  backgroundColor: "white",
+                  borderRadius: "10px",
+                  boxShadow:
+                    "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
+                }}
+              >
+                <h2
+                  style={{
+                    backgroundColor: "#7C2828",
+                    borderRadius: "10px 10px 0px 0px",
+                    padding: "5px 15px",
+                    fontWeight: "500",
+                    fontSize: "16px",
+                    height: "4.5vh",
+                    color: "white",
+                  }}
+                >
+                  3rd Month Probationary Employee for This Month
+                </h2>
+                <div
+                  style={{
+                    //backgroundColor: "lavender",
+                    height: "89.5%",
+                    width: "99%",
+                    borderRadius: "0px 0px 10px 10px",
+                    overflowX: "scroll",
+                  }}
+                >
+                  {/** labels */}
+                  <div
+                    style={{
+                      backgroundColor: "white",
+                      //padding: "5px 15px",
+                      fontWeight: "500",
+                      fontSize: "16px",
+                      height: "5vh",
+                      width: "95%",
+                      margin: "auto",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      color: "#636E72",
+                      //borderBottom: "1px solid #A9A9A9",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      marginTop: "5px",
+                      position: "sticky",
+                      top: 0,
+                    }}
+                  >
+                    <p
+                      style={{
+                        //backgroundColor: "tomato",
+                        flex: 2,
+                        paddingLeft: "15px",
+                      }}
+                    >
+                      Employee Name
+                    </p>
+                    <p
+                      style={{
+                        //backgroundColor: "lightgreen",
+                        flex: 2,
+                        paddingLeft: "15px",
+                      }}
+                    >
+                      Department
+                    </p>
+                    <p
+                      style={{
+                        //backgroundColor: "lightcoral",
+                        flex: 2,
+                        paddingLeft: "15px",
+                      }}
+                    >
+                      Position
+                    </p>
+                  </div>
+                  {/** users data */}
+                  <div
+                    style={{
+                      //backgroundColor: "#FFAD60",
+                      //padding: "5px 15px",
+                      fontWeight: "500",
+
+                      height: "5vh",
+                      width: "95%",
+                      margin: "auto",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      color: "#636E72",
+                      borderBottom: "1px solid #A9A9A9",
+                      fontSize: "14px",
+                    }}
+                  >
+                    <p
+                      style={{
+                        //backgroundColor: "tomato",
+                        flex: 2,
+                        paddingLeft: "15px",
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        icon={faUser}
+                        style={{ fontSize: "13px", marginRight: "10px" }}
+                      />
+                      John Doe
+                    </p>
+                    <p
+                      style={{
+                        //backgroundColor: "lightgreen",
+                        flex: 2,
+                        paddingLeft: "15px",
+                      }}
+                    >
+                      MIS
+                    </p>
+                    <p
+                      style={{
+                        //backgroundColor: "lightcoral",
+                        flex: 2,
+                        paddingLeft: "15px",
+                      }}
+                    >
+                      Programmer
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div
+                style={{
+                  height: "100%",
+                  width: "49%",
+                  backgroundColor: "white",
+                  borderRadius: "10px",
+                  boxShadow:
+                    "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
+                }}
+              >
+                <h2
+                  style={{
+                    backgroundColor: "#636E72",
+                    borderRadius: "10px 10px 0px 0px",
+                    padding: "5px 15px",
+                    fontWeight: "500",
+                    fontSize: "16px",
+                    height: "4.5vh",
+                    color: "white",
+                  }}
+                >
+                  5th Month Probationary Employee for This Month
+                </h2>
+                <div
+                  style={{
+                    //backgroundColor: "lavender",
+                    height: "89.5%",
+                    width: "99%",
+                    borderRadius: "0px 0px 10px 10px",
+                    overflowX: "scroll",
+                  }}
+                >
+                  {/** labels */}
+                  <div
+                    style={{
+                      backgroundColor: "white",
+                      //padding: "5px 15px",
+                      fontWeight: "500",
+                      fontSize: "16px",
+                      height: "5vh",
+                      width: "95%",
+                      margin: "auto",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      color: "#636E72",
+                      //borderBottom: "1px solid #A9A9A9",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      marginTop: "5px",
+                      position: "sticky",
+                      top: 0,
+                    }}
+                  >
+                    <p
+                      style={{
+                        //backgroundColor: "tomato",
+                        flex: 2,
+                        paddingLeft: "15px",
+                      }}
+                    >
+                      Employee Name
+                    </p>
+                    <p
+                      style={{
+                        //backgroundColor: "lightgreen",
+                        flex: 2,
+                        paddingLeft: "15px",
+                      }}
+                    >
+                      Department
+                    </p>
+                    <p
+                      style={{
+                        //backgroundColor: "lightcoral",
+                        flex: 2,
+                        paddingLeft: "15px",
+                      }}
+                    >
+                      Position
+                    </p>
+                  </div>
+                  {/** users data */}
+                  <div
+                    style={{
+                      //backgroundColor: "#FFAD60",
+                      //padding: "5px 15px",
+                      fontWeight: "500",
+
+                      height: "5vh",
+                      width: "95%",
+                      margin: "auto",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      color: "#636E72",
+                      borderBottom: "1px solid #A9A9A9",
+                      fontSize: "14px",
+                    }}
+                  >
+                    <p
+                      style={{
+                        //backgroundColor: "tomato",
+                        flex: 2,
+                        paddingLeft: "15px",
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        icon={faUser}
+                        style={{ fontSize: "13px", marginRight: "10px" }}
+                      />
+                      John Doe
+                    </p>
+                    <p
+                      style={{
+                        //backgroundColor: "lightgreen",
+                        flex: 2,
+                        paddingLeft: "15px",
+                      }}
+                    >
+                      MIS
+                    </p>
+                    <p
+                      style={{
+                        //backgroundColor: "lightcoral",
+                        flex: 2,
+                        paddingLeft: "15px",
+                      }}
+                    >
+                      Programmer
+                    </p>
+                  </div>
+                </div>
+              </div>
+              {/* <div
+              style={{
+                height: "100%",
+                width: "49%",
+                backgroundColor: "white",
+                borderRadius: "10px",
+                boxShadow:
+                  "0px 1px 3px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12)",
+              }}
+            >
+              <h2
+                style={{
+                  backgroundColor: "#FFEEAD",
+                  borderRadius: "10px 10px 0px 0px",
+                  padding: "5px 15px",
+                  fontWeight: "500",
+                  fontSize: "16px",
+                }}
+              >
+                5th-Month Probationary Employee for This Month
+              </h2>
+            </div> */}
+              <SchoolYearModal
+                openModal={openSYModal}
+                handleCloseModal={handleCloseSYModal}
+                isOpenView={isOpenView}
+                handleOpenView={handleOpenView}
+                handleCloseView={handleCloseView}
+                openAddSY={openAddSY}
+                setOpenAddSY={setOpenAddSY}
+                handleOpenAddSY={handleOpenAddSY}
+                handleCloseAddSY={handleCloseAddSY}
+                openEditView={openEditView}
+                handleOpenEditView={handleOpenEditView}
+                handleCloseEditView={handleCloseEditView}
+              />
+            </div>
+          </div>
+        </div>
       )}
-    </Container>
+    </div>
   );
 }
 
