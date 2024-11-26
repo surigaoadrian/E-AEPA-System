@@ -3,13 +3,14 @@
 // SI DATEHIRED D MO DISPLAY
 import React, { useState, useEffect, useMemo } from "react";
 import Paper from "@mui/material/Paper";
-import { Box, Button, Grid, Typography, TableContainer, Table, TableBody, TableCell, TableHead, TableRow, TablePagination, Skeleton, Card, TextField, InputAdornment,  Stack, Tabs, Tab } from "@mui/material";
+import { Box, Button, Grid, Typography, TableContainer, Table, TableBody, TableCell, TableHead, TableRow, TablePagination, Skeleton, Card, TextField, InputAdornment, Stack, Tabs, Tab } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faSearch } from "@fortawesome/free-solid-svg-icons";
 import Animated from "../components/motion";
 import ViewResults from "../modals/ViewResults";
 import PasswordConfirmationModal from "../modals/PasswordConfirmation";
 import { apiUrl } from "../config/config";
+import "../styles/Loader.css";
 
 function HeadEvalResult() {
   const userID = sessionStorage.getItem("userID");
@@ -18,14 +19,14 @@ function HeadEvalResult() {
   const [showViewRatingsModal, setViewRatingsModal] = useState(false);
   const [employee, setEmployee] = useState({});
   const [loggedUserData, setLoggedUserData] = useState({});
-  const [showPasswordModal, setShowPasswordModal] = useState(true);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9; // Adjust this based on your needs
   const pagesPerGroup = 5;
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
-
+  const [isLoading, setIsLoading] = useState(false);
   const totalPages = Math.ceil(rows.length / itemsPerPage);
 
   const startPageGroup =
@@ -84,6 +85,7 @@ function HeadEvalResult() {
 
 
   const fetchData = async () => {
+    setIsLoading(true);
     try {
       const userResponse = await fetch(`${apiUrl}user/getUser/${userID}`);
       if (!userResponse.ok) {
@@ -91,14 +93,14 @@ function HeadEvalResult() {
       }
       const userData = await userResponse.json();
       setLoggedUserData(userData);
-  
+
       const allUsersResponse = await fetch(`${apiUrl}evaluation/evaluations`);
       if (!allUsersResponse.ok) {
         throw new Error("Failed to fetch all users data");
       }
       const allUsersData = await allUsersResponse.json();
       console.log(allUsersData);
-      
+
       // Filter processed data based on selected tab
       const processedData = allUsersData
         .filter(
@@ -110,8 +112,8 @@ function HeadEvalResult() {
           userID: item.userID,
           dateHired: item.dateHired,
         }))
-        .filter(item => selectedTab === 0 ? (item.empStatus === 'Probationary' && item.is3rdEvalComplete || item.is5thEvalComplete) : (item.empStatus === 'Regular' && item.sentResult ) ); // Filter based on selected tab
-      
+        .filter(item => selectedTab === 0 ? (item.empStatus === 'Probationary' && item.is3rdEvalComplete || item.is5thEvalComplete) : (item.empStatus === 'Regular' && item.sentResult)); // Filter based on selected tab
+
       // Apply search filter
       const searchFilteredData = processedData.filter((item) =>
         Object.values(item).some(
@@ -120,23 +122,33 @@ function HeadEvalResult() {
             value.toString().toLowerCase().includes(searchTerm.toLowerCase())
         )
       );
-      
+
       setRows(searchFilteredData);
-  
+
     } catch (error) {
       console.error("Error fetching data:", error);
+        } finally {
+      const timer = setTimeout(() => {
+        setIsLoading(false); // Stop loading after data fetching
+      }, 1000);
     }
-  };
 
+  };
+  // Fetch data on change of dependencies
   useEffect(() => {
     fetchData();
-  }, [userID, updateFetch, searchTerm,selectedTab]);
+  }, [userID, selectedTab, searchTerm]);
 
+  // Only show password modal once on login
   useEffect(() => {
-    if (!showPasswordModal) {
-      fetchData();
+    const hasShownModal = sessionStorage.getItem('showPassModal');
+
+    if (!hasShownModal) {
+      setShowPasswordModal(true);
+      // sessionStorage.setItem('showPassModal', 'true'); // Mark modal as shown
     }
-  }, [showPasswordModal, updateFetch, userID]);
+  }, []); // Empty dependency array ensures this effect runs only on component mount
+
 
   const handleViewResultClick = async (userId) => {
     setLoading(true);
@@ -198,11 +210,11 @@ function HeadEvalResult() {
       id: "is3rdEvalComplete",
       label: "3rd Mon Result Status",
       align: "center",
-      minWidth: 150,
+      minWidth: 120,
       format: (value) => {
         if (!value) {
           return <span style={{ color: 'orange', fontWeight: 'bold' }}>Unavailable</span>;
-        } else  {
+        } else {
           return <span style={{ color: 'green', fontWeight: "bold" }}>Available</span>;
         }
       },
@@ -215,7 +227,7 @@ function HeadEvalResult() {
       format: (value) => {
         if (!value) {
           return <span style={{ color: 'orange', fontWeight: 'bold' }}>Unavailable</span>;
-        } else  {
+        } else {
           return <span style={{ color: 'green', fontWeight: "bold" }}>Available</span>;
         }
       },
@@ -227,7 +239,7 @@ function HeadEvalResult() {
       id: "workID",
       label: "ID No.",
       align: "center",
-      minWidth: 50,
+      minWidth: 54,
     },
     {
       id: "name",
@@ -260,7 +272,7 @@ function HeadEvalResult() {
       format: (value) => {
         if (value === "Annual-1st") {
           return <span style={{ color: 'green', fontWeight: 'bold' }}>Available</span>;
-        } else  {
+        } else {
           return <span style={{ color: 'orange', fontWeight: "bold" }}>Unavailable</span>;
         }
       },
@@ -273,7 +285,7 @@ function HeadEvalResult() {
       format: (value) => {
         if (value === "Annual-2nd") {
           return <span style={{ color: 'green', fontWeight: 'bold' }}>Available</span>;
-        } else  {
+        } else {
           return <span style={{ color: 'orange', fontWeight: "bold" }}>Unavailable</span>;
         }
       },
@@ -329,14 +341,14 @@ function HeadEvalResult() {
                       backgroundColor: "#ffffff", // Set the background color for the entire input area
                     },
                     "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
-                      {
-                        borderWidth: "1px",
-                        borderColor: "#e0e0e0",
-                      },
+                    {
+                      borderWidth: "1px",
+                      borderColor: "#e0e0e0",
+                    },
                     "&:hover .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
-                      {
-                        borderColor: "#e0e0e0",
-                      },
+                    {
+                      borderColor: "#e0e0e0",
+                    },
                     "&:focus-within": {
                       "& fieldset": {
                         borderColor: "#8C383E !important",
@@ -366,25 +378,25 @@ function HeadEvalResult() {
           </div>
         )}
 
-            {showPasswordModal ? (
-                <Skeleton variant="rectangular" width='80em' height={500} sx={{marginLeft: 6, marginTop:3}}  />
-            ) : (
-              <>
-        <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml:0.4,mt: 4, width: "100%", } }}>
-          <Grid container
-            spacing={1.5}
-            sx={{
-              display: "flex",
-              justifyContent: "flex-end",
-              alignItems: "center",
-            }}
-          >
-            {/* <Card variant="outlined" sx={{ borderRadius: "5px", width: "100%", height: "27.1em", backgroundColor: "transparent"}}> */}
+        {showPasswordModal ? (
+          <Skeleton variant="rectangular" width='80em' height={500} sx={{ marginLeft: 6, marginTop: 3 }} />
+        ) : (
+          <>
+            <Box sx={{ display: "flex", flexWrap: "wrap", "& > :not(style)": { ml: 0.4, mt: 4, width: "100%", } }}>
+              <Grid container
+                spacing={1.5}
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  alignItems: "center",
+                }}
+              >
+                {/* <Card variant="outlined" sx={{ borderRadius: "5px", width: "100%", height: "27.1em", backgroundColor: "transparent"}}> */}
 
                 <Grid
                   item
                   xs={12}
-                  sx={{ height: "2.8em", display: "flex", mt: "-2.5em", mb: "1em",ml:3 }}
+                  sx={{ height: "2.8em", display: "flex", mt: "-2.5em", mb: "1em", ml: 3 }}
                 >
                   <Tabs
                     value={selectedTab}
@@ -395,23 +407,39 @@ function HeadEvalResult() {
                     <Tab label={`Regular Employees`} sx={tabStyle} />
                   </Tabs>
                 </Grid>
-                <TableContainer sx={{ height: '28em', borderRadius: "5px 5px 0 0 ", maxHeight: "100%", border: '1px solid lightgray' , width: "95%", margin: "auto"}}>
+                <TableContainer sx={{ height: '28em', borderRadius: "5px 5px 0 0 ", maxHeight: "100%", border: '1px solid lightgray', width: "95%", margin: "auto" }}>
                   <Table stickyHeader aria-label="sticky table" size="small">
                     <TableHead sx={{ height: "2em" }}>
                       <TableRow>
-                        {(selectedTab === 0 ? columnsProbe: columnsRegular ).map((column) => (
-                       <TableCell
-                       sx={{ fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: "bold", maxWidth: "2em" }}
-                       key={column.id}
-                       align={column.align}
-                       style={{ minWidth: column.minWidth }}
-                     >
-                       {column.label}
-                     </TableCell>
+                        {(selectedTab === 0 ? columnsProbe : columnsRegular).map((column) => (
+                          <TableCell
+                            sx={{ fontFamily: "Poppins", bgcolor: "#8c383e", color: "white", fontWeight: "bold", maxWidth: "2em" }}
+                            key={column.id}
+                            align={column.align}
+                            style={{ minWidth: column.minWidth }}
+                          >
+                            {column.label}
+                          </TableCell>
                         ))}
                       </TableRow>
                     </TableHead>
-                    {hasData ? (
+                    {isLoading ? ( // Show loading indicator if loading
+                    <TableBody>
+                      <TableRow>
+                        <TableCell
+                          colSpan={columnsProbe.length || columnsRegular.length}
+                          align="center"
+                        >
+                          <div
+                            className="loader-container"
+                            style={{ height: '28em'}} 
+                          >
+                            <div className="loader"></div>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  ) : hasData ? (
                       <TableBody>
                         {paginatedRows.map((row) => (
                           <TableRow
@@ -419,7 +447,7 @@ function HeadEvalResult() {
                             key={row.id}
                             onClick={() => handleViewResultClick(row.userId)}
                           >
-                            {(selectedTab === 0 ? columnsProbe: columnsRegular ).map((column) => (
+                            {(selectedTab === 0 ? columnsProbe : columnsRegular).map((column) => (
                               <TableCell sx={{ fontFamily: "Poppins" }} key={`${row.id}-${column.id}`} align={column.align}>
                                 {column.id === "name" ? row.name : column.format ? column.format(row[column.id]) : row[column.id]}
                               </TableCell>
@@ -430,7 +458,7 @@ function HeadEvalResult() {
                     ) : (
                       <TableBody>
                         <TableRow>
-                          <TableCell sx={{ height: '32.3em', borderRadius: '5px 5px 0 0' }} colSpan={columnsProbe.length || columnsRegular.length} align="center">
+                          <TableCell sx={{ height: '29em', borderRadius: '5px 5px 0 0' }} colSpan={columnsProbe.length || columnsRegular.length} align="center">
                             <Typography
                               sx={{
                                 textAlign: "center",
@@ -449,18 +477,18 @@ function HeadEvalResult() {
                     )}
                   </Table>
                 </TableContainer>
-              
-            {/* </Card> */}
-          </Grid>
 
-            <ViewResults
-              open={showViewRatingsModal}
-              onClose={() => setViewRatingsModal(false)}
-              employee={employee}
-            />
-        </Box>
-        </>
-            )}
+                {/* </Card> */}
+              </Grid>
+
+              <ViewResults
+                open={showViewRatingsModal}
+                onClose={() => setViewRatingsModal(false)}
+                employee={employee}
+              />
+            </Box>
+          </>
+        )}
         {/* pagination */}
         {showPasswordModal ? (
           <Skeleton variant="rectangular" width="100%" height="100%" />
@@ -506,11 +534,10 @@ function HeadEvalResult() {
                   <li key={startPageGroup + index}>
                     <a
                       href="#"
-                      className={`block h-8 w-8 rounded border ${
-                        currentPage === startPageGroup + index
+                      className={`block h-8 w-8 rounded border ${currentPage === startPageGroup + index
                           ? "border-pink-900 bg-pink-900 text-white"
                           : "border-gray-100 bg-white text-gray-900"
-                      } text-center leading-8`}
+                        } text-center leading-8`}
                       onClick={() => handlePageChange(startPageGroup + index)}
                     >
                       {startPageGroup + index}

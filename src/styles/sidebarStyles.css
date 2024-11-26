@@ -61,5 +61,14 @@
   color: white;
   background-color: #8c383e;
 }
+.nav-title {
+  color: #000; /* Black text */
+  cursor: default; /* Non-clickable cursor */
+  padding: 5px 0 5px 29px; /* Indent to match other items */
+}
+.nav-title:hover {
+  color: #000; /* Prevent hover effect */
+}
+
 
 

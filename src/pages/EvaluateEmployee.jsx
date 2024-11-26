@@ -39,7 +39,7 @@ import EvaluationForm from "../components/EvaluationForm";
 import CheckIcon from "@mui/icons-material/Check";
 import { set } from "date-fns";
 import { apiUrl } from "../config/config";
-import Loader from "../components/Loader";
+import "../styles/Loader.css";
 
 function EvaluateEmployee() {
   const userID = sessionStorage.getItem("userID");
@@ -245,11 +245,11 @@ function EvaluateEmployee() {
         ? semester === "First Semester"
           ? "Annual-1st"
           : semester === "Second Semester"
-          ? "Annual-2nd"
-          : "Invalid Semester"
+            ? "Annual-2nd"
+            : "Invalid Semester"
         : selectedUser.probeStatus === "3rd Probationary"
-        ? "3rd Month"
-        : "5th Month";
+          ? "3rd Month"
+          : "5th Month";
 
     handleCompleteStatus(userID, selectedUser.userID, period, "VALUES", "HEAD");
     handleCompleteStatus(userID, selectedUser.userID, period, "JOB", "HEAD");
@@ -309,7 +309,7 @@ function EvaluateEmployee() {
           params: {
             userID: userID,
             empID: empID,
-            period: selectedEmpPeriod,
+            period: period,
             stage: stage,
             evalType: evalType,
           },
@@ -710,14 +710,14 @@ function EvaluateEmployee() {
                       backgroundColor: "#ffffff",
                     },
                     "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
-                      {
-                        borderWidth: "1px",
-                        borderColor: "#e0e0e0",
-                      },
+                    {
+                      borderWidth: "1px",
+                      borderColor: "#e0e0e0",
+                    },
                     "&:hover .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
-                      {
-                        borderColor: "#e0e0e0",
-                      },
+                    {
+                      borderColor: "#e0e0e0",
+                    },
                     "&:focus-within": {
                       "& fieldset": {
                         borderColor: "#8C383E !important",
@@ -821,7 +821,12 @@ function EvaluateEmployee() {
                           colSpan={columnsEmployees.length}
                           align="center"
                         >
-                          <Loader />
+                          <div
+                            className="loader-container"
+                            style={{ height: '30.53em' }} 
+                          >
+                            <div className="loader"></div>
+                          </div>
                         </TableCell>
                       </TableRow>
                     </TableBody>
@@ -849,12 +854,12 @@ function EvaluateEmployee() {
                               {column.id === "name"
                                 ? row.name
                                 : column.id === "actions"
-                                ? column.format
-                                  ? column.format(row[column.id], row)
-                                  : null
-                                : column.format
-                                ? column.format(row[column.id])
-                                : row[column.id]}
+                                  ? column.format
+                                    ? column.format(row[column.id], row)
+                                    : null
+                                  : column.format
+                                    ? column.format(row[column.id])
+                                    : row[column.id]}
                             </TableCell>
                           ))}
                         </TableRow>
@@ -932,11 +937,10 @@ function EvaluateEmployee() {
                   <li key={startPageGroup + index}>
                     <a
                       href="#"
-                      className={`block h-8 w-8 rounded border ${
-                        currentPage === startPageGroup + index
+                      className={`block h-8 w-8 rounded border ${currentPage === startPageGroup + index
                           ? "border-pink-900 bg-pink-900 text-white"
                           : "border-gray-100 bg-white text-gray-900"
-                      } text-center leading-8`}
+                        } text-center leading-8`}
                       onClick={() => handlePageChange(startPageGroup + index)}
                     >
                       {startPageGroup + index}
