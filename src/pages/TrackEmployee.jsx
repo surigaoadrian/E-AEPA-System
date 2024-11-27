@@ -32,6 +32,8 @@ import PasswordConfirmationModal from "../modals/PasswordConfirmation";
 import { apiUrl } from "../config/config";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import CheckIcon from "@mui/icons-material/Check";
+import "../styles/Loader.css";
+
 function TrackEmployee() {
   const userID = sessionStorage.getItem("userID");
   const [rows, setRows] = useState([]);
@@ -47,7 +49,7 @@ function TrackEmployee() {
   const [filterAnchorEl, setFilterAnchorEl] = useState(null);
   const [probeStatusFilter, setProbeStatusFilter] = useState("");
   const totalPages = Math.ceil(rows.length / itemsPerPage);
-
+  const [isLoading, setIsLoading] = useState(false);
   const startPageGroup =
     Math.floor((currentPage - 1) / pagesPerGroup) * pagesPerGroup + 1;
   const endPageGroup = Math.min(startPageGroup + pagesPerGroup - 1, totalPages);
@@ -86,7 +88,9 @@ function TrackEmployee() {
 
     return yearsDiff * 12 + monthsDiff; // Total months difference
   };
+
   const fetchData = async () => {
+    setIsLoading(true);
     try {
       // Fetch user data
       const userResponse = await fetch(`${apiUrl}user/getUser/${userID}`);
@@ -183,10 +187,16 @@ function TrackEmployee() {
       setRows(searchFilteredData);
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      const timer = setTimeout(() => {
+        setIsLoading(false); // Stop loading after data fetching
+      }, 1000);
     }
+    
   };
 
   useEffect(() => {
+     // Start loading
     fetchData();
   }, [userID, updateFetch, searchTerm, probeStatusFilter]);
 
@@ -213,12 +223,12 @@ function TrackEmployee() {
       id: "workID",
       label: "ID No.",
       align: "center",
-      minWidth: 70,
+      minWidth: 80,
     },
     {
       id: "name",
       label: "Name",
-      minWidth: 150,
+      minWidth: 190,
       align: "center",
       format: (value) => formatName(value),
     },
@@ -413,19 +423,7 @@ function TrackEmployee() {
 
   return (
     <div>
-      <PasswordConfirmationModal
-        open={showPasswordModal}
-        onClose={() => setShowPasswordModal(false)}
-        onConfirm={() => setShowPasswordModal(false)}
-        loggedUserData={loggedUserData}
-      />
       <Animated>
-        {showPasswordModal ? (
-          <Skeleton
-            variant="text"
-            sx={{ fontSize: "3em", width: "8em", ml: "1em", mt: ".3em" }}
-          ></Skeleton>
-        ) : (
           <Typography
             ml={4}
             mt={3}
@@ -437,13 +435,6 @@ function TrackEmployee() {
           >
             Track Employees Evaluation
           </Typography>
-        )}
-        {showPasswordModal ? (
-          <Skeleton
-            variant="text"
-            sx={{ fontSize: "3em", width: "6em", ml: "1em" }}
-          ></Skeleton>
-        ) : (
           <div className="ml-4 mt-2">
             <div className="mr-10  flex items-center justify-between">
               <div className="ml-4 flex items-center justify-start">
@@ -491,7 +482,6 @@ function TrackEmployee() {
               </div>
             </div>
           </div>
-        )}
 
         <Box
           sx={{
@@ -510,14 +500,6 @@ function TrackEmployee() {
               alignItems: "center",
             }}
           >
-            {/* <Card variant="outlined" sx={{ borderRadius: "5px", width: "100%", height: "27.1em", backgroundColor: "transparent"}}> */}
-            {showPasswordModal ? (
-              <Skeleton
-                variant="rectangular"
-                width="100%"
-                height="100%"
-              ></Skeleton>
-            ) : (
               <TableContainer
                 sx={{
                   height: "30em",
@@ -548,7 +530,23 @@ function TrackEmployee() {
                       ))}
                     </TableRow>
                   </TableHead>
-                  {hasData ? (
+                  {isLoading ? ( // Show loading indicator if loading
+                    <TableBody>
+                      <TableRow>
+                        <TableCell
+                          colSpan={columnsEmployees.length}
+                          align="center"
+                        >
+                          <div
+                            className="loader-container"
+                            style={{ height: '30em'}} 
+                          >
+                            <div className="loader"></div>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  ) : hasData ? (
                     <TableBody>
                       {paginatedRows.map((row) => (
                         <TableRow
@@ -612,7 +610,6 @@ function TrackEmployee() {
                   )}
                 </Table>
               </TableContainer>
-            )}
             {/* </Card> */}
           </Grid>
           <ViewResults
@@ -621,10 +618,6 @@ function TrackEmployee() {
             employee={employee}
           />
         </Box>
-        {/* pagination */}
-        {showPasswordModal ? (
-          <Skeleton variant="rectangular" width="100%" height="100%" />
-        ) : (
           <div
             className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-4"
             style={{
@@ -702,7 +695,6 @@ function TrackEmployee() {
               </li>
             </ol>
           </div>
-        )}
       </Animated>
     </div>
   );

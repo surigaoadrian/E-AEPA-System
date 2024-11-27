@@ -108,6 +108,7 @@ function NavBar() {
     localStorage.removeItem("token");
     sessionStorage.removeItem("userRole");
     sessionStorage.removeItem("userID");
+    sessionStorage.removeItem("showPassModal");
     navigate("/login");
   };
 

@@ -91,7 +91,7 @@ export const SideBarData = [
     title: "Evaluation Overview",
     role: ["HEAD"],
     icon: <FontAwesomeIcon icon={faUserTie} style={{ fontSize: "15px" }} />,
-    isDropdown: true, // Indicates this is a dropdown
+    // isDropdown: true, // Indicates this is a dropdown
     subItems: [
       {
         icon: <FontAwesomeIcon icon={faUserCheck} style={{ fontSize: "15px" }} />,
