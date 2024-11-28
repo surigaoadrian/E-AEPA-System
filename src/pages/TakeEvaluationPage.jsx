@@ -1613,6 +1613,51 @@ function TakeEvaluationPage() {
                   />
                 )}
 
+              {today >= evaluationStartDate5th &&
+                loggedUser.empStatus !== "Regular" &&
+                loggedUser.probeStatus !== "3rd Probationary" &&
+                shouldDisplay5th && (
+                  <EvaluationCard
+                    id={"5thMonth"}
+                    period={"5th Month"}
+                    dateHired={dateHired}
+                    evalDate={formattedDate}
+                    loggedUser={loggedUser}
+                    evalType={evalType}
+                    handleOpenForm={handleOpenForm}
+                    handleEvalTypeChange={handleEvalTypeChange}
+                    setEvalType={setEvalType}
+                    handleOpenModal={handleOpenModal}
+                    openModal={openModal}
+                    handleCloseModal={handleCloseModal}
+                    handleConfirm={handleConfirm}
+                    activeCard={activeCard}
+                    setActiveCard={setActiveCard}
+                    handleTakeEvalChange={handleTakeEvalChange}
+                    takeEval={takeEval}
+                    setTakeEval={setTakeEval}
+                    style={{ zIndex: 1 }}
+                  />
+                )}
+
+              {evaluateesDetails && evaluateesDetails.length > 0
+                ? evaluateesDetails.map((evalDeets) => {
+                    return (
+                      <PeerEvaluationCard
+                        key={evalDeets.id}
+                        id={evalDeets.id}
+                        evalDeets={evalDeets}
+                        setEvalType={setEvalType}
+                        handleOpenModal={handleOpenModal}
+                        openModal={openModal}
+                        handleCloseModal={handleCloseModal}
+                        handleConfirm={handleConfirm}
+                        setSelectedAssignedPeerId={setSelectedAssignedPeerId}
+                      />
+                    );
+                  })
+                : null}
+
               {shouldDisplayAnnual1st && (
                 <EvaluationCard
                   id={"Annual-1st"}
@@ -1636,6 +1681,26 @@ function TakeEvaluationPage() {
                   style={{ zIndex: 1 }}
                 />
               )}
+
+              <div
+                style={{
+                  height: "75px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  position: "absolute",
+                  top: "50px",
+                  left: "35%",
+                  zIndex: 0,
+                  color: "#a8a7a9",
+                }}
+              >
+                <FontAwesomeIcon
+                  icon={faGears}
+                  style={{ fontSize: "30px", color: "#a8a7a9" }}
+                />
+                <p>There are no evaluations as of the moment.</p>
+              </div>
             </div>
           )}
         </CustomTabPanel>
