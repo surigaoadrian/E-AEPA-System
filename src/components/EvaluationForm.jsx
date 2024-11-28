@@ -12,6 +12,8 @@ import ReactRouterPrompt from "react-router-prompt";
 import LeaveConfirmationModal from "../modals/LeaveConfirmationModal";
 import { apiUrl } from "../config/config";
 import Loader from "./Loader";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faMinus } from "@fortawesome/free-solid-svg-icons";
 
 function EvaluationForm({
   stage,
@@ -27,6 +29,8 @@ function EvaluationForm({
   annualFirstSemId,
   annualSecondSemId,
   setTakeEval,
+  schoolYear,
+  semester,
 }) {
   const [questions, setQuestions] = useState([]);
   const [responses, setResponses] = useState([]);
@@ -40,6 +44,8 @@ function EvaluationForm({
   const [headScores, setHeadScores] = useState({});
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  const [indices, setIndices] = useState([1, 2, 3, 4, 5]);
 
   const stageType = stage;
   const evalPeriod = period;
@@ -113,6 +119,22 @@ function EvaluationForm({
     "Occasionally exceeds expectations.",
     "Consistently exceeds expectations.",
   ];
+
+  const handleAddMoreJobResp = () => {
+    if (indices.length < 15) {
+      setIndices((prev) => [...prev, prev.length + 1]);
+    } else {
+      alert("Maximum of 15 responsibilities reached");
+    }
+  };
+
+  const handleMinusJobResp = () => {
+    if (indices.length > 5) {
+      setIndices((prev) => prev.slice(0, -1));
+    } else {
+      alert("Minimum of 5 textareas required");
+    }
+  };
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -556,6 +578,27 @@ function EvaluationForm({
     openModal();
   };
 
+  const formatDate = (date) => {
+    return new Intl.DateTimeFormat("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    }).format(date);
+  };
+
+  // Example usage:
+  const currentDate = formatDate(new Date());
+
+  const evalTypeResult =
+    evalType === "SELF" ? "Self Evaluation" : "Peer Evaluation";
+  const stageResult = stageType === "VALUES" ? "Values-based" : "Job-based";
+  const periodResult =
+    period === "3rd Month"
+      ? "3rd Month Probation"
+      : period === "5th Month"
+      ? "5th Month Probation"
+      : "Annual Evaluation";
+
   //submit
   const handleConfirmSubmit = async () => {
     closeModal();
@@ -750,6 +793,31 @@ function EvaluationForm({
       // Ensure response is not null before accessing its data
       if (response && response.data) {
         console.log("Responses submitted successfully:", response.data);
+
+        const evalLogsPayLoad = {
+          user: { userID: loggedUser.userID },
+          evalType: evalTypeResult,
+          stage: stageResult,
+          period: periodResult,
+          dateTaken: currentDate,
+          schoolYear: schoolYear,
+          semester: semester,
+        };
+
+        try {
+          const evalLogsResponse = await axios.post(
+            `${apiUrl}evaluationLogs/createEvalLogs`,
+            evalLogsPayLoad,
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+        } catch (error) {
+          console.error("Error creating evaluation logs:", error);
+        }
+
         localStorage.removeItem("responses");
         localStorage.removeItem("jobResponses");
         setResponses([]);
@@ -1295,7 +1363,8 @@ function EvaluationForm({
                 )
               ) : (
                 /** Job-based Questions for other evalTypes */
-                [1, 2, 3, 4, 5].map((i) => (
+
+                indices.map((i) => (
                   <div key={i}>
                     <label htmlFor={i}>{i}.</label>
                     <div
@@ -1375,6 +1444,83 @@ function EvaluationForm({
                 ))
               )}
             </>
+          )}
+
+          {stageType === "JOB" && evalType !== "HEAD" && (
+            <div
+              style={{
+                //backgroundColor: "tomato",
+                height: "5vh",
+                width: "100%",
+                marginBottom: "20px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <div
+                style={{
+                  width: "12%",
+                  display: "flex",
+                  justifyContent:
+                    indices.length > 5 && indices.length < 15
+                      ? "space-between"
+                      : "center",
+                }}
+              >
+                {indices.length == 15 ? null : (
+                  <Button
+                    sx={{
+                      width: "5%",
+                      height: "30px",
+                      fontFamily: "poppins",
+                      color: "#8C383E",
+                      border: "2px solid #8C383E",
+                      "&:hover": {
+                        backgroundColor: "#ffebee",
+                        color: "#7C2828",
+                        border: "2px solid #7C2828",
+                      },
+                    }}
+                    variant="outlined"
+                    onClick={handleAddMoreJobResp}
+                  >
+                    <FontAwesomeIcon
+                      icon={faPlus}
+                      style={{
+                        fontSize: "15px",
+                      }}
+                    />
+                  </Button>
+                )}
+
+                {indices.length > 5 ? (
+                  <Button
+                    sx={{
+                      width: "5%",
+                      height: "30px",
+                      fontFamily: "poppins",
+                      color: "#8C383E",
+                      border: "2px solid #8C383E",
+                      "&:hover": {
+                        backgroundColor: "#ffebee",
+                        color: "#7C2828",
+                        border: "2px solid #7C2828",
+                      },
+                    }}
+                    variant="outlined"
+                    onClick={handleMinusJobResp}
+                  >
+                    <FontAwesomeIcon
+                      icon={faMinus}
+                      style={{
+                        fontSize: "15px",
+                      }}
+                    />
+                  </Button>
+                ) : null}
+              </div>
+            </div>
           )}
 
           {/* <div

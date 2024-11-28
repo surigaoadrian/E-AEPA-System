@@ -15,7 +15,7 @@ import com.capstone.eapa.Service.ActivityLogService;
 
 @RestController
 @RequestMapping("/activityLog")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "*")
 public class ActivityLogController {
         @Autowired
     private ActivityLogService activityLogService;

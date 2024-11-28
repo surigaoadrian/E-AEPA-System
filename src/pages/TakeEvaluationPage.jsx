@@ -8,6 +8,109 @@ import PeerEvaluationCard from "../components/PeerEvaluationCard";
 import { apiUrl } from "../config/config";
 import Loader from "../components/Loader";
 import { format } from "date-fns";
+import PropTypes from "prop-types";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import { styled } from "@mui/material/styles";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell, { tableCellClasses } from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: "#8C383E",
+    color: "white",
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&:nth-of-type(odd)": {
+    backgroundColor: theme.palette.action.hover,
+  },
+  // hide last border
+  "&:last-child td, &:last-child th": {
+    border: 0,
+  },
+}));
+
+function createData(period, evalType, stage, dateTaken, schoolYear, semester) {
+  return { period, evalType, stage, dateTaken, schoolYear, semester };
+}
+
+// const rows = [
+//   createData(
+//     "5th Month Probation",
+//     "Self Evaluation",
+//     "Values-based",
+//     "November 27, 2024",
+//     "2024-2025",
+//     "First Semester"
+//   ),
+//   createData(
+//     "5th Month Probation",
+//     "Self Evaluation",
+//     "Values-based",
+//     "November 27, 2024",
+//     "2024-2025",
+//     "First Semester"
+//   ),
+//   createData(
+//     "5th Month Probation",
+//     "Self Evaluation",
+//     "Values-based",
+//     "November 27, 2024",
+//     "2024-2025",
+//     "First Semester"
+//   ),
+// ];
+
+function CustomTabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <div
+          style={{
+            padding: "0px 15px 0px 0px",
+            //backgroundColor: "lightgreen",
+            height: "75vh",
+            width: "100%",
+            overflow: "auto",
+          }}
+        >
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
+CustomTabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
+};
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
+  };
+}
 
 function TakeEvaluationPage() {
   const [loading, setLoading] = useState(true);
@@ -33,6 +136,13 @@ function TakeEvaluationPage() {
   const insertionExecuted5th = useRef(false);
   const insertionExecuted1stSem = useRef(false);
   const insertionExecutedEvalStatusTracker = useRef(false);
+
+  const [tabValue, setTabValue] = useState(0);
+  const [rows, setRows] = useState([]);
+
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
 
   const [renderFlag, setRenderFlag] = useState(false);
 
@@ -113,6 +223,28 @@ function TakeEvaluationPage() {
     };
     fetchUser();
   }, []);
+
+  //fetch eval logs
+  useEffect(() => {
+    const fetchEvalLogs = async () => {
+      try {
+        const response = await axios.get(
+          `${apiUrl}evaluationLogs/getEvalLogsByUserId`,
+          {
+            params: { userID: loggedUser.userID },
+          }
+        );
+        setRows(response.data);
+        console.log("fetched evaluation logs:", response.data);
+      } catch (error) {
+        console.error("Error fetching evaluation logs:", error);
+      }
+    };
+
+    if (loggedUser.userID) {
+      fetchEvalLogs();
+    }
+  }, [loggedUser, renderFlag]);
 
   const periodResult =
     loggedUser.empStatus === "Regular"
@@ -1355,7 +1487,7 @@ function TakeEvaluationPage() {
     height: "6vh",
     alignItems: "center",
     display: "flex",
-    marginBottom: "10px",
+    //marginBottom: "10px",
   };
 
   const dateHiredStyles = {
@@ -1388,148 +1520,164 @@ function TakeEvaluationPage() {
         <div></div>
       </div>
 
-      {loading ? (
-        <Loader />
-      ) : openForm ? (
-        isFormLoading ? (
-          <Loader />
-        ) : (
-          <EvaluationForm
-            period={period}
-            loggedUser={loggedUser}
-            stage={stage}
-            evalType={evalType}
-            setOpenForm={setOpenForm}
-            setEvalType={setEvalType}
-            selectedAssignedPeerId={selectedAssignedPeerId}
-            evalID={evalID}
-            annualFirstSemId={annualFirstSemStatus?.id}
-            annualSecondSemId={annualSecondSemStatus?.id}
-            handleRenderFlag={handleRenderFlag}
-            setTakeEval={setTakeEval}
-          />
-        )
-      ) : (
-        <div style={{ position: "relative" }}>
-          {today >= evaluationStartDate &&
-            loggedUser.empStatus !== "Regular" &&
-            loggedUser.probeStatus !== "5th Probationary" &&
-            shouldDisplay && (
-              <EvaluationCard
-                id={"3rdMonth"}
-                period={"3rd Month"}
-                dateHired={dateHired}
-                evalDate={formattedDate}
+      <div style={{ height: "90%" }}>
+        <div style={{ marginBottom: "10px" }}>
+          <Tabs
+            //sx={{ color: "black" }}
+            sx={{
+              "& .MuiTab-root": { color: "gray" }, // Default tab color
+              "& .MuiTab-root.Mui-selected": {
+                color: "#8C383E",
+              }, // Active tab color
+              "& .MuiTabs-indicator": {
+                backgroundColor: "#8C383E",
+                height: "3px",
+                borderRadius: "10px",
+              },
+            }}
+            value={tabValue}
+            onChange={handleTabChange}
+            aria-label="basic tabs example"
+          >
+            <Tab
+              sx={{
+                //textAlign: "start",
+                fontWeight: 600,
+                textTransform: "none",
+              }}
+              label="Ongoing"
+              {...a11yProps(0)}
+            />
+            <Tab
+              sx={{
+                //textAlign: "start",
+                fontWeight: 600,
+                textTransform: "none",
+              }}
+              label="Completed"
+              {...a11yProps(1)}
+            />
+          </Tabs>
+        </div>
+        <CustomTabPanel value={tabValue} index={0}>
+          {loading ? (
+            <Loader />
+          ) : openForm ? (
+            isFormLoading ? (
+              <Loader />
+            ) : (
+              <EvaluationForm
+                period={period}
                 loggedUser={loggedUser}
+                stage={stage}
                 evalType={evalType}
-                handleOpenForm={handleOpenForm}
-                handleEvalTypeChange={handleEvalTypeChange}
+                setOpenForm={setOpenForm}
                 setEvalType={setEvalType}
-                handleOpenModal={handleOpenModal}
-                openModal={openModal}
-                handleCloseModal={handleCloseModal}
-                handleConfirm={handleConfirm}
-                activeCard={activeCard}
-                shouldDisplay5th
-                setActiveCard={setActiveCard}
-                handleTakeEvalChange={handleTakeEvalChange}
-                takeEval={takeEval}
+                selectedAssignedPeerId={selectedAssignedPeerId}
+                evalID={evalID}
+                annualFirstSemId={annualFirstSemStatus?.id}
+                annualSecondSemId={annualSecondSemStatus?.id}
+                handleRenderFlag={handleRenderFlag}
                 setTakeEval={setTakeEval}
-                style={{ zIndex: 1 }}
+                schoolYear={schoolYear}
+                semester={semester}
               />
-            )}
-
-          {today >= evaluationStartDate5th &&
-            loggedUser.empStatus !== "Regular" &&
-            loggedUser.probeStatus !== "3rd Probationary" &&
-            shouldDisplay5th && (
-              <EvaluationCard
-                id={"5thMonth"}
-                period={"5th Month"}
-                dateHired={dateHired}
-                evalDate={formattedDate}
-                loggedUser={loggedUser}
-                evalType={evalType}
-                handleOpenForm={handleOpenForm}
-                handleEvalTypeChange={handleEvalTypeChange}
-                setEvalType={setEvalType}
-                handleOpenModal={handleOpenModal}
-                openModal={openModal}
-                handleCloseModal={handleCloseModal}
-                handleConfirm={handleConfirm}
-                activeCard={activeCard}
-                setActiveCard={setActiveCard}
-                handleTakeEvalChange={handleTakeEvalChange}
-                takeEval={takeEval}
-                setTakeEval={setTakeEval}
-                style={{ zIndex: 1 }}
-              />
-            )}
-
-          {evaluateesDetails && evaluateesDetails.length > 0
-            ? evaluateesDetails.map((evalDeets) => {
-                return (
-                  <PeerEvaluationCard
-                    key={evalDeets.id}
-                    id={evalDeets.id}
-                    evalDeets={evalDeets}
+            )
+          ) : (
+            <div style={{ position: "relative" }}>
+              {today >= evaluationStartDate &&
+                loggedUser.empStatus !== "Regular" &&
+                loggedUser.probeStatus !== "5th Probationary" &&
+                shouldDisplay && (
+                  <EvaluationCard
+                    id={"3rdMonth"}
+                    period={"3rd Month"}
+                    dateHired={dateHired}
+                    evalDate={formattedDate}
+                    loggedUser={loggedUser}
+                    evalType={evalType}
+                    handleOpenForm={handleOpenForm}
+                    handleEvalTypeChange={handleEvalTypeChange}
                     setEvalType={setEvalType}
                     handleOpenModal={handleOpenModal}
                     openModal={openModal}
                     handleCloseModal={handleCloseModal}
                     handleConfirm={handleConfirm}
-                    setSelectedAssignedPeerId={setSelectedAssignedPeerId}
+                    activeCard={activeCard}
+                    shouldDisplay5th
+                    setActiveCard={setActiveCard}
+                    handleTakeEvalChange={handleTakeEvalChange}
+                    takeEval={takeEval}
+                    setTakeEval={setTakeEval}
+                    style={{ zIndex: 1 }}
                   />
-                );
-              })
-            : null}
+                )}
 
-          {shouldDisplayAnnual1st && (
-            <EvaluationCard
-              id={"Annual-1st"}
-              period={"Annual-1st"}
-              dateHired={dateHired}
-              evalDate={format(firstSemEndDate, "MMMM dd, yyyy")}
-              loggedUser={loggedUser}
-              evalType={evalType}
-              handleOpenForm={handleOpenForm}
-              handleEvalTypeChange={handleEvalTypeChange}
-              setEvalType={setEvalType}
-              handleOpenModal={handleOpenModal}
-              openModal={openModal}
-              handleCloseModal={handleCloseModal}
-              handleConfirm={handleConfirm}
-              activeCard={activeCard}
-              setActiveCard={setActiveCard}
-              handleTakeEvalChange={handleTakeEvalChange}
-              takeEval={takeEval}
-              setTakeEval={setTakeEval}
-                
-              style={{ zIndex: 1 }}
-            />
+              {shouldDisplayAnnual1st && (
+                <EvaluationCard
+                  id={"Annual-1st"}
+                  period={"Annual-1st"}
+                  dateHired={dateHired}
+                  evalDate={format(firstSemEndDate, "MMMM dd, yyyy")}
+                  loggedUser={loggedUser}
+                  evalType={evalType}
+                  handleOpenForm={handleOpenForm}
+                  handleEvalTypeChange={handleEvalTypeChange}
+                  setEvalType={setEvalType}
+                  handleOpenModal={handleOpenModal}
+                  openModal={openModal}
+                  handleCloseModal={handleCloseModal}
+                  handleConfirm={handleConfirm}
+                  activeCard={activeCard}
+                  setActiveCard={setActiveCard}
+                  handleTakeEvalChange={handleTakeEvalChange}
+                  takeEval={takeEval}
+                  setTakeEval={setTakeEval}
+                  style={{ zIndex: 1 }}
+                />
+              )}
+            </div>
           )}
-
-          <div
-            style={{
-              height: "75px",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              position: "absolute",
-              top: "50px",
-              left: "35%",
-              zIndex: 0,
-              color: "#a8a7a9",
-            }}
-          >
-            <FontAwesomeIcon
-              icon={faGears}
-              style={{ fontSize: "30px", color: "#a8a7a9" }}
-            />
-            <p>There are no evaluations as of the moment.</p>
+        </CustomTabPanel>
+        <CustomTabPanel
+          sx={{ paddingLeft: 0, fontWeight: 600 }}
+          value={tabValue}
+          index={1}
+        >
+          <div style={{ height: "100%", width: "100%" }}>
+            <TableContainer component={Paper}>
+              <Table sx={{ minWidth: 700 }} aria-label="customized table">
+                <TableHead
+                  sx={{
+                    borderRadius: "25px 25px 0px 0px",
+                  }}
+                >
+                  <TableRow>
+                    <StyledTableCell>Period</StyledTableCell>
+                    <StyledTableCell>Evaluation Type</StyledTableCell>
+                    <StyledTableCell>Stage</StyledTableCell>
+                    <StyledTableCell>Date Taken</StyledTableCell>
+                    <StyledTableCell>School Year</StyledTableCell>
+                    <StyledTableCell>Semester</StyledTableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row) => (
+                    <StyledTableRow key={row.period}>
+                      <StyledTableCell>{row.period}</StyledTableCell>
+                      <StyledTableCell>{row.evalType}</StyledTableCell>
+                      <StyledTableCell>{row.stage}</StyledTableCell>
+                      <StyledTableCell>{row.dateTaken}</StyledTableCell>
+                      <StyledTableCell>{row.schoolYear}</StyledTableCell>
+                      <StyledTableCell>{row.semester}</StyledTableCell>
+                    </StyledTableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </div>
-        </div>
-      )}
+        </CustomTabPanel>
+      </div>
     </div>
   );
 }
