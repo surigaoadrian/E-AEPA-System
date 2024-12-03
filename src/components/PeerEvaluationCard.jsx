@@ -48,8 +48,8 @@ function PeerEvaluationCard({
       : evalDeets.period === "5th Month"
       ? "5-Month probationary"
       : evalDeets.period === "Annual-1st"
-      ? "first annual"
-      : "second annual";
+      ? "first semestral"
+      : "second semestral";
 
   //format date
   const formatDate = (dateString) => {

@@ -491,8 +491,10 @@ function EmployeeProfile({ user, handleBack }) {
     );
 
     const allValuesStagesCompleted =
-      hasCompletedValuesSelf && hasCompletedValuesPeer && hasCompletedJobSelf;
-    hasCompletedHeadValues && hasCompletedHeadJob;
+      hasCompletedValuesSelf &&
+      hasCompletedJobSelf &&
+      hasCompletedHeadValues &&
+      hasCompletedHeadJob;
 
     return (
       <TableContainer style={tableStyle}>

@@ -114,32 +114,76 @@ public class AssignedPeersService {
     }
 
     //update evaluator
+//    public void updateAssignedEvaluators(int assignPeerId, List<Integer> evaluatorIds) {
+//        Optional<AssignedPeersEntity> optionalAssignedPeers = apRepo.findById(assignPeerId);
+//        if (optionalAssignedPeers.isPresent()) {
+//            AssignedPeersEntity assignedPeers = optionalAssignedPeers.get();
+//
+//            // Clear current evaluators
+//            assignedPeers.getEvaluators().clear();
+//
+//            // Add new evaluators based on provided IDs
+//            for (Integer evaluatorId : evaluatorIds) {
+//                Optional<UserEntity> evaluator = userRepo.findById(evaluatorId);
+//                if (evaluator.isPresent()) {
+//                    AssignedPeerEvaluators assignedPeerEvaluators = new AssignedPeerEvaluators();
+//                    assignedPeerEvaluators.setAssignedPeers(assignedPeers);
+//                    assignedPeerEvaluators.setEvaluator(evaluator.get());
+//                    assignedPeerEvaluators.setStatus("PENDING"); // or some default status
+//                    assignedPeers.getEvaluators().add(assignedPeerEvaluators);
+//                } else {
+//                    throw new RuntimeException("User not found with id: " + evaluatorId);
+//                }
+//            }
+//            apRepo.save(assignedPeers);
+//        } else {
+//            throw new RuntimeException("Assigned peers not found with id: " + assignPeerId);
+//        }
+//    }
+
+    //adi new update evaluator
     public void updateAssignedEvaluators(int assignPeerId, List<Integer> evaluatorIds) {
         Optional<AssignedPeersEntity> optionalAssignedPeers = apRepo.findById(assignPeerId);
         if (optionalAssignedPeers.isPresent()) {
             AssignedPeersEntity assignedPeers = optionalAssignedPeers.get();
 
-            // Clear current evaluators
-            assignedPeers.getEvaluators().clear();
+            // Get current evaluators
+            List<AssignedPeerEvaluators> currentEvaluators = assignedPeers.getEvaluators();
 
-            // Add new evaluators based on provided IDs
+            // Determine evaluators to remove and keep
+            List<AssignedPeerEvaluators> toRemove = currentEvaluators.stream()
+                    .filter(evaluator -> !evaluatorIds.contains(evaluator.getEvaluator().getUserID()))
+                    .collect(Collectors.toList());
+
+            // Remove evaluators not in the new list
+            assignedPeers.getEvaluators().removeAll(toRemove);
+
+            // Add new evaluators that are not already present
             for (Integer evaluatorId : evaluatorIds) {
-                Optional<UserEntity> evaluator = userRepo.findById(evaluatorId);
-                if (evaluator.isPresent()) {
-                    AssignedPeerEvaluators assignedPeerEvaluators = new AssignedPeerEvaluators();
-                    assignedPeerEvaluators.setAssignedPeers(assignedPeers);
-                    assignedPeerEvaluators.setEvaluator(evaluator.get());
-                    assignedPeerEvaluators.setStatus("PENDING"); // or some default status
-                    assignedPeers.getEvaluators().add(assignedPeerEvaluators);
-                } else {
-                    throw new RuntimeException("User not found with id: " + evaluatorId);
+                boolean exists = currentEvaluators.stream()
+                        .anyMatch(evaluator -> evaluator.getEvaluator().getUserID() == evaluatorId);
+
+                if (!exists) {
+                    Optional<UserEntity> evaluator = userRepo.findById(evaluatorId);
+                    if (evaluator.isPresent()) {
+                        AssignedPeerEvaluators newEvaluator = new AssignedPeerEvaluators();
+                        newEvaluator.setAssignedPeers(assignedPeers);
+                        newEvaluator.setEvaluator(evaluator.get());
+                        newEvaluator.setStatus("PENDING"); // Default status for new evaluators
+                        assignedPeers.getEvaluators().add(newEvaluator);
+                    } else {
+                        throw new RuntimeException("User not found with id: " + evaluatorId);
+                    }
                 }
             }
+
+            // Save changes
             apRepo.save(assignedPeers);
         } else {
             throw new RuntimeException("Assigned peers not found with id: " + assignPeerId);
         }
     }
+
 
     //ANGELA 
     public Map<Integer, String> getOverallStatus() {

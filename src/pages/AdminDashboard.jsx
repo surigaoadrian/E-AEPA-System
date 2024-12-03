@@ -358,7 +358,7 @@ function AdminDashboard() {
   const [lineChartData, setLineChartData] = useState({
     series: [
       {
-        name: "Regular Employees",
+        name: "Regular Staff",
         data: [],
       },
     ],
@@ -796,7 +796,7 @@ function AdminDashboard() {
                     }}
                   >
                     <div style={{ height: "30%", fontWeight: "500" }}>
-                      <h3>Regular Employees</h3>
+                      <h3>Regular Staff</h3>
                     </div>
 
                     <div
@@ -847,7 +847,7 @@ function AdminDashboard() {
                       fontSize: "16px",
                     }}
                   >
-                    Total Regular Employees
+                    Total Regular Staff
                   </h1>
                   <div style={{ padding: "0px 10px 0pc 0pc" }}>
                     <ReactApexChart
@@ -894,7 +894,7 @@ function AdminDashboard() {
                     }}
                   >
                     <p style={{ fontSize: "13px" }}>
-                      Employee count: {empPieCount}
+                      Staff count: {empPieCount}
                     </p>
                     <select
                       value={pieMonth}
@@ -931,7 +931,7 @@ function AdminDashboard() {
                           paddingTop: "15px",
                         }}
                       >
-                        No employees found
+                        No staff found
                       </p>
                     </div>
                   ) : (
@@ -1155,7 +1155,7 @@ function AdminDashboard() {
                         }}
                       >
                         <p style={{ fontSize: "13px", color: "#636E72" }}>
-                          There are no 3rd month probationary employees for this
+                          There are no 3rd month probationary staff for this
                           month.
                         </p>
                       </div>
@@ -1312,7 +1312,7 @@ function AdminDashboard() {
                         }}
                       >
                         <p style={{ fontSize: "13px", color: "#636E72" }}>
-                          There are no 5th month probationary employees for this
+                          There are no 5th month probationary staff for this
                           month.
                         </p>
                       </div>

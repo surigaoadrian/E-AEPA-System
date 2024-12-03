@@ -47,6 +47,8 @@ function EvaluationForm({
 
   const [indices, setIndices] = useState([1, 2, 3, 4, 5]);
 
+  const [isValidationModalOpen, setIsValidationModalOpen] = useState(false);
+
   const stageType = stage;
   const evalPeriod = period;
   const formType = evalType;
@@ -57,7 +59,7 @@ function EvaluationForm({
   let hasRenderedFillHeading = false;
 
   const formContainer = {
-    height: "80vh",
+    height: "74vh",
     width: "100%",
     borderRadius: "10px",
     backgroundColor: "white",
@@ -72,10 +74,9 @@ function EvaluationForm({
   };
 
   const formContent = {
-    height: "68vh",
+    height: "62vh",
     overflow: "auto",
     paddingRight: "10px",
-    //backgroundColor: "tomato",
   };
 
   const overlayStyle = {
@@ -575,6 +576,7 @@ function EvaluationForm({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     openModal();
   };
 

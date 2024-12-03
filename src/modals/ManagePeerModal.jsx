@@ -70,7 +70,12 @@ function ManagePeerModal({
   const [openEditPeer, setOpenEditPeer] = useState(false);
   const [viewedUser, setViewedUser] = useState();
   const [selectedEvaluators, setSelectedEvaluators] = useState([]);
-  const [assignEvalautorsStats, setAssignedEvaluatorsStats] = useState([]);
+  const [assignedEvalautorsStats, setAssignedEvaluatorsStats] = useState([]);
+  // const [renderFlag, setRenderFlag] = useState(false);
+
+  const handleRenderFlag = () => {
+    setRenderFlag((prevFlag) => !prevFlag);
+  };
 
   //fetch user
   useEffect(() => {
@@ -119,6 +124,8 @@ function ManagePeerModal({
 
     fetchAssignPeerID();
   }, [userId, selectedEvaluationPeriod]);
+
+  console.log("Assigned peer id from table:", assignPeerId);
 
   //fetching assigned evaluators id
   useEffect(() => {
@@ -200,7 +207,7 @@ function ManagePeerModal({
 
   const handleSelectChange = (index, event) => {
     const newSelectedEvaluators = [...selectedEvaluators];
-    newSelectedEvaluators[index] = event.target.value;
+    newSelectedEvaluators[index] = parseInt(event.target.value, 10);
     setSelectedEvaluators(newSelectedEvaluators);
   };
 
@@ -236,6 +243,8 @@ function ManagePeerModal({
         selectedEvaluators
       );
       console.log(response.data);
+
+      fetchassignEvalStats();
     } catch (error) {
       console.error("Error updating evaluators:", error);
     }
@@ -249,8 +258,56 @@ function ManagePeerModal({
     setOpenEditPeer(false);
   };
 
-  console.log("Assigned peer id:" + assignPeerId);
-  console.log("selected evaluation period " + selectedEvaluationPeriod);
+  // console.log("Assigned peer id:" + assignPeerId);
+  // console.log("selected evaluation period " + selectedEvaluationPeriod);
+
+  // useEffect(() => {
+  //   const fetchassignEvalStats = async () => {
+  //     try {
+  //       const response = await axios.get(
+  //         `${apiUrl}assignedPeers/getEvaluatorIdsAndStatuses`,
+  //         {
+  //           params: {
+  //             assignedPeersId: assignPeerId,
+  //           },
+  //         }
+  //       );
+
+  //       setAssignedEvaluatorsStats(response.data);
+  //     } catch (error) {
+  //       console.log("Error fetching assigned evaluators statuses", error);
+  //     }
+  //   };
+
+  //   if (assignPeerId) {
+  //     fetchassignEvalStats();
+  //   }
+  // }, [assignPeerId]);
+
+  const fetchassignEvalStats = async () => {
+    try {
+      const response = await axios.get(
+        `${apiUrl}assignedPeers/getEvaluatorIdsAndStatuses`,
+        {
+          params: {
+            assignedPeersId: assignPeerId,
+          },
+        }
+      );
+
+      setAssignedEvaluatorsStats(response.data);
+    } catch (error) {
+      console.log("Error fetching assigned evaluators statuses", error);
+    }
+  };
+
+  useEffect(() => {
+    if (assignPeerId) {
+      fetchassignEvalStats();
+    }
+  }, [assignPeerId]);
+
+  console.log("Assigned Evaluators Statuses: ", assignedEvalautorsStats);
 
   return (
     <Modal
@@ -334,11 +391,13 @@ function ManagePeerModal({
                             )?.lName
                           }
                         </option>
-                        {filteredDeptOnlyUsers.map((user) => (
-                          <option key={user.userID} value={user.userID}>
-                            {user.fName} {user.lName}
-                          </option>
-                        ))}
+                        {filteredDeptOnlyUsers
+                          .filter((user) => user.userID !== userId)
+                          .map((user) => (
+                            <option key={user.userID} value={user.userID}>
+                              {user.fName} {user.lName}
+                            </option>
+                          ))}
                       </select>
                     </div>
                   ))}
@@ -413,25 +472,50 @@ function ManagePeerModal({
                         {selectedEvaluationPeriod} Assigned Peers:
                       </p>
 
-                      {filteredDeptUsers.map((evaluator) => (
-                        <div
-                          style={{
-                            display: "flex",
-                            //backgroundColor: "lightgreen",
-                            width: "100%",
-                            marginTop: "10px",
-                          }}
-                        >
-                          <FontAwesomeIcon
-                            icon={faUser}
-                            style={{ marginRight: "10px" }}
-                          />
+                      {filteredDeptUsers.map((evaluator) => {
+                        // Find the matching evaluator status
+                        const matchedEvaluator = assignedEvalautorsStats.find(
+                          (statusObj) =>
+                            statusObj.evaluatorId === evaluator.userID
+                        );
 
-                          <p key={evaluator.userID}>
-                            {evaluator.fName} {evaluator.lName}
-                          </p>
-                        </div>
-                      ))}
+                        return (
+                          <div
+                            key={evaluator.userID}
+                            style={{
+                              display: "flex",
+                              width: "65%",
+                              marginTop: "10px",
+                              //backgroundColor: "tomato",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <div style={{ display: "flex" }}>
+                              <FontAwesomeIcon
+                                icon={faUser}
+                                style={{ marginRight: "10px" }}
+                              />
+                              <p>
+                                {evaluator.fName} {evaluator.lName}{" "}
+                              </p>
+                            </div>
+
+                            {matchedEvaluator && (
+                              <p
+                                style={{
+                                  color:
+                                    matchedEvaluator.status === "PENDING"
+                                      ? "#E81B1B"
+                                      : "#00C44E",
+                                  fontWeight: 500,
+                                }}
+                              >
+                                {matchedEvaluator.status}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
 
                     <div

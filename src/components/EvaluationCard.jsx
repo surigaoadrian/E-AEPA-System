@@ -106,9 +106,9 @@ function EvaluationCard({
           }}
         >
           {period === "Annual-1st" ? (
-            "Annual Evaluation (First Semester)"
+            "Semestral Evaluation (First Semester)"
           ) : period === "Annual-2nd" ? (
-            "Annual Evaluation (Second Semester)"
+            "Semestral Evaluation (Second Semester)"
           ) : (
             <span>{period} Evaluation</span>
           )}
@@ -234,14 +234,14 @@ function EvaluationCard({
             {period === "Annual-1st" ? (
               <p>
                 As the first semester concludes, the employee will undergo their
-                Annual Evaluation for the First Semester. During this e-AEPA,
+                Semestral Evaluation for the First Semester. During this e-AEPA,
                 the employee will be evaluated by their Immediate Head, as well
                 as through a Self-Evaluation and Peer Evaluation.
               </p>
             ) : period === "Annual-2nd" ? (
               <p>
                 As the second semester concludes, the employee will undergo
-                their Annual Evaluation for the Second Semester. During this
+                their Semestral Evaluation for the Second Semester. During this
                 e-AEPA, the employee will be evaluated by their Immediate Head,
                 as well as through a Self-Evaluation and Peer Evaluation.
               </p>

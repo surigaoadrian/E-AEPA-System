@@ -1476,7 +1476,6 @@ function TakeEvaluationPage() {
   };
 
   const container = {
-    //backgroundColor: "tomato",
     height: "100%",
     padding: "10px 25px 0px 25px",
     overflow: "auto",
@@ -1523,9 +1522,8 @@ function TakeEvaluationPage() {
       <div style={{ height: "90%" }}>
         <div style={{ marginBottom: "10px" }}>
           <Tabs
-            //sx={{ color: "black" }}
             sx={{
-              "& .MuiTab-root": { color: "gray" }, // Default tab color
+              "& .MuiTab-root": { color: "gray" },
               "& .MuiTab-root.Mui-selected": {
                 color: "#8C383E",
               }, // Active tab color
@@ -1560,149 +1558,151 @@ function TakeEvaluationPage() {
           </Tabs>
         </div>
         <CustomTabPanel value={tabValue} index={0}>
-          {loading ? (
-            <Loader />
-          ) : openForm ? (
-            isFormLoading ? (
+          <div>
+            {loading ? (
               <Loader />
-            ) : (
-              <EvaluationForm
-                period={period}
-                loggedUser={loggedUser}
-                stage={stage}
-                evalType={evalType}
-                setOpenForm={setOpenForm}
-                setEvalType={setEvalType}
-                selectedAssignedPeerId={selectedAssignedPeerId}
-                evalID={evalID}
-                annualFirstSemId={annualFirstSemStatus?.id}
-                annualSecondSemId={annualSecondSemStatus?.id}
-                handleRenderFlag={handleRenderFlag}
-                setTakeEval={setTakeEval}
-                schoolYear={schoolYear}
-                semester={semester}
-              />
-            )
-          ) : (
-            <div style={{ position: "relative" }}>
-              {today >= evaluationStartDate &&
-                loggedUser.empStatus !== "Regular" &&
-                loggedUser.probeStatus !== "5th Probationary" &&
-                shouldDisplay && (
-                  <EvaluationCard
-                    id={"3rdMonth"}
-                    period={"3rd Month"}
-                    dateHired={dateHired}
-                    evalDate={formattedDate}
-                    loggedUser={loggedUser}
-                    evalType={evalType}
-                    handleOpenForm={handleOpenForm}
-                    handleEvalTypeChange={handleEvalTypeChange}
-                    setEvalType={setEvalType}
-                    handleOpenModal={handleOpenModal}
-                    openModal={openModal}
-                    handleCloseModal={handleCloseModal}
-                    handleConfirm={handleConfirm}
-                    activeCard={activeCard}
-                    shouldDisplay5th
-                    setActiveCard={setActiveCard}
-                    handleTakeEvalChange={handleTakeEvalChange}
-                    takeEval={takeEval}
-                    setTakeEval={setTakeEval}
-                    style={{ zIndex: 1 }}
-                  />
-                )}
-
-              {today >= evaluationStartDate5th &&
-                loggedUser.empStatus !== "Regular" &&
-                loggedUser.probeStatus !== "3rd Probationary" &&
-                shouldDisplay5th && (
-                  <EvaluationCard
-                    id={"5thMonth"}
-                    period={"5th Month"}
-                    dateHired={dateHired}
-                    evalDate={formattedDate}
-                    loggedUser={loggedUser}
-                    evalType={evalType}
-                    handleOpenForm={handleOpenForm}
-                    handleEvalTypeChange={handleEvalTypeChange}
-                    setEvalType={setEvalType}
-                    handleOpenModal={handleOpenModal}
-                    openModal={openModal}
-                    handleCloseModal={handleCloseModal}
-                    handleConfirm={handleConfirm}
-                    activeCard={activeCard}
-                    setActiveCard={setActiveCard}
-                    handleTakeEvalChange={handleTakeEvalChange}
-                    takeEval={takeEval}
-                    setTakeEval={setTakeEval}
-                    style={{ zIndex: 1 }}
-                  />
-                )}
-
-              {evaluateesDetails && evaluateesDetails.length > 0
-                ? evaluateesDetails.map((evalDeets) => {
-                    return (
-                      <PeerEvaluationCard
-                        key={evalDeets.id}
-                        id={evalDeets.id}
-                        evalDeets={evalDeets}
-                        setEvalType={setEvalType}
-                        handleOpenModal={handleOpenModal}
-                        openModal={openModal}
-                        handleCloseModal={handleCloseModal}
-                        handleConfirm={handleConfirm}
-                        setSelectedAssignedPeerId={setSelectedAssignedPeerId}
-                      />
-                    );
-                  })
-                : null}
-
-              {shouldDisplayAnnual1st && (
-                <EvaluationCard
-                  id={"Annual-1st"}
-                  period={"Annual-1st"}
-                  dateHired={dateHired}
-                  evalDate={format(firstSemEndDate, "MMMM dd, yyyy")}
+            ) : openForm ? (
+              isFormLoading ? (
+                <Loader />
+              ) : (
+                <EvaluationForm
+                  period={period}
                   loggedUser={loggedUser}
+                  stage={stage}
                   evalType={evalType}
-                  handleOpenForm={handleOpenForm}
-                  handleEvalTypeChange={handleEvalTypeChange}
+                  setOpenForm={setOpenForm}
                   setEvalType={setEvalType}
-                  handleOpenModal={handleOpenModal}
-                  openModal={openModal}
-                  handleCloseModal={handleCloseModal}
-                  handleConfirm={handleConfirm}
-                  activeCard={activeCard}
-                  setActiveCard={setActiveCard}
-                  handleTakeEvalChange={handleTakeEvalChange}
-                  takeEval={takeEval}
+                  selectedAssignedPeerId={selectedAssignedPeerId}
+                  evalID={evalID}
+                  annualFirstSemId={annualFirstSemStatus?.id}
+                  annualSecondSemId={annualSecondSemStatus?.id}
+                  handleRenderFlag={handleRenderFlag}
                   setTakeEval={setTakeEval}
-                  style={{ zIndex: 1 }}
+                  schoolYear={schoolYear}
+                  semester={semester}
                 />
-              )}
+              )
+            ) : (
+              <div style={{ position: "relative" }}>
+                {today >= evaluationStartDate &&
+                  loggedUser.empStatus !== "Regular" &&
+                  loggedUser.probeStatus !== "5th Probationary" &&
+                  shouldDisplay && (
+                    <EvaluationCard
+                      id={"3rdMonth"}
+                      period={"3rd Month"}
+                      dateHired={dateHired}
+                      evalDate={formattedDate}
+                      loggedUser={loggedUser}
+                      evalType={evalType}
+                      handleOpenForm={handleOpenForm}
+                      handleEvalTypeChange={handleEvalTypeChange}
+                      setEvalType={setEvalType}
+                      handleOpenModal={handleOpenModal}
+                      openModal={openModal}
+                      handleCloseModal={handleCloseModal}
+                      handleConfirm={handleConfirm}
+                      activeCard={activeCard}
+                      shouldDisplay5th
+                      setActiveCard={setActiveCard}
+                      handleTakeEvalChange={handleTakeEvalChange}
+                      takeEval={takeEval}
+                      setTakeEval={setTakeEval}
+                      style={{ zIndex: 1 }}
+                    />
+                  )}
 
-              <div
-                style={{
-                  height: "75px",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  position: "absolute",
-                  top: "50px",
-                  left: "35%",
-                  zIndex: 0,
-                  color: "#a8a7a9",
-                }}
-              >
-                <FontAwesomeIcon
-                  icon={faGears}
-                  style={{ fontSize: "30px", color: "#a8a7a9" }}
-                />
-                <p>There are no evaluations as of the moment.</p>
+                {today >= evaluationStartDate5th &&
+                  loggedUser.empStatus !== "Regular" &&
+                  loggedUser.probeStatus !== "3rd Probationary" &&
+                  shouldDisplay5th && (
+                    <EvaluationCard
+                      id={"5thMonth"}
+                      period={"5th Month"}
+                      dateHired={dateHired}
+                      evalDate={formattedDate}
+                      loggedUser={loggedUser}
+                      evalType={evalType}
+                      handleOpenForm={handleOpenForm}
+                      handleEvalTypeChange={handleEvalTypeChange}
+                      setEvalType={setEvalType}
+                      handleOpenModal={handleOpenModal}
+                      openModal={openModal}
+                      handleCloseModal={handleCloseModal}
+                      handleConfirm={handleConfirm}
+                      activeCard={activeCard}
+                      setActiveCard={setActiveCard}
+                      handleTakeEvalChange={handleTakeEvalChange}
+                      takeEval={takeEval}
+                      setTakeEval={setTakeEval}
+                      style={{ zIndex: 1 }}
+                    />
+                  )}
+
+                {evaluateesDetails && evaluateesDetails.length > 0
+                  ? evaluateesDetails.map((evalDeets) => {
+                      return (
+                        <PeerEvaluationCard
+                          key={evalDeets.id}
+                          id={evalDeets.id}
+                          evalDeets={evalDeets}
+                          setEvalType={setEvalType}
+                          handleOpenModal={handleOpenModal}
+                          openModal={openModal}
+                          handleCloseModal={handleCloseModal}
+                          handleConfirm={handleConfirm}
+                          setSelectedAssignedPeerId={setSelectedAssignedPeerId}
+                        />
+                      );
+                    })
+                  : null}
+
+                {shouldDisplayAnnual1st && (
+                  <EvaluationCard
+                    id={"Annual-1st"}
+                    period={"Annual-1st"}
+                    dateHired={dateHired}
+                    evalDate={format(firstSemEndDate, "MMMM dd, yyyy")}
+                    loggedUser={loggedUser}
+                    evalType={evalType}
+                    handleOpenForm={handleOpenForm}
+                    handleEvalTypeChange={handleEvalTypeChange}
+                    setEvalType={setEvalType}
+                    handleOpenModal={handleOpenModal}
+                    openModal={openModal}
+                    handleCloseModal={handleCloseModal}
+                    handleConfirm={handleConfirm}
+                    activeCard={activeCard}
+                    setActiveCard={setActiveCard}
+                    handleTakeEvalChange={handleTakeEvalChange}
+                    takeEval={takeEval}
+                    setTakeEval={setTakeEval}
+                    style={{ zIndex: 1 }}
+                  />
+                )}
+
+                <div
+                  style={{
+                    height: "75px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    position: "absolute",
+                    top: "50px",
+                    left: "35%",
+                    zIndex: 0,
+                    color: "#a8a7a9",
+                  }}
+                >
+                  <FontAwesomeIcon
+                    icon={faGears}
+                    style={{ fontSize: "30px", color: "#a8a7a9" }}
+                  />
+                  <p>There are no evaluations as of the moment.</p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </CustomTabPanel>
         <CustomTabPanel
           sx={{ paddingLeft: 0, fontWeight: 600 }}
