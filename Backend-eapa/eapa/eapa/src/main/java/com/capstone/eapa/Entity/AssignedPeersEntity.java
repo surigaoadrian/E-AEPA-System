@@ -22,16 +22,27 @@ public class AssignedPeersEntity {
 
     private String period; //3rd Month, 5th Month, Annual
     private String dateAssigned; //YYYY-MM-DD
+    private String schoolYear;
+    private String semester;
 
     public AssignedPeersEntity() {
         super();
     }
 
-    public AssignedPeersEntity(UserEntity evaluatee, String period, String dateAssigned, List<AssignedPeerEvaluators> evaluators) {
+//    public AssignedPeersEntity(UserEntity evaluatee, String period, String dateAssigned, List<AssignedPeerEvaluators> evaluators) {
+//        this.evaluatee = evaluatee;
+//        this.period = period;
+//        this.dateAssigned = dateAssigned;
+//        this.evaluators = evaluators;
+//    }
+
+
+    public AssignedPeersEntity(UserEntity evaluatee,  String period, String dateAssigned, String schoolYear, String semester) {
         this.evaluatee = evaluatee;
         this.period = period;
         this.dateAssigned = dateAssigned;
-        this.evaluators = evaluators;
+        this.schoolYear = schoolYear;
+        this.semester = semester;
     }
 
     public int getId() {
@@ -68,5 +79,21 @@ public class AssignedPeersEntity {
 
     public void setDateAssigned(String dateAssigned) {
         this.dateAssigned = dateAssigned;
+    }
+
+    public String getSchoolYear() {
+        return schoolYear;
+    }
+
+    public void setSchoolYear(String schoolYear) {
+        this.schoolYear = schoolYear;
+    }
+
+    public String getSemester() {
+        return semester;
+    }
+
+    public void setSemester(String semester) {
+        this.semester = semester;
     }
 }

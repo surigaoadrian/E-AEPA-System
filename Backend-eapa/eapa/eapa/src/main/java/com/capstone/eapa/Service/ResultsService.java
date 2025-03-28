@@ -49,6 +49,8 @@ public class ResultsService {
                 evaluation.getEvalType(),
                 evaluation.getPeriod(),
                 evaluation.getStage(),
+                evaluation.getSchoolYear(),
+                evaluation.getSemester(),
                 0
         );
 
@@ -78,6 +80,8 @@ public class ResultsService {
                 evaluation.getEvalType(),
                 evaluation.getPeriod(),
                 evaluation.getStage(),
+                evaluation.getSchoolYear(),
+                evaluation.getSemester(),
                 0
         );
 
@@ -139,15 +143,16 @@ private double calculateAverage(List<ResponseEntity> responses, String category)
         return resultRepo.findByUser_UserIDAndEvalTypeAndStageAndPeriod(userId, evalType, stage, period);
     }
 
-    // Method to get jobRespAverage where emp_id, evalType = "HEAD", and stage = "JOB"
-    public double getJobRespAverageByEmpIdAndEvalType(int empId) {
-        ResultsEntity result = resultRepo.findByEmp_UserIDAndEvalTypeAndStage(empId, "HEAD", "JOB");
+    // Method to get jobRespAverage where emp_id, evalType = "HEAD", stage = "JOB", and specified period
+    public double getJobRespAverageByEmpIdEvalTypeAndPeriod(int empId, String period) {
+        ResultsEntity result = resultRepo.findByEmp_UserIDAndEvalTypeAndStageAndPeriod(empId, "HEAD", "JOB", period);
         if (result != null) {
             return result.getJobRespAverage();
         } else {
-            throw new RuntimeException("No result found for emp_id: " + empId + " with evalType: HEAD and stage: JOB");
+            throw new RuntimeException("No result found for emp_id: " + empId + " with evalType: HEAD, stage: JOB, and period: " + period);
         }
     }
+
 
     // Method to get cultureOfExcellenceAverage, integrityAverage, teamworkAverage, universalityAverage
     // where emp_id, evalType = "HEAD", and stage = "VALUES"

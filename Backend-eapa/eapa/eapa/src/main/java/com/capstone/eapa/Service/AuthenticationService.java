@@ -18,6 +18,7 @@ public class AuthenticationService {
     private final UserRepository userRepo;
     @Autowired
     UserService userService;
+
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -66,7 +67,6 @@ public class AuthenticationService {
 
             // Generate JWT token for the updated user
             String token = jwtService.generateToken(existingUser);
-
             String admin = userRepo.findById(adminId).get().getfName() + " " + userRepo.findById(adminId).get().getlName();
             userService.logActivity(adminId,admin,"Created User Account", "Added New User  : " + existingUser.getfName() + " " + existingUser.getlName());
             return new AuthenticationResponse(token,existingUser.getUserID());
@@ -99,7 +99,6 @@ public class AuthenticationService {
             
             // Generate JWT token for the new user
             String token = jwtService.generateToken(newUser);
-
             String admin = userRepo.findById(adminId).get().getfName() + " " + userRepo.findById(adminId).get().getlName();
             userService.logActivity(adminId,admin,"Created User Account", "Added New User : " + newUser.getfName() + " " + newUser.getlName());
             return new AuthenticationResponse(token,newUser.getUserID());

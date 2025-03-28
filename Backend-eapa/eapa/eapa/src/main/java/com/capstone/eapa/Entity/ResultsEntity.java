@@ -32,6 +32,9 @@ public class ResultsEntity {
     private String period; //3rd Month, 5th Month, Annual
     private String stage; //Values or Job
 
+    private String schoolYear;
+    private String semester;
+
 
     private int isDeleted = 0;
 
@@ -39,7 +42,7 @@ public class ResultsEntity {
         super();
     }
 
-    public ResultsEntity(UserEntity user, UserEntity emp, double cultureOfExcellenceAverage, double integrityAverage, double teamworkAverage, double universalityAverage, double jobRespAverage, String evalType, String period, String stage, int isDeleted) {
+    public ResultsEntity(UserEntity user, UserEntity emp, double cultureOfExcellenceAverage, double integrityAverage, double teamworkAverage, double universalityAverage, double jobRespAverage, String evalType, String period, String stage, String schoolYear, String semester, int isDeleted) {
         this.user = user;
         this.emp = emp;
         this.cultureOfExcellenceAverage = cultureOfExcellenceAverage;
@@ -50,6 +53,8 @@ public class ResultsEntity {
         this.evalType = evalType;
         this.period = period;
         this.stage = stage;
+        this.schoolYear = schoolYear;
+        this.semester = semester;
         this.isDeleted = isDeleted;
     }
 
@@ -140,6 +145,22 @@ public class ResultsEntity {
 
     public int getIsDeleted() {
         return isDeleted;
+    }
+
+    public String getSchoolYear() {
+        return schoolYear;
+    }
+
+    public void setSchoolYear(String schoolYear) {
+        this.schoolYear = schoolYear;
+    }
+
+    public String getSemester() {
+        return semester;
+    }
+
+    public void setSemester(String semester) {
+        this.semester = semester;
     }
 
     public void setIsDeleted(int isDeleted) {

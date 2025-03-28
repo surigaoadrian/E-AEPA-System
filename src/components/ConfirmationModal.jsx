@@ -46,6 +46,7 @@ function ConfirmationModal({ isOpen, onConfirm, onCancel }) {
               marginRight: "10px",
               width: "25%",
               height: "35px",
+              textTransform:"none",
               backgroundColor: "#8C383E",
               "&:hover": {
                 backgroundColor: "#7C2828",

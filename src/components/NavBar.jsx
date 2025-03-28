@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import logo from "../assets/e-AEPA-logo.png";
+import defaultProfie from "../assets/default-profile.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBell,
   faCaretDown,
   faSignOutAlt,
   faUser,
-  faRightLeft
+  faRightLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
@@ -14,9 +15,24 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { Form, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Box, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormHelperText, Grid, IconButton, ListItemIcon, TextField } from "@mui/material";
+import {
+  Box,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  FormHelperText,
+  Grid,
+  IconButton,
+  ListItemIcon,
+  TextField,
+} from "@mui/material";
 import profile from "../assets/logo.png";
 import HighlightOffOutlinedIcon from "@mui/icons-material/HighlightOffOutlined";
+import { apiUrl } from "../config/config";
+import { jwtDecode } from "jwt-decode";
+import SessionExpiredModal from "../modals/SessionExpiredModal";
 
 function NavBar() {
   const [loggedUserData, setLoggedUserData] = useState({});
@@ -28,8 +44,12 @@ function NavBar() {
   const [targetRole, setTargetRole] = useState("");
   const [targetUsername, setTargetUsername] = useState("");
   const [password, setPassword] = useState("");
-  const displayEmpUsername = loggedUserData?.username ? loggedUserData.username.replace(/^adm_/, '') : '';
-  const displayAdmUsername = loggedUserData?.username ? `adm_${loggedUserData.username}` : '';
+  const displayEmpUsername = loggedUserData?.username
+    ? loggedUserData.username.replace(/^adm_/, "")
+    : "";
+  const displayAdmUsername = loggedUserData?.username
+    ? `adm_${loggedUserData.username}`
+    : "";
   const [message, setMessage] = useState("");
   const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
   const [hasAdminAccount, setHasAdminAccount] = useState(false);
@@ -37,6 +57,66 @@ function NavBar() {
   const [loading, setLoading] = useState(true);
 
   const role = sessionStorage.getItem("userRole");
+
+  const [isSessionExpired, setIsSessionExpired] = useState(false);
+
+  const abbreviateDept = (deptName) => {
+    if (!deptName) {
+      return "";
+    }
+
+    const commonWords = ["of", "and"];
+    const words = deptName.split(" ");
+
+    if (words.length < 2) {
+      return deptName;
+    }
+
+    return words
+      .filter((word) => !commonWords.includes(word.toLowerCase()))
+      .map((word) => word.charAt(0).toUpperCase())
+      .join("");
+  };
+
+  // Token expiry check function
+  const checkTokenExpiry = () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      const currentTime = Date.now() / 1000;
+      console.log("Checking token expiration...");
+
+      if (decodedToken.exp < currentTime) {
+        console.log("Token expired!");
+        localStorage.removeItem("token");
+
+        setIsSessionExpired(true); // Show session expiration modal
+        console.log("State set to isSessionExpired: ", true);
+      }
+    }
+  };
+
+  // Set up token expiration check on mount and periodically
+  useEffect(() => {
+    checkTokenExpiry(); // Run check on component mount
+    const intervalId = setInterval(checkTokenExpiry, 3000); // Check every 3 seconds
+
+    return () => clearInterval(intervalId); // Clean up interval on unmount
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("userRole");
+    sessionStorage.removeItem("userID");
+    sessionStorage.removeItem("showPassModal");
+    navigate("/login");
+  };
+
+  const handleCloseSessionExpiredModal = () => {
+    console.log("Closing modal and redirecting to login...");
+    setIsSessionExpired(false);
+    navigate("/login"); // Redirect to login page
+  };
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -49,12 +129,9 @@ function NavBar() {
 
   const getImageUrl = async (userID) => {
     try {
-      const response = await axios.get(
-        `http://localhost:8080/user/image/${userID}`,
-        {
-          responseType: "arraybuffer",
-        }
-      );
+      const response = await axios.get(`${apiUrl}user/image/${userID}`, {
+        responseType: "arraybuffer",
+      });
       const imageBlob = new Blob([response.data], {
         type: response.headers["content-type"],
       });
@@ -65,7 +142,6 @@ function NavBar() {
       return null;
     }
   };
-
 
   // useEffect(() => {
   //   const getImageUrl = async (userID) => {
@@ -97,19 +173,21 @@ function NavBar() {
     const fetchUser = async () => {
       try {
         const userID = sessionStorage.getItem("userID");
-        const response = await axios.get(
-          `http://localhost:8080/user/getUser/${userID}`
-        );
+        const response = await axios.get(`${apiUrl}user/getUser/${userID}`);
         setLoggedUserData(response.data);
 
-         // Check for admin account
+        // Check for admin account
         //  const adminUsername = `adm_${response.data.username}`;
-         const checkAdminResponse = await axios.get(`http://localhost:8080/checkAdminAccount/${response.data.username}`);
-         setHasAdminAccount(checkAdminResponse.data);
+        const checkAdminResponse = await axios.get(
+          `${apiUrl}checkAdminAccount/${response.data.username}`
+        );
+        setHasAdminAccount(checkAdminResponse.data);
 
-         const checkEmpResponse = await axios.get(`http://localhost:8080/checkEmpAccount/${response.data.username}`);
-          setHasEmpAccount(checkEmpResponse.data);
-          console.log("Has Employee account:", checkEmpResponse.data);
+        const checkEmpResponse = await axios.get(
+          `${apiUrl}checkEmpAccount/${response.data.username}`
+        );
+        setHasEmpAccount(checkEmpResponse.data);
+        console.log("Has Employee account:", checkEmpResponse.data);
       } catch (error) {
         if (error.response) {
           //not in 200 response range
@@ -125,33 +203,28 @@ function NavBar() {
     fetchUser();
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    sessionStorage.removeItem("userRole");
-    sessionStorage.removeItem("userID");
-    navigate("/login");
-  };
-
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
     if (message) setMessage(""); // Clear error message on user input
   };
 
   const handleSwitchAccount = (role) => {
-    setTargetRole(role)
+    setTargetRole(role);
     // Determine the new username based on the role
-    const newUsername = role === "EMPLOYEE" ? displayEmpUsername : displayAdmUsername;
+    const newUsername =
+      role === "EMPLOYEE" ? displayEmpUsername : displayAdmUsername;
     setTargetUsername(newUsername);
     setMessage("");
     setPassword("");
     setOpenPasswordModal(true);
-  }
-  const handleSwitchConfirm = async () => {
+  };
+  const handleSwitchConfirm = async (e) => {
+    e.preventDefault();
     setMessage("");
     try {
-      const response = await axios.post("http://localhost:8080/swapAccount", {
+      const response = await axios.post(`${apiUrl}swapAccount`, {
         username: targetUsername,
-        password: password
+        password: password,
       });
 
       if (response.data && response.data.token) {
@@ -161,11 +234,14 @@ function NavBar() {
 
         // Fetch new user data
         const userID = sessionStorage.getItem("userID");
-        const userResponse = await axios.get(`http://localhost:8080/user/getUser/${userID}`);
+        const userResponse = await axios.get(
+          "${apiUrl}/user/getUser/${userID}"
+        );
 
         // Update state and handle navigation
         setLoggedUserData(userResponse.data);
         console.log("Logged in as", userResponse.data.role);
+        console.log("successfully switched account");
         window.location.reload();
         navigate("/"); // Navigate to home or another page
         handleClose(); // Close the dialog
@@ -173,14 +249,11 @@ function NavBar() {
         console.error("Authentication failed");
       }
     } catch (error) {
-      setTimeout(() => setMessage("Password is invalid or missing."), 0);
+      setTimeout(() => setMessage("Password is invalid"), 0);
 
       console.error("Error during account swap:", error);
     }
   };
-
-
-
 
   const navBarStyle = {
     height: "8vh",
@@ -239,8 +312,10 @@ function NavBar() {
             {loggedUserData.role === "ADMIN"
               ? "Admin"
               : loggedUserData.role === "SUPERUSER"
-                ? "Superuser"
-                : `${loggedUserData.dept} - ${loggedUserData.position}`}
+              ? "Superuser"
+              : `${abbreviateDept(loggedUserData.dept)} - ${
+                  loggedUserData.position
+                }`}
           </Typography>
         </div>
       </div>
@@ -259,7 +334,7 @@ function NavBar() {
             src={
               loggedUserData?.profilePic
                 ? base64ToDataURL(loggedUserData.profilePic)
-                : "/user.png"
+                : defaultProfie
             }
             alt="nav-profile-picture"
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
@@ -382,7 +457,6 @@ function NavBar() {
             </MenuItem>
           )}
 
-
           <MenuItem
             onClick={handleLogout}
             sx={{
@@ -419,11 +493,7 @@ function NavBar() {
           </MenuItem>
         </Menu>
       </div>
-      <Dialog
-        maxWidth="xs"
-        open={openPasswordModal}
-        onClose={handleClose}
-      >
+      <Dialog maxWidth="xs" open={openPasswordModal} onClose={handleClose}>
         <Box
           sx={{
             bgcolor: "#8c383e",
@@ -446,7 +516,7 @@ function NavBar() {
                   alignItems: "center",
                 }}
               >
-                <Grid item sx={{ height: "2.3em", mt: '.3em' }}>
+                <Grid item sx={{ height: "2.3em", mt: ".3em" }}>
                   <FontAwesomeIcon
                     icon={faRightLeft}
                     style={{
@@ -456,7 +526,7 @@ function NavBar() {
                     }}
                   />
                 </Grid>
-                <Grid  item >Switch Account</Grid>
+                <Grid item>Switch Account</Grid>
               </Grid>
             </Grid>
           </Grid>
@@ -469,20 +539,85 @@ function NavBar() {
             />
           </IconButton>
         </Box>
-        <DialogContent>
-          <DialogContentText style={{ fontFamily: 'Poppins', fontSize: '15px' }}>
-            <Box sx={{bgcolor: 'rgba(128, 128, 128, 0.2)' , height:'7vh', borderRadius:'.5em'}}>
-              <Typography style={{padding:'5px', fontFamily: 'Poppins', fontSize: '13px',  }}>Switching to <span style={{fontStyle:'italic', color:'#8c383e'}}>'{targetUsername}'</span>, an <span style={{fontStyle:'italic', fontWeight:'initial'}}>{targetRole}</span> account of yours. Please enter your  <span style={{fontWeight:'bold'}}>password</span> to confirm this change.</Typography>
-            </Box>
-           
-            <div style={{ display: "flex", flexDirection: "column", marginTop: '1.2vh', marginLeft: '2em' }}>
-              <div style={{ display: "flex", alignItems: "center", marginTop: '1vh' }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            paddingLeft: "1em",
+            paddingRight: "1em",
+            paddingTop: "1em",
+          }}
+        >
+          <Box
+            sx={{
+              bgcolor: "rgba(128, 128, 128, 0.2)",
+              height: "8.2vh",
+              borderRadius: ".5em",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <Typography
+              style={{
+                padding: "5px",
+                fontFamily: "Poppins",
+                fontSize: "12px",
+              }}
+            >
+              {" "}
+              You're about to switch to{" "}
+              <span
+                style={{
+                  fontStyle: "italic",
+                  color: "#8c383e",
+                  fontWeight: 600,
+                }}
+              >
+                '{targetUsername}'
+              </span>
+              , your{" "}
+              <span style={{ fontStyle: "italic", fontWeight: 500 }}>
+                {targetRole}
+              </span>{" "}
+              account. Please confirm the switch by entering the{" "}
+              <span style={{ fontWeight: 700 }}>password</span> for{" "}
+              <span
+                style={{
+                  fontStyle: "italic",
+                  color: "#8c383e",
+                  fontWeight: 600,
+                }}
+              >
+                '{targetUsername}'
+              </span>
+              .
+            </Typography>
+          </Box>
+        </div>
+
+        <form
+          onSubmit={handleSwitchConfirm}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            // Center contents horizontally
+            padding: ".5em",
+            width: "100%",
+          }}
+        >
+          <DialogContent>
+            <DialogContentText
+              style={{ fontFamily: "Poppins", fontSize: "15px" }}
+            >
+              {/* <div style={{display: 'flex', gap: '0.5em' }}> */}
+              <div style={{ display: "flex", alignItems: "left" }}>
                 <Typography
                   color="text.secondary"
                   sx={{
                     fontFamily: "Poppins",
                     fontSize: ".9em",
-
+                    mr: "10px",
+                    mt: "8px",
                   }}
                 >
                   Password:
@@ -497,39 +632,50 @@ function NavBar() {
                   inputProps={{
                     style: { fontFamily: "Poppins", fontSize: ".9em" },
                   }}
-                  style={{ marginLeft: '1.2vh' }}></TextField>
-
+                  style={{ width: "60%" }}
+                />
               </div>
               {message && (
-                <FormHelperText style={{ color: 'red', fontSize: '12px', marginLeft: '7em', fontFamily: 'Poppins' }}>{message}</FormHelperText>
+                <FormHelperText
+                  style={{
+                    color: "red",
+                    fontSize: "12px",
+                    fontFamily: "Poppins",
+                    marginLeft: "7em",
+                  }}
+                >
+                  {message}
+                </FormHelperText>
               )}
-
-            </div>
-
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions sx={{ display: "flex", justifyContent: "center" }}>
-          <Button
-            type="submit"
-            onClick={handleSwitchConfirm}
-            variant="contained"
-            sx={{
-              bgcolor: "#8C383E",
-              height: "2.5em",
-              borderRadius: "5px",
-              textTransform: "none",
-              width: "35%",
-              mr: ".5em",
-              mb: "1em",
-              fontFamily: "Poppins",
-              color: "white",
-              "&:hover": { bgcolor: "#762F34", color: "white" },
-            }}
+              {/* </div> */}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions
+            sx={{ display: "flex", justifyContent: "center", width: "100%" }}
           >
-            Confirm{" "}
-          </Button>
-        </DialogActions>
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{
+                bgcolor: "#8C383E",
+                borderRadius: "5px",
+                textTransform: "none",
+                width: "35%",
+                fontFamily: "Poppins",
+                color: "white",
+
+                "&:hover": { bgcolor: "#762F34", color: "white" },
+              }}
+            >
+              Confirm
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
+      <SessionExpiredModal
+        open={isSessionExpired}
+        handleClose={handleCloseSessionExpiredModal}
+      />
     </div>
   );
 }

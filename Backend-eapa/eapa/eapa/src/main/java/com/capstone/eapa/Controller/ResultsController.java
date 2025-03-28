@@ -34,10 +34,9 @@ public class ResultsController {
         return resultService.getAverages(userId, evalType, stage, period);
     }
 
-    //Get Head Job results
     @GetMapping("/getJobRespAverageByEmpId")
-    public double getJobRespAverageByEmpIdAndEvalType(@RequestParam int empId) {
-        return resultService.getJobRespAverageByEmpIdAndEvalType(empId);
+    public double getJobRespAverageByEmpIdEvalTypeAndPeriod(@RequestParam int empId, @RequestParam String period) {
+        return resultService.getJobRespAverageByEmpIdEvalTypeAndPeriod(empId, period);
     }
 
     //Get Head Values results

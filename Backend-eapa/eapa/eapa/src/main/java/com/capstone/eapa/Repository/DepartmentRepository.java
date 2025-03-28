@@ -14,4 +14,5 @@ public interface DepartmentRepository extends JpaRepository<DepartmentEntity, In
     List<DepartmentEntity> findAllDepts();
     //Track Employee - finds the departments under the department head using the name
     List<DepartmentEntity> findByDeptOfficeHead(String headName);
+    List<DepartmentEntity> findByIsDeleted(int isDeleted);
 }

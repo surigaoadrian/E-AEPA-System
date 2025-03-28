@@ -1,8 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import axios from "axios";
+import { apiUrl } from "../config/config";
 
-const COLORS = ['#FFBA00', '#597001'];
+const COLORS = ["#FFBA00", "#597001"];
 
 const EmployeeStatusChart = () => {
   const [data, setData] = useState([]);
@@ -11,8 +19,8 @@ const EmployeeStatusChart = () => {
     const fetchData = async () => {
       try {
         const [probationaryRes, regularRes] = await Promise.all([
-          axios.get('http://localhost:8080/user/countProbationaryUsers'),
-          axios.get('http://localhost:8080/user/getRegularEmployees')
+          axios.get(`${apiUrl}user/countProbationaryUsers`),
+          axios.get(`${apiUrl}user/getRegularEmployees`),
         ]);
 
         const probationaryCount = probationaryRes.data;
@@ -21,14 +29,24 @@ const EmployeeStatusChart = () => {
         const total = probationaryCount + regularCount;
 
         const chartData = [
-          { name: 'Probationary', value: (probationaryCount / total) * 100, count: probationaryCount, color: COLORS[0] },
-          { name: 'Regular', value: (regularCount / total) * 100, count: regularCount, color: COLORS[1] }
+          {
+            name: "Probationary",
+            value: (probationaryCount / total) * 100,
+            count: probationaryCount,
+            color: COLORS[0],
+          },
+          {
+            name: "Regular",
+            value: (regularCount / total) * 100,
+            count: regularCount,
+            color: COLORS[1],
+          },
         ];
 
-        console.log('Fetched Data:', chartData); // Logging the fetched data
+        console.log("Fetched Data:", chartData); // Logging the fetched data
         setData(chartData);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       }
     };
 
@@ -40,7 +58,15 @@ const EmployeeStatusChart = () => {
   };
 
   return (
-    <div style={{ textAlign: 'center', padding: '20px', borderRadius: '8px', width: '100%', height: '100%' }}>
+    <div
+      style={{
+        textAlign: "center",
+        padding: "20px",
+        borderRadius: "8px",
+        width: "100%",
+        height: "100%",
+      }}
+    >
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
@@ -53,13 +79,18 @@ const EmployeeStatusChart = () => {
             paddingAngle={1}
             dataKey="value"
             label={renderCustomizedLabel}
-            labelStyle={{ fontSize: '10px' }} // Adjust font size here
+            labelStyle={{ fontSize: "10px" }} // Adjust font size here
           >
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.color} />
             ))}
           </Pie>
-          <Tooltip formatter={(value, name, props) => [`${value.toFixed(2)}% (${props.payload.count})`, name]} />
+          <Tooltip
+            formatter={(value, name, props) => [
+              `${value.toFixed(2)}% (${props.payload.count})`,
+              name,
+            ]}
+          />
           <Legend />
         </PieChart>
       </ResponsiveContainer>
@@ -68,4 +99,3 @@ const EmployeeStatusChart = () => {
 };
 
 export default EmployeeStatusChart;
-

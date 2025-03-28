@@ -1,71 +1,93 @@
-import React, { useEffect, useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import axios from 'axios';
-import { Box, Select, MenuItem, Typography } from '@mui/material';
-import { styled } from '@mui/system';
+import React, { useEffect, useState } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import axios from "axios";
+import {
+  Box,
+  Select,
+  MenuItem,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
+import { styled } from "@mui/system";
+import { apiUrl } from "../config/config";
 
 const BorderlessSelect = styled(Select)({
-  '& .MuiOutlinedInput-notchedOutline': {
-    border: 'none',
+  "& .MuiOutlinedInput-notchedOutline": {
+    border: "none",
   },
-  '&:hover .MuiOutlinedInput-notchedOutline': {
-    border: 'none',
+  "&:hover .MuiOutlinedInput-notchedOutline": {
+    border: "none",
   },
-  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-    border: 'none',
+  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+    border: "none",
   },
 });
 
-const colorPalette = ['#C97338', '#A54D27', '#65371F', '#282119'];
+const colorPalette = ["#C97338", "#A54D27", "#65371F", "#282119"];
 
 const getColor = (index) => colorPalette[index % colorPalette.length];
 
 const AccomplishmentRateChart = () => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [period, setPeriod] = useState('annual');
+  const [period, setPeriod] = useState("annual");
+  const [error, setError] = useState(null);
 
   const getEndpoint = (period) => {
     switch (period) {
-      case 'annual':
-        return 'http://localhost:8080/evaluation/annualPerDept';
-      case 'thirdMonth':
-        return 'http://localhost:8080/evaluation/thirdMonthPerDept';
-      case 'fifthMonth':
-        return 'http://localhost:8080/evaluation/fifthMonthPerDept';
+      case "annual":
+        return `${apiUrl}evaluation/annualPerDept`;
+      case "thirdMonth":
+        return `${apiUrl}evaluation/thirdMonthPerDept`;
+      case "fifthMonth":
+        return `${apiUrl}evaluation/fifthMonthPerDept`;
       default:
-        return 'http://localhost:8080/evaluation/annualPerDept';
+        return `${apiUrl}evaluation/annualPerDept`;
     }
   };
 
   useEffect(() => {
     const endpoint = getEndpoint(period);
-    axios.get(endpoint)
-      .then(response => {
-        if (response.data && response.data.length > 0) {
-          setData(response.data);
-        } else {
-          setData([]); // Reset data if response is empty
-        }
+    setIsLoading(true);
+    setError(null);
+    axios
+      .get(endpoint)
+      .then((response) => {
+        setData(response.data || []);
         setIsLoading(false);
       })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-        setData([]); // Reset data on error
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        setError("Failed to load data");
         setIsLoading(false);
       });
   }, [period]);
 
   const handlePeriodChange = (event) => {
     setPeriod(event.target.value);
-    setIsLoading(true); // Set loading state to true while fetching new data
   };
 
   const chartHeight = data.length > 10 ? data.length * 40 : 342;
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 1 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 1,
+        }}
+      >
         <Typography sx={{ fontWeight: 500 }} fontSize={15} fontFamily="Poppins">
           Accomplishment Rate Per Department
         </Typography>
@@ -81,33 +103,58 @@ const AccomplishmentRateChart = () => {
         </BorderlessSelect>
       </Box>
       {isLoading ? (
-        <div>Loading...</div>
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height={chartHeight}
+        >
+          <CircularProgress />
+        </Box>
+      ) : error ? (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height={chartHeight}
+        >
+          <Typography color="error">{error}</Typography>
+        </Box>
       ) : data.length === 0 ? (
-        <div>No data available for the selected period</div>
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height={chartHeight}
+        >
+          <Typography>No data available for the selected period</Typography>
+        </Box>
       ) : (
-        <Box sx={{ overflowY: 'auto', maxHeight: 342 }}>
+        <Box sx={{ overflowX: "auto", maxHeight: 342 }}>
           <ResponsiveContainer width="100%" height={chartHeight}>
             <BarChart
               data={data}
-              layout="vertical"
+              layout="horizontal"
               margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" />
-              <YAxis
+              <XAxis
                 type="category"
                 dataKey="department"
-                tick={({ x, y, payload }) => (
-                  <text x={x} y={y} dy={16} textAnchor="end" fill="#666" fontSize={13}>
-                    {payload.value}
-                  </text>
-                )}
+                label={{
+                  value: "Department",
+                  position: "insideBottomRight",
+                  offset: 0,
+                }}
+              />
+              <YAxis
+                type="number"
+                tickFormatter={(tick) => Math.floor(tick)}
+                label={{ value: "Count", angle: -90, position: "insideLeft" }}
               />
               <Tooltip />
               <Legend />
-              {data.map((entry, index) => (
-                <Bar key={entry.department} dataKey="count" fill={getColor(index)} />
-              ))}
+              <Bar dataKey="count" fill={colorPalette[0]} />
             </BarChart>
           </ResponsiveContainer>
         </Box>

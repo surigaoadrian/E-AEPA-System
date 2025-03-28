@@ -1,6 +1,7 @@
 package com.capstone.eapa.Controller;
 
-import com.capstone.eapa.DTO.PasswordRequest;
+import com.capstone.eapa.DTO.ThirdAndFifthProbeDTO;
+import com.capstone.eapa.DTO.UserCountDTO;
 import com.capstone.eapa.Entity.UserEntity;
 import com.capstone.eapa.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "*")
 public class UserController {
     @Autowired
     private UserService userServ;
@@ -139,7 +140,48 @@ public class UserController {
         }
     }
 
-        //total probationary employees
+    
+    //random assigned peers for 3rd month
+    @GetMapping("/getAssignedEvaluators")
+    public ResponseEntity<List<Integer>> getAssignedEvaluators(@RequestParam String dept, @RequestParam int excludedUserID) {
+        try {
+            List<Integer> assignedEvaluators = userServ.getAssignedEvaluators(dept, excludedUserID);
+            if (assignedEvaluators.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.ok(assignedEvaluators);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    //random assigned peers for 5th month
+    @GetMapping("/get5thMonthAssignedEvaluators")
+    public ResponseEntity<List<Integer>> get5thMonthAssignedEvaluators(
+            @RequestParam String dept,
+            @RequestParam int excludedUserID,
+            @RequestParam List<Integer> excludedPeerIds) {
+        List<Integer> evaluatorIds = userServ.get5thMonthAssignedEvaluators(dept, excludedUserID, excludedPeerIds);
+        return ResponseEntity.ok(evaluatorIds);
+    }
+
+    //random assigned peers for Annual 1st Sem
+    @GetMapping("/get1stAnnualAssignedEvaluators")
+    public ResponseEntity<List<Integer>> get1stAnnualAssignedEvaluators(@RequestParam String dept, @RequestParam int excludedUserID) {
+        try {
+            List<Integer> assignedEvaluators = userServ.get1stAnnualAssignedEvaluators(dept, excludedUserID);
+            if (assignedEvaluators.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.ok(assignedEvaluators);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    //total probationary employees
     @GetMapping("/countProbationaryUsers")
     public ResponseEntity<Long> countProbationaryUsers() {
         long count = userServ.getTotalProbationaryUsers();
@@ -158,6 +200,32 @@ public class UserController {
         return ResponseEntity.ok(count);
     }
 
+    @PatchMapping("/{userId}/3rdEval")
+    public ResponseEntity<?> update3rdEvaluationStatus(@PathVariable int userId, @RequestParam boolean status) {
+        userServ.update3rdEvaluationStatus(userId, status);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{userId}/5thEval")
+    public ResponseEntity<?> update5thEvaluationStatus(@PathVariable int userId, @RequestParam boolean status) {
+        userServ.update5thEvaluationStatus(userId, status);
+        return ResponseEntity.ok().build();
+    }
+
+
+
+    @PatchMapping("/{userId}/promote")
+    public ResponseEntity<String> promoteTo5thProbationary(@PathVariable int userId) {
+        try {
+            userServ.promoteTo5thProbationary(userId);
+            return ResponseEntity.ok("User promoted to 5th Probationary successfully.");
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
     //get the employees' data with the corresponding department head - Track Employee
     //  @GetMapping("/employees-with-head")
     // public ResponseEntity<List<UserEntity>> getAllEmployeesFromDepartmentHead(@RequestParam String headName) {
@@ -166,13 +234,69 @@ public class UserController {
     // }
 
 
-
-
-
     @GetMapping("/getHeadUserIdByDept")
     public ResponseEntity<Integer> getHeadUserIdByDept(@RequestParam String dept) {
         Integer userId = userServ.getHeadUserIdByDept(dept);
         return ResponseEntity.ok(userId);
     }
+
+    //dashboard adi
+    @GetMapping("/getThirdMonthEmpCount")
+    public ResponseEntity<Integer> getThirdMonthEmpCount(){
+        Integer thirdMonthEmpCount = userServ.getThirdMonthEmpCount();
+        return ResponseEntity.ok(thirdMonthEmpCount);
+    }
+    @GetMapping("/getFifthMonthEmpCount")
+    public ResponseEntity<Integer> getFifthMonthEmpCount(){
+        Integer fifthMonthEmpCount = userServ.getFifthMonthEmpCount();
+        return ResponseEntity.ok(fifthMonthEmpCount);
+    }
+    @GetMapping("/getRegularEmpCount")
+    public ResponseEntity<Integer> getRegularEmpCount(){
+        Integer regularEmpCount = userServ.getRegularEmpCount();
+        return ResponseEntity.ok(regularEmpCount);
+    }
+
+    @GetMapping("/get3rdMonthProbeEmp")
+    public ResponseEntity<List<ThirdAndFifthProbeDTO>> get3rdMonthProbeEmp(){
+        System.out.println("Fetching 3rd-month probationary employees...");
+        List<ThirdAndFifthProbeDTO> userList = userServ.getAll3rdMonthProbeEmp("3rd Probationary");
+        System.out.println("User list size: " + userList.size());
+//
+//        if (userList.isEmpty()) {
+//            return ResponseEntity.notFound().build();
+//        } else {
+//            return ResponseEntity.ok(userList);
+//        }
+        return ResponseEntity.ok(userList);
+    }
+
+    @GetMapping("/get5thMonthProbeEmp")
+    public ResponseEntity<List<ThirdAndFifthProbeDTO>> get5thMonthProbeEmp(){
+        System.out.println("Fetching 5th-month probationary employees...");
+        List<ThirdAndFifthProbeDTO> userList = userServ.getAll5thMonthProbeEmp("5th Probationary");
+        System.out.println("User list size: " + userList.size());
+
+//        if (userList.isEmpty()) {
+//            return ResponseEntity.notFound().build();
+//        } else {
+//            return ResponseEntity.ok(userList);
+//        }
+        return ResponseEntity.ok(userList);
+    }
+
+    //return user counts by dept
+    @GetMapping("/userCounts/{department}")
+    public ResponseEntity<UserCountDTO> getUserCounts(@PathVariable String department) {
+        UserCountDTO counts = userServ.getUserCountsByDept(department);
+        return ResponseEntity.ok(counts);
+    }
+
+    //return user counts by array of depts
+    @GetMapping("/counts-by-departments")
+    public List<UserCountDTO> getCountsByDepartments(@RequestParam String[] departments) {
+        return userServ.getEmployeeCountsByDepartments(departments);
+    }
+
 }
 

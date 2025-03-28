@@ -13,4 +13,6 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
     @Query(value = "SELECT * FROM tblquestions ques WHERE ques.is_deleted = 0", nativeQuery = true)
     List<QuestionEntity> findAllQuestions();
 
+    List<QuestionEntity> findByQuesIDIn(List<Integer> quesIDs);
+
 }

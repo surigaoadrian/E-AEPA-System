@@ -1,6 +1,27 @@
+/*
+ISSUE: if d mo update si admin sa MA sa probestat, walay makita dire na evaluation like:
+if si employee mana sa iyang 3rd din pa 5th na siya pero wa nag update sa probstat si admin, d makita dri ni head ang eval 
+unless d mag update si admin so maghuwat gyud ni dire sa update sa probestat
+so OPTION: DYNAMIC UPDATE probestat: IF kni, issue ani kay mawala ang prev period bisan wala pa nka eval ang head.
+*/
 import React, { useState, useEffect, useMemo } from "react";
 import Paper from "@mui/material/Paper";
-import { Box, Button, Grid, Typography, Menu, Modal, TextField, InputAdornment, IconButton, Select, FormControl, ListItemIcon, ListItemText } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  Typography,
+  Menu,
+  Modal,
+  TextField,
+  InputAdornment,
+  IconButton,
+  Select,
+  FormControl,
+  ListItemIcon,
+  ListItemText,
+  Tooltip,
+} from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -12,11 +33,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileLines, faSearch } from "@fortawesome/free-solid-svg-icons";
 import Animated from "../components/motion";
 import axios from "axios";
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import Fade from "@mui/material/Fade";
 import EvaluationForm from "../components/EvaluationForm";
-import CheckIcon from '@mui/icons-material/Check';
+import CheckIcon from "@mui/icons-material/Check";
 import { set } from "date-fns";
+import { apiUrl } from "../config/config";
+import "../styles/Loader.css";
 
 function EvaluateEmployee() {
   const userID = sessionStorage.getItem("userID");
@@ -28,9 +51,9 @@ function EvaluateEmployee() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // Adjust this based on your needs
   const pagesPerGroup = 5;
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   // Add state for probeStatus filter
-  const [probeStatusFilter, setProbeStatusFilter] = useState('');
+  const [probeStatusFilter, setProbeStatusFilter] = useState("");
   const [filterAnchorEl, setFilterAnchorEl] = useState(null);
   const openFilterMenu = Boolean(filterAnchorEl);
   //adi changes
@@ -42,11 +65,14 @@ function EvaluateEmployee() {
   const [selectedStage, setSelectedStage] = useState("");
   const [isEvaluationCompleted, setIsEvaluationCompleted] = useState(false);
   const evalType = "HEAD";
-
+  const [isLoading, setIsLoading] = useState(false);
   const [isEvaluationCompletedValues, setIsEvaluationCompletedValues] =
     useState(false);
   const [isEvaluationCompletedJob, setIsEvaluationCompletedJob] =
     useState(false);
+  const [schoolYear, setSchoolYear] = useState("");
+  const [semester, setSemester] = useState("");
+  const [selectedEmpPeriod, setSelectedEmpPeriod] = useState("");
 
   const modalStyle = {
     position: "absolute",
@@ -64,6 +90,30 @@ function EvaluateEmployee() {
     textAlign: "left",
   };
 
+  //fetch school year and semester
+  useEffect(() => {
+    const fetchSchoolYearAndSem = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}academicYear/current-year`);
+        const response2 = await axios.get(
+          `${apiUrl}academicYear/current-semester`
+        );
+        setSchoolYear(response.data);
+        setSemester(response2.data);
+      } catch (error) {
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else {
+          console.log(`Error: ${error.message}`);
+        }
+      }
+    };
+
+    fetchSchoolYearAndSem();
+  }, []);
+
   const handleOpenModal = (stage, period) => {
     setSelectedStage(stage);
     setOpenModal(true);
@@ -77,6 +127,7 @@ function EvaluateEmployee() {
   };
 
   const handleConfirm = async () => {
+    // setIsLoading(true);
     setOpenForm(!openForm);
     setStage(selectedStage);
     setOpenModal(false);
@@ -97,38 +148,32 @@ function EvaluateEmployee() {
         userID: selectedEmp.userID,
       },
       stage: selectedStage,
-      period: period,
+      period: selectedEmpPeriod,
       evalType: evalType,
       status: "OPEN",
       dateTaken: currentDate,
+      schoolYear: schoolYear,
+      semester: semester,
       isDeleted: 0,
     };
 
     console.log("Evaluation object to be sent:", evaluation);
 
-    try {
-      const response = await axios.post(
-        "http://localhost:8080/evaluation/createEvaluation",
-        evaluation
-      );
+    let existingEvalID = null;
 
-      const evalPeriod = getEvaluationPeriod(selectedEmp.probeStatus);
-      await handleCompleteStatus(
-        userID,
-        selectedEmp.userID,
-        evalPeriod,
-        "VALUES",
-        "HEAD"
-      );
-      await handleCompleteStatus(
-        userID,
-        selectedEmp.userID,
-        evalPeriod,
-        "JOB",
-        "HEAD"
-      );
+    try {
+      const response = await axios.get(`${apiUrl}evaluation/getEvalIDHead`, {
+        params: {
+          userID: userID,
+          empID: selectedEmp.userID,
+          period: selectedEmpPeriod,
+          stage: selectedStage,
+          evalType: "HEAD",
+        },
+      });
+      existingEvalID = response.data;
     } catch (error) {
-      console.error("Creating evaluation failed", error);
+      console.error("Fetching evaluation id failed", error);
       if (error.response) {
         console.log(error.response.data);
         console.log(error.response.status);
@@ -137,7 +182,55 @@ function EvaluateEmployee() {
         console.log(`Error: ${error.message}`);
       }
     }
+
+    if (!existingEvalID) {
+      try {
+        const response = await axios.post(
+          `${apiUrl}evaluation/createEvaluation`,
+          evaluation
+        );
+
+        const evalPeriod = getEvaluationPeriod(selectedEmp.probeStatus);
+        await handleCompleteStatus(
+          userID,
+          selectedEmp.userID,
+          evalPeriod,
+          "VALUES",
+          "HEAD"
+        );
+        await handleCompleteStatus(
+          userID,
+          selectedEmp.userID,
+          evalPeriod,
+          "JOB",
+          "HEAD"
+        );
+      } catch (error) {
+        console.error("Creating evaluation failed", error);
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else {
+          console.log(`Error: ${error.message}`);
+        }
+      }
+    }
+    // setIsLoading(false);
   };
+
+  useEffect(() => {
+    if (!openForm) {
+      setIsLoading(true); // Set loading to true when form closes
+
+      // Simulate loading with a timeout, replace this with your data fetching logic
+      const timer = setTimeout(() => {
+        setIsLoading(false); // Stop loading after data fetching
+      }, 1000); // Adjust the delay as needed
+
+      return () => clearTimeout(timer); // Cleanup on unmount
+    }
+  }, [openForm]);
 
   const handleClick = (event, selectedUser) => {
     setAnchorEl(event.currentTarget);
@@ -147,18 +240,38 @@ function EvaluateEmployee() {
     setIsEvaluationCompletedValues(false);
     setIsEvaluationCompletedJob(false);
 
-    const period = getEvaluationPeriod(selectedUser.probeStatus);
+    const period =
+      selectedUser.empStatus === "Regular"
+        ? semester === "First Semester"
+          ? "Annual-1st"
+          : semester === "Second Semester"
+            ? "Annual-2nd"
+            : "Invalid Semester"
+        : selectedUser.probeStatus === "3rd Probationary"
+          ? "3rd Month"
+          : "5th Month";
+
     handleCompleteStatus(userID, selectedUser.userID, period, "VALUES", "HEAD");
     handleCompleteStatus(userID, selectedUser.userID, period, "JOB", "HEAD");
+    setSelectedEmpPeriod(period);
   };
+
+  console.log("Adi ---- selected period: ", selectedEmpPeriod);
+
   const handleClose = () => {
     setAnchorEl(null);
   };
 
-  const getEvaluationPeriod = (probeStatus) => {
+  const getEvaluationPeriod = (probeStatus, empStatus) => {
     if (probeStatus === "3rd Probationary") return "3rd Month";
     if (probeStatus === "5th Probationary") return "5th Month";
-    return "Annual";
+
+    if (empStatus === "Regular") {
+      if (semester) {
+        // check if semester is defined
+        return semester === "First Semester" ? "Annual-1st" : "Annual-2nd";
+      }
+    }
   };
 
   useEffect(() => {
@@ -167,11 +280,17 @@ function EvaluateEmployee() {
       handleCompleteStatus(
         userID,
         selectedEmp.userID,
-        period,
+        selectedEmpPeriod,
         "VALUES",
         "HEAD"
       );
-      handleCompleteStatus(userID, selectedEmp.userID, period, "JOB", "HEAD");
+      handleCompleteStatus(
+        userID,
+        selectedEmp.userID,
+        selectedEmpPeriod,
+        "JOB",
+        "HEAD"
+      );
     }
   }, [selectedEmp]);
 
@@ -185,7 +304,7 @@ function EvaluateEmployee() {
   ) => {
     try {
       const response = await axios.get(
-        "http://localhost:8080/evaluation/isEvaluationCompletedHead",
+        `${apiUrl}evaluation/isEvaluationCompletedHead`,
         {
           params: {
             userID: userID,
@@ -198,77 +317,132 @@ function EvaluateEmployee() {
       );
       if (stage === "VALUES") {
         setIsEvaluationCompletedValues(response.data);
+        return response.data;
       } else if (stage === "JOB") {
         setIsEvaluationCompletedJob(response.data);
+        return response.data;
       }
     } catch (error) {
       console.error("Error checking evaluation status:", error);
     }
   };
 
+  const getProbationaryMonth = (probeStatus) => {
+    const statusNumber = probeStatus.split(" ")[0];
+    return parseInt(statusNumber); // Extract the number (e.g., 3 from "3rd probationary")
+  };
+
+  const calculateMonthsDifference = (startDate, endDate) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const yearsDiff = end.getFullYear() - start.getFullYear();
+    const monthsDiff = end.getMonth() - start.getMonth() + 1;
+
+    return yearsDiff * 12 + monthsDiff; // Total months difference
+  };
+
   //fetch the user data
   useEffect(() => {
     const fetchData = async () => {
+      //setIsLoading(true);
       try {
-        // Fetch specific user data based on userID
-        const userResponse = await fetch(
-          `http://localhost:8080/user/getUser/${userID}`
-        );
-        if (!userResponse.ok) {
-          throw new Error("Failed to fetch user data");
-        }
+        const userResponse = await fetch(`${apiUrl}user/getUser/${userID}`);
         const userData = await userResponse.json();
         setUser(userData);
 
-        // Fetch all users
-        const allUsersResponse = await fetch(
-          "http://localhost:8080/user/getAllUser"
-        );
-        if (!allUsersResponse.ok) {
-          throw new Error("Failed to fetch all users data");
-        }
+        const allUsersResponse = await fetch(`${apiUrl}user/getAllUser`);
         const allUsersData = await allUsersResponse.json();
-        const processedData = allUsersData
-          .filter(
-            (item) => item.role === "EMPLOYEE" && item.dept === userData.dept
-          )
-          .map((item) => ({
-            ...item,
-            name: `${item.fName} ${item.lName}`,
-            userID: item.userID,
-          }))
+        console.log(allUsersData);
+        const currentDate = new Date();
 
-          .filter((item) => {
-            if (probeStatusFilter === '') {
-              return true;
-            }
-            if (probeStatusFilter === 'Annually' && item.probeStatus === '') {
-              return true;
-            }
-            return item.probeStatus === probeStatusFilter;
-          });
+        const processedData = await Promise.all(
+          allUsersData
+            .filter(
+              (item) => item.role === "EMPLOYEE" && item.dept === userData.dept
+            )
+            .filter((item) => {
+              if (probeStatusFilter === "") {
+                return true;
+              }
+              if (probeStatusFilter === "Annually" && item.probeStatus === "") {
+                return true;
+              }
+              return item.probeStatus === probeStatusFilter;
+            })
+            .map(async (item) => {
+              const probationaryMonth = getProbationaryMonth(item.probeStatus);
+              const monthsSinceHired = calculateMonthsDifference(
+                item.dateHired,
+                currentDate
+              );
+              const isRegularEmployee = item.empStatus === "Regular";
+
+              const isEligibleForEvaluation =
+                (isRegularEmployee && monthsSinceHired >= 6) ||
+                (!isRegularEmployee && monthsSinceHired >= probationaryMonth);
+
+              if (!isEligibleForEvaluation) return null;
+
+              // Fetch evaluation statuses
+              const isEvaluationCompletedValues = await handleCompleteStatus(
+                userID,
+                item.userID,
+                getEvaluationPeriod(item.probeStatus),
+                "VALUES",
+                "HEAD"
+              );
+              const isEvaluationCompletedJob = await handleCompleteStatus(
+                userID,
+                item.userID,
+                getEvaluationPeriod(item.probeStatus),
+                "JOB",
+                "HEAD"
+              );
+              // If both evaluations are completed, skip this employee
+              if (isEvaluationCompletedValues && isEvaluationCompletedJob) {
+                return null;
+              }
+
+              return {
+                ...item,
+                name: `${item.fName} ${item.lName}`,
+                userID: item.userID,
+                probationaryMonth,
+                monthsSinceHired,
+                isEligibleForEvaluation,
+              };
+            })
+        );
+
+        const filteredData = processedData.filter((item) => item !== null);
+        setRows(filteredData);
+
         // Apply search filter
-        const searchFilteredData = processedData.filter((item) =>
+        const searchFilteredData = filteredData.filter((item) =>
           Object.values(item).some(
             (value) =>
               value &&
               value.toString().toLowerCase().includes(searchTerm.toLowerCase())
           )
         );
-
         setRows(searchFilteredData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
+      // finally {
+      //   setIsLoading(false);
+      // }
     };
-
-    fetchData();
-  }, [userID, updateFetch, searchTerm, probeStatusFilter]);
-
+    if (!openForm) {
+      fetchData();
+    }
+  }, [userID, updateFetch, searchTerm, probeStatusFilter, openForm]);
 
   const totalPages = Math.ceil(rows.length / itemsPerPage);
 
-  const startPageGroup = Math.floor((currentPage - 1) / pagesPerGroup) * pagesPerGroup + 1;
+  const startPageGroup =
+    Math.floor((currentPage - 1) / pagesPerGroup) * pagesPerGroup + 1;
   const endPageGroup = Math.min(startPageGroup + pagesPerGroup - 1, totalPages);
 
   const handlePageChange = (newPage) => {
@@ -333,11 +507,11 @@ function EvaluateEmployee() {
     {
       id: "probeStatus",
       label: (
-        <div style={{ display: 'flex', alignItems: 'center', }}>
-          <span>Evaluation Period</span>
+        <div>
+          <span style={{ paddingLeft: 26 }}>Evaluation Period</span>
           <IconButton
             onClick={handleFilterClick}
-            sx={{ color: 'white', width: '1.3em', height: '1.3em', ml: '.6vh' }}
+            sx={{ color: "white", width: "1.3em", height: "1.3em", ml: ".6vh" }}
           >
             <FilterAltIcon fontSize="medium" />
           </IconButton>
@@ -347,51 +521,76 @@ function EvaluateEmployee() {
             onClose={handleCloseFilter}
             PaperProps={{
               sx: {
-                '& .MuiMenuItem-root': {
-                  fontSize: '.7em',
-                  fontFamily: 'Poppins',
+                "& .MuiMenuItem-root": {
+                  fontSize: ".7em",
+                  fontFamily: "Poppins",
                 },
               },
             }}
           >
             <MenuItem
-            dense
-              onClick={() => handleMenuClick('')}
-              selected={probeStatusFilter === ''}
-              sx={{ fontFamily: 'Poppins' }}
+              dense
+              onClick={() => handleMenuClick("")}
+              selected={probeStatusFilter === ""}
+              sx={{ fontFamily: "Poppins" }}
             >
-              <ListItemIcon>{probeStatusFilter === '' && <CheckIcon fontSize="small" />}</ListItemIcon>
-              <ListItemText  primary="All" style={{ fontFamily: 'Poppins',fontSize:'.5em',  }} />
+              <ListItemIcon>
+                {probeStatusFilter === "" && <CheckIcon fontSize="small" />}
+              </ListItemIcon>
+              <ListItemText
+                primary="All"
+                style={{ fontFamily: "Poppins", fontSize: ".5em" }}
+              />
             </MenuItem>
             <MenuItem
-            dense
-              onClick={() => handleMenuClick('Annually')}
-              selected={probeStatusFilter === 'Annually'}
-              sx={{ fontFamily: 'Poppins',fontSize:'.5em' }}
+              dense
+              onClick={() => handleMenuClick("Annually")}
+              selected={probeStatusFilter === "Annually"}
+              sx={{ fontFamily: "Poppins", fontSize: ".5em" }}
             >
-              <ListItemIcon>{probeStatusFilter === 'Annually' && <CheckIcon fontSize="small" />}</ListItemIcon>
-              <ListItemText primary="Annually" sx={{ fontFamily: 'Poppins',fontSize:'.5em' }} />
+              <ListItemIcon>
+                {probeStatusFilter === "Annually" && (
+                  <CheckIcon fontSize="small" />
+                )}
+              </ListItemIcon>
+              <ListItemText
+                primary="Annually"
+                sx={{ fontFamily: "Poppins", fontSize: ".5em" }}
+              />
             </MenuItem>
             <MenuItem
-            dense
-              onClick={() => handleMenuClick('3rd Probationary')}
-              selected={probeStatusFilter === '3rd Probationary'}
-              sx={{ fontFamily: 'Poppins',fontSize:'.5em' }}
+              dense
+              onClick={() => handleMenuClick("3rd Probationary")}
+              selected={probeStatusFilter === "3rd Probationary"}
+              sx={{ fontFamily: "Poppins", fontSize: ".5em" }}
             >
-              <ListItemIcon>{probeStatusFilter === '3rd Probationary' && <CheckIcon fontSize="small" />}</ListItemIcon>
-              <ListItemText primary="3rd Probationary" sx={{ fontFamily: 'Poppins',fontSize:'.5em' }} />
+              <ListItemIcon>
+                {probeStatusFilter === "3rd Probationary" && (
+                  <CheckIcon fontSize="small" />
+                )}
+              </ListItemIcon>
+              <ListItemText
+                primary="3rd Probationary"
+                sx={{ fontFamily: "Poppins", fontSize: ".5em" }}
+              />
             </MenuItem>
             <MenuItem
-            dense
-              onClick={() => handleMenuClick('5th Probationary')}
-              selected={probeStatusFilter === '5th Probationary'}
-              style={{ fontFamily: 'Poppins',fontSize:'.5em' }}
+              dense
+              onClick={() => handleMenuClick("5th Probationary")}
+              selected={probeStatusFilter === "5th Probationary"}
+              style={{ fontFamily: "Poppins", fontSize: ".5em" }}
             >
-              <ListItemIcon>{probeStatusFilter === '5th Probationary' && <CheckIcon fontSize="small" />}</ListItemIcon>
-              <ListItemText primary="5th Probationary" sx={{ fontFamily: 'Poppins',fontSize:'.5em' }} />
+              <ListItemIcon>
+                {probeStatusFilter === "5th Probationary" && (
+                  <CheckIcon fontSize="small" />
+                )}
+              </ListItemIcon>
+              <ListItemText
+                primary="5th Probationary"
+                sx={{ fontFamily: "Poppins", fontSize: ".5em" }}
+              />
             </MenuItem>
           </Menu>
-
         </div>
       ),
       minWidth: 150,
@@ -404,7 +603,6 @@ function EvaluateEmployee() {
         }
       },
     },
-
     {
       id: "actions",
       label: "Action",
@@ -424,7 +622,7 @@ function EvaluateEmployee() {
                 "&:hover": { color: "red" },
               }}
               onClick={(event) => handleClick(event, row)}
-              style={{ textTransform: "none", fontFamily: 'Poppins' }}
+              style={{ textTransform: "none", fontFamily: "Poppins" }}
               startIcon={
                 <FontAwesomeIcon
                   icon={faFileLines}
@@ -446,11 +644,11 @@ function EvaluateEmployee() {
               PaperProps={{
                 elevation: 0, // Remove shadow
                 sx: {
-                  border: '1px solid #d3d4d5',
-                  boxShadow: 'none', // Remove shadow
-                  '& .MuiMenuItem-root': {
-                    fontSize: '.8em',
-                    fontFamily: 'Poppins',
+                  border: "1px solid #d3d4d5",
+                  boxShadow: "none", // Remove shadow
+                  "& .MuiMenuItem-root": {
+                    fontSize: ".8em",
+                    fontFamily: "Poppins",
                   },
                 },
               }}
@@ -490,73 +688,75 @@ function EvaluateEmployee() {
   ];
 
   return (
-    <div>
+    <div style={{ height: "91.5vh", overflowX: "auto" }}>
       <Animated>
         <Typography
-          ml={6.5}
+          ml={4}
           mt={3}
           sx={{ fontFamily: "Poppins", fontWeight: "bold", fontSize: "1.5em" }}
         >
           {openForm ? "Evaluation" : "List of Staff"}{" "}
         </Typography>
-        <div className="ml-8 mt-2">
-          <div className="mr-10  flex items-center justify-between">
-            <div className="ml-4 flex items-center justify-start">
-              <TextField
-                placeholder="Search ..."
-                value={searchTerm}
-                onChange={handleSearchChange}
-                sx={{
-
-                  "& .MuiOutlinedInput-root": {
-                    backgroundColor: "#ffffff", // Set the background color for the entire input area
-                  },
-                  "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-                    borderWidth: "1px",
-                    borderColor: "#e0e0e0",
-                  },
-                  "&:hover .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
-                  {
-                    borderColor: "#e0e0e0",
-                  },
-                  "&:focus-within": {
-                    "& fieldset": {
-                      borderColor: "#8C383E !important",
-                      borderWidth: "1px !important",
+        {!openForm && (
+          <div className="ml-4 mt-2">
+            <div className="mr-10 flex items-center justify-between">
+              <div className="ml-4 flex items-center justify-start">
+                <TextField
+                  placeholder="Search Employee..."
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      backgroundColor: "#ffffff",
                     },
-                  },
-                  "& .MuiInputBase-input": {
-                    padding: "10px 10px",
-                    fontSize: "13px",
-                    fontFamily: "Poppins",
-                  },
-                  minWidth: "110%",
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment>
-                      <FontAwesomeIcon
-                        icon={faSearch}
-                        style={{ fontSize: "13px", padding: "0" }}
-                      />
-                    </InputAdornment>
-                  ),
-                }}
-              />
+                    "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
+                    {
+                      borderWidth: "1px",
+                      borderColor: "#e0e0e0",
+                    },
+                    "&:hover .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
+                    {
+                      borderColor: "#e0e0e0",
+                    },
+                    "&:focus-within": {
+                      "& fieldset": {
+                        borderColor: "#8C383E !important",
+                        borderWidth: "1px !important",
+                      },
+                    },
+                    "& .MuiInputBase-input": {
+                      padding: "10px 10px",
+                      fontSize: "13px",
+                      fontFamily: "Poppins",
+                    },
+                    minWidth: "110%",
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment>
+                        <FontAwesomeIcon
+                          icon={faSearch}
+                          style={{ fontSize: "13px", padding: "0" }}
+                        />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
         {/** Diri ko mag conditional rendering */}
         {openForm ? (
           <Box
             sx={{
               display: "flex",
               flexWrap: "wrap",
-              "& > :not(style)": { ml: 4, mt: 2, mr: 4, width: "93.5%" },
+              "& > :not(style)": { ml: 4, mt: 0, mr: 4, width: "93.5%" },
             }}
           >
             <EvaluationForm
-              period={period}
+              period={selectedEmpPeriod}
               loggedUser={user}
               selectedEmp={selectedEmp}
               stage={stage}
@@ -569,7 +769,9 @@ function EvaluateEmployee() {
             sx={{
               display: "flex",
               flexWrap: "wrap",
-              "& > :not(style)": { ml: 6, mt: 2, width: "93%" },
+              "& > :not(style)": { ml: 4, mt: 2, width: "95%" },
+              //backgroundColor: "tomato",
+              //height: "65vh",
             }}
           >
             <Grid
@@ -581,16 +783,22 @@ function EvaluateEmployee() {
                 alignItems: "center",
               }}
             >
-
               <TableContainer
-                sx={{ borderRadius: "5px 5px 0 0 ", maxHeight: "100%", border: '1px solid lightgray' }}
+                sx={{
+                  height: "30.53em",
+                  borderRadius: "5px 5px 0 0 ",
+                  maxHeight: "100%",
+                  border: "1px solid lightgray",
+                  //backgroundColor: "lightgreen",
+                }}
               >
                 <Table stickyHeader aria-label="a dense table" size="small">
                   <TableHead sx={{ height: "2em" }}>
                     <TableRow>
                       {columnsEmployees.map((column) => (
                         <TableCell
-                          component="th" scope="row"
+                          component="th"
+                          scope="row"
                           sx={{
                             fontFamily: "Poppins",
                             bgcolor: "#8c383e",
@@ -606,7 +814,23 @@ function EvaluateEmployee() {
                       ))}
                     </TableRow>
                   </TableHead>
-                  {hasData ? (
+                  {isLoading ? ( // Show loading indicator if loading
+                    <TableBody>
+                      <TableRow>
+                        <TableCell
+                          colSpan={columnsEmployees.length}
+                          align="center"
+                        >
+                          <div
+                            className="loader-container"
+                            style={{ height: '30.53em' }} 
+                          >
+                            <div className="loader"></div>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  ) : hasData ? (
                     <TableBody>
                       {paginatedRows.map((row) => (
                         <TableRow
@@ -621,8 +845,9 @@ function EvaluateEmployee() {
                         >
                           {columnsEmployees.map((column) => (
                             <TableCell
-                              component="th" scope="row"
-                              sx={{ fontFamily: "Poppins", fontSize: '.8em' }}
+                              component="th"
+                              scope="row"
+                              sx={{ fontFamily: "Poppins", fontSize: ".8em" }}
                               key={`${row.id}-${column.id}`}
                               align={column.align}
                             >
@@ -643,7 +868,11 @@ function EvaluateEmployee() {
                   ) : (
                     <TableBody>
                       <TableRow>
-                        <TableCell sx={{ bgcolor: 'white', height: '28.25em', borderRadius: '0 0 5px 5px' }} colSpan={columnsEmployees.length} align="center">
+                        <TableCell
+                          sx={{ height: "32em", borderRadius: "5px 5px 0 0" }}
+                          colSpan={columnsEmployees.length}
+                          align="center"
+                        >
                           <Typography
                             sx={{
                               textAlign: "center",
@@ -654,91 +883,96 @@ function EvaluateEmployee() {
                               padding: "25px",
                             }}
                           >
-                            There are currently no data in this table</Typography>
+                            There are currently no data in this table
+                          </Typography>
                         </TableCell>
                       </TableRow>
                     </TableBody>
                   )}
-
                 </Table>
               </TableContainer>
             </Grid>
           </Box>
         )}
         {/* Pagination */}
-        < div
-          className="rounded-b-lg mt-2 border-gray-200 px-4 py-2 ml-9"
-          style={{
-            position: "absolute", // Change to relative to keep it in place
-            bottom: 45,
-            left: '21.5%',
-            transform: "translateX(-50%)",
-            display: "flex",
-            alignItems: "center",
-            ml: '4em'
-          }}
-        >
-          <ol className="flex justify-end gap-1 text-xs font-medium">
-            <li>
-              <a
-                href="#"
-                className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180"
-                onClick={handlePrevPage}
-              >
-                <span className="sr-only">Prev Page</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-3 w-3"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </a>
-            </li>
-
-            {Array.from({ length: endPageGroup - startPageGroup + 1 }, (_, index) => (
-              <li key={startPageGroup + index}>
+        {!openForm && (
+          <div
+            className="rounded-b-lg mt-1 border-gray-200 px-4 py-2 ml-4"
+            style={{
+              position: "relative", // Change to relative to keep it in place
+              // bottom: 45,
+              // left: '21.5%',
+              // transform: "translateX(-50%)",
+              display: "flex",
+              alignItems: "center",
+              // ml: '4em'
+            }}
+          >
+            <ol className="flex justify-end gap-1 text-xs font-medium">
+              <li>
                 <a
                   href="#"
-                  className={`block h-8 w-8 rounded border ${currentPage === startPageGroup + index
-                    ? "border-pink-900 bg-pink-900 text-white"
-                    : "border-gray-100 bg-white text-gray-900"
-                    } text-center leading-8`}
-                  onClick={() => handlePageChange(startPageGroup + index)}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180"
+                  onClick={handlePrevPage}
                 >
-                  {startPageGroup + index}
+                  <span className="sr-only">Prev Page</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-3 w-3"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
                 </a>
               </li>
-            ))}
 
-            <li>
-              <a
-                href="#"
-                className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180"
-                onClick={handleNextPage}
-              >
-                <span className="sr-only">Next Page</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-3 w-3"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
+              {Array.from(
+                { length: endPageGroup - startPageGroup + 1 },
+                (_, index) => (
+                  <li key={startPageGroup + index}>
+                    <a
+                      href="#"
+                      className={`block h-8 w-8 rounded border ${currentPage === startPageGroup + index
+                          ? "border-pink-900 bg-pink-900 text-white"
+                          : "border-gray-100 bg-white text-gray-900"
+                        } text-center leading-8`}
+                      onClick={() => handlePageChange(startPageGroup + index)}
+                    >
+                      {startPageGroup + index}
+                    </a>
+                  </li>
+                )
+              )}
+
+              <li>
+                <a
+                  href="#"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded border border-gray-100 bg-white text-gray-900 rtl:rotate-180"
+                  onClick={handleNextPage}
                 >
-                  <path
-                    fillRule="evenodd"
-                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </a>
-            </li>
-          </ol>
-        </div>
+                  <span className="sr-only">Next Page</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-3 w-3"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </a>
+              </li>
+            </ol>
+          </div>
+        )}
       </Animated>
 
       <Modal

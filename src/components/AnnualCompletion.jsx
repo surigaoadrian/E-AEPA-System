@@ -1,50 +1,62 @@
-import React, { useEffect, useState } from 'react';
-import Typography from '@mui/material/Typography';
+import React, { useEffect, useState } from "react";
+import Typography from "@mui/material/Typography";
+import { apiUrl } from "../config/config";
 
 const AnnualCompletion = () => {
-    const [count, setCount] = useState(0);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const [count, setCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const fetchCompletedCount = async () => {
-            try {
-                const response = await fetch('http://localhost:8080/evaluation/annualStatus');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                console.log('Fetched Annual data:', data);
+  useEffect(() => {
+    const fetchCompletedCount = async () => {
+      try {
+        const response = await fetch(`${apiUrl}evaluation/annualCompleted`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log("Fetched Annual data:", data);
 
-                if (data.completed === undefined) {
-                    throw new Error('Unexpected Annual data format');
-                }
+        if (data.completed === undefined) {
+          throw new Error("Unexpected Annual data format");
+        }
 
-                setCount(data.completed);
-            } catch (error) {
-                console.error('Error fetching the count:', error);
-                setError(error.message);
-            } finally {
-                setLoading(false);
-            }
-        };
+        setCount(data.completed);
+      } catch (error) {
+        console.error("Error fetching the count:", error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-        fetchCompletedCount();
-    }, []);
+    fetchCompletedCount();
+  }, []);
 
-    if (loading) {
-        return <Typography variant="body2" color="textSecondary">Loading...</Typography>;
-    }
-
-    if (error) {
-        return <Typography variant="body2" color="error">{error}</Typography>;
-    }
-
+  if (loading) {
     return (
-        <Typography variant="h3" sx={{ fontFamily: 'Poppins', color: '#121212', fontWeight: 'bold' }}>
-            {count}
-        </Typography>
+      <Typography variant="body2" color="textSecondary">
+        Loading...
+      </Typography>
     );
+  }
+
+  if (error) {
+    return (
+      <Typography variant="body2" color="error">
+        {error}
+      </Typography>
+    );
+  }
+
+  return (
+    <Typography
+      variant="h3"
+      sx={{ fontFamily: "Poppins", color: "#121212", fontWeight: "bold" }}
+    >
+      {count}
+    </Typography>
+  );
 };
 
 export default AnnualCompletion;

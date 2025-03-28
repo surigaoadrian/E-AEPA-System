@@ -5,6 +5,7 @@ import logo from "../assets/e-AEPA-logo.png";
 import ResetPassForm from "../components/ResetPassForm";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { apiUrl } from '../config/config';
 
 function ResetPasswordPage() {
   const [newPassword, setNewPassword] = useState("");
@@ -56,7 +57,7 @@ function ResetPasswordPage() {
       params.append("newPassword", newPassword);
 
       const response = await axios.post(
-        "http://localhost:8080/auth/resetPassword",
+        `${apiUrl}auth/resetPassword`,
         params.toString(),
         {
           headers: {

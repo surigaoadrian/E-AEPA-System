@@ -18,35 +18,61 @@ function SideBar() {
     setFilteredSideBarData(filteredData);
   }, []);
 
-  console.log(filteredSideBarData);
-
   const sidebarStyles = {
     height: "92vh",
     width: "229px",
     backgroundColor: "#FFFFFF",
     paddingTop: "10px",
     borderTop: "3px solid #F8C702",
-    overflowY: "auto", 
+    overflowY: "auto",
   };
 
   return (
     <div>
       <div style={sidebarStyles}>
-        {filteredSideBarData.map((item, index) => {
-          return (
-            <div key={index} style={{ paddingTop: "5px", fontSize: "15px" }}>
-              <div id="linkStyle">
-                <NavLink className="nav-link" to={item.path}>
-                  <span style={{ marginRight: "15px" }}>{item.icon}</span>
-                  <span style={{ margin: item.margin }}>{item.title}</span>
-                </NavLink>
-              </div>
-            </div>
-          );
-        })}
+        {filteredSideBarData.map((item, index) => (
+          <div key={index} style={{ paddingTop: "5px", fontSize: "15px" }}>
+            {/* Check if item has subItems */}
+            {item.subItems ? (
+  <>
+    {/* Render the parent item without NavLink */}
+    <div id="linkStyle">
+      <span className="nav-title">
+        <span style={{ marginRight: "18px" }}>{item.icon}</span>
+        <span style={{ margin: item.margin }}>{item.title}</span>
+      </span>
+    </div>
+
+    {/* Render sub-items immediately, no dropdown */}
+    <div style={{ paddingLeft: "2px", marginTop: "5px" }}>
+      {item.subItems.map((subItem, subIndex) => (
+        <NavLink
+          key={subIndex}
+          className="dropdown-subitem nav-link"
+          to={subItem.path}
+          activeClassName="active"
+        >
+          <span style={{ marginRight: "15px" }}>{subItem.icon}</span>
+          <span style={{ margin: item.margin }}>{subItem.title}</span>
+        </NavLink>
+      ))}
+    </div>
+  </>
+) : (
+  // Render regular items without subItems
+  <div id="linkStyle">
+    <NavLink className="nav-link" to={item.path}>
+      <span style={{ marginRight: "15px" }}>{item.icon}</span>
+      <span style={{ margin: item.margin }}>{item.title}</span>
+    </NavLink>
+  </div>
+)}
+          </div>
+        ))}
       </div>
     </div>
   );
 }
 
 export default SideBar;
+

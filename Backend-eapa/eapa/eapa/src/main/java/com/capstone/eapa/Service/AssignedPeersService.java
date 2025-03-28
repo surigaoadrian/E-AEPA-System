@@ -1,16 +1,20 @@
 package com.capstone.eapa.Service;
 
+import com.capstone.eapa.DTO.AsssignedEvaluatorStatusDTO;
 import com.capstone.eapa.DTO.EvaluatorAssignmentDTO;
 import com.capstone.eapa.Entity.AssignedPeerEvaluators;
 import com.capstone.eapa.Entity.AssignedPeersEntity;
 import com.capstone.eapa.Entity.UserEntity;
+import com.capstone.eapa.Repository.AssignedPeerEvaluatorsRepository;
 import com.capstone.eapa.Repository.AssignedPeersRepository;
 import com.capstone.eapa.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -18,6 +22,10 @@ import java.util.stream.Collectors;
 public class AssignedPeersService {
     @Autowired
     AssignedPeersRepository apRepo;
+
+    //ANGELA
+    @Autowired 
+    AssignedPeerEvaluatorsRepository apeRepo;
 
     @Autowired
     UserRepository userRepo;
@@ -104,4 +112,148 @@ public class AssignedPeersService {
     public List<Integer> getEvaluatorIdsByAssignedPeersId(int assignedPeersId) {
         return apRepo.findEvaluatorIdsByAssignedPeersId(assignedPeersId);
     }
+
+    //update evaluator
+//    public void updateAssignedEvaluators(int assignPeerId, List<Integer> evaluatorIds) {
+//        Optional<AssignedPeersEntity> optionalAssignedPeers = apRepo.findById(assignPeerId);
+//        if (optionalAssignedPeers.isPresent()) {
+//            AssignedPeersEntity assignedPeers = optionalAssignedPeers.get();
+//
+//            // Clear current evaluators
+//            assignedPeers.getEvaluators().clear();
+//
+//            // Add new evaluators based on provided IDs
+//            for (Integer evaluatorId : evaluatorIds) {
+//                Optional<UserEntity> evaluator = userRepo.findById(evaluatorId);
+//                if (evaluator.isPresent()) {
+//                    AssignedPeerEvaluators assignedPeerEvaluators = new AssignedPeerEvaluators();
+//                    assignedPeerEvaluators.setAssignedPeers(assignedPeers);
+//                    assignedPeerEvaluators.setEvaluator(evaluator.get());
+//                    assignedPeerEvaluators.setStatus("PENDING"); // or some default status
+//                    assignedPeers.getEvaluators().add(assignedPeerEvaluators);
+//                } else {
+//                    throw new RuntimeException("User not found with id: " + evaluatorId);
+//                }
+//            }
+//            apRepo.save(assignedPeers);
+//        } else {
+//            throw new RuntimeException("Assigned peers not found with id: " + assignPeerId);
+//        }
+//    }
+
+    //adi new update evaluator
+    public void updateAssignedEvaluators(int assignPeerId, List<Integer> evaluatorIds) {
+        Optional<AssignedPeersEntity> optionalAssignedPeers = apRepo.findById(assignPeerId);
+        if (optionalAssignedPeers.isPresent()) {
+            AssignedPeersEntity assignedPeers = optionalAssignedPeers.get();
+
+            // Get current evaluators
+            List<AssignedPeerEvaluators> currentEvaluators = assignedPeers.getEvaluators();
+
+            // Determine evaluators to remove and keep
+            List<AssignedPeerEvaluators> toRemove = currentEvaluators.stream()
+                    .filter(evaluator -> !evaluatorIds.contains(evaluator.getEvaluator().getUserID()))
+                    .collect(Collectors.toList());
+
+            // Remove evaluators not in the new list
+            assignedPeers.getEvaluators().removeAll(toRemove);
+
+            // Add new evaluators that are not already present
+            for (Integer evaluatorId : evaluatorIds) {
+                boolean exists = currentEvaluators.stream()
+                        .anyMatch(evaluator -> evaluator.getEvaluator().getUserID() == evaluatorId);
+
+                if (!exists) {
+                    Optional<UserEntity> evaluator = userRepo.findById(evaluatorId);
+                    if (evaluator.isPresent()) {
+                        AssignedPeerEvaluators newEvaluator = new AssignedPeerEvaluators();
+                        newEvaluator.setAssignedPeers(assignedPeers);
+                        newEvaluator.setEvaluator(evaluator.get());
+                        newEvaluator.setStatus("PENDING"); // Default status for new evaluators
+                        assignedPeers.getEvaluators().add(newEvaluator);
+                    } else {
+                        throw new RuntimeException("User not found with id: " + evaluatorId);
+                    }
+                }
+            }
+
+            // Save changes
+            apRepo.save(assignedPeers);
+        } else {
+            throw new RuntimeException("Assigned peers not found with id: " + assignPeerId);
+        }
+    }
+
+
+    //ANGELA 
+    public Map<Integer, String> getOverallStatus() {
+        List<AssignedPeerEvaluators> evaluations = apeRepo.findAll();
+        Map<Integer, String> overallStatusMap = new HashMap<>();
+    
+        // Group evaluations by evaluatee_id
+        Map<Integer, List<AssignedPeerEvaluators>> groupedEvaluations = new HashMap<>();
+        for (AssignedPeerEvaluators evaluation : evaluations) {
+            int evaluateeId = evaluation.getAssignedPeers().getEvaluatee().getUserID();
+            groupedEvaluations
+                .computeIfAbsent(evaluateeId, k -> new ArrayList<>())
+                .add(evaluation);
+        }
+    
+        // Determine overall status for each evaluatee_id
+        for (Map.Entry<Integer, List<AssignedPeerEvaluators>> entry : groupedEvaluations.entrySet()) {
+            int evaluateeId = entry.getKey();
+            List<AssignedPeerEvaluators> evals = entry.getValue();
+    
+            boolean allCompleted = true;
+    
+            for (AssignedPeerEvaluators eval : evals) {
+                if (!"COMPLETED".equals(eval.getStatus())) {
+                    allCompleted = false;
+                    break; // Stop checking if a pending status is found
+                }
+            }
+    
+            overallStatusMap.put(evaluateeId, allCompleted ? "COMPLETED" : "PENDING");
+        }
+    
+        return overallStatusMap;
+    }
+
+    public boolean isAssignedPeersIdPresentAnnual(String period, int evaluateeId, String schoolYear, String semester) {
+        Integer id = apRepo.findIdByPeriodAndEvaluateeIdAndSchoolYearAndSemester(period, evaluateeId, schoolYear, semester);
+        return id != null;
+    }
+
+    //get statuses for evaluators
+//    public List<EvaluatorAssignmentDTO> getEvaluateeAssignmentsByEvaluators(List<Integer> evaluatorIds) {
+//        List<AssignedPeersEntity> assignedPeersList = apRepo.findAll();
+//        List<EvaluatorAssignmentDTO> evaluatorAssignments = new ArrayList<>();
+//
+//        for (AssignedPeersEntity assignedPeers : assignedPeersList) {
+//            for (AssignedPeerEvaluators evaluator : assignedPeers.getEvaluators()) {
+//                if (evaluatorIds.contains(evaluator.getEvaluator().getUserID()) ) {
+//                    EvaluatorAssignmentDTO dto = new EvaluatorAssignmentDTO(
+//                            assignedPeers.getId(),
+//                            assignedPeers.getDateAssigned(),
+//                            assignedPeers.getPeriod(),
+//                            assignedPeers.getEvaluatee().getUserID(),
+//                            evaluator.getEvaluator().getUserID(),
+//                            evaluator.getStatus()
+//                    );
+//                    evaluatorAssignments.add(dto);
+//                }
+//            }
+//        }
+//
+//        return evaluatorAssignments;
+//    }
+    public List<AsssignedEvaluatorStatusDTO> getEvaluatorIdsAndStatusesByAssignedPeersId(int assignedPeersId) {
+        List<AssignedPeerEvaluators> evaluators = apeRepo.findByAssignedPeersId(assignedPeersId);
+        return evaluators.stream()
+                .map(e -> new AsssignedEvaluatorStatusDTO(e.getEvaluator().getUserID(), e.getStatus()))
+                .collect(Collectors.toList());
+    }
+
+
+
 }

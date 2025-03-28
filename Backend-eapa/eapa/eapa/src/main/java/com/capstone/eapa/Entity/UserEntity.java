@@ -1,10 +1,10 @@
 package com.capstone.eapa.Entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.sql.Blob;
 import java.util.Collection;
@@ -42,7 +42,7 @@ public class UserEntity implements UserDetails {
     private String dateHired;
     @Column(name = "Date Started")
     private String dateStarted;
-    @JsonIgnore
+    //@JsonIgnore
     @Lob
     @Column(name = "Profile Picture", columnDefinition = "LONGBLOB")
     private byte[] profilePic;
@@ -56,10 +56,44 @@ public class UserEntity implements UserDetails {
 //    private boolean isProbationary;
     @Column(name = "Probationary Status")
     private String probeStatus;
-    
+
+    // mao ni sa is3rd
+    private boolean is3rdEvalComplete= false;
+
+    private boolean is5thEvalComplete= false;
+
+
     private int isDeleted = 0;
 
     public UserEntity() {
+    }
+
+    @Override
+    public String toString() {
+        return "UserEntity{" +
+                "userID=" + userID +
+                ", fName='" + fName + '\'' +
+                ", lName='" + lName + '\'' +
+                ", dept='" + dept + '\'' +
+                ", position='" + position + '\'' +
+                ", empStatus='" + empStatus + '\'' +
+                '}';
+    }
+
+    public boolean getIs3rdEvalComplete() {
+        return is3rdEvalComplete;
+    }
+
+    public boolean getIs5thEvalComplete() {
+        return is5thEvalComplete;
+    }
+
+    public void setIs3rdEvalComplete(boolean is3rdEvalComplete) {
+        this.is3rdEvalComplete = is3rdEvalComplete;
+    }
+
+    public void setIs5thEvalComplete(boolean is5thEvalComplete) {
+        this.is5thEvalComplete = is5thEvalComplete;
     }
 
     public int getUserID() {
@@ -256,6 +290,8 @@ public class UserEntity implements UserDetails {
     public void setImageFormat(String imageFormat) {
         this.imageFormat = imageFormat;
     }
+
+
 
     
 }

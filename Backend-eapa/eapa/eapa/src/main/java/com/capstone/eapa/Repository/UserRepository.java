@@ -38,11 +38,28 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
     long countTotalEmployees();
 
     //count Regular Employees
-    @Query("SELECT COUNT(u) FROM UserEntity u WHERE u.empStatus = 'Regular'")
-    long countRegularEmployees();
+//    @Query("SELECT COUNT(u) FROM UserEntity u WHERE u.empStatus = 'Regular'")
+//    long countRegularEmployees();
 
 
     @Query("SELECT u.userID FROM UserEntity u WHERE u.role = 'HEAD' AND u.dept = :dept AND u.isDeleted = 0")
     Integer findHeadUserIdByDept(@Param("dept") String dept);
+
+    //dashboard adi
+    @Query("SELECT COUNT(u) FROM UserEntity u WHERE u.probeStatus = '3rd Probationary' AND u.isDeleted = 0")
+    Integer countThirdMonthEmployees();
+    @Query("SELECT COUNT(u) FROM UserEntity u WHERE u.probeStatus = '5th Probationary' AND u.isDeleted = 0")
+    Integer countFifthMonthEmployees();
+    @Query("SELECT COUNT(u) FROM UserEntity u WHERE u.empStatus = 'Regular' AND u.isDeleted = 0")
+    Integer countRegularEmployees();
+
+    //fetch all 3rd month employees
+    List<UserEntity> findAllByProbeStatusAndIsDeleted(String probeStatus, int isDeleted);
+
+    @Query("SELECT COUNT(u) FROM UserEntity u WHERE u.probeStatus = :probeStatus AND u.dept = :dept AND u.isDeleted = 0")
+    int countByProbeStatusAndDept(@Param("probeStatus") String probeStatus, @Param("dept") String dept);
+
+    @Query("SELECT COUNT(u) FROM UserEntity u WHERE u.empStatus = :empStatus AND u.dept = :dept AND u.isDeleted = 0")
+    int countByEmpStatusAndDept(@Param("empStatus") String empStatus, @Param("dept") String dept);
 
 }

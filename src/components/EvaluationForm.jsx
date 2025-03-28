@@ -10,6 +10,10 @@ import Typography from "@mui/material/Typography";
 import ConfirmationModal from "./ConfirmationModal";
 import ReactRouterPrompt from "react-router-prompt";
 import LeaveConfirmationModal from "../modals/LeaveConfirmationModal";
+import { apiUrl } from "../config/config";
+import Loader from "./Loader";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faMinus } from "@fortawesome/free-solid-svg-icons";
 
 function EvaluationForm({
   stage,
@@ -20,7 +24,13 @@ function EvaluationForm({
   setEvalType,
   selectedEmp,
   selectedAssignedPeerId,
-  randomPeerId,
+  evalID,
+  handleRenderFlag,
+  annualFirstSemId,
+  annualSecondSemId,
+  setTakeEval,
+  schoolYear,
+  semester,
 }) {
   const [questions, setQuestions] = useState([]);
   const [responses, setResponses] = useState([]);
@@ -35,6 +45,10 @@ function EvaluationForm({
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
+  const [indices, setIndices] = useState([1, 2, 3, 4, 5]);
+
+  const [isValidationModalOpen, setIsValidationModalOpen] = useState(false);
+
   const stageType = stage;
   const evalPeriod = period;
   const formType = evalType;
@@ -45,7 +59,7 @@ function EvaluationForm({
   let hasRenderedFillHeading = false;
 
   const formContainer = {
-    height: "80vh",
+    height: "74vh",
     width: "100%",
     borderRadius: "10px",
     backgroundColor: "white",
@@ -60,7 +74,7 @@ function EvaluationForm({
   };
 
   const formContent = {
-    height: "68vh",
+    height: "62vh",
     overflow: "auto",
     paddingRight: "10px",
   };
@@ -107,6 +121,32 @@ function EvaluationForm({
     "Consistently exceeds expectations.",
   ];
 
+  const handleAddMoreJobResp = () => {
+    if (indices.length < 15) {
+      setIndices((prev) => [...prev, prev.length + 1]);
+    } else {
+      alert("Maximum of 15 responsibilities reached");
+    }
+  };
+
+  const handleMinusJobResp = () => {
+    if (indices.length > 5) {
+      setIndices((prev) => prev.slice(0, -1));
+    } else {
+      alert("Minimum of 5 textareas required");
+    }
+  };
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const hasUnsavedChanges = responses.length > 0 || jobResponses.length > 0;
 
   const openModal = () => {
@@ -118,13 +158,65 @@ function EvaluationForm({
   };
 
   //empty the peer when evaluation is open
-  useEffect(() => {
-    if (setOpenForm) {
-      setPeer({});
-    }
-  }, [setOpenForm]);
+  // useEffect(() => {
+  //   if (setOpenForm) {
+  //     setPeer({});
+  //   }
+  // }, [setOpenForm]);
 
-  //fetch id from random
+  const [randomPID, setrandomPID] = useState();
+
+  //fetch peer id
+  useEffect(() => {
+    if (evaluationID) {
+      const fetchPeerID = async () => {
+        try {
+          const response = await axios.get(`${apiUrl}evaluation/getPeerID`, {
+            params: {
+              evalID: evaluationID,
+            },
+          });
+          console.log("Fetched Peer ID:", response.data);
+          setrandomPID(response.data);
+        } catch (error) {
+          if (error.response) {
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          } else {
+            console.log(`Error: ${error.message}`);
+          }
+        }
+      };
+
+      fetchPeerID();
+    }
+  }, [evaluationID]);
+
+  //fetch random peer details
+  useEffect(() => {
+    if (randomPID) {
+      const fetchRandomPeer = async () => {
+        try {
+          const response = await axios.get(
+            `${apiUrl}user/getUser/${randomPID}`
+          );
+          console.log("Peer data:", response.data); // Debugging log
+          setPeer(response.data);
+        } catch (error) {
+          if (error.response) {
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          } else {
+            console.log(`Error: ${error.message}`);
+          }
+        }
+      };
+
+      fetchRandomPeer();
+    }
+  }, [randomPID]);
 
   //fetch id from assigned peer table
   const [assignPeerID, setAssignPeerID] = useState(null);
@@ -135,7 +227,7 @@ function EvaluationForm({
       const fetchAssignPeerID = async () => {
         try {
           const response = await axios.get(
-            "http://localhost:8080/assignedPeers/getAssignedPeersId",
+            `${apiUrl}assignedPeers/getAssignedPeersId`,
             {
               params: {
                 period: evalPeriod,
@@ -166,7 +258,7 @@ function EvaluationForm({
       const fetchAssignEvalutaorsID = async () => {
         try {
           const response = await axios.get(
-            "http://localhost:8080/assignedPeers/getAssignedEvaluatorId",
+            `${apiUrl}assignedPeers/getAssignedEvaluatorId`,
             {
               params: {
                 evaluatorId: userId,
@@ -197,21 +289,17 @@ function EvaluationForm({
       let response = null;
       try {
         if (evalType === "PEER") {
-          response = await axios.get(
-            "http://localhost:8080/evaluation/getEvalIDAssignedPeer",
-            {
-              params: {
-                userID: userId,
-                period: evalPeriod,
-                stage: stageType,
-                evalType: formType,
-                peerID: randomPeerId,
-              },
-            }
-          );
+          response = await axios.get(`${apiUrl}evaluation/getEvalID`, {
+            params: {
+              userID: userId,
+              period: evalPeriod,
+              stage: stageType,
+              evalType: formType,
+            },
+          });
         } else if (evalType === "PEER-A") {
           response = await axios.get(
-            "http://localhost:8080/evaluation/getEvalIDAssignedPeer",
+            `${apiUrl}evaluation/getEvalIDAssignedPeer`,
             {
               params: {
                 userID: userId,
@@ -223,33 +311,27 @@ function EvaluationForm({
             }
           );
         } else if (evalType === "SELF") {
-          response = await axios.get(
-            "http://localhost:8080/evaluation/getEvalID",
-            {
-              params: {
-                userID: userId,
-                period: evalPeriod,
-                stage: stageType,
-                evalType: formType,
-              },
-            }
-          );
+          response = await axios.get(`${apiUrl}evaluation/getEvalID`, {
+            params: {
+              userID: userId,
+              period: evalPeriod,
+              stage: stageType,
+              evalType: formType,
+            },
+          });
         } else if (evalType === "HEAD") {
-          response = await axios.get(
-            "http://localhost:8080/evaluation/getEvalIDHead",
-            {
-              params: {
-                userID: userId,
-                empID: selectedEmp.userID,
-                period: evalPeriod,
-                stage: stageType,
-                evalType: formType,
-              },
-            }
-          );
+          response = await axios.get(`${apiUrl}evaluation/getEvalIDHead`, {
+            params: {
+              userID: userId,
+              empID: selectedEmp.userID,
+              period: evalPeriod,
+              stage: stageType,
+              evalType: formType,
+            },
+          });
         }
 
-        console.log(response.data);
+        console.log("check: ", response.data);
         setEvaluationID(response.data);
       } catch (error) {
         if (error.response) {
@@ -267,13 +349,15 @@ function EvaluationForm({
     return () => clearInterval(intervalId); // Cleanup on unmount
   }, [userId, evalPeriod, stageType]);
 
+  console.log("EVALUATION IDDDD:" + evaluationID);
+
   //fetch selected emp job responses
   useEffect(() => {
     if (selectedEmp && selectedEmp.userID) {
       const fetchJobResp = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:8080/jobbasedresponse/getAllResponsesByID/${selectedEmp.userID}`
+            `${apiUrl}jobbasedresponse/getAllResponsesByID/${selectedEmp.userID}`
           );
           const jobResponsesWithScores = response.data.map((resp, index) => ({
             index,
@@ -316,7 +400,7 @@ function EvaluationForm({
       const fetchAssignedPeer = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:8080/user/getUser/${selectedAssignedPeerId}`
+            `${apiUrl}user/getUser/${selectedAssignedPeerId}`
           );
           setAssignedPeer(response.data);
         } catch (error) {
@@ -334,38 +418,11 @@ function EvaluationForm({
     }
   }, [selectedAssignedPeerId, evalType === "PEER-A"]);
 
-  //fetch peer details if peer is selected
-  useEffect(() => {
-    if (evalType === "PEER") {
-      const fetchRandomPeer = async () => {
-        try {
-          const response = await axios.get(
-            `http://localhost:8080/user/getUser/${randomPeerId}`
-          );
-
-          setPeer(response.data);
-        } catch (error) {
-          if (error.response) {
-            console.log(error.response.data);
-            console.log(error.response.status);
-            console.log(error.response.headers);
-          } else {
-            console.log(`Error: ${error.message}`);
-          }
-        }
-      };
-
-      fetchRandomPeer();
-    }
-  }, [evalType]);
-
   //fetch all questions
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8080/question/getAllQuestions"
-        );
+        const response = await axios.get(`${apiUrl}question/getAllQuestions`);
         setQuestions(response.data);
       } catch (error) {
         if (error.response) {
@@ -519,8 +576,30 @@ function EvaluationForm({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     openModal();
   };
+
+  const formatDate = (date) => {
+    return new Intl.DateTimeFormat("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    }).format(date);
+  };
+
+  // Example usage:
+  const currentDate = formatDate(new Date());
+
+  const evalTypeResult =
+    evalType === "SELF" ? "Self Evaluation" : "Peer Evaluation";
+  const stageResult = stageType === "VALUES" ? "Values-based" : "Job-based";
+  const periodResult =
+    period === "3rd Month"
+      ? "3rd Month Probation"
+      : period === "5th Month"
+      ? "5th Month Probation"
+      : "Annual Evaluation";
 
   //submit
   const handleConfirmSubmit = async () => {
@@ -546,6 +625,7 @@ function EvaluationForm({
       let updateEval = null;
       let updateEvaluatorStatus = null;
       let createResults = null;
+      let updateAnnualEvalStatus = null;
 
       console.log("Stage:", stage);
       console.log("EvalType:", evalType);
@@ -553,12 +633,12 @@ function EvaluationForm({
 
       if (stage === "VALUES" && evalType === "PEER-A") {
         response = await axios.post(
-          "http://localhost:8080/response/createResponses",
+          `${apiUrl}response/createResponses`,
           responses
         );
 
         updateEval = await axios.patch(
-          `http://localhost:8080/evaluation/updateEvaluation/${evaluationID}`,
+          `${apiUrl}evaluation/updateEvaluation/${evaluationID}`,
           peerAEvalPayload,
           {
             headers: {
@@ -569,7 +649,7 @@ function EvaluationForm({
 
         if (assignEvaluatorID) {
           updateEvaluatorStatus = await axios.patch(
-            `http://localhost:8080/assignedPeers/updateEvaluatorStatus/${assignEvaluatorID}`,
+            `${apiUrl}assignedPeers/updateEvaluatorStatus/${assignEvaluatorID}`,
             assignPeerEvalPayload,
             {
               headers: {
@@ -582,12 +662,12 @@ function EvaluationForm({
         }
       } else if (stage === "VALUES" && evalType === "PEER") {
         response = await axios.post(
-          "http://localhost:8080/response/createResponses",
+          `${apiUrl}response/createResponses`,
           responses
         );
 
         updateEval = await axios.patch(
-          `http://localhost:8080/evaluation/updateEvaluation/${evaluationID}`,
+          `${apiUrl}evaluation/updateEvaluation/${evaluationID}`,
           peerEvalPayload,
           {
             headers: {
@@ -597,7 +677,7 @@ function EvaluationForm({
         );
 
         createResults = await axios.post(
-          `http://localhost:8080/results/calculateResults?evaluationID=${evaluationID}`,
+          `${apiUrl}results/calculateResults?evaluationID=${evaluationID}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -606,12 +686,12 @@ function EvaluationForm({
         );
       } else if (stage === "VALUES" && evalType === "HEAD") {
         response = await axios.post(
-          "http://localhost:8080/response/createResponses",
+          `${apiUrl}response/createResponses`,
           responses
         );
 
         updateEval = await axios.patch(
-          `http://localhost:8080/evaluation/updateEvaluation/${evaluationID}`,
+          `${apiUrl}evaluation/updateEvaluation/${evaluationID}`,
           evalPayload,
           {
             headers: {
@@ -621,7 +701,7 @@ function EvaluationForm({
         );
 
         createResults = await axios.post(
-          `http://localhost:8080/results/calculateResults?evaluationID=${evaluationID}`,
+          `${apiUrl}results/calculateResults?evaluationID=${evaluationID}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -630,12 +710,12 @@ function EvaluationForm({
         );
       } else if (stage === "VALUES") {
         response = await axios.post(
-          "http://localhost:8080/response/createResponses",
+          `${apiUrl}response/createResponses`,
           responses
         );
 
         updateEval = await axios.patch(
-          `http://localhost:8080/evaluation/updateEvaluation/${evaluationID}`,
+          `${apiUrl}evaluation/updateEvaluation/${evaluationID}`,
           evalPayload,
           {
             headers: {
@@ -645,7 +725,7 @@ function EvaluationForm({
         );
 
         createResults = await axios.post(
-          `http://localhost:8080/results/calculateResults?evaluationID=${evaluationID}`,
+          `${apiUrl}results/calculateResults?evaluationID=${evaluationID}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -661,12 +741,12 @@ function EvaluationForm({
         }));
 
         response = await axios.post(
-          "http://localhost:8080/jobbasedresponse/createResponses",
+          `${apiUrl}jobbasedresponse/createResponses`,
           responsesToSubmit
         );
 
         updateEval = await axios.patch(
-          `http://localhost:8080/evaluation/updateEvaluation/${evaluationID}`,
+          `${apiUrl}evaluation/updateEvaluation/${evaluationID}`,
           evalPayload,
           {
             headers: {
@@ -676,7 +756,7 @@ function EvaluationForm({
         );
 
         createResults = await axios.post(
-          `http://localhost:8080/results/calculateJobResults?evaluationID=${evaluationID}`,
+          `${apiUrl}results/calculateJobResults?evaluationID=${evaluationID}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -687,13 +767,13 @@ function EvaluationForm({
         console.log("Job Responses:", jobResponses);
 
         response = await axios.post(
-          "http://localhost:8080/jobbasedresponse/createResponses",
+          `${apiUrl}jobbasedresponse/createResponses`,
           jobResponses
         );
 
         console.log("Eval Payload:", evalPayload);
         updateEval = await axios.patch(
-          `http://localhost:8080/evaluation/updateEvaluation/${evaluationID}`,
+          `${apiUrl}evaluation/updateEvaluation/${evaluationID}`,
           evalPayload,
           {
             headers: {
@@ -703,7 +783,7 @@ function EvaluationForm({
         );
 
         createResults = await axios.post(
-          `http://localhost:8080/results/calculateJobResults?evaluationID=${evaluationID}`,
+          `${apiUrl}results/calculateJobResults?evaluationID=${evaluationID}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -715,12 +795,39 @@ function EvaluationForm({
       // Ensure response is not null before accessing its data
       if (response && response.data) {
         console.log("Responses submitted successfully:", response.data);
+
+        const evalLogsPayLoad = {
+          user: { userID: loggedUser.userID },
+          evalType: evalTypeResult,
+          stage: stageResult,
+          period: periodResult,
+          dateTaken: currentDate,
+          schoolYear: schoolYear,
+          semester: semester,
+        };
+
+        try {
+          const evalLogsResponse = await axios.post(
+            `${apiUrl}evaluationLogs/createEvalLogs`,
+            evalLogsPayLoad,
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+        } catch (error) {
+          console.error("Error creating evaluation logs:", error);
+        }
+
         localStorage.removeItem("responses");
         localStorage.removeItem("jobResponses");
         setResponses([]);
         setOpenForm(false);
-        setEvalType("");
+        setTakeEval(true);
+        //setEvalType("");
         setEvaluationID(0);
+        handleRenderFlag();
       } else {
         console.error("No response data received.");
       }
@@ -732,6 +839,10 @@ function EvaluationForm({
   const filteredQuestions = questions.filter(
     (ques) => ques.evalType === formType || ques.kind === "RADIO"
   );
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   return (
     <div style={formContainer}>
@@ -797,14 +908,20 @@ function EvaluationForm({
       </ReactRouterPrompt>
       <div style={formHeader}>
         <h2 style={{ fontSize: "18px", fontWeight: 600 }}>
-          {period} Evaluation:{" "}
+          {period === "Annual-1st" ? (
+            "Annual Evaluation (First Semester):"
+          ) : period === "Annual-2nd" ? (
+            "Annual Evaluation (Second Semester):"
+          ) : (
+            <span>{period} Evaluation: </span>
+          )}
           {stageType === "VALUES"
             ? evalType === "PEER" || evalType === "PEER-A"
-              ? "Values-Based Performance Assessment (Peer)"
+              ? " Values-Based Performance Assessment (Peer)"
               : evalType === "HEAD"
-              ? "Values-Based Performance Assessment (Employee)"
-              : "Values-Based Performance Assessment"
-            : "Job-Based Performance Assessment"}
+              ? " Values-Based Performance Assessment (Employee)"
+              : " Values-Based Performance Assessment"
+            : " Job-Based Performance Assessment"}
         </h2>
       </div>
       <div style={formContent}>
@@ -955,17 +1072,59 @@ function EvaluationForm({
                       <React.Fragment key={index}>
                         <h2
                           style={{
-                            fontWeight: "500",
+                            fontWeight: "600",
                             margin: "15px 0px 15px 0px",
                           }}
                         >
-                          {formType === "PEER"
-                            ? "Suggestions / Insights for the Co-Worker"
-                            : "Personal Insights / Perspectives on my performance:"}
+                          Personal Insights / Perspectives on my performance:
                         </h2>
+
                         <div>
                           <label htmlFor={ques.quesID}>{ques.quesText}</label>
                           <textarea
+                            required
+                            id={ques.quesID}
+                            style={{
+                              margin: "8px 0px 5px 0px",
+                              height: "100px",
+                              width: "100%",
+                              border: "1px solid black",
+                              borderRadius: "5px",
+                              padding: "5px",
+                              boxSizing: "border-box",
+                              overflow: "hidden",
+                              resize: "none",
+                            }}
+                            onChange={(e) =>
+                              handleTextareaChange(ques.quesID, e.target.value)
+                            }
+                          ></textarea>
+                        </div>
+                      </React.Fragment>
+                    );
+                  }
+
+                  if (
+                    formType === "PEER-A" &&
+                    ques.kind === "FILL" &&
+                    !hasRenderedFillHeading
+                  ) {
+                    hasRenderedFillHeading = true;
+                    return (
+                      <React.Fragment key={index}>
+                        <h2
+                          style={{
+                            fontWeight: "600",
+                            margin: "15px 0px 15px 0px",
+                          }}
+                        >
+                          Suggestions / Insights for the Co-Worker
+                        </h2>
+
+                        <div>
+                          <label htmlFor={ques.quesID}>{ques.quesText}</label>
+                          <textarea
+                            required
                             id={ques.quesID}
                             style={{
                               margin: "8px 0px 5px 0px",
@@ -1021,6 +1180,7 @@ function EvaluationForm({
                             }}
                           >
                             <input
+                              required
                               type="radio"
                               id={`ques-${index}-opt-${value}`}
                               name={`question-${index}`}
@@ -1043,6 +1203,7 @@ function EvaluationForm({
                         <div key={index}>
                           <label htmlFor={ques.quesID}>{ques.quesText}</label>
                           <textarea
+                            required
                             id={ques.quesID}
                             style={{
                               margin: "8px 0px 15px 0px",
@@ -1076,7 +1237,7 @@ function EvaluationForm({
                   style={{
                     marginBottom: "10px",
                     display: "flex",
-                    height: "30px",
+                    minHeight: "30px",
                     alignItems: "center",
                     backgroundColor: "#1E1E1E",
                     color: "white",
@@ -1110,8 +1271,9 @@ function EvaluationForm({
                   </p>
                 </div>
               </div>
-              {evalType === "HEAD"
-                ? /** Job-based Questions for HEAD */
+              {evalType === "HEAD" ? (
+                /** Job-based Questions for HEAD */
+                selectedEmpJobResp && selectedEmpJobResp.length > 0 ? (
                   selectedEmpJobResp.map((resp, index) => (
                     <div key={index}>
                       <label htmlFor={index}>{index + 1}.</label>
@@ -1175,6 +1337,7 @@ function EvaluationForm({
                               onChange={(e) =>
                                 handleHeadJobScoreChange(index, e.target.value)
                               }
+                              required
                             >
                               <MenuItem value={1}>1</MenuItem>
                               <MenuItem value={2}>2</MenuItem>
@@ -1187,93 +1350,189 @@ function EvaluationForm({
                       </div>
                     </div>
                   ))
-                : /** Job-based Questions for other evalTypes */
-                  [1, 2, 3, 4, 5].map((i) => (
-                    <div key={i}>
-                      <label htmlFor={i}>{i}.</label>
+                ) : (
+                  <div>
+                    <p
+                      style={{
+                        color: "#636E72",
+                        textAlign: "center",
+                        padding: "25px 0px 25px 0px",
+                      }}
+                    >
+                      Employee did not answer the evaluation yet.
+                    </p>
+                  </div>
+                )
+              ) : (
+                /** Job-based Questions for other evalTypes */
+
+                indices.map((i) => (
+                  <div key={i}>
+                    <label htmlFor={i}>{i}.</label>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: "10px",
+                      }}
+                    >
+                      <textarea
+                        id={i}
+                        style={{
+                          margin: "8px 0px 15px 0px",
+                          height: "100px",
+                          width: "100%",
+                          border: "1px solid black",
+                          borderRadius: "5px",
+                          padding: "5px",
+                          boxSizing: "border-box",
+                          overflow: "hidden",
+                          resize: "none",
+                        }}
+                        required
+                        onChange={(e) =>
+                          handleJobTextareaChange(i, e.target.value)
+                        }
+                      ></textarea>
+
                       <div
                         style={{
+                          width: "10%",
+                          height: "100px",
                           display: "flex",
+                          flexDirection: "column",
                           alignItems: "center",
-                          marginBottom: "10px",
+                          justifyContent: "center",
                         }}
                       >
-                        <textarea
-                          id={i}
-                          style={{
-                            margin: "8px 0px 15px 0px",
-                            height: "100px",
-                            width: "100%",
-                            border: "1px solid black",
-                            borderRadius: "5px",
-                            padding: "5px",
-                            boxSizing: "border-box",
-                            overflow: "hidden",
-                            resize: "none",
-                          }}
-                          onChange={(e) =>
-                            handleJobTextareaChange(i, e.target.value)
-                          }
-                        ></textarea>
-
                         <div
                           style={{
-                            width: "10%",
-                            height: "100px",
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            justifyContent: "center",
+                            backgroundColor: "#8C383E",
+                            border: "1px solid black",
+                            borderTopRightRadius: "3px",
+                            borderTopLeftRadius: "3px",
+
+                            color: "white",
+                            padding: "5px",
+                            fontSize: "14px",
+                            height: "30px",
+                            width: "75px",
+                            textAlign: "center",
                           }}
                         >
-                          <div
-                            style={{
-                              backgroundColor: "#8C383E",
-                              border: "1px solid black",
-                              borderTopRightRadius: "3px",
-                              borderTopLeftRadius: "3px",
-
-                              color: "white",
-                              padding: "5px",
-                              fontSize: "14px",
-                              height: "30px",
-                              width: "75px",
-                              textAlign: "center",
-                            }}
-                          >
-                            Ratings:
-                          </div>
-
-                          <FormControl sx={{ width: "75px" }}>
-                            <Select
-                              labelId="demo-simple-select-label"
-                              id="demo-simple-select"
-                              value={scores[i] || ""}
-                              onChange={(e) =>
-                                handleJobScoreChange(i, e.target.value)
-                              }
-                            >
-                              <MenuItem value={1}>1</MenuItem>
-                              <MenuItem value={2}>2</MenuItem>
-                              <MenuItem value={3}>3</MenuItem>
-                              <MenuItem value={4}>4</MenuItem>
-                              <MenuItem value={5}>5</MenuItem>
-                            </Select>
-                          </FormControl>
+                          Ratings:
                         </div>
+
+                        <FormControl sx={{ width: "75px" }}>
+                          <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={scores[i] || ""}
+                            onChange={(e) =>
+                              handleJobScoreChange(i, e.target.value)
+                            }
+                            required
+                          >
+                            <MenuItem value={1}>1</MenuItem>
+                            <MenuItem value={2}>2</MenuItem>
+                            <MenuItem value={3}>3</MenuItem>
+                            <MenuItem value={4}>4</MenuItem>
+                            <MenuItem value={5}>5</MenuItem>
+                          </Select>
+                        </FormControl>
                       </div>
                     </div>
-                  ))}
+                  </div>
+                ))
+              )}
             </>
           )}
 
-          <div
+          {stageType === "JOB" && evalType !== "HEAD" && (
+            <div
+              style={{
+                //backgroundColor: "tomato",
+                height: "5vh",
+                width: "100%",
+                marginBottom: "20px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <div
+                style={{
+                  width: "12%",
+                  display: "flex",
+                  justifyContent:
+                    indices.length > 5 && indices.length < 15
+                      ? "space-between"
+                      : "center",
+                }}
+              >
+                {indices.length == 15 ? null : (
+                  <Button
+                    sx={{
+                      width: "5%",
+                      height: "30px",
+                      fontFamily: "poppins",
+                      color: "#8C383E",
+                      border: "2px solid #8C383E",
+                      "&:hover": {
+                        backgroundColor: "#ffebee",
+                        color: "#7C2828",
+                        border: "2px solid #7C2828",
+                      },
+                    }}
+                    variant="outlined"
+                    onClick={handleAddMoreJobResp}
+                  >
+                    <FontAwesomeIcon
+                      icon={faPlus}
+                      style={{
+                        fontSize: "15px",
+                      }}
+                    />
+                  </Button>
+                )}
+
+                {indices.length > 5 ? (
+                  <Button
+                    sx={{
+                      width: "5%",
+                      height: "30px",
+                      fontFamily: "poppins",
+                      color: "#8C383E",
+                      border: "2px solid #8C383E",
+                      "&:hover": {
+                        backgroundColor: "#ffebee",
+                        color: "#7C2828",
+                        border: "2px solid #7C2828",
+                      },
+                    }}
+                    variant="outlined"
+                    onClick={handleMinusJobResp}
+                  >
+                    <FontAwesomeIcon
+                      icon={faMinus}
+                      style={{
+                        fontSize: "15px",
+                      }}
+                    />
+                  </Button>
+                ) : null}
+              </div>
+            </div>
+          )}
+
+          {/* <div
             style={{
               display: "flex",
               justifyContent: "flex-end",
               margin: "10px 0px 10px 0px",
             }}
           >
+            
             <Button
               type="submit"
               sx={{
@@ -1289,7 +1548,37 @@ function EvaluationForm({
             >
               Finish
             </Button>
-          </div>
+          </div> */}
+
+          {evalType === "HEAD" &&
+          selectedEmpJobResp.length === 0 &&
+          stageType === "JOB" ? null : (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                margin: "10px 0px 10px 0px",
+              }}
+            >
+              <Button
+                type="submit"
+                sx={{
+                  marginTop: marginTopValueHead,
+                  width: "8%",
+                  backgroundColor: "#8C383E",
+                  "&:hover": {
+                    backgroundColor: "#7C2828",
+                  },
+                  fontFamily: "poppins",
+                }}
+                variant="contained"
+              >
+                Finish
+              </Button>
+            </div>
+          )}
+
+          {console.log("SELECTED EMP JOB RESP: ", selectedEmpJobResp)}
         </form>
       </div>
       <ConfirmationModal

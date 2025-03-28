@@ -1,24 +1,15 @@
 package com.capstone.eapa.Controller;
 
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.capstone.eapa.Entity.DepartmentEntity;
 import com.capstone.eapa.Service.DepartmentService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import java.util.List;
 
+import java.util.List;
+import java.util.NoSuchElementException;
 
 
 @RestController
@@ -50,14 +41,36 @@ public class DepartmentController {
 		}
 	}
 
-    @PutMapping("/updateDept/{adminId}/")
+    @PatchMapping("/updateDept/{adminId}")
 	public DepartmentEntity updateDept(@PathVariable int adminId,@RequestParam int deptID, @RequestBody DepartmentEntity newDept) {
 		return departmentServ.updateDepartment(adminId,deptID, newDept);
 	}
+
 	
 	@DeleteMapping("/deleteDept/{adminId}/{id}")
 	public String deleteDept(@PathVariable int adminId,@PathVariable int id) {
 		return departmentServ.deleteDepartment(adminId,id);
+	}
+
+	@GetMapping("/getAllDeptNames")
+	public List<String> getAllDeptNames() {
+		return departmentServ.getAllDepartmentNames();
+	}
+
+	//update dept office head
+
+	@PatchMapping("/{id}/office-head")
+	public ResponseEntity<String> updateDepartmentOfficeHead(
+			@PathVariable("id") int deptId,
+			@RequestParam("newOfficeHead") String fullName) {
+		try {
+			departmentServ.updateDeptOfficeHead(deptId, fullName);
+			return ResponseEntity.ok("Department office head updated successfully.");
+		} catch (NoSuchElementException e) {
+			return ResponseEntity.status(404).body("Department not found.");
+		} catch (Exception e) {
+			return ResponseEntity.status(500).body("An error occurred: " + e.getMessage());
+		}
 	}
     
 }
